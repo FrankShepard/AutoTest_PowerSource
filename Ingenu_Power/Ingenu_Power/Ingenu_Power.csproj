@@ -93,6 +93,9 @@
     <Compile Include="Domain\SampleMessageDialog.xaml.cs">
       <DependentUpon>SampleMessageDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\ucFeatureChoose.xaml.cs">
+      <DependentUpon>ucFeatureChoose.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\ucLogin.xaml.cs">
       <DependentUpon>ucLogin.xaml</DependentUpon>
     </Compile>
@@ -142,6 +145,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ucFeatureChoose.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

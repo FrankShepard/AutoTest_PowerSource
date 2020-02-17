@@ -26,26 +26,35 @@ namespace Ingenu_Power
 
         #region -- 使用到的用户控件窗口
 
+        object obj_user_control;
+
         /// <summary>
         /// 用户登录窗口界面
         /// </summary>
-        UserControls.UcLogin ucLogin = new UserControls.UcLogin();
+        //UserControls.UcLogin ucLogin = new UserControls.UcLogin();
 
 
         #endregion
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!Properties.Settings.Default.AutoLogin) {
-                ucLogin.Name = "NewLogin";
-                ucLogin.Margin = new Thickness( 0, 0, 0, 0 );
-                if (Properties.Settings.Default.RememberPassWord) {
-                    ucLogin.ChkRememberPassword.IsChecked = true;
-                    ucLogin.UserName.Text = Properties.Settings.Default.UserName;
-                    ucLogin.FloatingPasswordBox.Password = Properties.Settings.Default.PassWord;
-                }
-                GrdMain.Children.Add( ucLogin );
-            }            
+            //if (!Properties.Settings.Default.AutoLogin) {
+            //    UserControls.UcLogin ucLogin = new UserControls.UcLogin();
+            //    ucLogin.Name = "NewLogin";
+            //    ucLogin.Margin = new Thickness( 0, 0, 0, 0 );
+            //    if (Properties.Settings.Default.RememberPassWord) {
+            //        ucLogin.ChkRememberPassword.IsChecked = true;
+            //        ucLogin.UserName.Text = Properties.Settings.Default.UserName;
+            //        ucLogin.FloatingPasswordBox.Password = Properties.Settings.Default.PassWord;
+            //    }
+            //    obj_user_control = ucLogin;
+            //    GrdMain.Children.Add( ( UserControls.UcLogin ) obj_user_control );
+            //}
+
+            UserControls.UcFeatureChoose ucFeatureChoose = new UserControls.UcFeatureChoose();
+            ucFeatureChoose.Margin = new Thickness( 0, 0, 0, 0 );
+            obj_user_control = ucFeatureChoose;
+            GrdMain.Children.Add( ( UserControls.UcFeatureChoose ) obj_user_control );
         }
     }
 }

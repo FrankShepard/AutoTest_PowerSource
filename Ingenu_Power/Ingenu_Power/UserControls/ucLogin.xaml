@@ -83,8 +83,8 @@
                 </StackPanel>
             </materialDesign:Card>
 
-            <Grid Height="50" VerticalAlignment="Top" HorizontalAlignment="Center" Width="140" Margin="294,330,293,0">
-                <Button IsDefault="True" Name="BtnLogin" Click="BtnLogin_Click"
+            <Grid Height="50" VerticalAlignment="Top" HorizontalAlignment="Center" Width="140" Margin="294,330,293,0">                
+                <Button IsDefault="True" Name="BtnLogin" Click="BtnLogin_Click"                        
                         FontSize="25"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}"
                         Height="Auto" 

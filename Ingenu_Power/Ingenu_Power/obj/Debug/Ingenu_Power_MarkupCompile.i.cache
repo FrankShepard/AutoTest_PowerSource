@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\Administrator\Desktop\过年任务\测试系统\综合测试\上位机控制软件\NewTest\Ingenu_Power\Ingenu_Power\obj\Debug\
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\Debug\
 Ingenu_Power
 none
 false
 DEBUG;TRACE
-C:\Users\Administrator\Desktop\过年任务\测试系统\综合测试\上位机控制软件\NewTest\Ingenu_Power\Ingenu_Power\App.xaml
-3-1089055631
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\App.xaml
+4-1661388561
 
-13897373937
-15-188825464
-Domain\SampleMessageDialog.xaml;MainWindow.xaml;UserControls\ucLogin.xaml;
+14689856329
+15-2019580126
+Domain\SampleMessageDialog.xaml;MainWindow.xaml;UserControls\ucFeatureChoose.xaml;UserControls\ucLogin.xaml;
 resources\spcstart.png
 False
 

@@ -9,12 +9,14 @@
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
-        TextElement.FontSize="14"     
-        Title="盈帜电源测试系统" Height="474" MinHeight="474" MaxHeight="711" Width="734" MinWidth="734" MaxWidth="1100" HorizontalAlignment="Center" VerticalAlignment="Center" 
+        TextElement.FontSize="14"         
+        Title="盈帜电源测试系统" Height="474" MinHeight="474"  Width="734" MinWidth="734" HorizontalAlignment="Center" VerticalAlignment="Center" MaxHeight="711" MaxWidth="1100" 
         WindowStartupLocation="CenterScreen" ToolTip="用于盈帜电源系列产品的自动测试" Topmost="True" VerticalContentAlignment="Center" WindowStyle="ThreeDBorderWindow" Loaded="Window_Loaded" >
-    <Grid Name="GrdMain">
-        <Grid.Background>
-            <ImageBrush ImageSource="Resources/BackGroundImage.png"/>
-        </Grid.Background>
-    </Grid>
+    <materialDesign:DialogHost Identifier="RootDialog" >
+        <Grid Name="GrdMain">
+            <Grid.Background>
+                <ImageBrush ImageSource="Resources/BackGroundImage.png"/>
+            </Grid.Background>
+        </Grid>
+    </materialDesign:DialogHost>
 </Window>
