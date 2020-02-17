@@ -1,0 +1,20 @@
+﻿<Window x:Class="Ingenu_Power.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:domain="clr-namespace:Ingenu_Power.Domain"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"     
+        Title="盈帜电源测试系统" Height="474" MinHeight="474" MaxHeight="711" Width="734" MinWidth="734" MaxWidth="1100" HorizontalAlignment="Center" VerticalAlignment="Center" 
+        WindowStartupLocation="CenterScreen" ToolTip="用于盈帜电源系列产品的自动测试" Topmost="True" VerticalContentAlignment="Center" WindowStyle="ThreeDBorderWindow" Loaded="Window_Loaded" >
+    <Grid Name="GrdMain">
+        <Grid.Background>
+            <ImageBrush ImageSource="Resources/BackGroundImage.png"/>
+        </Grid.Background>
+    </Grid>
+</Window>
