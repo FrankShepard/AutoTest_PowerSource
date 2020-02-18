@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/spcstart.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/owl.ico")]
 
 

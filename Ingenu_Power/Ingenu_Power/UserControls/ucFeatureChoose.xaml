@@ -7,23 +7,33 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Ingenu_Power.Domain"
              mc:Ignorable="d" 
-             d:DesignHeight="443" d:DesignWidth="726">
-    <Grid Margin="10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" RenderTransformOrigin="0,0" AutomationProperties.IsRowHeader="True" Grid.IsSharedSizeScope="True">
-            <Button Name="BtnMeasureFeature"  materialDesign:ButtonAssist.CornerRadius="15" Width="240" Height="250" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="54,61,59,0" Click="Btn_Click">
-                <materialDesign:PackIcon Kind="ScaleBalance" Height="200" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Button>
-            <Label  Content="产品测试" FontSize="40" Margin="50,322,53,41" FontStyle="Italic" FontWeight="Bold"  HorizontalAlignment="Center" HorizontalContentAlignment="Center" Width="250" Height="65" />
-        </Grid>
-        <Grid Grid.Column="1" RenderTransformOrigin="0,0" AutomationProperties.IsRowHeader="True" Grid.IsSharedSizeScope="True">
-            <Button Name="BtnQueryFeature"  materialDesign:ButtonAssist.CornerRadius="15" Width="240" Height="250" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="54,61,59,0"  Click="Btn_Click">
-                <materialDesign:PackIcon Kind="Magnify" Height="200" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Button>
-            <Label  Content="数据查询" FontSize="40" Margin="44,322,59,41" FontStyle="Italic" FontWeight="Bold"   HorizontalAlignment="Center" HorizontalContentAlignment="Center" Width="250" Height="65"/>
-        </Grid>
-    </Grid>
+             d:DesignHeight="440" d:DesignWidth="720" >
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<!-- note you only need bring in these extra resource dictionaries when using non-default styles, so only bring them into your controls where the default style is not what you want -->
+				<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Label.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<Grid Margin="15">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+		<Grid Grid.Column="0" RenderTransformOrigin="0,0" AutomationProperties.IsRowHeader="True" Grid.IsSharedSizeScope="True">
+			<Button Name="BtnMeasureFeature"  materialDesign:ButtonAssist.CornerRadius="15" Width="240" Height="250" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="54,61,59,0" Click="Btn_Click">
+				<materialDesign:PackIcon Kind="ScaleBalance" Height="200" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			</Button>
+			<Label  Content="产品测试" FontSize="40" Margin="52,322,56,26"  FontWeight="Bold"  HorizontalAlignment="Center" HorizontalContentAlignment="Center" Width="240" />
+		</Grid>
+		<Grid Grid.Column="1" RenderTransformOrigin="0,0" AutomationProperties.IsRowHeader="True" Grid.IsSharedSizeScope="True">
+			<Button Name="BtnQueryFeature"  materialDesign:ButtonAssist.CornerRadius="15" Width="240" Height="250" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="54,61,59,0"  Click="Btn_Click">
+				<materialDesign:PackIcon Kind="Magnify" Height="200" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			</Button>
+			<Label  Content="数据查询" FontSize="40" Margin="52,322,56,27" FontWeight="Bold"   HorizontalAlignment="Center" HorizontalContentAlignment="Center" Width="240"/>
+		</Grid>
+	</Grid>
 </UserControl>

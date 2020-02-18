@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Ingenu_Power.Domain;
 
 namespace Ingenu_Power.UserControls
 {
@@ -26,30 +27,6 @@ namespace Ingenu_Power.UserControls
         }
 
         /// <summary>
-        /// 下次需要显示的界面的类型
-        /// </summary>
-        public enum NextWindow : int
-        {
-            /// <summary>
-            /// 下次需要显示的界面保持不变
-            /// </summary>
-            NextWindow_Now = 0,
-            /// <summary>
-            /// 下次需要显示的界面是产品测试界面
-            /// </summary>
-            NextWindow_Measure,
-            /// <summary>
-            /// 下次需要显示的界面是数据查询界面
-            /// </summary>
-            NextWindow_QueryData,
-        } ;
-
-        /// <summary>
-        /// 默认的点击按键之后需要显示的界面是产品测试界面
-        /// </summary>
-        public NextWindow nextWindow = NextWindow.NextWindow_Now;
-
-        /// <summary>
         /// 按键按下决定后续执行的动作是数据查询还是电源的测试过程
         /// </summary>
         /// <param name="sender"></param>
@@ -58,10 +35,11 @@ namespace Ingenu_Power.UserControls
         {
             Button button = sender as Button;
             if (button == BtnMeasureFeature) {
-                nextWindow = NextWindow.NextWindow_Measure;
+				StaticInfor.nextWindow = StaticInfor.NextWindow.NextWindow_Measure;
             } else if(button == BtnQueryFeature){
-                nextWindow = NextWindow.NextWindow_QueryData;
+				StaticInfor.nextWindow = StaticInfor.NextWindow.NextWindow_QueryData;
             }
-        }
-    }
+			this.Visibility = Visibility.Hidden;
+		}
+	}
 }

@@ -27,25 +27,10 @@ namespace Ingenu_Power.UserControls
             InitializeComponent();          
         }
 
-        /// <summary>
-        /// 检查用户名与密码是否有效
-        /// </summary>
-        /// <param name="message">需要显示的信息</param>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void MessageTips( string message,  object sender, RoutedEventArgs e)
-        {
-            var sampleMessageDialog = new SampleMessageDialog
-            {
-                Message = { Text = message }
-            };
-
-            await DialogHost.Show( sampleMessageDialog, "RootDialog" );
-        }
-
         private void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
-            MessageTips( "请正确填写用户名", sender, e );
+			SampleMessageDialog sampleMessageDialog = new SampleMessageDialog();
+			sampleMessageDialog.MessageTips( "请正确填写用户名" );
         }
     }
 }
