@@ -23,6 +23,8 @@ namespace Ingenu_Power
         public MainWindow()
         {
             InitializeComponent();
+			//首要任务是先进行数据库的连接，保证用户可以正常登陆
+
         }
 		
 		#region -- 使用到的用户控件对象
@@ -41,24 +43,30 @@ namespace Ingenu_Power
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-			if (!Properties.Settings.Default.AutoLogin) {
-				ucLogin.Name = "NewLogin";
-				ucLogin.Margin = new Thickness( 0, 0, 0, 0 );
-				if (Properties.Settings.Default.RememberPassWord) {
-					ucLogin.ChkRememberPassword.IsChecked = true;
-					ucLogin.UserName.Text = Properties.Settings.Default.UserName;
-					ucLogin.FloatingPasswordBox.Password = Properties.Settings.Default.PassWord;
-				}
-				GrdMain.Children.Add( ucLogin );
-				//绑定控件显示状态的事件
-				ucLogin.IsVisibleChanged += new DependencyPropertyChangedEventHandler( this.Window_NextShow );
-			} else {
-				ucFeatureChoose.Name = "NewFeatureChoose";
-				ucFeatureChoose.Margin = new Thickness( 0, 0, 0, 0 );
-				GrdMain.Children.Add( ucFeatureChoose );
-				//绑定控件显示状态的事件
-				ucFeatureChoose.IsVisibleChanged += new DependencyPropertyChangedEventHandler( this.Window_NextShow );
-			}
+
+			//	ucLogin.Name = "NewLogin";
+			//	ucLogin.Margin = new Thickness( 0, 0, 0, 0 );
+			//	if (Properties.Settings.Default.RememberPassWord) {
+			//		ucLogin.ChkRememberPassword.IsChecked = true;
+			//		ucLogin.TxtUserName.Text = Properties.Settings.Default.UserName[0];
+			//		ucLogin.FloatingPasswordBox.Password = Properties.Settings.Default.PassWord[0];
+			//	}
+			//	GrdMain.Children.Add( ucLogin );
+			//	//绑定控件显示状态的事件
+			//	ucLogin.IsVisibleChanged += new DependencyPropertyChangedEventHandler( this.Window_NextShow );
+			////} else {
+			////	ucFeatureChoose.Name = "NewFeatureChoose";
+			////	ucFeatureChoose.Margin = new Thickness( 0, 0, 0, 0 );
+			////	GrdMain.Children.Add( ucFeatureChoose );
+			////	//绑定控件显示状态的事件
+			////	ucFeatureChoose.IsVisibleChanged += new DependencyPropertyChangedEventHandler( this.Window_NextShow );
+			////}
+
+			UserControls.UcDatabaseLogin ucDatabaseLogin = new UserControls.UcDatabaseLogin();
+			ucDatabaseLogin.Name = "NewLogin";
+			ucDatabaseLogin.Margin = new Thickness( 0, 0, 0, 0 );
+			
+			GrdMain.Children.Add( ucDatabaseLogin );			
 		}
 
 		private void Window_NextShow(object sender, DependencyPropertyChangedEventArgs e)
@@ -72,5 +80,69 @@ namespace Ingenu_Power
 				GrdMain.Children.Remove( ucFeatureChoose );
 			}
 		}
-    }
+
+		/// <summary>
+		/// 显示版本信息
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnInfor_Click(object sender, RoutedEventArgs e)
+		{
+			SampleMessageDialog sampleMessageDialog = new SampleMessageDialog();
+			sampleMessageDialog.MessageTips( "电源自动测试系统 \r\n©北京盈帜新源科技有限公司\r\nVer1.0.0" );
+		}
+			   
+		/// <summary>
+		/// 菜单选择重新连接数据库
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnMenu_ConnectDatabase_Click(object sender, RoutedEventArgs e)
+		{			
+		}
+
+		/// <summary>
+		/// 菜单选择用户重新登录
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnMenu_Login_Click(object sender, RoutedEventArgs e)
+		{
+		}
+
+		/// <summary>
+		/// 菜单选择重新进行比较校验
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnMenu_InstumentValidate_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		/// <summary>
+		/// 打开菜单，在菜单打开之前，需要先检查逻辑，个别项不可以使能
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnMenuShow_Click(object sender, RoutedEventArgs e)
+		{
+			BtnMenu_InstumentValidate.IsEnabled = false;
+		}
+
+		private void BtnMenu_Measure_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void BtnMenu_DataQuery_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void BtnMenu_DataView_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+	}
 }

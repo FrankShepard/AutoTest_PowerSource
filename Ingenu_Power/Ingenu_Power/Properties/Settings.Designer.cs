@@ -25,10 +25,9 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string UserName {
+        public global::System.Collections.Specialized.StringCollection UserName {
             get {
-                return ((string)(this["UserName"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["UserName"]));
             }
             set {
                 this["UserName"] = value;
@@ -37,10 +36,9 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string PassWord {
+        public global::System.Collections.Specialized.StringCollection PassWord {
             get {
-                return ((string)(this["PassWord"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["PassWord"]));
             }
             set {
                 this["PassWord"] = value;
@@ -61,13 +59,37 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool AutoLogin {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SQL_Name {
             get {
-                return ((bool)(this["AutoLogin"]));
+                return ((string)(this["SQL_Name"]));
             }
             set {
-                this["AutoLogin"] = value;
+                this["SQL_Name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SQL_User {
+            get {
+                return ((string)(this["SQL_User"]));
+            }
+            set {
+                this["SQL_User"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SQL_Password {
+            get {
+                return ((string)(this["SQL_Password"]));
+            }
+            set {
+                this["SQL_Password"] = value;
             }
         }
     }

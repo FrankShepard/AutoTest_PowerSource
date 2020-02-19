@@ -33,7 +33,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -59,7 +59,28 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\owl.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Instrument_Control">
+      <HintPath>E:\测试项目\仪表程控\Instrument_Control\Instrument_Control\bin\Debug\Instrument_Control.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignColors, Version=1.2.2.920, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.1.2.2\lib\net45\MaterialDesignColors.dll</HintPath>
     </Reference>
@@ -92,6 +113,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Domain\Database.cs" />
+    <Compile Include="Domain\ResultMessageDialog.xaml.cs">
+      <DependentUpon>ResultMessageDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Domain\StaticInfor.cs" />
     <Compile Include="Domain\PowerSource_Measure.cs" />
     <Compile Include="Domain\SampleMessageDialog.xaml.cs">
@@ -99,6 +124,9 @@
     </Compile>
     <Compile Include="UserControls\ucFeatureChoose.xaml.cs">
       <DependentUpon>ucFeatureChoose.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ucDatabaseLogin.xaml.cs">
+      <DependentUpon>ucDatabaseLogin.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\ucLogin.xaml.cs">
       <DependentUpon>ucLogin.xaml</DependentUpon>
@@ -144,6 +172,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Domain\ResultMessageDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Domain\SampleMessageDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -155,6 +187,10 @@
     <Page Include="UserControls\ucFeatureChoose.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ucDatabaseLogin.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UserControls\ucLogin.xaml">
       <SubType>Designer</SubType>

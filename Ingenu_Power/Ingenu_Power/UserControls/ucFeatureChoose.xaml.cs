@@ -39,7 +39,7 @@ namespace Ingenu_Power.UserControls
             } else if(button == BtnQueryFeature){
 				StaticInfor.nextWindow = StaticInfor.NextWindow.NextWindow_QueryData;
             }
-			this.Visibility = Visibility.Hidden;
+			this.Visibility = Visibility.Collapsed;
 		}
 	}
 }
