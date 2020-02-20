@@ -71,12 +71,12 @@ namespace Ingenu_Power
 
 		private void Window_NextShow(object sender, DependencyPropertyChangedEventArgs e)
 		{
-			SampleMessageDialog sampleMessageDialog = new SampleMessageDialog();
+			ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
 			if (StaticInfor.nextWindow ==  StaticInfor.NextWindow.NextWindow_Measure) {				
-				sampleMessageDialog.MessageTips( "测试" );
+				sampleMessageDialog.MessageTips( "测试",false );
 				GrdMain.Children.Remove( ucFeatureChoose );
 			} else if (StaticInfor.nextWindow == StaticInfor.NextWindow.NextWindow_QueryData) {
-				sampleMessageDialog.MessageTips( "查询" );
+				sampleMessageDialog.MessageTips( "查询",false );
 				GrdMain.Children.Remove( ucFeatureChoose );
 			}
 		}
@@ -88,8 +88,8 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnInfor_Click(object sender, RoutedEventArgs e)
 		{
-			SampleMessageDialog sampleMessageDialog = new SampleMessageDialog();
-			sampleMessageDialog.MessageTips( "电源自动测试系统 \r\n©北京盈帜新源科技有限公司\r\nVer1.0.0" );
+			ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
+			sampleMessageDialog.MessageTips( "电源自动测试系统 \r\n©北京盈帜新源科技有限公司\r\nVer1.0.0",false );
 		}
 			   
 		/// <summary>
@@ -144,5 +144,6 @@ namespace Ingenu_Power
 		{
 
 		}
+
 	}
 }

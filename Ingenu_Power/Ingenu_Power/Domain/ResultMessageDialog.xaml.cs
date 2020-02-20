@@ -19,12 +19,15 @@ namespace Ingenu_Power.Domain
 		/// <param name="message">需要显示的信息</param>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		public async void MessageTips(string message)
+		public async void MessageTips(string message,bool cancel_showed)
 		{
 			TxtMessage.Text = message;
+			if (!cancel_showed) {
+				BtnCancel.Visibility = System.Windows.Visibility.Collapsed;
+				BtnSure.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
+			}
 			await DialogHost.Show( this, "RootDialog" );
 		}
-		public delegate void dlg_MessageTips(string message);
 
 		/// <summary>
 		/// 确定/取消按下的事件，按下后此控件需要隐藏

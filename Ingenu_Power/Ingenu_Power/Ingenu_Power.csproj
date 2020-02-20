@@ -119,9 +119,6 @@
     </Compile>
     <Compile Include="Domain\StaticInfor.cs" />
     <Compile Include="Domain\PowerSource_Measure.cs" />
-    <Compile Include="Domain\SampleMessageDialog.xaml.cs">
-      <DependentUpon>SampleMessageDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UserControls\ucFeatureChoose.xaml.cs">
       <DependentUpon>ucFeatureChoose.xaml</DependentUpon>
     </Compile>
@@ -175,10 +172,6 @@
     <Page Include="Domain\ResultMessageDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Domain\SampleMessageDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MainWindow.xaml">
       <SubType>Designer</SubType>

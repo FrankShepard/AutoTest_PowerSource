@@ -33,6 +33,8 @@ namespace Ingenu_Power.UserControls
 		/// </summary>
 		Thread trdSQL_Validation;
 
+		private delegate MessageBoxResult dlg_MessageBoxShow(string infor);
+
 		/// <summary>
 		/// 载入用户控件时所需要的逻辑 - 记住密码与自动登陆所需要的逻辑处理
 		/// </summary>
@@ -50,31 +52,48 @@ namespace Ingenu_Power.UserControls
 				StaticInfor.sQL_Information.SQL_User = TxtUserName.Text.Trim();
 				StaticInfor.sQL_Information.SQL_Password = FloatingPasswordBox.Password;
 
+				Func<StaticInfor.SQL_Information,string> func = V_ValidateSQL;
+				func.BeginInvoke( StaticInfor.sQL_Information, ValidateSQL_CallBack, func );
+
+				ResultMessageDialog resultMessageDialog = new ResultMessageDialog();
+				resultMessageDialog.MessageTips( result, false );
+
 				//工作线程中校验SQL状态是否正常
 				trdSQL_Validation = new Thread( () => V_ValidateSQL( StaticInfor.sQL_Information ) ) {
-					IsBackground = true
-				};
+					IsBackground = true					
+				};				
 				trdSQL_Validation.SetApartmentState( ApartmentState.STA );
 				trdSQL_Validation.Start();
 			} else {
-				SampleMessageDialog sampleMessageDialog = new SampleMessageDialog();
-				sampleMessageDialog.MessageTips( "请正确填写SQL使用到服务器IP、用户名和密码" );
+				ResultMessageDialog resultMessageDialog = new ResultMessageDialog();
+				resultMessageDialog.MessageTips( "请正确填写SQL使用到服务器IP、用户名和密码", false );
 			}
         }
+		string result = string.Empty;
+
+		private void ValidateSQL_CallBack(IAsyncResult func)
+		{
+			if(func == null) {
+				throw new ArgumentNullException( "fun" );
+			}
+			Func<StaticInfor.SQL_Information, string> dl = ( Func<StaticInfor.SQL_Information, string> )func.AsyncState;
+			result = dl.EndInvoke( func );			
+		}
 
 		/// <summary>
 		/// 数据库的校验程序 -- 工作于后台工作线程中
 		/// </summary>
 		/// <param name="information">服务器信息的集合体</param>        
-		private void V_ValidateSQL(StaticInfor.SQL_Information information)
+		private string V_ValidateSQL(StaticInfor.SQL_Information information)
 		{
 			string error_information = string.Empty;
 			using (Database database = new Database()) {
 				error_information = database.V_Initialize( information.SQL_Name, information.SQL_User, information.SQL_Password );
 			}
 			if (error_information != string.Empty) {
-				ResultMessageDialog resultMessageDialog = new ResultMessageDialog();
-				resultMessageDialog.Dispatcher.Invoke( new ResultMessageDialog.dlg_MessageTips( resultMessageDialog.MessageTips ), error_information );
+				//this.Dispatcher.Invoke( new dlg_MessageBoxShow( MessageBox.Show ), error_information );
+				//ResultMessageDialog resultMessageDialog = new ResultMessageDialog();
+				//this.Dispatcher.BeginInvoke( new ResultMessageDialog.dlg_MessageTips( resultMessageDialog.MessageTips ), error_information );
 			} else {
 				//更新SQL用户登信息
 				Properties.Settings.Default.SQL_Name = information.SQL_Name;
@@ -82,6 +101,7 @@ namespace Ingenu_Power.UserControls
 				Properties.Settings.Default.SQL_Password = information.SQL_Password;
 				Properties.Settings.Default.Save();
 			}
+			return error_information;
 		}
 	}
 }

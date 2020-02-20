@@ -66,13 +66,18 @@
 			<Grid Grid.Row="0">
 				<materialDesign:ColorZone Padding="1" materialDesign:ShadowAssist.ShadowDepth="Depth2" Mode="PrimaryMid" DockPanel.Dock="Top">
 					<Grid Height="24">
-						<Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}" HorizontalAlignment="Left" Height="24" Margin="0" Width="24" Name="BtnMenuShow" Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" Click="BtnMenuShow_Click" >
-							<materialDesign:PackIcon Kind="Settings" Margin="0" />
-						</Button>				
-						<Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnInfor" Click="BtnInfor_Click">
-							<materialDesign:PackIcon Kind="InformationOutline" Margin="0" />
-						</Button>
-					</Grid>
+							<Grid HorizontalAlignment="Left">
+								<Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}" HorizontalAlignment="Left" Height="24" Margin="0" Width="24" Name="BtnMenuShow" Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" Click="BtnMenuShow_Click" >
+									<materialDesign:PackIcon Kind="Settings" Margin="0" />
+								</Button>
+							</Grid>
+							<WrapPanel HorizontalAlignment="Right">
+								<materialDesign:PackIcon Kind="MessageTextOutline" Margin="0" Height="24" Width="24"/>
+								<Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnInfor" Click="BtnInfor_Click">
+									<materialDesign:PackIcon Kind="InformationVariant" Margin="0" />
+								</Button>
+							</WrapPanel>
+						</Grid>
 				</materialDesign:ColorZone>
 			</Grid>
 			<Grid Grid.Row="1" Name="GrdMain">

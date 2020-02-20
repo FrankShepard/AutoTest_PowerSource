@@ -59,16 +59,16 @@ namespace Ingenu_Power.UserControls
 
 				if (exist_user) {
 					if (FloatingPasswordBox.Password.Trim().ToUpper() == "RESET") { //用户忘记密码时的重置功能
-						SampleMessageDialog sampleMessageDialog = new SampleMessageDialog();
-						sampleMessageDialog.MessageTips( "重置用户密码？" );
+						ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
+						sampleMessageDialog.MessageTips( "重置用户密码？",true );
 						if (StaticInfor.messageBoxResult == MessageBoxResult.Yes) {
 							Properties.Settings.Default.PassWord.RemoveAt( index_of_user );
 							Properties.Settings.Default.PassWord.Insert( index_of_user, DefaultPassword );
 							Properties.Settings.Default.Save();
 						}
 					} else if (FloatingPasswordBox.Password.Trim() != Properties.Settings.Default.PassWord[ index_of_user ]) {
-						SampleMessageDialog sampleMessageDialog = new SampleMessageDialog();
-						sampleMessageDialog.MessageTips( "输入的密码错误，请重新输入密码" );
+						ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
+						sampleMessageDialog.MessageTips( "输入的密码错误，请重新输入密码",false );
 					}
 				} else {
 					if (Properties.Settings.Default.UserName == null) {
@@ -80,8 +80,8 @@ namespace Ingenu_Power.UserControls
 					Properties.Settings.Default.Save();
 				}
 			} else {
-				SampleMessageDialog sampleMessageDialog = new SampleMessageDialog();
-				sampleMessageDialog.MessageTips( "请正确填写用户名和密码" );
+				ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
+				sampleMessageDialog.MessageTips( "请正确填写用户名和密码",false );
 			}
         }
 

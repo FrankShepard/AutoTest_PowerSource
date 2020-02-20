@@ -5,6 +5,9 @@ using System.Threading;
 
 namespace Ingenu_Power.Domain
 {
+	/// <summary>
+	/// SQL数据库的操作，带返回可能存在异常信息的class
+	/// </summary>
 	public class Database : IDisposable
 	{
 		#region -- 数据库操作部分需要使用到的全局变量 
@@ -13,6 +16,8 @@ namespace Ingenu_Power.Domain
 		/// 执行连接数据库操作连接的全局变量声名；
 		/// </summary>
 		private SqlConnection objConnection;
+
+
 
 		#endregion
 
@@ -219,6 +224,11 @@ namespace Ingenu_Power.Domain
 		//}
 
 		//#endregion
+
+		#region --  回调函数功能
+
+		
+		#endregion
 
 		#region -- 垃圾回收机制 
 
