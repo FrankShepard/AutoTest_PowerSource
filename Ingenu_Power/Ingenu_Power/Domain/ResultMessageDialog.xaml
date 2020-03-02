@@ -13,7 +13,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 		<Grid Grid.Row="0">		
-	        <TextBlock x:Name="TxtMessage" Margin="6" FontSize="18" Grid.Row="0"/>
+	        <TextBlock x:Name="TxtMessage" Margin="6" FontSize="18" Grid.Row="0" MaxWidth="500"/>
 		</Grid>
 		<Grid Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="1">
 			<WrapPanel>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading;
@@ -15,9 +16,7 @@ namespace Ingenu_Power.Domain
 		/// <summary>
 		/// 执行连接数据库操作连接的全局变量声名；
 		/// </summary>
-		private SqlConnection objConnection;
-
-
+		private SqlConnection objConnection = new SqlConnection( "Data Source=" + Properties.Settings.Default.SQL_Name + ";Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + Properties.Settings.Default.SQL_User + ";Password=" + Properties.Settings.Default.SQL_Password );
 
 		#endregion
 
@@ -29,205 +28,184 @@ namespace Ingenu_Power.Domain
 		/// <param name="servername">SQL 数据库的服务器名称</param>
 		/// <param name="user_name">SQL用户名</param>
 		/// <param name="password">用户登录密码</param>
-		public string V_Initialize(string servername, string user_name, string password)
+		public bool V_Initialize(string servername, string user_name, string password,out string error_information)
 		{
-			string error_information = string.Empty;
-			objConnection = new SqlConnection( "Data Source=" + servername + ";Initial Catalog=盈帜产品程序;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
+			bool status = false;
+			error_information = string.Empty;
+			objConnection = new SqlConnection( "Data Source=" + servername + ";Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
 			/*以下验证SQL用户名与密码是否能够和SQL数据库正常通讯*/
 			try {
 				/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作-----可能的原因是另一台电脑正在调用数据库，需要等待*/
 				while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
 				objConnection.Open();
 				objConnection.Close();      //前面能打开则此处可以关闭   防止后续操作异常 
+				status = true;
 			} catch                               //'异常可能：数据库用户名或密码输入错误
 			  {
 				error_information = "数据库服务器连接异常，请检查数据库工作环境";
 				objConnection.Close();      //前面能打开则此处可以关闭   防止后续操作异常  
 			}
-			return error_information;
+			return status;
+		}
+
+		/// <summary>
+		/// 获取用户信息
+		/// </summary>
+		/// <param name="error_information"> 可能存在的错误信息</param>
+		/// <returns></returns>
+		public DataTable V_UserGet(out string error_information)
+		{			
+			error_information = string.Empty;
+			DataTable dtTarget = new DataTable();
+			dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[测试软件用户信息]", out error_information );			
+			return dtTarget;
 		}
 
 		#endregion
 
-		//#region -- 在数据库中查找是否存在待查询信息的数据
+		#region -- 在数据库中查找是否存在待查询信息的数据
 
-		///// <summary>
-		///// 在数据库中查询是否包含程序ID的数据
-		///// </summary>
-		///// <param name="infor">产品ID号或者产品型号信息</param>
-		///// <param name="queryType">查找的方式</param>
-		///// <returns>在数据库中查询数据是否存在的情况</returns>
-		//public string V_QueryInfor(string infor, MainWindow.QueryType queryType)
-		//{
-		//	string error_information = string.Empty;
-		//	/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作-----可能的原因是另一台电脑正在调用数据库，需要等待*/
-		//	while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
-		//	objConnection.Open();                  //使用ExecuteReader()方法前需要保证数据库连接
-		//	using (SqlCommand objCommand = objConnection.CreateCommand()) {
-		//		if (queryType == MainWindow.QueryType.QueryByID) {
-		//			objCommand.CommandText = "SELECT *  FROM [盈帜产品程序].[dbo].[盈帜产品程序信息] WHERE [文件编号ID] = '" + infor + "'";
-		//			using (SqlDataReader reader = objCommand.ExecuteReader()) {
-		//				if (!reader.Read()) { error_information = "数据库中缺少待测产品的数据信息，请核实数据库信息"; }
-		//				reader.Close();
-		//				objConnection.Close();             //关闭数据库连接    
-		//			}
-		//		} else if (queryType == MainWindow.QueryType.QueryByModel) {
-		//			//查询对应的产品   最多可能存在于30列中，关键词需要进行处理操作
-		//			int index = 0;
-		//			for (index = 0; index < 30; index++) {
-		//				if (index < 9) {
-		//					objCommand.CommandText = "SELECT *  FROM [盈帜产品程序].[dbo].[盈帜产品程序信息] WHERE [对应产品型号_0" + (index + 1).ToString() + "] LIKE '%" + infor + "%'";
-		//				} else {
-		//					objCommand.CommandText = "SELECT *  FROM [盈帜产品程序].[dbo].[盈帜产品程序信息] WHERE [对应产品型号_" + (index + 1).ToString() + "] LIKE '%" + infor + "%'";
-		//				}
-		//				using (SqlDataReader reader = objCommand.ExecuteReader()) {
-		//					if (reader.Read()) {
-		//						reader.Close();
-		//						break;
-		//					}
+		/// <summary>
+		/// 在数据库中查询相信息
+		/// </summary>
+		/// <param name="infor">查询的SQL语言</param>\
+		/// <param name="error_information" >可能存在的相关错误信息</param>
+		/// <returns>在数据库中查询数据是否存在的情况</returns>
+		public DataTable V_QueryInfor(string infor, out string error_information)
+		{
+			DataTable dtTarget = new DataTable();
+			error_information = string.Empty;
+			/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作-----可能的原因是另一台电脑正在调用数据库，需要等待*/
+			while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
+			
+			using (SqlCommand objCommand = objConnection.CreateCommand()) {
+				using (SqlDataAdapter objDataAdapter = new SqlDataAdapter()) {
+					objDataAdapter.SelectCommand = objCommand;
+					objDataAdapter.SelectCommand.Connection = objConnection;
+					objDataAdapter.SelectCommand.CommandType = CommandType.Text;
 
+					objCommand.CommandText = "SELECT *  FROM [盈帜电源].[dbo].[测试软件用户信息]";
 
-		//				}
-		//				Thread.Sleep( 1 );
-		//			}
+					objConnection.Open(); //使用ExecuteReader()方法前需要保证数据库连接
 
-		//			if (index >= 30) { error_information = "数据库中缺少待测产品的数据信息，请核实数据库信息"; }
-		//			objConnection.Close();             //关闭数据库连接    
-		//		}
-		//	}
-		//	return error_information;
-		//}
+					using (SqlDataReader reader = objCommand.ExecuteReader()) {
+						if (!reader.Read()) {
+							error_information = "数据库中缺少数据信息，请核实数据库信息";
+						} else {
+							objDataAdapter.Fill( dtTarget ); //将查询到的值通过DataAdapter写入到DataSet的"程序相关信息"表中
+						}
+						reader.Close();
+					}
+					objConnection.Close(); //关闭数据库连接
+				}
+			}
+			return dtTarget;
+		}
 
-		//#endregion
+		#endregion
 
-		//#region -- 从数据库中查询到所搜索信息的数据到DataTable中 
+		#region -- 从数据库中查询到所搜索信息的数据到DataTable中 
 
-		///// <summary>
-		///// 将数据库中匹配的数据填充到待执行操作的数据集中
-		///// </summary>
-		///// <param name="infor">待匹配程序的ID号或者对应的产品整机型号</param>
-		///// <param name="queryType">查找的方式</param>
-		///// <returns>返回数据库中查询到的数据集合</returns>
-		//public DataTable V_MatchDataInSQL(string infor, MainWindow.QueryType queryType)
-		//{
-		//	DataTable dtTarget = new DataTable();
+		/// <summary>
+		/// 将数据库中匹配的数据填充到待执行操作的数据集中
+		/// </summary>
+		/// <param name="infor">待匹配程序的ID号或者对应的产品整机型号</param>
+		/// <param name="queryType">查找的方式</param>
+		/// <returns>返回数据库中查询到的数据集合</returns>
+		public DataTable V_MatchDataInSQL(string infor)
+		{
+			DataTable dtTarget = new DataTable();
 
-		//	//声明数据库操作需要使用到的对象
-		//	using (SqlCommand objCommand = new SqlCommand()) {
-		//		using (SqlDataAdapter objDataAdapter = new SqlDataAdapter()) {
-		//			objDataAdapter.SelectCommand = objCommand;
-		//			objDataAdapter.SelectCommand.Connection = objConnection;
-		//			objDataAdapter.SelectCommand.CommandType = CommandType.Text;
+			//声明数据库操作需要使用到的对象
+			using (SqlCommand objCommand = new SqlCommand()) {
+				using (SqlDataAdapter objDataAdapter = new SqlDataAdapter()) {
+					objDataAdapter.SelectCommand = objCommand;
+					objDataAdapter.SelectCommand.Connection = objConnection;
+					objDataAdapter.SelectCommand.CommandType = CommandType.Text;
 
-		//			if (queryType == MainWindow.QueryType.QueryByID) {
-		//				//增加SQL指令,降序查找最近归档时间的文件信息
-		//				objDataAdapter.SelectCommand.CommandText = "SELECT * FROM [盈帜产品程序].[dbo].[盈帜产品程序信息] WHERE [文件编号ID] = '" + infor + "' ORDER BY [归档日期] DESC";
+					//增加SQL指令,降序查找最近归档时间的文件信息
+					objDataAdapter.SelectCommand.CommandText = "SELECT * FROM [盈帜电源].[dbo].[测试软件用户信息]";
 
-		//				//等待SQL数据库正常连接,防止其他程序正在执行与数据库的连接
-		//				while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
-		//				objConnection.Open();                  //使用ExecuteReader()方法前需要保证数据库连接
+					//等待SQL数据库正常连接,防止其他程序正在执行与数据库的连接
+					while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
+					objConnection.Open();                  //使用ExecuteReader()方法前需要保证数据库连接
 
-		//				//将查询到的值通过DataAdapter写入到DataSet的"程序相关信息"表中
-		//				objDataAdapter.Fill( dtTarget );
-		//			} else if (queryType == MainWindow.QueryType.QueryByModel) {
-		//				//等待SQL数据库正常连接,防止其他程序正在执行与数据库的连接
-		//				while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
-		//				objConnection.Open();                  //使用ExecuteReader()方法前需要保证数据库连接
+					//将查询到的值通过DataAdapter写入到DataSet的"程序相关信息"表中
+					objDataAdapter.Fill( dtTarget );
+				}
+			}
+			return dtTarget;
+		}
 
-		//				//查询对应的产品   最多可能存在于30列中，关键词需要进行处理操作
-		//				int index = 0;
-		//				for (index = 0; index < 30; index++) {
-		//					if (index < 9) {
-		//						objCommand.CommandText = "SELECT *  FROM [盈帜产品程序].[dbo].[盈帜产品程序信息] WHERE [对应产品型号_0" + (index + 1).ToString() + "] LIKE '%" + infor + "%' ORDER BY [归档日期] DESC";
-		//					} else {
-		//						objCommand.CommandText = "SELECT *  FROM [盈帜产品程序].[dbo].[盈帜产品程序信息] WHERE [对应产品型号_" + (index + 1).ToString() + "] LIKE '%" + infor + "%' ORDER BY [归档日期] DESC";
-		//					}
+		/// <summary>
+		/// 查找数据库中的对应数据
+		/// </summary>
+		/// <param name="ID_Code">待匹配的程序ID</param>
+		/// <param name="verion">待匹配的版本号</param>
+		/// <returns>数据库中提取的数据表</returns>
+		public DataTable V_MatchDataInSQL(string ID_Code, string verion)
+		{
+			DataTable dtTarget = new DataTable();
+			while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
 
-		//					//将查询到的值通过DataAdapter写入到DataSet的"程序相关信息"表中；防止重复，将所有30个参数都需要进行遍历查询 - 待验证
-		//					objDataAdapter.Fill( dtTarget );
+			//声明数据库操作需要使用到的对象
+			using (SqlCommand objCommand = new SqlCommand()) {
+				using (SqlDataAdapter objDataAdapter = new SqlDataAdapter()) {
+					objDataAdapter.SelectCommand = objCommand;
+					objDataAdapter.SelectCommand.Connection = objConnection;
+					objDataAdapter.SelectCommand.CommandType = CommandType.Text;
 
-		//					Thread.Sleep( 1 );
-		//				}
-		//			}
-		//		}
-		//	}
-		//	return dtTarget;
-		//}
+					//增加SQL指令,降序查找最近归档时间的文件信息
+					objDataAdapter.SelectCommand.CommandText = "SELECT * FROM [盈帜产品程序].[dbo].[盈帜产品程序信息] WHERE [文件编号ID] = '" + ID_Code + "' AND [版本号] = '" + verion + "' ORDER BY [归档日期] DESC";
 
-		///// <summary>
-		///// 查找数据库中的对应数据
-		///// </summary>
-		///// <param name="ID_Code">待匹配的程序ID</param>
-		///// <param name="verion">待匹配的版本号</param>
-		///// <returns>数据库中提取的数据表</returns>
-		//public DataTable V_MatchDataInSQL(string ID_Code, string verion)
-		//{
-		//	DataTable dtTarget = new DataTable();
-		//	while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
+					//等待SQL数据库正常连接,防止其他程序正在执行与数据库的连接
+					while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
 
-		//	//声明数据库操作需要使用到的对象
-		//	using (SqlCommand objCommand = new SqlCommand()) {
-		//		using (SqlDataAdapter objDataAdapter = new SqlDataAdapter()) {
-		//			objDataAdapter.SelectCommand = objCommand;
-		//			objDataAdapter.SelectCommand.Connection = objConnection;
-		//			objDataAdapter.SelectCommand.CommandType = CommandType.Text;
+					//将查询到的值通过DataAdapter写入到DataSet的"程序相关信息"表中
+					objDataAdapter.Fill( dtTarget );
+				}
+			}
+			return dtTarget;
+		}
 
-		//			//增加SQL指令,降序查找最近归档时间的文件信息
-		//			objDataAdapter.SelectCommand.CommandText = "SELECT * FROM [盈帜产品程序].[dbo].[盈帜产品程序信息] WHERE [文件编号ID] = '" + ID_Code + "' AND [版本号] = '" + verion + "' ORDER BY [归档日期] DESC";
+		#endregion
 
-		//			//等待SQL数据库正常连接,防止其他程序正在执行与数据库的连接
-		//			while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
+		#region -- 更新数据到数据库的操作
 
-		//			//将查询到的值通过DataAdapter写入到DataSet的"程序相关信息"表中
-		//			objDataAdapter.Fill( dtTarget );
-		//		}
-		//	}
-		//	return dtTarget;
-		//}
+		/// <summary>
+		/// 将整理好的SqlCommand成员的信息插入到数据库中
+		/// </summary>
+		/// <param name="objCommand">包含需要上传的数据信息SqlCommand对象；已经经过赋值等操作信息</param>
+		/// <returns>上传过程中是否出现异常的说明</returns>
+		public string V_UpdateDataToSQL(SqlCommand objCommand)
+		{
+			string error_information = string.Empty;
+			/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作*/
+			objCommand.Connection = objConnection;
+			while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
+			objConnection.Open();                  //使用ExecuteReader()方法前需要保证数据库连接
 
-		//#endregion
+			using (SqlTransaction objTransaction = objConnection.BeginTransaction()) {
+				objCommand.Transaction = objTransaction;
 
-		//#region -- 更新数据到数据库的操作
+				try {
+					objCommand.ExecuteNonQuery();      //执行SQL语句，并返回受影响的行数
+					objTransaction.Commit();
+				} catch (Exception e) {
+					error_information = e.ToString();
+					error_information = "向数据库中更新数据过程出现了位置错误(Database.V_UpdateDataToSQL)，请检查数据库的连接";
+					try {
+						objTransaction.Rollback();
+					} catch {
+						error_information = "Transaction  Rollback异常提示";
+					}
+				}
+				objConnection.Close();             //关闭数据库连接
+			}
+			//返回插入数据成功与否的标记量
+			return error_information;
+		}
 
-		///// <summary>
-		///// 将整理好的SqlCommand成员的信息插入到数据库中
-		///// </summary>
-		///// <param name="objCommand">包含需要上传的数据信息SqlCommand对象；已经经过赋值等操作信息</param>
-		///// <returns>上传过程中是否出现异常的说明</returns>
-		//public string V_UpdateDataToSQL(SqlCommand objCommand)
-		//{
-		//	string error_information = string.Empty;
-		//	/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作*/
-		//	objCommand.Connection = objConnection;
-		//	while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
-		//	objConnection.Open();                  //使用ExecuteReader()方法前需要保证数据库连接
-
-		//	using (SqlTransaction objTransaction = objConnection.BeginTransaction()) {
-		//		objCommand.Transaction = objTransaction;
-
-		//		try {
-		//			objCommand.ExecuteNonQuery();      //执行SQL语句，并返回受影响的行数
-		//			objTransaction.Commit();
-		//		} catch (Exception e) {
-		//			error_information = e.ToString();
-		//			error_information = "向数据库中更新数据过程出现了位置错误(Database.V_UpdateDataToSQL)，请检查数据库的连接";
-		//			try {
-		//				objTransaction.Rollback();
-		//			} catch {
-		//				error_information = "Transaction  Rollback异常提示";
-		//			}
-		//		}
-		//		objConnection.Close();             //关闭数据库连接
-		//	}
-		//	//返回插入数据成功与否的标记量
-		//	return error_information;
-		//}
-
-		//#endregion
-
-		#region --  回调函数功能
-
-		
 		#endregion
 
 		#region -- 垃圾回收机制 

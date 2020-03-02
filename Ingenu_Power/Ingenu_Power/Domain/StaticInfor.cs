@@ -74,6 +74,9 @@ namespace Ingenu_Power.Domain
 		/// 默认的对话框的点击结果，此处用于特殊显示的窗体传输结果使用
 		/// </summary>
 		public static MessageBoxResult messageBoxResult = MessageBoxResult.Cancel;
-
+		/// <summary>
+		/// 工作时遇到的错误信息
+		/// </summary>
+		public static string Error_Message = string.Empty;
 	}
 }

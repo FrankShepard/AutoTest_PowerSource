@@ -2,22 +2,22 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Ingenu_Power.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="UserName" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="PassWord" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="RememberPassWord" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="SQL_Name" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">192.168.1.99</Value>
     </Setting>
     <Setting Name="SQL_User" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">yanfa</Value>
     </Setting>
     <Setting Name="SQL_Password" Type="System.String" Scope="User">
+      <Value Profile="(Default)">admin123456</Value>
+    </Setting>
+    <Setting Name="UserName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="PassWord" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

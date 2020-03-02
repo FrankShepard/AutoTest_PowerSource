@@ -14,19 +14,31 @@ namespace Ingenu_Power.Domain
         }
 
 		/// <summary>
+		/// 线程间的委托使用，在主界面上显示 DialogHost
+		/// </summary>
+		/// <param name="message">待显示的异常情况</param>
+		/// <param name="cancel_showed">是否需要隐藏"取消"按键</param>
+		public delegate void dlg_MessageTips(string message, bool cancel_showed);
+
+		/// <summary>
 		/// 检查用户名与密码是否有效
 		/// </summary>
 		/// <param name="message">需要显示的信息</param>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		public async void MessageTips(string message,bool cancel_showed)
+		public async void MessageTips(string message, bool cancel_showed = false)
 		{
 			TxtMessage.Text = message;
 			if (!cancel_showed) {
 				BtnCancel.Visibility = System.Windows.Visibility.Collapsed;
 				BtnSure.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
 			}
-			await DialogHost.Show( this, "RootDialog" );
+
+			try {
+				await DialogHost.Show( this, "RootDialog" );
+			} catch {
+				; //可能是之前的 DialogHost 没有关闭造成，不要显示  方式异常退出
+			}
 		}
 
 		/// <summary>

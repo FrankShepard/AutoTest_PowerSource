@@ -24,61 +24,35 @@ namespace Ingenu_Power
         {
             InitializeComponent();
 			//首要任务是先进行数据库的连接，保证用户可以正常登陆
+			string error_information = UserControls.UcDatabaseLogin.V_ValidateSQL_First();
+			if(error_information != string.Empty) {
+				MessageTips( error_information );
+			}
+		}
 
-        }
-		
-		#region -- 使用到的用户控件对象
-
-		/// <summary>
-		/// 用户登录界面
-		/// </summary>
-		UserControls.UcLogin ucLogin = new UserControls.UcLogin();
-		/// <summary>
-		/// 用户选择后续重要分支窗口使用的控件
-		/// </summary>
-		UserControls.UcFeatureChoose ucFeatureChoose = new UserControls.UcFeatureChoose();
+		#region -- 涉及到主线程控件的全局变量及函数
 
 
 		#endregion
 
+		#region -- 使用到的用户控件对象
+				
+		
+		#endregion
+
 		private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
-			//	ucLogin.Name = "NewLogin";
-			//	ucLogin.Margin = new Thickness( 0, 0, 0, 0 );
-			//	if (Properties.Settings.Default.RememberPassWord) {
-			//		ucLogin.ChkRememberPassword.IsChecked = true;
-			//		ucLogin.TxtUserName.Text = Properties.Settings.Default.UserName[0];
-			//		ucLogin.FloatingPasswordBox.Password = Properties.Settings.Default.PassWord[0];
-			//	}
-			//	GrdMain.Children.Add( ucLogin );
-			//	//绑定控件显示状态的事件
-			//	ucLogin.IsVisibleChanged += new DependencyPropertyChangedEventHandler( this.Window_NextShow );
-			////} else {
-			////	ucFeatureChoose.Name = "NewFeatureChoose";
-			////	ucFeatureChoose.Margin = new Thickness( 0, 0, 0, 0 );
-			////	GrdMain.Children.Add( ucFeatureChoose );
-			////	//绑定控件显示状态的事件
-			////	ucFeatureChoose.IsVisibleChanged += new DependencyPropertyChangedEventHandler( this.Window_NextShow );
-			////}
-
-			UserControls.UcDatabaseLogin ucDatabaseLogin = new UserControls.UcDatabaseLogin();
-			ucDatabaseLogin.Name = "NewLogin";
-			ucDatabaseLogin.Margin = new Thickness( 0, 0, 0, 0 );
-			
-			GrdMain.Children.Add( ucDatabaseLogin );			
-		}
-
-		private void Window_NextShow(object sender, DependencyPropertyChangedEventArgs e)
-		{
-			ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
-			if (StaticInfor.nextWindow ==  StaticInfor.NextWindow.NextWindow_Measure) {				
-				sampleMessageDialog.MessageTips( "测试",false );
-				GrdMain.Children.Remove( ucFeatureChoose );
-			} else if (StaticInfor.nextWindow == StaticInfor.NextWindow.NextWindow_QueryData) {
-				sampleMessageDialog.MessageTips( "查询",false );
-				GrdMain.Children.Remove( ucFeatureChoose );
+			//默认界面是用户登录界面
+			UserControls.UcLogin ucLogin = new UserControls.UcLogin {
+				Name = "NewLogin",
+				Margin = new Thickness( 0, 0, 0, 0 )
+			};
+			if (Properties.Settings.Default.RememberPassWord) {
+				ucLogin.ChkRememberPassword.IsChecked = true;
+				ucLogin.TxtUserName.Text = Properties.Settings.Default.UserName;
+				ucLogin.FloatingPasswordBox.Password = Properties.Settings.Default.PassWord;
 			}
+			GrdMain.Children.Add( ucLogin );
 		}
 
 		/// <summary>
@@ -88,8 +62,7 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnInfor_Click(object sender, RoutedEventArgs e)
 		{
-			ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
-			sampleMessageDialog.MessageTips( "电源自动测试系统 \r\n©北京盈帜新源科技有限公司\r\nVer1.0.0",false );
+			MessageTips( "电源自动测试系统 \r\n©北京盈帜新源科技有限公司" );
 		}
 			   
 		/// <summary>
@@ -98,7 +71,12 @@ namespace Ingenu_Power
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void BtnMenu_ConnectDatabase_Click(object sender, RoutedEventArgs e)
-		{			
+		{
+			GrdMain.Children.Clear();
+			UserControls.UcDatabaseLogin ucDatabaseLogin = new UserControls.UcDatabaseLogin();
+			ucDatabaseLogin.Name = "NewSQLLogin";
+			ucDatabaseLogin.Margin = new Thickness( 0, 0, 0, 0 );
+			GrdMain.Children.Add( ucDatabaseLogin );
 		}
 
 		/// <summary>
@@ -108,6 +86,11 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenu_Login_Click(object sender, RoutedEventArgs e)
 		{
+			GrdMain.Children.Clear();
+			UserControls.UcLogin ucLogin = new UserControls.UcLogin();
+			ucLogin.Name = "NewLogin";
+			ucLogin.Margin = new Thickness( 0, 0, 0, 0 );
+			GrdMain.Children.Add( ucLogin );
 		}
 
 		/// <summary>
@@ -145,5 +128,24 @@ namespace Ingenu_Power
 
 		}
 
+		public delegate void Dlg_MessageTips(string message, bool cancel_showed = false);
+
+		/// <summary>
+		/// 显示上次出现的故障，用于用户故障的回看
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public  void BtnMessage_Click(object sender, RoutedEventArgs e)
+		{
+			if (StaticInfor.Error_Message != string.Empty) {
+				MessageTips( StaticInfor.Error_Message );
+			}
+		}
+
+		public static void MessageTips(string message, bool cancel_showed = false)
+		{
+			ResultMessageDialog resultMessageDialog = new ResultMessageDialog();
+			resultMessageDialog.MessageTips( message ,cancel_showed);
+		}
 	}
 }

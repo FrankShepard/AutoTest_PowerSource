@@ -25,28 +25,6 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection UserName {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["UserName"]));
-            }
-            set {
-                this["UserName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection PassWord {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["PassWord"]));
-            }
-            set {
-                this["PassWord"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool RememberPassWord {
             get {
@@ -59,7 +37,7 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("192.168.1.99")]
         public string SQL_Name {
             get {
                 return ((string)(this["SQL_Name"]));
@@ -71,7 +49,7 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("yanfa")]
         public string SQL_User {
             get {
                 return ((string)(this["SQL_User"]));
@@ -83,13 +61,37 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("admin123456")]
         public string SQL_Password {
             get {
                 return ((string)(this["SQL_Password"]));
             }
             set {
                 this["SQL_Password"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string UserName {
+            get {
+                return ((string)(this["UserName"]));
+            }
+            set {
+                this["UserName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PassWord {
+            get {
+                return ((string)(this["PassWord"]));
+            }
+            set {
+                this["PassWord"] = value;
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,56 +34,68 @@ namespace Ingenu_Power.UserControls
 		const string DefaultPassword = "123456";
 
 		/// <summary>
-		/// 载入用户控件时所需要的逻辑 - 记住密码与自动登陆所需要的逻辑处理
+		/// 载入用户控件时所需要的逻辑 - 记住密码所需要的逻辑处理
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-
+			string error_information = string.Empty;
+			using (Database database = new Database()) {			
+				DataTable status = database.V_UserGet( out error_information );
+				if (error_information != string.Empty) {
+					//标记异常并提示
+					StaticInfor.Error_Message = error_information;
+				}
+			}
 		}
 
+		/// <summary>
+		/// 用户登录，需要将本次数据与数据库中的数据进行匹配，进一步存在权限需求
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
-			if ((TxtUserName.Text.Trim() != string.Empty) && (FloatingPasswordBox.Password.Trim() != string.Empty)) {
-				//检查输入的用户名和密码是否与之前输入的用户名/密码匹配；
-				bool exist_user = false;
-				int index_of_user = -1;
-				if (Properties.Settings.Default.UserName != null) {
-					foreach (string user_name in Properties.Settings.Default.UserName) {
-						if (TxtUserName.Text.Trim() == user_name) {
-							exist_user = true;
-						}
-						index_of_user++;
-					}
-				}
+			//if ((TxtUserName.Text.Trim() != string.Empty) && (FloatingPasswordBox.Password.Trim() != string.Empty)) {
+			//	//检查输入的用户名和密码是否与之前输入的用户名/密码匹配；
+			//	bool exist_user = false;
+			//	int index_of_user = -1;
+			//	if (Properties.Settings.Default.UserName != null) {
+			//		foreach (string user_name in Properties.Settings.Default.UserName) {
+			//			if (TxtUserName.Text.Trim() == user_name) {
+			//				exist_user = true;
+			//			}
+			//			index_of_user++;
+			//		}
+			//	}
 
-				if (exist_user) {
-					if (FloatingPasswordBox.Password.Trim().ToUpper() == "RESET") { //用户忘记密码时的重置功能
-						ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
-						sampleMessageDialog.MessageTips( "重置用户密码？",true );
-						if (StaticInfor.messageBoxResult == MessageBoxResult.Yes) {
-							Properties.Settings.Default.PassWord.RemoveAt( index_of_user );
-							Properties.Settings.Default.PassWord.Insert( index_of_user, DefaultPassword );
-							Properties.Settings.Default.Save();
-						}
-					} else if (FloatingPasswordBox.Password.Trim() != Properties.Settings.Default.PassWord[ index_of_user ]) {
-						ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
-						sampleMessageDialog.MessageTips( "输入的密码错误，请重新输入密码",false );
-					}
-				} else {
-					if (Properties.Settings.Default.UserName == null) {
-						Properties.Settings.Default.UserName = new System.Collections.Specialized.StringCollection();
-						Properties.Settings.Default.PassWord = new System.Collections.Specialized.StringCollection();
-					}
-					Properties.Settings.Default.UserName.Add( TxtUserName.Text.Trim() );
-					Properties.Settings.Default.PassWord.Add( FloatingPasswordBox.Password.Trim() );
-					Properties.Settings.Default.Save();
-				}
-			} else {
-				ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
-				sampleMessageDialog.MessageTips( "请正确填写用户名和密码",false );
-			}
+			//	if (exist_user) {
+			//		if (FloatingPasswordBox.Password.Trim().ToUpper() == "RESET") { //用户忘记密码时的重置功能
+			//			ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
+			//			sampleMessageDialog.MessageTips( "重置用户密码？",true );
+			//			if (StaticInfor.messageBoxResult == MessageBoxResult.Yes) {
+			//				Properties.Settings.Default.PassWord.RemoveAt( index_of_user );
+			//				Properties.Settings.Default.PassWord.Insert( index_of_user, DefaultPassword );
+			//				Properties.Settings.Default.Save();
+			//			}
+			//		} else if (FloatingPasswordBox.Password.Trim() != Properties.Settings.Default.PassWord[ index_of_user ]) {
+			//			ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
+			//			sampleMessageDialog.MessageTips( "输入的密码错误，请重新输入密码",false );
+			//		}
+			//	} else {
+			//		if (Properties.Settings.Default.UserName == null) {
+			//			Properties.Settings.Default.UserName = new System.Collections.Specialized.StringCollection();
+			//			Properties.Settings.Default.PassWord = new System.Collections.Specialized.StringCollection();
+			//		}
+			//		Properties.Settings.Default.UserName.Add( TxtUserName.Text.Trim() );
+			//		Properties.Settings.Default.PassWord.Add( FloatingPasswordBox.Password.Trim() );
+			//		Properties.Settings.Default.Save();
+			//	}
+			//} else {
+			//	ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
+			//	sampleMessageDialog.MessageTips( "请正确填写用户名和密码",false );
+			//}
         }
 
 		/// <summary>
@@ -92,11 +105,11 @@ namespace Ingenu_Power.UserControls
 		/// <param name="e"></param>
 		private void TxtUserName_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			if ((bool)ChkRememberPassword.IsChecked) {
-				foreach (string user_name in Properties.Settings.Default.UserName) {
+			//if ((bool)ChkRememberPassword.IsChecked) {
+			//	foreach (string user_name in Properties.Settings.Default.UserName) {
 
-				}
-			}
+			//	}
+			//}
 		}
 	}
 }
