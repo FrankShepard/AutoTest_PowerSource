@@ -119,11 +119,17 @@
     </Compile>
     <Compile Include="Domain\StaticInfor.cs" />
     <Compile Include="Domain\PowerSource_Measure.cs" />
-    <Compile Include="UserControls\ucFeatureChoose.xaml.cs">
-      <DependentUpon>ucFeatureChoose.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UserControls\ucDatabaseLogin.xaml.cs">
       <DependentUpon>ucDatabaseLogin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ucInstrumentValidation.xaml.cs">
+      <DependentUpon>ucInstrumentValidation.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ucMeasure.xaml.cs">
+      <DependentUpon>ucMeasure.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ucISP.xaml.cs">
+      <DependentUpon>ucISP.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\ucLogin.xaml.cs">
       <DependentUpon>ucLogin.xaml</DependentUpon>
@@ -177,11 +183,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\ucFeatureChoose.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UserControls\ucDatabaseLogin.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\ucInstrumentValidation.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\ucMeasure.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\ucISP.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
