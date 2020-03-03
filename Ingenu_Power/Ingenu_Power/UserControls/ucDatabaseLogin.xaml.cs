@@ -52,26 +52,6 @@ namespace Ingenu_Power.UserControls
         }
 
 		/// <summary>
-		/// 默认执行的数据库校验操作
-		/// </summary>
-		public static string V_ValidateSQL_First()
-		{
-			string error_information = string.Empty;
-			using (Database database = new Database()) {
-				string sql_name = Properties.Settings.Default.SQL_Name;
-				string sql_user = Properties.Settings.Default.SQL_User;
-				string sql_password = Properties.Settings.Default.SQL_Password;
-
-				bool status = database.V_Initialize( sql_name, sql_user, sql_password, out error_information );
-				if (!status) {
-					//标记异常并提示
-					StaticInfor.Error_Message = error_information;
-				}
-			}
-			return error_information;
-		}
-
-		/// <summary>
 		/// 数据库的校验程序 -- 工作于后台工作线程中
 		/// </summary>
 		/// <param name="information">服务器信息的集合体</param>        
@@ -79,20 +59,17 @@ namespace Ingenu_Power.UserControls
 		{
 			string error_information = string.Empty;
 			using (Database database = new Database()) {
-				bool status = database.V_Initialize( information.SQL_Name, information.SQL_User, information.SQL_Password, out error_information );
-				if (!status) {
-					//标记异常并提示
-					StaticInfor.Error_Message = error_information;
+				database.V_Initialize( information.SQL_Name, information.SQL_User, information.SQL_Password, out error_information );
+				if (error_information != string.Empty) {
 					this.Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), error_information, false );
 				} else {
 					//更新SQL用户登信息
 					Properties.Settings.Default.SQL_Name = information.SQL_Name;
 					Properties.Settings.Default.SQL_User = information.SQL_User;
 					Properties.Settings.Default.SQL_Password = information.SQL_Password;
-					Properties.Settings.Default.Save();
-					//取消可能存在的异常信息
-					StaticInfor.Error_Message = string.Empty;
+					Properties.Settings.Default.Save();					
 				}
+				StaticInfor.Error_Message = string.Empty;
 			}
 			return error_information;
 		}

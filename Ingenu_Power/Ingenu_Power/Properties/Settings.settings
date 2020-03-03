@@ -3,22 +3,22 @@
   <Profiles />
   <Settings>
     <Setting Name="RememberPassWord" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="SQL_Name" Type="System.String" Scope="User">
-      <Value Profile="(Default)">192.168.1.99</Value>
+      <Value Profile="(Default)">PC\\SQLEXPRESS</Value>
     </Setting>
     <Setting Name="SQL_User" Type="System.String" Scope="User">
-      <Value Profile="(Default)">yanfa</Value>
+      <Value Profile="(Default)">quhao</Value>
     </Setting>
     <Setting Name="SQL_Password" Type="System.String" Scope="User">
       <Value Profile="(Default)">admin123456</Value>
     </Setting>
     <Setting Name="UserName" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">瞿浩</Value>
     </Setting>
     <Setting Name="PassWord" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">123456</Value>
     </Setting>
   </Settings>
 </SettingsFile>

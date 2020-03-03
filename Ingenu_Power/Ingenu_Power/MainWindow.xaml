@@ -22,8 +22,8 @@
 						<TextBlock Margin="10" HorizontalAlignment="Left">功能选项</TextBlock>									
 						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Left}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Name="BtnMenu_ConnectDatabase" Click="BtnMenu_ConnectDatabase_Click">
 							<WrapPanel>
-								<materialDesign:PackIcon Kind="Database" Margin="5" VerticalAlignment="Center"/>
-								<TextBlock TextWrapping="Wrap" Text="连接数据库" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
+								<materialDesign:PackIcon Kind="DatabasePlus" Margin="5" VerticalAlignment="Center"/>
+								<TextBlock TextWrapping="Wrap" Text="重连数据库" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
 							</WrapPanel>							
 						</Button>
 					<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Left}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Name="BtnMenu_Login" Click="BtnMenu_Login_Click">
@@ -36,6 +36,12 @@
 						<WrapPanel>
 							<materialDesign:PackIcon Kind="Verified" Margin="5" VerticalAlignment="Center"/>
 							<TextBlock TextWrapping="Wrap" Text="仪表通讯校验" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
+						</WrapPanel>
+					</Button>
+					<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Left}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Name="BtnMenu_ISP" Click="BtnMenu_ISP_Click">
+						<WrapPanel>
+							<materialDesign:PackIcon Kind="Download" Margin="5" VerticalAlignment="Center"/>
+							<TextBlock TextWrapping="Wrap" Text="单片机ISP" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
 						</WrapPanel>
 					</Button>
 					<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Left}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Name="BtnMenu_Measure" Click="BtnMenu_Measure_Click">

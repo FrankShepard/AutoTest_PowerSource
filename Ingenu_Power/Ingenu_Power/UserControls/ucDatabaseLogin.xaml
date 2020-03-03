@@ -41,7 +41,7 @@
 								<ColumnDefinition Width="*"/>
 								<ColumnDefinition Width="30"/>
 							</Grid.ColumnDefinitions>
-							<materialDesign:PackIcon  Kind="Database" Style="{StaticResource InputIcon}" Width="44" Height="46" RenderTransformOrigin="0.289,0.565" Grid.ColumnSpan="2" Margin="19,0,0,0"/>
+							<materialDesign:PackIcon  Kind="Database" Style="{StaticResource InputIcon}" Width="40" Height="40" RenderTransformOrigin="0.289,0.565" Grid.ColumnSpan="2" Margin="19,0,0,0"/>
 							<TextBox Grid.Column="2" Padding="10 0" materialDesign:HintAssist.Hint="SQL-IP" x:Name="TxtSQLName" PreviewKeyDown="TxtSQLName_PreviewKeyDown"
                                  materialDesign:HintAssist.Foreground="{StaticResource InputBoxHintAssistForegorundBrush}"
                                  materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource InputBoxHintAssistForegorundBrush}"
@@ -58,21 +58,21 @@
 								<ColumnDefinition Width="*"/>
 								<ColumnDefinition Width="30"/>
 							</Grid.ColumnDefinitions>
-							<materialDesign:PackIcon  Kind="Account" Style="{StaticResource InputIcon}" Width="44" Height="46" RenderTransformOrigin="0.289,0.565" Grid.ColumnSpan="2" Margin="19,0,0,0"/>
+							<materialDesign:PackIcon  Kind="Account" Style="{StaticResource InputIcon}" Width="40" Height="40" RenderTransformOrigin="0.289,0.565" Grid.ColumnSpan="2" Margin="19,0,0,0"/>
 							<TextBox Grid.Column="2" Padding="10 0" materialDesign:HintAssist.Hint="SQL-用户" x:Name="TxtUserName" 
                                  materialDesign:HintAssist.Foreground="{StaticResource InputBoxHintAssistForegorundBrush}"
                                  materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource InputBoxHintAssistForegorundBrush}"
                                  materialDesign:HintAssist.FloatingScale="0.6"
-                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                                  FontSize="20" Margin="6,0,0,0" >
-								<TextBox.Text>
+								<!--<TextBox.Text>
 									<Binding Path="UserName" UpdateSourceTrigger="PropertyChanged">
-										<!--对用户名和密码暂时先不使用公共的文本框异常检测-->
-										<!--<Binding.ValidationRules>
+										--><!--对用户名和密码暂时先不使用公共的文本框异常检测--><!--
+										<Binding.ValidationRules>
                                         <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
-                                    </Binding.ValidationRules>-->
+                                    </Binding.ValidationRules>
 									</Binding>
-								</TextBox.Text>
+								</TextBox.Text>-->
 							</TextBox>
 						</Grid>
 
@@ -83,7 +83,7 @@
 								<ColumnDefinition/>
 								<ColumnDefinition Width="30"/>
 							</Grid.ColumnDefinitions>
-							<materialDesign:PackIcon Kind="Key" Style="{StaticResource InputIcon}" Height="46" Grid.ColumnSpan="2" Margin="19,0,0,0" Width="45"/>
+							<materialDesign:PackIcon Kind="Key" Style="{StaticResource InputIcon}" Height="40" Grid.ColumnSpan="2" Margin="19,0,0,0" Width="40"/>
 							<PasswordBox Grid.Column="2" Padding="10 0" 
                                      x:Name="FloatingPasswordBox"
                                      materialDesign:HintAssist.Hint="SQL-密码"
@@ -97,13 +97,40 @@
 				</materialDesign:Card>
 
 		<Grid Height="50" VerticalAlignment="Top" HorizontalAlignment="Center" Width="120" Margin="294,330,293,0">
-			<Button IsDefault="True" Name="BtnLogin" Click="BtnLogin_Click"
+			<!--<Button IsDefault="True" Name="BtnLogin" Click="BtnLogin_Click"
                         FontSize="23"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}"
                         Height="Auto" 
                         materialDesign:ButtonAssist.CornerRadius="25">
 				<TextBlock  Text="SQL登录" />
+			</Button>-->
+
+			<Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" Margin="8 0 0 0"
+					 Command="{Binding SaveComand}"
+                    materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding IsSaving}"
+                    materialDesign:ButtonProgressAssist.Value="{Binding SaveProgress}">
+					<materialDesign:PackIcon Height="24" Width="24">
+                    <materialDesign:PackIcon.Style>
+                        <Style TargetType="materialDesign:PackIcon" BasedOn="{StaticResource {x:Type materialDesign:PackIcon}}">
+                            <Setter Property="Kind" Value="CloudSync" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSaveComplete}" Value="True">
+                                    <Setter Property="Kind" Value="Check" />
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.8" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </materialDesign:PackIcon.Style>
+                </materialDesign:PackIcon>
+				<!--<TextBlock  Text="SQL登录" />-->
 			</Button>
+
 		</Grid>
 
 	</Grid>

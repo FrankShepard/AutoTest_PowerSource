@@ -16,7 +16,7 @@ namespace Ingenu_Power.Domain
 		/// <summary>
 		/// 执行连接数据库操作连接的全局变量声名；
 		/// </summary>
-		private SqlConnection objConnection = new SqlConnection( "Data Source=" + Properties.Settings.Default.SQL_Name + ";Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + Properties.Settings.Default.SQL_User + ";Password=" + Properties.Settings.Default.SQL_Password );
+		private SqlConnection objConnection;
 
 		#endregion
 
@@ -28,24 +28,22 @@ namespace Ingenu_Power.Domain
 		/// <param name="servername">SQL 数据库的服务器名称</param>
 		/// <param name="user_name">SQL用户名</param>
 		/// <param name="password">用户登录密码</param>
-		public bool V_Initialize(string servername, string user_name, string password,out string error_information)
+		public void V_Initialize(string servername, string user_name, string password,out string error_information)
 		{
-			bool status = false;
 			error_information = string.Empty;
-			objConnection = new SqlConnection( "Data Source=" + servername + ";Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
+//			objConnection = new SqlConnection( "Data Source=" + servername + ";Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
+			objConnection = new SqlConnection( "Data Source=PC\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
 			/*以下验证SQL用户名与密码是否能够和SQL数据库正常通讯*/
 			try {
 				/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作-----可能的原因是另一台电脑正在调用数据库，需要等待*/
 				while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
 				objConnection.Open();
 				objConnection.Close();      //前面能打开则此处可以关闭   防止后续操作异常 
-				status = true;
 			} catch                               //'异常可能：数据库用户名或密码输入错误
 			  {
 				error_information = "数据库服务器连接异常，请检查数据库工作环境";
 				objConnection.Close();      //前面能打开则此处可以关闭   防止后续操作异常  
 			}
-			return status;
 		}
 
 		/// <summary>
@@ -61,6 +59,54 @@ namespace Ingenu_Power.Domain
 			return dtTarget;
 		}
 
+		/// <summary>
+		/// 新建用户登陆数据
+		/// </summary>
+		/// <param name="user_name">用户登录名</param>
+		/// <param name="password">用户登录密码</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void V_CreatUserInfor(string user_name, string password, out string error_information)
+		{
+			error_information = string.Empty;
+			try {
+				using (SqlCommand objCommand = objConnection.CreateCommand()) {
+					objCommand.Connection = objConnection;
+					objCommand.CommandType =  CommandType.Text;
+					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[测试软件用户信息] ([用户名],[登陆密码],[最近登陆时间],[计算机名],[权限等级]) VALUES (@用户名,@登陆密码,@最近登陆时间,@计算机名,@权限等级)";
+					objCommand.Parameters.Clear();
+					objCommand.Parameters.AddWithValue( "@用户名", user_name );
+					objCommand.Parameters.AddWithValue( "@登陆密码", password );
+					objCommand.Parameters.AddWithValue( "@最近登陆时间", DateTime.Now );
+					objCommand.Parameters.AddWithValue( "@计算机名", Environment.GetEnvironmentVariable( "ComputerName" )); 
+					objCommand.Parameters.AddWithValue( "@权限等级", 1);
+
+					V_UpdateInfor( objCommand, out error_information );
+				}
+			} catch {
+				error_information = "Database.V_CreatUserInfor /r/n 数据库操作异常";
+			}
+		}
+
+		public void V_UpdateUserInfor(string user_name, string password, out string error_information)
+		{
+			error_information = string.Empty;
+			try {
+				using (SqlCommand objCommand = objConnection.CreateCommand()) {
+					objCommand.Connection = objConnection;
+					objCommand.CommandType = CommandType.Text;
+					objCommand.CommandText = "UPDATE [盈帜电源].[dbo].[测试软件用户信息] SET [登陆密码] = @登陆密码, [最近登陆时间] = @最近登陆时间, [计算机名] = @计算机名 WHERE [用户名] = '" + user_name + "'";
+					objCommand.Parameters.Clear();
+					objCommand.Parameters.AddWithValue( "@登陆密码", password );
+					objCommand.Parameters.AddWithValue( "@最近登陆时间", DateTime.Now );
+					objCommand.Parameters.AddWithValue( "@计算机名", Environment.GetEnvironmentVariable( "ComputerName" )); 
+
+					V_UpdateInfor( objCommand, out error_information );
+				}
+			} catch {
+				error_information = "Database.V_UpdateUserInfor /r/n 数据库操作异常";
+			}
+		}
+
 		#endregion
 
 		#region -- 在数据库中查找是否存在待查询信息的数据
@@ -71,36 +117,72 @@ namespace Ingenu_Power.Domain
 		/// <param name="infor">查询的SQL语言</param>\
 		/// <param name="error_information" >可能存在的相关错误信息</param>
 		/// <returns>在数据库中查询数据是否存在的情况</returns>
-		public DataTable V_QueryInfor(string infor, out string error_information)
+		private  DataTable V_QueryInfor(string infor, out string error_information)
 		{
 			DataTable dtTarget = new DataTable();
 			error_information = string.Empty;
-			/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作-----可能的原因是另一台电脑正在调用数据库，需要等待*/
-			while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
-			
-			using (SqlCommand objCommand = objConnection.CreateCommand()) {
-				using (SqlDataAdapter objDataAdapter = new SqlDataAdapter()) {
-					objDataAdapter.SelectCommand = objCommand;
-					objDataAdapter.SelectCommand.Connection = objConnection;
-					objDataAdapter.SelectCommand.CommandType = CommandType.Text;
+			try {
+				/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作-----可能的原因是另一台电脑正在调用数据库，需要等待*/
+				while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
 
-					objCommand.CommandText = "SELECT *  FROM [盈帜电源].[dbo].[测试软件用户信息]";
+				using (SqlCommand objCommand = objConnection.CreateCommand()) {
+					using (SqlDataAdapter objDataAdapter = new SqlDataAdapter()) {
+						objDataAdapter.SelectCommand = objCommand;
+						objDataAdapter.SelectCommand.Connection = objConnection;
+						objDataAdapter.SelectCommand.CommandType = CommandType.Text;
 
-					objConnection.Open(); //使用ExecuteReader()方法前需要保证数据库连接
+						objCommand.CommandText = infor;
+						objConnection.Open(); //使用ExecuteReader()方法前需要保证数据库连接
 
-					using (SqlDataReader reader = objCommand.ExecuteReader()) {
-						if (!reader.Read()) {
-							error_information = "数据库中缺少数据信息，请核实数据库信息";
-						} else {
-							objDataAdapter.Fill( dtTarget ); //将查询到的值通过DataAdapter写入到DataSet的"程序相关信息"表中
-						}
-						reader.Close();
+						//using (SqlDataReader reader = objCommand.ExecuteReader()) {
+						//	if (!reader.Read()) {
+						//		error_information = "数据库中缺少数据信息，请核实数据库信息";
+						//	} else {
+								objDataAdapter.Fill( dtTarget ); //将查询到的值通过DataAdapter写入到DataSet的"程序相关信息"表中
+							//}
+							//reader.Close();
+						//}
+						objConnection.Close(); //关闭数据库连接
 					}
-					objConnection.Close(); //关闭数据库连接
 				}
+			} catch {
+				error_information = "数据库操作异常";
 			}
 			return dtTarget;
 		}
+
+		/// <summary>
+		/// 更新数据库中的数据，具体的SQL命令数据在需要单独处理
+		/// </summary>
+		/// <param name="error_information">可能存在的错误信息</param>
+		private  void V_UpdateInfor(SqlCommand objCommand, out string error_information)
+		{
+			error_information = string.Empty;
+			/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作*/
+			objCommand.Connection = objConnection;
+			while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
+			objConnection.Open();                  //使用ExecuteReader()方法前需要保证数据库连接
+
+			using (SqlTransaction objTransaction = objConnection.BeginTransaction()) {
+				objCommand.Transaction = objTransaction;
+
+				try {
+					objCommand.ExecuteNonQuery();      //执行SQL语句，并返回受影响的行数
+					objTransaction.Commit();
+				} catch (Exception e) {
+					error_information = e.ToString();
+					error_information += "/r/n Database.V_UpdateInfor";
+					try {
+						objTransaction.Rollback();
+					} catch {
+						error_information = "/r/n Transaction  Rollback异常提示";
+					}
+				}
+				objConnection.Close();             //关闭数据库连接
+			}
+		}
+
+
 
 		#endregion
 

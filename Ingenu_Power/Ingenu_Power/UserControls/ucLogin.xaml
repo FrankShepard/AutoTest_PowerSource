@@ -40,21 +40,21 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
-                        <materialDesign:PackIcon  Kind="UserBox" Style="{StaticResource InputIcon}" Width="44" Height="46" RenderTransformOrigin="0.289,0.565" Grid.ColumnSpan="2" Margin="19,0,0,0"/>
-                        <TextBox Grid.Column="2" Padding="10 0" MaxLength="11" materialDesign:HintAssist.Hint="用户" x:Name="TxtUserName" ToolTip="请如实填写姓名,十个字符以内" TextChanged="TxtUserName_TextChanged"
+                        <materialDesign:PackIcon  Kind="UserBox" Style="{StaticResource InputIcon}" Width="40" Height="40" RenderTransformOrigin="0.289,0.565" Grid.ColumnSpan="2" Margin="19,0,0,0"/>
+                        <TextBox Grid.Column="2" Padding="10 0" MaxLength="5" materialDesign:HintAssist.Hint="用户" x:Name="TxtUserName" ToolTip="请如实填写姓名,十个字符以内" 
                                  materialDesign:HintAssist.Foreground="{StaticResource InputBoxHintAssistForegorundBrush}"
                                  materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource InputBoxHintAssistForegorundBrush}"
                                  materialDesign:HintAssist.FloatingScale="0.6"
                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                  FontSize="20" Margin="6,0,0,0" >
-                            <TextBox.Text>
+                            <!--<TextBox.Text>
                                 <Binding Path="UserName" UpdateSourceTrigger="PropertyChanged">
-									<!--对用户名和密码暂时先不使用公共的文本框异常检测-->
-                                    <!--<Binding.ValidationRules>
+									--><!--对用户名和密码暂时先不使用公共的文本框异常检测--><!--
+                                    <Binding.ValidationRules>
                                         <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True" />
-                                    </Binding.ValidationRules>-->
+                                    </Binding.ValidationRules>
                                 </Binding>
-                            </TextBox.Text>
+                            </TextBox.Text>-->
                         </TextBox>
                     </Grid>
 
@@ -65,10 +65,10 @@
                             <ColumnDefinition/>
                             <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
-                        <materialDesign:PackIcon Kind="ShieldKey" Style="{StaticResource InputIcon}" Height="46" Grid.ColumnSpan="2" Margin="19,0,0,0" Width="45"/>
-                        <PasswordBox Grid.Column="2" Padding="10 0" ToolTip="默认用户密码为 123456 ;用户重置密码操作为 RESET(不区分大小写)"
+                        <materialDesign:PackIcon Kind="ShieldKey" Style="{StaticResource InputIcon}" Height="40" Grid.ColumnSpan="2" Margin="19,0,0,0" Width="40"/>
+                        <PasswordBox Grid.Column="2" Padding="10 0" ToolTip="用户重置密码操作为 RESET(不区分大小写)"
                                      x:Name="FloatingPasswordBox"
-                                     MaxLength="10"
+                                     MaxLength="20"
                                      materialDesign:HintAssist.Hint="密码"
                                      materialDesign:HintAssist.Foreground="{StaticResource InputBoxHintAssistForegorundBrush}"
                                      materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource InputBoxHintAssistForegorundBrush}"
@@ -93,6 +93,6 @@
                     <TextBlock  Text="登录" />
                 </Button>
             </Grid>
-        </Grid>
+		</Grid>
     </Grid>
 </UserControl>

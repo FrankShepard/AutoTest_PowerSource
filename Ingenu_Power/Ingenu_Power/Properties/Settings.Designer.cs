@@ -25,7 +25,7 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool RememberPassWord {
             get {
                 return ((bool)(this["RememberPassWord"]));
@@ -37,7 +37,7 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("192.168.1.99")]
+        [global::System.Configuration.DefaultSettingValueAttribute("PC\\\\SQLEXPRESS")]
         public string SQL_Name {
             get {
                 return ((string)(this["SQL_Name"]));
@@ -49,7 +49,7 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("yanfa")]
+        [global::System.Configuration.DefaultSettingValueAttribute("quhao")]
         public string SQL_User {
             get {
                 return ((string)(this["SQL_User"]));
@@ -73,7 +73,7 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("瞿浩")]
         public string UserName {
             get {
                 return ((string)(this["UserName"]));
@@ -85,7 +85,7 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("123456")]
         public string PassWord {
             get {
                 return ((string)(this["PassWord"]));

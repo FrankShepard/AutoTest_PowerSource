@@ -23,11 +23,6 @@ namespace Ingenu_Power
         public MainWindow()
         {
             InitializeComponent();
-			//首要任务是先进行数据库的连接，保证用户可以正常登陆
-			string error_information = UserControls.UcDatabaseLogin.V_ValidateSQL_First();
-			if(error_information != string.Empty) {
-				MessageTips( error_information );
-			}
 		}
 
 		#region -- 涉及到主线程控件的全局变量及函数
@@ -36,8 +31,8 @@ namespace Ingenu_Power
 		#endregion
 
 		#region -- 使用到的用户控件对象
-				
-		
+
+
 		#endregion
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -73,9 +68,10 @@ namespace Ingenu_Power
 		private void BtnMenu_ConnectDatabase_Click(object sender, RoutedEventArgs e)
 		{
 			GrdMain.Children.Clear();
-			UserControls.UcDatabaseLogin ucDatabaseLogin = new UserControls.UcDatabaseLogin();
-			ucDatabaseLogin.Name = "NewSQLLogin";
-			ucDatabaseLogin.Margin = new Thickness( 0, 0, 0, 0 );
+			UserControls.UcDatabaseLogin ucDatabaseLogin = new UserControls.UcDatabaseLogin {
+				Name = "NewSQLLogin",
+				Margin = new Thickness( 0, 0, 0, 0 )
+			};
 			GrdMain.Children.Add( ucDatabaseLogin );
 		}
 
@@ -87,9 +83,10 @@ namespace Ingenu_Power
 		private void BtnMenu_Login_Click(object sender, RoutedEventArgs e)
 		{
 			GrdMain.Children.Clear();
-			UserControls.UcLogin ucLogin = new UserControls.UcLogin();
-			ucLogin.Name = "NewLogin";
-			ucLogin.Margin = new Thickness( 0, 0, 0, 0 );
+			UserControls.UcLogin ucLogin = new UserControls.UcLogin {
+				Name = "NewLogin",
+				Margin = new Thickness( 0, 0, 0, 0 )
+			};
 			GrdMain.Children.Add( ucLogin );
 		}
 
@@ -110,7 +107,35 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenuShow_Click(object sender, RoutedEventArgs e)
 		{
-			BtnMenu_InstumentValidate.IsEnabled = false;
+			switch (StaticInfor.UserRightLevel) {
+				case 0: //未登陆成功时
+					BtnMenu_InstumentValidate.IsEnabled = false;
+					BtnMenu_ISP.IsEnabled = false;					
+					BtnMenu_Measure.IsEnabled = false;
+
+					BtnMenu_DataQuery.IsEnabled = false;
+					BtnMenu_DataView.IsEnabled = false;					
+					break;
+				case 1: //仅用于查询与打印数据
+					BtnMenu_InstumentValidate.IsEnabled = false;
+					BtnMenu_ISP.IsEnabled = false;
+					BtnMenu_Measure.IsEnabled = false;
+
+					BtnMenu_DataQuery.IsEnabled = true;
+					BtnMenu_DataView.IsEnabled = true;
+					break;
+				case 2: //可以执行产品测试
+				case 3: //全功能
+					BtnMenu_InstumentValidate.IsEnabled = true;
+					BtnMenu_ISP.IsEnabled = true;
+					BtnMenu_Measure.IsEnabled = true;
+
+					BtnMenu_DataQuery.IsEnabled = true;
+					BtnMenu_DataView.IsEnabled = true;
+					break;
+				default:
+					break;
+			}
 		}
 
 		private void BtnMenu_Measure_Click(object sender, RoutedEventArgs e)
@@ -144,8 +169,15 @@ namespace Ingenu_Power
 
 		public static void MessageTips(string message, bool cancel_showed = false)
 		{
-			ResultMessageDialog resultMessageDialog = new ResultMessageDialog();
-			resultMessageDialog.MessageTips( message ,cancel_showed);
+			if (message != string.Empty) {
+				ResultMessageDialog resultMessageDialog = new ResultMessageDialog();
+				resultMessageDialog.MessageTips( message, cancel_showed );
+			}
+		}
+
+		private void BtnMenu_ISP_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 	}
 }

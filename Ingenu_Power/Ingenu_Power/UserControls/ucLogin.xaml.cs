@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,13 +26,8 @@ namespace Ingenu_Power.UserControls
     {
         public UcLogin()
         {
-            InitializeComponent();          
-        }
-
-		/// <summary>
-		/// 默认用户登录密码
-		/// </summary>
-		const string DefaultPassword = "123456";
+            InitializeComponent();			
+		}
 
 		/// <summary>
 		/// 载入用户控件时所需要的逻辑 - 记住密码所需要的逻辑处理
@@ -40,13 +36,10 @@ namespace Ingenu_Power.UserControls
 		/// <param name="e"></param>
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			string error_information = string.Empty;
-			using (Database database = new Database()) {			
-				DataTable status = database.V_UserGet( out error_information );
-				if (error_information != string.Empty) {
-					//标记异常并提示
-					StaticInfor.Error_Message = error_information;
-				}
+			if (Properties.Settings.Default.RememberPassWord) {
+				TxtUserName.Text = Properties.Settings.Default.UserName;
+				FloatingPasswordBox.Password = Properties.Settings.Default.PassWord;
+				ChkRememberPassword.IsChecked = true;
 			}
 		}
 
@@ -57,59 +50,62 @@ namespace Ingenu_Power.UserControls
 		/// <param name="e"></param>
 		private void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
-			//if ((TxtUserName.Text.Trim() != string.Empty) && (FloatingPasswordBox.Password.Trim() != string.Empty)) {
-			//	//检查输入的用户名和密码是否与之前输入的用户名/密码匹配；
-			//	bool exist_user = false;
-			//	int index_of_user = -1;
-			//	if (Properties.Settings.Default.UserName != null) {
-			//		foreach (string user_name in Properties.Settings.Default.UserName) {
-			//			if (TxtUserName.Text.Trim() == user_name) {
-			//				exist_user = true;
-			//			}
-			//			index_of_user++;
-			//		}
-			//	}
+			if ((TxtUserName.Text.Trim() != string.Empty) && (FloatingPasswordBox.Password.Trim() != string.Empty)) {
+				string error_information = string.Empty;
+				using (Database database = new Database()) {
+					//数据库的初始化连接
+					database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
+					if (error_information == string.Empty) {
+						DataTable table = database.V_UserGet( out error_information );
+						if (error_information == string.Empty) {
+							int index = 0;
+							for (index = 0; index < table.Rows.Count; index++) {
+								if (TxtUserName.Text.Trim() == table.Rows[ index ][ "用户名" ].ToString().Trim()) {
+									if ((FloatingPasswordBox.Password.Trim().ToUpper() != table.Rows[ index ][ "登陆密码" ].ToString().Trim().ToUpper()) && (FloatingPasswordBox.Password.Trim().ToUpper() != "RESET")) {
+										//密码不匹配									
+										error_information = "密码错误，请重新输入密码";
+										StaticInfor.UserRightLevel = 0;
+									} else {
+										//密码匹配或者密码重置 - 更新当前登陆时间和登陆的电脑
+										database.V_UpdateUserInfor( table.Rows[ index ][ "用户名" ].ToString().Trim().ToUpper(), FloatingPasswordBox.Password.Trim().ToUpper(), out error_information );
 
-			//	if (exist_user) {
-			//		if (FloatingPasswordBox.Password.Trim().ToUpper() == "RESET") { //用户忘记密码时的重置功能
-			//			ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
-			//			sampleMessageDialog.MessageTips( "重置用户密码？",true );
-			//			if (StaticInfor.messageBoxResult == MessageBoxResult.Yes) {
-			//				Properties.Settings.Default.PassWord.RemoveAt( index_of_user );
-			//				Properties.Settings.Default.PassWord.Insert( index_of_user, DefaultPassword );
-			//				Properties.Settings.Default.Save();
-			//			}
-			//		} else if (FloatingPasswordBox.Password.Trim() != Properties.Settings.Default.PassWord[ index_of_user ]) {
-			//			ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
-			//			sampleMessageDialog.MessageTips( "输入的密码错误，请重新输入密码",false );
-			//		}
-			//	} else {
-			//		if (Properties.Settings.Default.UserName == null) {
-			//			Properties.Settings.Default.UserName = new System.Collections.Specialized.StringCollection();
-			//			Properties.Settings.Default.PassWord = new System.Collections.Specialized.StringCollection();
-			//		}
-			//		Properties.Settings.Default.UserName.Add( TxtUserName.Text.Trim() );
-			//		Properties.Settings.Default.PassWord.Add( FloatingPasswordBox.Password.Trim() );
-			//		Properties.Settings.Default.Save();
-			//	}
-			//} else {
-			//	ResultMessageDialog sampleMessageDialog = new ResultMessageDialog();
-			//	sampleMessageDialog.MessageTips( "请正确填写用户名和密码",false );
-			//}
-        }
+										if (error_information == string.Empty) {
+											StaticInfor.UserRightLevel = Convert.ToInt32( table.Rows[ index ][ "权限等级" ] ); //获取权限等级
 
-		/// <summary>
-		/// 在记住密码的情况下会触发自动填写密码情况
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void TxtUserName_TextChanged(object sender, TextChangedEventArgs e)
-		{
-			//if ((bool)ChkRememberPassword.IsChecked) {
-			//	foreach (string user_name in Properties.Settings.Default.UserName) {
+											if (( bool )ChkRememberPassword.IsChecked) {
+												Properties.Settings.Default.UserName = TxtUserName.Text.Trim();
+												Properties.Settings.Default.PassWord = FloatingPasswordBox.Password.Trim().ToUpper();
+											} else {
+												Properties.Settings.Default.UserName = string.Empty;
+												Properties.Settings.Default.PassWord = string.Empty;
+											}
+											Properties.Settings.Default.RememberPassWord = ( bool )ChkRememberPassword.IsChecked;
+											Properties.Settings.Default.Save();
+										}
+									}
+									break;
+								}
+							}
 
-			//	}
-			//}
+							if (index == table.Rows.Count) {
+								//数据库中没有对应的信息，需要更新数据
+								database.V_CreatUserInfor( TxtUserName.Text.Trim().ToUpper(), FloatingPasswordBox.Password.Trim().ToUpper(), out error_information );
+								if (error_information == string.Empty) {
+									StaticInfor.UserRightLevel = 1; //新建用户权限等级为1
+								} else {
+									StaticInfor.UserRightLevel = 0; //新建失败，权限修改为默认的0
+								}
+							}
+						}
+					}
+					//标记异常并提示
+					StaticInfor.Error_Message = error_information;
+				}
+			} else {
+				StaticInfor.Error_Message = "请正确填写用户名和密码";
+			}
+			MainWindow.MessageTips( StaticInfor.Error_Message );
 		}
+
 	}
 }
