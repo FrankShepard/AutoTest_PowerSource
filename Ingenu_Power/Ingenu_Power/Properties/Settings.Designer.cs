@@ -94,5 +94,29 @@ namespace Ingenu_Power.Properties {
                 this["PassWord"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ISP_ID {
+            get {
+                return ((int)(this["ISP_ID"]));
+            }
+            set {
+                this["ISP_ID"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ISP_Ver {
+            get {
+                return ((int)(this["ISP_Ver"]));
+            }
+            set {
+                this["ISP_Ver"] = value;
+            }
+        }
     }
 }

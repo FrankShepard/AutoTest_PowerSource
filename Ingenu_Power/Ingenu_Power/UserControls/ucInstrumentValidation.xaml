@@ -39,7 +39,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <materialDesign:PackIcon  Kind="SerialPort"  Width="70" Height="60" Grid.ColumnSpan="1" Margin="0"/>
-                        <ComboBox   Grid.Column="2" Margin="20,0" materialDesign:HintAssist.Hint="测试使用的串口" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+						<ComboBox   Grid.Column="2" Margin="20,0" materialDesign:HintAssist.Hint="测试使用的串口" PreviewMouseDown ="ComboBox_PreviewMouseDown"  Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         </ComboBox>
                     </Grid>
 
@@ -48,7 +48,7 @@
                             <ColumnDefinition Width="60"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <materialDesign:PackIcon Kind="BarcodeScan" Width="50" Height="45" Grid.ColumnSpan="1" Margin="5,0,0,0"/>
+						<materialDesign:PackIcon Kind="Barcode" Width="50" Height="45" Grid.ColumnSpan="1" Margin="5,0,0,0"/>
                         <TextBox Margin="20,0" materialDesign:HintAssist.Hint="示波器INS码" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" />
                     </Grid>
                     <ProgressBar Value="0" Margin="30" Height="8" />
@@ -56,7 +56,7 @@
             </materialDesign:Card>
 
             <Grid Height="50" VerticalAlignment="Top" HorizontalAlignment="Center" Width="130" Margin="294,330,293,0">
-                <Button IsDefault="True" Name="BtnLogin" Click="BtnLogin_Click"                        
+                <Button IsDefault="True" Name="BtnValidate" Click="BtnValidate_Click"                        
                         FontSize="25"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}"
                         Height="Auto" 

@@ -29,8 +29,18 @@ namespace Ingenu_Power.UserControls
             InitializeComponent();			
 		}
 
+		private void ComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+
+		}
+
+		private void BtnValidate_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
 		/// <summary>
-		
+
 
 	}
 }

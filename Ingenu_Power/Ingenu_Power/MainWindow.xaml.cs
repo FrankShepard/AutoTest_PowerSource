@@ -97,7 +97,12 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenu_InstumentValidate_Click(object sender, RoutedEventArgs e)
 		{
-
+			GrdMain.Children.Clear();
+			UserControls.UcInstrumentValidation ucInstrumentValidation = new UserControls.UcInstrumentValidation {
+				Name = "NewInstrumentValidation",
+				Margin = new Thickness( 0, 0, 0, 0 )
+			};
+			GrdMain.Children.Add( ucInstrumentValidation );
 		}
 
 		/// <summary>
@@ -107,50 +112,65 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenuShow_Click(object sender, RoutedEventArgs e)
 		{
-			switch (StaticInfor.UserRightLevel) {
-				case 0: //未登陆成功时
-					BtnMenu_InstumentValidate.IsEnabled = false;
-					BtnMenu_ISP.IsEnabled = false;					
-					BtnMenu_Measure.IsEnabled = false;
+			//switch (StaticInfor.UserRightLevel) {
+			//	case 0: //未登陆成功时
+			//		BtnMenu_InstumentValidate.IsEnabled = false;
+			//		BtnMenu_ISP.IsEnabled = false;					
+			//		BtnMenu_Measure.IsEnabled = false;
 
-					BtnMenu_DataQuery.IsEnabled = false;
-					BtnMenu_DataView.IsEnabled = false;					
-					break;
-				case 1: //仅用于查询与打印数据
-					BtnMenu_InstumentValidate.IsEnabled = false;
-					BtnMenu_ISP.IsEnabled = false;
-					BtnMenu_Measure.IsEnabled = false;
+			//		BtnMenu_DataQuery.IsEnabled = false;
+			//		BtnMenu_DataView.IsEnabled = false;					
+			//		break;
+			//	case 1: //仅用于查询与打印数据
+			//		BtnMenu_InstumentValidate.IsEnabled = false;
+			//		BtnMenu_ISP.IsEnabled = false;
+			//		BtnMenu_Measure.IsEnabled = false;
 
-					BtnMenu_DataQuery.IsEnabled = true;
-					BtnMenu_DataView.IsEnabled = true;
-					break;
-				case 2: //可以执行产品测试
-				case 3: //全功能
-					BtnMenu_InstumentValidate.IsEnabled = true;
-					BtnMenu_ISP.IsEnabled = true;
-					BtnMenu_Measure.IsEnabled = true;
+			//		BtnMenu_DataQuery.IsEnabled = true;
+			//		BtnMenu_DataView.IsEnabled = true;
+			//		break;
+			//	case 2: //可以执行产品测试
+			//	case 3: //全功能
+			//		BtnMenu_InstumentValidate.IsEnabled = true;
+			//		BtnMenu_ISP.IsEnabled = true;
+			//		BtnMenu_Measure.IsEnabled = true;
 
-					BtnMenu_DataQuery.IsEnabled = true;
-					BtnMenu_DataView.IsEnabled = true;
-					break;
-				default:
-					break;
-			}
+			//		BtnMenu_DataQuery.IsEnabled = true;
+			//		BtnMenu_DataView.IsEnabled = true;
+			//		break;
+			//	default:
+			//		break;
+			//}
 		}
 
 		private void BtnMenu_Measure_Click(object sender, RoutedEventArgs e)
 		{
-
+			GrdMain.Children.Clear();
+			UserControls.UcMeasure ucMeasure = new UserControls.UcMeasure {
+				Name = "NewUcMeasure",
+				Margin = new Thickness( 0, 0, 0, 0 )
+			};
+			GrdMain.Children.Add( ucMeasure );
 		}
 
 		private void BtnMenu_DataQuery_Click(object sender, RoutedEventArgs e)
 		{
-
+			GrdMain.Children.Clear();
+			UserControls.UcLogin ucLogin = new UserControls.UcLogin {
+				Name = "NewLogin",
+				Margin = new Thickness( 0, 0, 0, 0 )
+			};
+			GrdMain.Children.Add( ucLogin );
 		}
 
 		private void BtnMenu_DataView_Click(object sender, RoutedEventArgs e)
 		{
-
+			GrdMain.Children.Clear();
+			UserControls.UcLogin ucLogin = new UserControls.UcLogin {
+				Name = "NewLogin",
+				Margin = new Thickness( 0, 0, 0, 0 )
+			};
+			GrdMain.Children.Add( ucLogin );
 		}
 
 		public delegate void Dlg_MessageTips(string message, bool cancel_showed = false);
@@ -177,7 +197,12 @@ namespace Ingenu_Power
 
 		private void BtnMenu_ISP_Click(object sender, RoutedEventArgs e)
 		{
-
+			GrdMain.Children.Clear();
+			UserControls.UcISP ucISP = new UserControls.UcISP {
+				Name = "NewISP",
+				Margin = new Thickness( 0, 0, 0, 0 )
+			};
+			GrdMain.Children.Add( ucISP );
 		}
 	}
 }
