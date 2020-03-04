@@ -20,10 +20,16 @@
     <Setting Name="PassWord" Type="System.String" Scope="User">
       <Value Profile="(Default)">123456</Value>
     </Setting>
-    <Setting Name="ISP_ID" Type="System.Int32" Scope="User">
+    <Setting Name="ISP_ID_Hardware" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="ISP_Ver" Type="System.Int32" Scope="User">
+    <Setting Name="ISP_Ver_Hardware" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ISP_ID_Software" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ISP_Ver_Software" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>

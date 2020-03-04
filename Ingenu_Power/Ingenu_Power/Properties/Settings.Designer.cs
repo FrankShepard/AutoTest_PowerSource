@@ -98,24 +98,48 @@ namespace Ingenu_Power.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int ISP_ID {
+        public int ISP_ID_Hardware {
             get {
-                return ((int)(this["ISP_ID"]));
+                return ((int)(this["ISP_ID_Hardware"]));
             }
             set {
-                this["ISP_ID"] = value;
+                this["ISP_ID_Hardware"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int ISP_Ver {
+        public int ISP_Ver_Hardware {
             get {
-                return ((int)(this["ISP_Ver"]));
+                return ((int)(this["ISP_Ver_Hardware"]));
             }
             set {
-                this["ISP_Ver"] = value;
+                this["ISP_Ver_Hardware"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ISP_ID_Software {
+            get {
+                return ((int)(this["ISP_ID_Software"]));
+            }
+            set {
+                this["ISP_ID_Software"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ISP_Ver_Software {
+            get {
+                return ((int)(this["ISP_Ver_Software"]));
+            }
+            set {
+                this["ISP_Ver_Software"] = value;
             }
         }
     }

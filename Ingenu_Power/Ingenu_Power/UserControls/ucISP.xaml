@@ -49,7 +49,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <materialDesign:PackIcon Kind="BarcodeScan" Width="50" Height="45" Grid.ColumnSpan="1" Margin="5,0,0,0"/>
-                        <TextBox Margin="20,0" materialDesign:HintAssist.Hint="产品ID" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" TextChanged="TextBox_TextChanged" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="15" Name="TxtID" />
+                        <TextBox Margin="20,0" materialDesign:HintAssist.Hint="产品ID" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="15" Name="TxtID" />
                     </Grid>
 					<WrapPanel Margin="10">
 						<ProgressBar Value="0" Margin="20" Height="8" Width="230"/>

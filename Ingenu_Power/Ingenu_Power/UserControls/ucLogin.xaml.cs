@@ -56,7 +56,7 @@ namespace Ingenu_Power.UserControls
 					//数据库的初始化连接
 					database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
 					if (error_information == string.Empty) {
-						DataTable table = database.V_UserGet( out error_information );
+						DataTable table = database.V_UserInfor_Get( out error_information );
 						if (error_information == string.Empty) {
 							int index = 0;
 							for (index = 0; index < table.Rows.Count; index++) {
@@ -67,7 +67,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.UserRightLevel = 0;
 									} else {
 										//密码匹配或者密码重置 - 更新当前登陆时间和登陆的电脑
-										database.V_UpdateUserInfor( table.Rows[ index ][ "用户名" ].ToString().Trim().ToUpper(), FloatingPasswordBox.Password.Trim().ToUpper(), out error_information );
+										database.V_UserInfor_Update( table.Rows[ index ][ "用户名" ].ToString().Trim().ToUpper(), FloatingPasswordBox.Password.Trim().ToUpper(), out error_information );
 
 										if (error_information == string.Empty) {
 											StaticInfor.UserRightLevel = Convert.ToInt32( table.Rows[ index ][ "权限等级" ] ); //获取权限等级
@@ -89,7 +89,7 @@ namespace Ingenu_Power.UserControls
 
 							if (index == table.Rows.Count) {
 								//数据库中没有对应的信息，需要更新数据
-								database.V_CreatUserInfor( TxtUserName.Text.Trim().ToUpper(), FloatingPasswordBox.Password.Trim().ToUpper(), out error_information );
+								database.V_UserInfor_Creat( TxtUserName.Text.Trim().ToUpper(), FloatingPasswordBox.Password.Trim().ToUpper(), out error_information );
 								if (error_information == string.Empty) {
 									StaticInfor.UserRightLevel = 1; //新建用户权限等级为1
 								} else {

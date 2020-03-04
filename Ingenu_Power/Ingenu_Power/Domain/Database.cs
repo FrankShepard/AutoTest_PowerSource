@@ -46,12 +46,14 @@ namespace Ingenu_Power.Domain
 			}
 		}
 
-		/// <summary>
-		/// 获取用户信息
-		/// </summary>
-		/// <param name="error_information"> 可能存在的错误信息</param>
-		/// <returns></returns>
-		public DataTable V_UserGet(out string error_information)
+        #region -- 用户登录相关的表格信息获取与更新
+
+        /// <summary>
+        /// 获取用户的相关信息
+        /// </summary>
+        /// <param name="error_information"> 可能存在的错误信息</param>
+        /// <returns></returns>
+        public DataTable V_UserInfor_Get(out string error_information)
 		{			
 			error_information = string.Empty;
 			DataTable dtTarget = new DataTable();
@@ -60,12 +62,12 @@ namespace Ingenu_Power.Domain
 		}
 
 		/// <summary>
-		/// 新建用户登陆数据
+		/// 新建用户数据
 		/// </summary>
 		/// <param name="user_name">用户登录名</param>
 		/// <param name="password">用户登录密码</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void V_CreatUserInfor(string user_name, string password, out string error_information)
+		public void V_UserInfor_Creat(string user_name, string password, out string error_information)
 		{
 			error_information = string.Empty;
 			try {
@@ -87,7 +89,13 @@ namespace Ingenu_Power.Domain
 			}
 		}
 
-		public void V_UpdateUserInfor(string user_name, string password, out string error_information)
+        /// <summary>
+        /// 更新用户数据
+        /// </summary>
+        /// <param name="user_name">用户登录名</param>
+        /// <param name="password">用户登录密码</param>
+        /// <param name="error_information">可能存在的错误信息</param>
+		public void V_UserInfor_Update(string user_name, string password, out string error_information)
 		{
 			error_information = string.Empty;
 			try {
@@ -107,17 +115,53 @@ namespace Ingenu_Power.Domain
 			}
 		}
 
-		#endregion
+        #endregion
 
-		#region -- 在数据库中查找是否存在待查询信息的数据
+        #region -- ISP相关信息
 
-		/// <summary>
-		/// 在数据库中查询相信息
-		/// </summary>
-		/// <param name="infor">查询的SQL语言</param>\
-		/// <param name="error_information" >可能存在的相关错误信息</param>
-		/// <returns>在数据库中查询数据是否存在的情况</returns>
-		private  DataTable V_QueryInfor(string infor, out string error_information)
+        /// <summary>
+        /// 获取硬件ID和硬件版本号所映射的软件ID和软件版本号
+        /// </summary>
+        /// <param name="id_hardware">产品ID中包含的硬件ID</param>
+        /// <param name="ver_hardware">产品ID中包含的硬件版本号</param>
+        /// <param name="error_information"> 可能存在的错误信息</param>
+        /// <returns>硬件ID、版本号与软件ID、版本号之间的对应数据表格</returns>
+        public DataTable V_SoftwareInfor_Get(int id_hardware,int ver_hardware, out string error_information)
+        {
+            error_information = string.Empty;
+            DataTable dtTarget = new DataTable();
+            dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[MCU软件绑定信息] WHERE [硬件ID] = '" + id_hardware.ToString() + "' AND [硬件版本号] = '" + ver_hardware.ToString() + "'", out error_information );
+            return dtTarget;
+        }
+
+        /// <summary>
+        /// 获取指定软件ID和软件版本号的电源程序
+        /// </summary>
+        /// <param name="id_software">软件ID</param>
+        /// <param name="ver_software">软件版本号</param>
+        /// <param name="error_information"> 可能存在的错误信息</param>
+        /// <returns>单片机程序相关信息</returns>
+        public DataTable V_McuCode_Get(int id_software,int ver_software,out string error_information)
+        {
+            error_information = string.Empty;
+            DataTable dtTarget = new DataTable();
+            dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[盈帜产品程序信息] WHERE [文件编号ID] = '" + id_software.ToString() + "' AND [版本号] = '" + ver_software.ToString() + "' ORDER BY [归档日期] DESC", out error_information );
+            return dtTarget;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region -- 在数据库中查找是否存在待查询信息的数据
+
+        /// <summary>
+        /// 在数据库中查询相信息
+        /// </summary>
+        /// <param name="infor">查询的SQL语言</param>\
+        /// <param name="error_information" >可能存在的相关错误信息</param>
+        /// <returns>在数据库中查询数据是否存在的情况</returns>
+        private DataTable V_QueryInfor(string infor, out string error_information)
 		{
 			DataTable dtTarget = new DataTable();
 			error_information = string.Empty;
@@ -145,8 +189,8 @@ namespace Ingenu_Power.Domain
 						objConnection.Close(); //关闭数据库连接
 					}
 				}
-			} catch {
-				error_information = "数据库操作异常";
+			} catch(Exception ex) {
+                error_information = ex.ToString();
 			}
 			return dtTarget;
 		}
