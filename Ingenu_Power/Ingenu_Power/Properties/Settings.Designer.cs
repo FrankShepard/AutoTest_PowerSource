@@ -142,5 +142,17 @@ namespace Ingenu_Power.Properties {
                 this["ISP_Ver_Software"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Instrment_OSC_INS {
+            get {
+                return ((string)(this["Instrment_OSC_INS"]));
+            }
+            set {
+                this["Instrment_OSC_INS"] = value;
+            }
+        }
     }
 }

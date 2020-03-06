@@ -186,7 +186,7 @@
             <param name="data_arrayList">通过串口发送的指令元素数组</param>
             <returns>返回的校验和</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vCommandSend(System.Collections.ArrayList,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vCommandSend(System.Collections.ArrayList,System.IO.Ports.SerialPort)">
             <summary>
             使用串口发送指令代码
             </summary>
@@ -194,14 +194,14 @@
             <param name="sp_acpower">目标串口</param>
             <returns>发送指令的状态信息，返回值为 string.Empty 说明正常传输数据</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vCheckRespond(System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vCheckRespond(System.IO.Ports.SerialPort)">
             <summary>
             程控交流电源指令响应与读取数据的判断
             </summary>
             <param name="sp_acpower">程控交流电源连接的电脑串口</param>
             <returns>程控交流电源的响应，正确与否的判定依据之一</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vGetQueryedValue(System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vGetQueryedValue(System.IO.Ports.SerialPort,System.String@)">
             <summary>
             从交流电源返回得到的查询值进行有效数据的提取
             </summary>
@@ -209,14 +209,14 @@
             <param name="error_information">可能存在的故障</param>
             <returns>提取之后的有效值</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vWaitForRespond(System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vWaitForRespond(System.IO.Ports.SerialPort)">
             <summary>
             等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
             </summary>
             <param name="sp_instrument">仪表连接的电脑串口</param>
             <returns>可能存在的异常情况</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vQuery(System.Byte,System.Byte,System.String,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vQuery(System.Byte,System.Byte,System.String,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             查询交流电源的相关信息
             </summary>
@@ -227,7 +227,7 @@
             <param name="error_information">可能存在的异常信息</param>
             <returns>需要获取的数据</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vInitializate(System.Byte,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vInitializate(System.Byte,System.IO.Ports.SerialPort)">
             <summary>
             程控交流电源初始化；注意：连续操作启动指令、查询指令之前需要执行延迟等待，否则交流电源容易不响应
             </summary>
@@ -235,7 +235,7 @@
             <param name="sp_acpower">程控交流电源使用到的串口的对象</param>
             <returns>初始化信息</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vControlStart(System.Byte,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vControlStart(System.Byte,System.IO.Ports.SerialPort)">
             <summary>
             向程控交流电源发送的启动指令
             </summary>
@@ -243,7 +243,7 @@
             <param name="sp_acpower">与交流电源连接的电脑串口</param>
             <returns>发送指令的信息，若不是string.Empty，则表示发送指令时出现了异常</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vControlStop(System.Byte,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vControlStop(System.Byte,System.IO.Ports.SerialPort)">
             <summary>
             向程控交流电源发送的停止指令
             </summary>
@@ -251,7 +251,7 @@
             <param name="sp_acpower">与交流电源连接的电脑串口</param>
             <returns>发送指令的信息，若不是string.Empty，则表示发送指令时出现了异常</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vSetParameters(System.Byte,System.Decimal,System.Decimal,System.Boolean,System.IO.Ports.SerialPort@,System.Int32,System.Int32,System.Int32)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vSetParameters(System.Byte,System.Decimal,System.Decimal,System.Boolean,System.IO.Ports.SerialPort,System.Int32,System.Int32,System.Int32)">
             <summary>
             向交流电源发送仪表常规测量参数的设置值
             </summary>
@@ -265,7 +265,7 @@
             <param name="down_floating">输出电压的下浮值（5V~30V整数）</param>
             <returns>发送指令的信息，若不是string.Empty则表示发送指令时出现了异常情况</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vQueryModel(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vQueryModel(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             查询交流电源的型号
             </summary>
@@ -274,7 +274,7 @@
             <param name="error_information">查询错误信息</param>
             <returns>电源型号</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vQueryVerion(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vQueryVerion(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             查询交流电源的软件版本
             </summary>
@@ -283,7 +283,7 @@
             <param name="error_information">查询错误提示信息</param>
             <returns>软件版本</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vQueryWorkingStatus(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vQueryWorkingStatus(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             查询交流电源的工作状态
             </summary>
@@ -292,7 +292,7 @@
             <param name="error_information">查询错误提示信息</param>
             <returns>电源的工作状态</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vQueryResult(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vQueryResult(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             查询当前时刻电源的具体数值，包括电压、电流、频率、功率
             </summary>
@@ -301,7 +301,7 @@
             <param name="error_information">查询错误信息</param>
             <returns>输出的真实值结构体</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vQuerySettingParameters(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vQuerySettingParameters(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             对交流电源预置参数的查询，包含电压、频率、上浮值、下浮值、快捷组、高档锁定状态
             </summary>
@@ -682,7 +682,7 @@
             <param name="length">需要进行CRC校验的通讯帧的字节长度</param>
             <returns>返回的校验数据</returns>
         </member>
-        <member name="M:Instrument_Control.DP11_12.DCPower_vCommandSend(System.Byte[],System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.DP11_12.DCPower_vCommandSend(System.Byte[],System.IO.Ports.SerialPort)">
             <summary>
             使用串口发送指令代码
             </summary>
@@ -690,7 +690,7 @@
             <param name="sp_power"></param>
             <returns>可能存在的异常状态</returns>
         </member>
-        <member name="M:Instrument_Control.DP11_12.DCPower_vCommandRespond_Flag(System.Byte,Instrument_Control.DP11_12.FlagAddress,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.DP11_12.DCPower_vCommandRespond_Flag(System.Byte,Instrument_Control.DP11_12.FlagAddress,System.IO.Ports.SerialPort)">
             <summary>
             检查直流电源返回的数据是否存在异常的判断
             </summary>
@@ -699,7 +699,7 @@
             <param name="sp_dcpower">使用到的串口</param>
             <returns>可能存在的异常信息</returns>
         </member>
-        <member name="M:Instrument_Control.DP11_12.DCPower_vCommandEnableAction(System.Byte,Instrument_Control.DP11_12.CMD_Meaning,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.DP11_12.DCPower_vCommandEnableAction(System.Byte,Instrument_Control.DP11_12.CMD_Meaning,System.IO.Ports.SerialPort)">
             <summary>
             用于生效用户的设置功能
             </summary>
@@ -707,7 +707,7 @@
             <param name="cMD_Meaning">cmd确认指令意义</param>
             <param name="sp_dcpower">使用到的串口</param>
         </member>
-        <member name="M:Instrument_Control.DP11_12.DCPower_vReadFlag(System.Byte,Instrument_Control.DP11_12.FlagAddress,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.DP11_12.DCPower_vReadFlag(System.Byte,Instrument_Control.DP11_12.FlagAddress,System.IO.Ports.SerialPort)">
             <summary>
             从电源内部读取Flag标志位
             </summary>
@@ -716,7 +716,7 @@
             <param name="sp_dcpower">使用到的通讯串口</param>
             <returns>返回的错误信息</returns>
         </member>
-        <member name="M:Instrument_Control.DP11_12.DCPower_vSetFlag(System.Byte,Instrument_Control.DP11_12.FlagAddress,System.UInt16,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.DP11_12.DCPower_vSetFlag(System.Byte,Instrument_Control.DP11_12.FlagAddress,System.UInt16,System.IO.Ports.SerialPort)">
             <summary>
             电源内部设置Flag标志的函数
             </summary>
@@ -726,7 +726,7 @@
             <param name="sp_dcpower">使用到的串口</param>
             <returns>可能存在的异常欣喜</returns>
         </member>
-        <member name="M:Instrument_Control.DP11_12.DCPower_vSetRegister(System.Byte,Instrument_Control.DP11_12.RegisiterAddress,System.Single,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.DP11_12.DCPower_vSetRegister(System.Byte,Instrument_Control.DP11_12.RegisiterAddress,System.Single,System.IO.Ports.SerialPort)">
             <summary>
             设置直流电源中寄存器的数据
             </summary>
@@ -736,7 +736,7 @@
             <param name="sp_dcpower">通讯使用的串口</param>
             <returns></returns>
         </member>
-        <member name="M:Instrument_Control.DP11_12.DCPower_vReadRegister(System.Byte,Instrument_Control.DP11_12.RegisiterAddress,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.DP11_12.DCPower_vReadRegister(System.Byte,Instrument_Control.DP11_12.RegisiterAddress,System.IO.Ports.SerialPort)">
             <summary>
             读取直流电源中寄存器内的值
             </summary>
@@ -745,7 +745,7 @@
             <param name="sp_dcpower">使用到的通讯串口</param>
             <returns>返回的可能存在异常的信息</returns>
         </member>
-        <member name="M:Instrument_Control.DP11_12.DCPower_vOutputOff(System.Byte,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.DP11_12.DCPower_vOutputOff(System.Byte,System.IO.Ports.SerialPort)">
             <summary>
             直接对电源发送一个关闭输出的指令
             </summary>
@@ -753,7 +753,7 @@
             <param name="sp_dcpower">使用到的串口</param>
             <returns>可能存在的异常信息</returns>
         </member>
-        <member name="M:Instrument_Control.DP11_12.DCPower_vOutputOn(System.Byte,System.Single,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.DP11_12.DCPower_vOutputOn(System.Byte,System.Single,System.IO.Ports.SerialPort)">
             <summary>
             控制电源启动输出
             </summary>
@@ -2543,7 +2543,7 @@
             <param name="count">需要计算的字节长度</param>
             <returns>所需校验和</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.Itech_vCheckRespond(System.Byte,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.Itech_vCheckRespond(System.Byte,System.IO.Ports.SerialPort)">
             <summary>
             仪表对用户发送指令的响应数据
             </summary>
@@ -2551,7 +2551,7 @@
             <param name="sp_instrument">仪表连接的电脑串口</param>
             <returns>仪表响应，正确与否的判定依据</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.Itech_vWaitForRespond(System.Byte,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.Itech_vWaitForRespond(System.Byte,System.IO.Ports.SerialPort)">
             <summary>
             等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
             </summary>
@@ -2559,7 +2559,7 @@
             <param name="sp_instrument">仪表连接的电脑串口</param>
             <returns>可能存在的异常情况</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.Itech_vGetQueryedValue(System.Int32,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.Itech_vGetQueryedValue(System.Int32,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             从电子负载返回得到的查询值进行有效数据的提取
             </summary>
@@ -2568,7 +2568,7 @@
             <param name="error_information">可能存在的故障</param>
             <returns>提取之后的有效值</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vGetQueryedValue(System.Byte,Instrument_Control.Itech.ElecLoad_Command,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vGetQueryedValue(System.Byte,Instrument_Control.Itech.ElecLoad_Command,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             从串口接收到的数据中提取结构体，与命令相关
             </summary>
@@ -2578,7 +2578,7 @@
             <param name="error_information">可能存在的错误信息</param>
             <returns>返回的结构体对象，为了保证传输的普遍适用，用object类型</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vTransferOneCommand(System.Byte,Instrument_Control.Itech.ElecLoad_Command,System.IO.Ports.SerialPort@,System.String@,System.Byte,System.Byte,System.Byte,System.Byte)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vTransferOneCommand(System.Byte,Instrument_Control.Itech.ElecLoad_Command,System.IO.Ports.SerialPort,System.String@,System.Byte,System.Byte,System.Byte,System.Byte)">
             <summary>
             为电子负载进行单条指令设置时的动作
             </summary>
@@ -2592,7 +2592,7 @@
             <param name="para4">可选参数4</param>
             <returns>可能返回的查询数据或者结构体</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vTransferOneCommand(System.Byte,Instrument_Control.Itech.ElecLoad_Command,System.IO.Ports.SerialPort@,System.String@,System.Object)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vTransferOneCommand(System.Byte,Instrument_Control.Itech.ElecLoad_Command,System.IO.Ports.SerialPort,System.String@,System.Object)">
             <summary>
             为电子负载进行动态参数设置的动作
             </summary>
@@ -2603,7 +2603,7 @@
             <param name="obj">为了满足普遍适用性而使用基础变量</param>
             <returns>可能返回的查询数据或者结构体</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.DCPower_vTransferOneCommand(System.Byte,Instrument_Control.Itech.DCPower_Command,System.IO.Ports.SerialPort@,System.String@,System.Byte,System.Byte,System.Byte,System.Byte)">
+        <member name="M:Instrument_Control.Itech.DCPower_vTransferOneCommand(System.Byte,Instrument_Control.Itech.DCPower_Command,System.IO.Ports.SerialPort,System.String@,System.Byte,System.Byte,System.Byte,System.Byte)">
             <summary>
             为直流电源进行单条指令设置时的动作
             </summary>
@@ -2617,7 +2617,7 @@
             <param name="para4">可选参数4</param>
             <returns>可能返回的查询数据或者结构体</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.DCPower_vTransferOneCommand(System.Byte,Instrument_Control.Itech.DCPower_Command,System.IO.Ports.SerialPort@,System.String@,System.Object)">
+        <member name="M:Instrument_Control.Itech.DCPower_vTransferOneCommand(System.Byte,Instrument_Control.Itech.DCPower_Command,System.IO.Ports.SerialPort,System.String@,System.Object)">
             <summary>
             为电源进行结构体相关命令的设置
             </summary>
@@ -2628,7 +2628,7 @@
             <param name="obj">为了满足普遍适用性而使用基础变量</param>
             <returns>可能返回的查询数据或者结构体</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.DCPower_vGetQueryedValue(System.Byte,Instrument_Control.Itech.DCPower_Command,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.DCPower_vGetQueryedValue(System.Byte,Instrument_Control.Itech.DCPower_Command,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             从串口接收到的数据中提取结构体，与命令相关
             </summary>
@@ -2638,7 +2638,7 @@
             <param name="error_information">可能存在的错误信息</param>
             <returns>返回的结构体对象，为了保证传输的普遍适用，用object类型</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.Itech_vRemoteControl(System.Byte,Instrument_Control.Itech.RemoteControlMode,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.Itech_vRemoteControl(System.Byte,Instrument_Control.Itech.RemoteControlMode,System.IO.Ports.SerialPort)">
             <summary>
             仪表的远程控制方式设置
             </summary>
@@ -2647,7 +2647,7 @@
             <param name="sp_instrument">通讯使用到串口对象</param>
             <returns>可能存在的故障状态</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.Itech_vInOutOnOffSet(System.Byte,Instrument_Control.Itech.OnOffStatus,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.Itech_vInOutOnOffSet(System.Byte,Instrument_Control.Itech.OnOffStatus,System.IO.Ports.SerialPort)">
             <summary>
             快速设置仪表的输入/输出状态
             </summary>
@@ -2656,7 +2656,7 @@
             <param name="sp_instrument">通讯用的串口</param>
             <returns>可能存在的故障情况</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vInitializate(System.Byte,System.Boolean,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vInitializate(System.Byte,System.Boolean,System.IO.Ports.SerialPort)">
             <summary>
             指定电子负载的初始化，运行模式定为CC，输入断开，远程控制、remotesense打开
             </summary>
@@ -2665,7 +2665,7 @@
             <param name="sp_instrument">电子负载通讯使用到的串口</param>
             <returns>可能存在的异常信息</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vRemoteSenseControl(System.Byte,System.Boolean,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vRemoteSenseControl(System.Byte,System.Boolean,System.IO.Ports.SerialPort)">
             <summary>
             仪表的远端测试功能设置，仅在电子负载上可以使用
             </summary>
@@ -2674,7 +2674,7 @@
             <param name="sp_instrument">使用到的通讯串口</param>
             <returns>可能存在的故障状态</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vInputStatusSet(System.Byte,Instrument_Control.Itech.WorkingMode,Instrument_Control.Itech.OnOffStatus,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vInputStatusSet(System.Byte,Instrument_Control.Itech.WorkingMode,Instrument_Control.Itech.OnOffStatus,System.IO.Ports.SerialPort)">
             <summary>
             电子负载常规模式或者短路模式的设置
             </summary>
@@ -2684,7 +2684,7 @@
             <param name="sp_instrument">使用到的通讯串口</param>
             <returns></returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vInputStatusSet(System.Byte,Instrument_Control.Itech.OperationMode,System.Decimal,Instrument_Control.Itech.OnOffStatus,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vInputStatusSet(System.Byte,Instrument_Control.Itech.OperationMode,System.Decimal,Instrument_Control.Itech.OnOffStatus,System.IO.Ports.SerialPort)">
             <summary>
             电子负载的工作模式、带载情况和开启状态的设置
             </summary>
@@ -2695,7 +2695,7 @@
             <param name="sp_instrument">通讯使用到的串口</param>
             <returns>可能存在的问题</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vReadMeasuredValue(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vReadMeasuredValue(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             获取电子负载的测试返回值
             </summary>
@@ -2704,7 +2704,7 @@
             <param name="error_information">在通讯过程中可能出现的错误的情况说明</param>
             <returns>测试得到的相关信息的集合</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vInputMaxValueSet(System.Byte,Instrument_Control.Itech.OperationMode,System.Decimal,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vInputMaxValueSet(System.Byte,Instrument_Control.Itech.OperationMode,System.Decimal,System.IO.Ports.SerialPort)">
             <summary>
             设置电子负载在不同操作模式时的最大值
             </summary>
@@ -2714,7 +2714,7 @@
             <param name="sp_instrument">使用到的串口</param>
             <returns>在通讯过程中可能出现的错误的情况说明</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vInputMaxValueGet(System.Byte,Instrument_Control.Itech.OperationMode,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vInputMaxValueGet(System.Byte,Instrument_Control.Itech.OperationMode,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             读取电子负载在不同操作模式时的最大值
             </summary>
@@ -2724,7 +2724,7 @@
             <param name="error_information">可能存在的故障</param>
             <returns>在通讯过程中可能出现的错误的情况说明</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vDynamicParameterSet(System.Byte,Instrument_Control.Itech.OperationMode,System.Decimal,System.Decimal,System.Decimal,System.Decimal,Instrument_Control.Itech.DynamicMode,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vDynamicParameterSet(System.Byte,Instrument_Control.Itech.OperationMode,System.Decimal,System.Decimal,System.Decimal,System.Decimal,Instrument_Control.Itech.DynamicMode,System.IO.Ports.SerialPort)">
             <summary>
             设置电子负载动态参数值，包含电流模式、电压模式、电阻模式和功率模式
             </summary>
@@ -2738,7 +2738,7 @@
             <param name="dynamicMode">动态操作的模式</param>
             <returns>在通讯过程中可能出现的错误的情况说明</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vDynamicParameterGet(System.Byte,Instrument_Control.Itech.OperationMode,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vDynamicParameterGet(System.Byte,Instrument_Control.Itech.OperationMode,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             查询电子负载动态参数值，包含电流模式、电压模式、电阻模式和功率模式
             </summary>
@@ -2748,7 +2748,7 @@
             <param name="error_information">在通讯过程中可能出现的错误的情况说明</param>
             <returns>动态参数数据</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vListOperationSet(System.Byte,Instrument_Control.Itech.OperationMode_List,Instrument_Control.Itech.List_CyclicalMode,System.Boolean,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vListOperationSet(System.Byte,Instrument_Control.Itech.OperationMode_List,Instrument_Control.Itech.List_CyclicalMode,System.Boolean,System.IO.Ports.SerialPort)">
             <summary>
             设置List模式的相关参数，包含了操作模式和循环模式
             </summary>
@@ -2759,7 +2759,7 @@
             <param name="sp_instrument">使用到的串口</param>		
             <returns>可能存在的故障状态</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vListStepParameterSet(System.Byte,System.Int32,System.Decimal,System.Int32,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vListStepParameterSet(System.Byte,System.Int32,System.Decimal,System.Int32,System.IO.Ports.SerialPort)">
             <summary>
             List模式下指定步骤的参数设置
             </summary>
@@ -2770,7 +2770,7 @@
             <param name="sp_instrument">使用到的串口</param>
             <returns>可能存在的异常状态</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vMachineInforGet(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vMachineInforGet(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             读取仪表的产品序列号、产品型号及软件版本号
             </summary>
@@ -2779,7 +2779,7 @@
             <param name="error_information">可能存在的错误信息</param>
             <returns>仪表信息的结构体</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vHardwareLimitInforGet(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vHardwareLimitInforGet(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             读取仪表的硬件限制信息
             </summary>
@@ -2788,7 +2788,7 @@
             <param name="error_information">可能存在的错误信息</param>
             <returns>仪表硬件信息的结构体</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vOCPSet(System.Byte,System.IO.Ports.SerialPort@,System.Decimal,System.Int32,System.Boolean)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vOCPSet(System.Byte,System.IO.Ports.SerialPort,System.Decimal,System.Int32,System.Boolean)">
             <summary>
             OCP保护功能的相关设置
             </summary>
@@ -2799,7 +2799,7 @@
             <param name="ocp_enable">ocp使能状态</param>
             <returns>可能存在的异常信息</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vSetMaxCurrentInCV(System.Byte,System.IO.Ports.SerialPort@,System.Decimal)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vSetMaxCurrentInCV(System.Byte,System.IO.Ports.SerialPort,System.Decimal)">
             <summary>
             设置定电压时电流的上限
             </summary>
@@ -2808,7 +2808,7 @@
             <param name="target_value">目标电流上限</param>
             <returns>可能存在的异常信息</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vClearProtection(System.Byte,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vClearProtection(System.Byte,System.IO.Ports.SerialPort)">
             <summary>
             清除保护状态
             </summary>
@@ -2816,7 +2816,7 @@
             <param name="sp_instrument">使用到的串口</param>
             <returns>可能存在的异常信息</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vReadInputRange(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vReadInputRange(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             获取输入的电压和电流的变化范围
             </summary>
@@ -2825,7 +2825,7 @@
             <param name="error_information">可能存在的错误信息</param>
             <returns>电压/电流变化范围的结构体</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.ElecLoad_vReadInputRapple(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.ElecLoad_vReadInputRapple(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             获取输入的电压和电流的纹波值
             </summary>
@@ -2834,7 +2834,7 @@
             <param name="error_information">可能存在的错误信息</param>
             <returns>电压/电流纹波值的结构体</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.DCPower_vOutputStatusSet(System.Byte,System.Decimal,System.Boolean,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.DCPower_vOutputStatusSet(System.Byte,System.Decimal,System.Boolean,System.IO.Ports.SerialPort)">
             <summary>
             直流电源的输出电压的设置
             </summary>
@@ -2844,7 +2844,7 @@
             <param name="sp_instrument">使用到的串口</param>
             <returns>可能存在的问题</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.DCPower_vOutputStatusSet(System.Byte,System.Decimal,System.Decimal,System.Decimal,System.Boolean,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.DCPower_vOutputStatusSet(System.Byte,System.Decimal,System.Decimal,System.Decimal,System.Boolean,System.IO.Ports.SerialPort)">
             <summary>
             直流电源的输出状态的设置
             </summary>
@@ -2856,7 +2856,7 @@
             <param name="sp_instrument">使用到的串口</param>
             <returns>可能存在的问题</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.DCPower_vReadParameter(System.Byte,System.IO.Ports.SerialPort@,System.String@)">
+        <member name="M:Instrument_Control.Itech.DCPower_vReadParameter(System.Byte,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             获取电源的相关参数信息
             </summary>
@@ -2865,7 +2865,7 @@
             <param name="error_information">可能存在的故障信息</param>
             <returns>相关信息的结构体</returns>
         </member>
-        <member name="M:Instrument_Control.Itech.DCPower_vRealyDoEvent(System.Int32,System.Boolean,System.IO.Ports.SerialPort@)">
+        <member name="M:Instrument_Control.Itech.DCPower_vRealyDoEvent(System.Int32,System.Boolean,System.IO.Ports.SerialPort)">
             <summary>
             控制继电器模块保证备电的功率源从仪表更改为固定电平的大功率电源
             </summary>
@@ -2886,6 +2886,588 @@
             <param name="disposing"></param>
         </member>
         <member name="M:Instrument_Control.Itech.Finalize">
+            <summary>
+            类释放资源析构函数
+            </summary>
+        </member>
+        <member name="T:Instrument_Control.MCU_Control">
+            <summary>
+            定义管理员模式下的待测电源产品单片机通讯方式和双通道分选板、备电控制板的控制方式
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Address_Bats">
+            <summary>
+            备电模块的地址
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Address_ChannelChoose">
+            <summary>
+            通道分选模块的地址
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Header_Control">
+            <summary>
+            备电控制继电器模块和通道分选模块协议中使用的通讯同步 帧头
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Ender_Control">
+            <summary>
+            备电控制继电器模块和通道分选模块协议中使用的通讯同步 帧尾
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Header_Vali">
+            <summary>
+            通用校准协议中使用的通讯同步 帧头
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Ender_Vali">
+            <summary>
+            通用校准协议中使用的通讯同步 帧尾
+            </summary>
+        </member>
+        <member name="T:Instrument_Control.MCU_Control.Cmd">
+            <summary>
+            管理员模式下的命令cmd码
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd.Cmd_Set">
+            <summary>
+            在管理员模式下的设置命令
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd.Cmd_Reset">
+            <summary>
+            待测产品的单片机复位命令
+            </summary>
+        </member>
+        <member name="T:Instrument_Control.MCU_Control.Config">
+            <summary>
+            进行通讯的Config码 - 管理员模式
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.Default_No_Sense">
+            <summary>
+            默认，无意义
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.OutputTargetSet_1">
+            <summary>
+            Write : 输出通道1设定输出电压，用于后续扩展
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.OutputTargetSet_2">
+            <summary>
+            Write : 输出通道2设定输出电压，用于后续扩展
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.OverCurrentSet_1OutputTargetSet_3">
+            <summary>
+            Write : 输出通道3设定输出电压，用于后续扩展
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.ZeroCalibrate_1">
+            <summary>
+            Write : 输出通道1的零点校准
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.ZeroCalibrate_2">
+            <summary>
+            Write : 输出通道2的零点校准
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.ZeroCalibrate_3">
+            <summary>
+            Write : 输出通道3的零点校准
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.OverCurrentSet_1">
+            <summary>
+            Write : 设置输出通道1的软件过流点
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.OverCurrentSet_2">
+            <summary>
+            Write : 设置输出通道2的软件过流点
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.OverCurrentSet_3">
+            <summary>
+            Write : 设置输出通道3的软件过流点
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.DisplayVoltage_Ratio_1">
+            <summary>
+            Write : 输出通道1的电压与电流校准
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.DisplayVoltage_Ratio_2">
+            <summary>
+            Write : 输出通道2的电压与电流校准
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.DisplayVoltage_Ratio_3">
+            <summary>
+            Write : 输出通道3的电压与电流校准
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.OutputVoltage_Adjust">
+            <summary>
+            Write : 输出电压的调整(硬件设计问题，所有通道的电压时调整，待后续扩展)
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.Mcu_MainpowerPeriodCountGet">
+            <summary>
+            主电校准时的频率计数获取
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.Mcu_MainpowerUnderVoltageCountGet">
+            <summary>
+            主电欠压点时刻主电S1SL信号的低电平计数值
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.DisplayVoltage_Ratio_Bat">
+            <summary>
+            备电电压的显示系数的获取 - 表示总的备电电压
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.Mcu_CannotChargeHighCountGet">
+            <summary>
+            主电快要过压时停止充电时刻S1SL信号的低电平计数值
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.MainpowerVoltageCalibrate">
+            <summary>
+            主电电压校准
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.RatioSpCurrentToMp_1">
+            <summary>
+            备电时的输出电流1与主电时电流的系数
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.AlwaysCharging">
+            <summary>
+            管理员指令，对特定的产品而言，使用本指令来保证始终处于充电的状态（应急照明电源）
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.BatsSingleWorkDisable">
+            <summary>
+            管理员指令，对特定产品，使用本指令之后会造成备电单投功能无效（应急照明电源）
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.Mcu_ClearValidationCode">
+            <summary>
+            清除单片机中相应的扇区中的校准数据
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.ChangeBeepWorkingTime">
+            <summary>
+            更改蜂鸣器使用标准的时长
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.SetBeValidatedFlag">
+            <summary>
+            更改产品被校准后的标志位
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.RatioSpCurrentToMp_2">
+            <summary>
+            备电时的输出电流2与主电时电流的系数
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.RatioSpCurrentToMp_3">
+            <summary>
+            备电时的输出电流3与主电时电流的系数
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.FlashDataSet">
+            <summary>
+            设置单片机内指定地址的Flash数据
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.FlashDataRead">
+            <summary>
+            读取单片机内指定地址的Flash数据
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.ExitAdminMode">
+            <summary>
+            退出管理员模式的代码
+            </summary>
+        </member>
+        <member name="T:Instrument_Control.MCU_Control.FixedLevel">
+            <summary>
+            备电控制继电器模块输出的固定电平种类的枚举
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.FixedLevel.FixedLevel_24V">
+            <summary>
+            固定输出24V（近似，实际会加上上浮电压）
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.FixedLevel.FixedLevel_12V">
+            <summary>
+            固定输出12V（近似，实际会加上上浮电压）
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.FixedLevel.FixedLevel_36V">
+            <summary>
+            固定输出36V（近似，实际会加上上浮电压）
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.FixedLevel.FixedLevel_Short">
+            <summary>
+            备电接入设置为短路模式
+            </summary>
+        </member>
+        <member name="T:Instrument_Control.MCU_Control.Location">
+            <summary>
+            通道分选继电器板中的位置枚举
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Location.Location_Left">
+            <summary>
+            安装位置 - 左
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Location.Location_Right">
+            <summary>
+            安装位置 - 右
+            </summary>
+        </member>
+        <member name="T:Instrument_Control.MCU_Control.MS_Choose">
+            <summary>
+            待执行ISP的单片机的主从的枚举
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.MS_Choose.Master">
+            <summary>
+            主
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.MS_Choose.Slaver">
+            <summary>
+            从
+            </summary>
+        </member>
+        <member name="T:Instrument_Control.MCU_Control.Cmd_MCUModel">
+            <summary>
+            对备电控制继电器模块和双通道分选继电器模块的通讯命令
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_BatsOuputType">
+            <summary>
+            设置备电控制板输出类型相关参数
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_RippleChannel">
+            <summary>
+            设置测试的输出纹波通道的切换数据
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_ISPConnection">
+            <summary>
+            设置产品MCU的ISP连接的开关状态
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_ISPMasterSlave">
+            <summary>
+            设置ISP时主从MCU的通道选择
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_ISPResetPower">
+            <summary>
+            设置ISP时目标MCU的上电复位操作
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_MandatoryStatus">
+            <summary>
+            设置应急照明电源的强制启动开关状态
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_Location">
+            <summary>
+            设置待测产品的左右安装位置
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Respond_Busy">
+            <summary>
+            MCU返回代码 - busy
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Respond_CmdError">
+            <summary>
+            MCU返回代码 - 指令错误
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Respond_ValiError">
+            <summary>
+            MCU返回代码 - 校验和错误
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Reset_Model">
+            <summary>
+            软件复位特定地址的单片机
+            </summary>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vBatsOutput(System.Boolean,System.Boolean,Instrument_Control.MCU_Control.FixedLevel,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            向备电控制继电器板发送的控制备电输出类型的函数
+            </summary>
+            <param name="output_enable">是否允许备电输出到待测产品</param>
+            <param name="adjust_enable">输出的备电电压是否可以自由调整</param>
+            <param name="fixedLevel">输出的固定电平的备电的电压种类</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vRappleChannelChoose(System.Int32,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+             向通道分选继电器板下发输出纹波测试的通道选择
+            </summary>
+            <param name="channel_index">0 -- 通道1； 1 -- 通道2；2 -- 通道3</param>
+            <param name="serialPort">使用到串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vConnectISP(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            向通道分选继电器板下发ISP管脚连接与否的设置
+            </summary>
+            <param name="connect_status">设定的ISP连接状态</param>
+            <param name="serialPort">使用到串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vISPMasterOrSlaver(Instrument_Control.MCU_Control.MS_Choose,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            向通道分选继电器板下发ISP连接的主从单片机的设置
+            </summary>
+            <param name="mS_Choose">设定的ISP应该对Master还是Slaver</param>
+            <param name="serialPort">使用到串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vISPRestartPower(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            向通道分选继电器板ISP操作时对应MCU重新上电的过程
+            </summary>
+            <param name="serialPort">使用到串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vMandatory(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            向通道分选继电器板下发应急照明电源是否强制启动的命令
+            </summary>
+            <param name="mandatory">应急照明电源是否强制启动</param>
+            <param name="serialPort">使用到串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vMeasureLocation(Instrument_Control.MCU_Control.Location,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            向通道分选继电器板双工位的具体选择
+            </summary>
+            <param name="location">应该测试的产品安装位置</param>
+            <param name="serialPort">使用到串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vReset(System.Byte,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对指定地址的模块进行软件重启操作
+            </summary>
+            <param name="address">模块地址</param>
+            <param name="serialPort">使用到串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vMpOutputVoltage(System.Int32,System.Decimal,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 输出通道输出电压采集值(在主电输出空载的情况下校准)
+            </summary>
+            <param name="channel_index">输出通道</param>
+            <param name="voltage">测试得到的输出电压</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vMpVoltage(System.Decimal,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 主电电压值的采集
+            </summary>
+            <param name="voltage">实际主电电压值</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vSpVoltage(System.Decimal,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 备电电压采集值(在备电输出空载的情况下校准)
+            </summary>
+            <param name="voltage">测试得到的备电电压</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vMpVoltage_StopCharge(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 主电停止充电的对应电压值,在J-EI8212中涉及到主电过压的判断
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vOCP(System.Int32,System.Decimal,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 输出通道OCP设置
+            </summary>
+            <param name="channel_index">输出通道</param>
+            <param name="ocp_value">目标OCP</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vMpOutputCurrent(System.Int32,System.Decimal,System.Decimal,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 再主电输出通道电流校准
+            </summary>
+            <param name="channel_index">输出通道</param>
+            <param name="voltage">实测电压值</param>
+            <param name="current">实测电流值</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vSpOutputCurrent(System.Int32,System.Decimal,System.Decimal,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 在备电提供输出时使用，用于备电的电流准确
+            </summary>
+            <param name="channel_index">输出通道</param>
+            <param name="voltage">实测电压值</param>
+            <param name="current">实测电流值</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vAlwaysCharging(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 强制充电的控制逻辑
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vBatsSingleWorkEnableSet(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 在应急照明电源中禁止备电单投功能
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vClear(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 擦除校准数据
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vSetLongBeepTime(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 设置蜂鸣器工作时长为标准时长
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vCalibrationCompeletd(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 校准后的数据标记，在一些电源中串口管脚与信号管脚复用时使用
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vExitCalibration(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 退出校准程序
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vMp(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 主电周期及主电欠压点的校准
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vReset(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行校准 - 软件重启MCU
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vCalculateVali(System.Byte[])">
+            <summary>
+            ModelBus中的CRC校验   逆序 多项式8005  初始值0xFFFF  异或值0x0000
+            </summary>
+            <param name="cmd">待计算校验和的数组对象</param>
+            <returns>CRC16校验和</returns>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            具体的使用串口发送指令代码和等待接收的过程
+            </summary>
+            <param name="command_bytes">待发送的实际数据流</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+             <summary>
+             设备对用户发送指令的响应数据
+             </summary>
+             <param name="command_bytes">发送到设备的命令</param>
+             <param name="serialPort">设备连接的电脑串口</param>
+            <param name="error_information">可能出现的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vSendCmd(System.Byte,Instrument_Control.MCU_Control.Cmd_MCUModel,System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            具体的执行下发到设备的命令填充，包含了设备回码的检查
+            </summary>
+            <param name="address">设备地址</param>
+            <param name="cmd_MCUModel">对设备的命令</param>
+            <param name="datas">实际有效的数据</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vCalculateVali(System.Byte[])">
+            <summary>
+            校验值为之前所有字节的和的低8位
+            </summary>
+            <param name="cmd">待计算校验和的数组对象</param>
+            <returns>校验和</returns>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+             <summary>
+             设备对用户发送指令的响应数据
+             </summary>
+             <param name="command_bytes">发送到设备的命令</param>
+             <param name="serialPort">设备连接的电脑串口</param>
+            <param name="error_information">可能出现的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            校准时使用的具体发送函数
+            </summary>
+            <param name="command_bytes">通讯协议中规定的9字节数组数据</param>
+            <param name="serialPort">单片机使用的串口</param>
+            <param name="error_information">可能出现的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vSendCmd(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            具体的执行下发到待测电源MCU命令填充，包含了回码的检查
+            </summary>
+            <param name="datas">可变参数数据</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.Dispose">
+            <summary>
+            本类资源释放
+            </summary>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.Dispose(System.Boolean)">
+            <summary>
+            无法直接调用的资源释放程序
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.Finalize">
             <summary>
             类释放资源析构函数
             </summary>
