@@ -31,6 +31,28 @@
 
     <Grid>
         <Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid HorizontalAlignment="Left" Margin="0">
+                <Expander ExpandDirection="Left">
+                    <Expander.Header>
+                        <TextBlock Text="待测产品通讯说明" >
+                            <TextBlock.LayoutTransform>
+                                <RotateTransform Angle="90" />
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </Expander.Header>
+                    <StackPanel Orientation="Vertical"
+                            TextBlock.Foreground="{DynamicResource MaterialDesignBody}"
+                            Margin="0,5,0,0">                        
+                        <WrapPanel Margin="10">
+                            <materialDesign:PackIcon Kind="TooltipImage" />
+                            <TextBlock FontStyle="Italic" Text="通讯模块 "></TextBlock>
+                        </WrapPanel>
+                        <!--<Image ></Image>-->
+                        <TextBlock Margin="10,0,10,10" FontSize="11" Opacity=".68" Text=""
+                               TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Expander>
+            </Grid>
             <materialDesign:Card Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360" Height="266" Padding="10"  >
                 <StackPanel Margin="0 30 0 0">
                     <Grid Margin="5,10,10,10">

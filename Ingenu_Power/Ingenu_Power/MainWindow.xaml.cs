@@ -31,7 +31,15 @@ namespace Ingenu_Power
 		/// <summary>
 		/// 测试窗体，需要保证唯一性，在测试时允许查看测试结果后返回窗体继续测试
 		/// </summary>
-		UserControls.UcMeasure ucMeasure;
+		UserControls.UcMeasure ucMeasure = new UserControls.UcMeasure {
+            	Name = "NewUcMeasure",
+            	Margin = new Thickness( 0, 0, 0, 0 )
+        };
+
+        /// <summary>
+        /// 测试窗体在主窗体中的children的索引
+        /// </summary>
+        int index_of_measure_in_grid = 0;
 
 		#endregion
 
@@ -59,7 +67,9 @@ namespace Ingenu_Power
 				ucLogin.TxtUserName.Text = Properties.Settings.Default.UserName;
 				ucLogin.FloatingPasswordBox.Password = Properties.Settings.Default.PassWord;
 			}
-			GrdMain.Children.Add( ucLogin );
+            ucMeasure.Visibility = Visibility.Hidden;
+            index_of_measure_in_grid = GrdMain.Children.Add( ucMeasure );
+            GrdMain.Children.Add( ucLogin );
 		}
 
 		/// <summary>
@@ -131,7 +141,14 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenu_ConnectDatabase_Click(object sender, RoutedEventArgs e)
 		{
-			GrdMain.Children.Clear();
+            for(int index = 0;index < GrdMain.Children.Count; index++) {
+                if (index != index_of_measure_in_grid) {
+                    GrdMain.Children.RemoveAt( index );
+                } else {
+                    GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Hidden;
+                }
+            }
+			
 			UserControls.UcDatabaseLogin ucDatabaseLogin = new UserControls.UcDatabaseLogin {
 				Name = "NewSQLLogin",
 				Margin = new Thickness( 0, 0, 0, 0 )
@@ -146,8 +163,14 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenu_Login_Click(object sender, RoutedEventArgs e)
 		{
-			GrdMain.Children.Clear();
-			UserControls.UcLogin ucLogin = new UserControls.UcLogin {
+            for (int index = 0; index < GrdMain.Children.Count; index++) {
+                if (index != index_of_measure_in_grid) {
+                    GrdMain.Children.RemoveAt( index );
+                } else {
+                    GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Hidden;
+                }
+            }
+            UserControls.UcLogin ucLogin = new UserControls.UcLogin {
 				Name = "NewLogin",
 				Margin = new Thickness( 0, 0, 0, 0 )
 			};
@@ -161,8 +184,14 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenu_InstumentValidate_Click(object sender, RoutedEventArgs e)
 		{
-			GrdMain.Children.Clear();
-			UserControls.UcInstrumentValidation ucInstrumentValidation = new UserControls.UcInstrumentValidation {
+            for (int index = 0; index < GrdMain.Children.Count; index++) {
+                if (index != index_of_measure_in_grid) {
+                    GrdMain.Children.RemoveAt( index );
+                } else {
+                    GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Hidden;
+                }
+            }
+            UserControls.UcInstrumentValidation ucInstrumentValidation = new UserControls.UcInstrumentValidation {
 				Name = "NewInstrumentValidation",
 				Margin = new Thickness( 0, 0, 0, 0 )
 			};
@@ -176,8 +205,14 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenu_ISP_Click(object sender, RoutedEventArgs e)
 		{
-			//GrdMain.Children.Clear();
-			UserControls.UcISP ucISP = new UserControls.UcISP {
+            for (int index = 0; index < GrdMain.Children.Count; index++) {
+                if (index != index_of_measure_in_grid) {
+                    GrdMain.Children.RemoveAt( index );
+                } else {
+                    GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Hidden;
+                }
+            }
+            UserControls.UcISP ucISP = new UserControls.UcISP {
 				Name = "NewISP",
 				Margin = new Thickness( 0, 0, 0, 0 )
 			};
@@ -191,15 +226,14 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenu_Measure_Click(object sender, RoutedEventArgs e)
 		{
-			IEnumerator enumerator = GrdMain.Children.GetEnumerator();
-			//GrdMain.Children.Clear();
-			//ucMeasure = new UserControls.UcMeasure {
-			//	Name = "NewUcMeasure",
-			//	Margin = new Thickness( 0, 0, 0, 0 )
-			//};
-			//GrdMain.Children.Add( ucMeasure );			
-			//GrdMain.Children.RemoveAt( ucMeasure );			
-		}
+            for (int index = 0; index < GrdMain.Children.Count; index++) {
+                if (index != index_of_measure_in_grid) {
+                    GrdMain.Children.RemoveAt( index );
+                } else {
+                    GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Visible;
+                }
+            }
+        }
 
 		/// <summary>
 		/// 菜单选择产品数据查询
@@ -208,8 +242,14 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenu_DataQuery_Click(object sender, RoutedEventArgs e)
 		{
-			GrdMain.Children.Clear();
-			UserControls.UcLogin ucLogin = new UserControls.UcLogin {
+            for (int index = 0; index < GrdMain.Children.Count; index++) {
+                if (index != index_of_measure_in_grid) {
+                    GrdMain.Children.RemoveAt( index );
+                } else {
+                    GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Hidden;
+                }
+            }
+            UserControls.UcLogin ucLogin = new UserControls.UcLogin {
 				Name = "NewLogin",
 				Margin = new Thickness( 0, 0, 0, 0 )
 			};
@@ -223,8 +263,14 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenu_DataView_Click(object sender, RoutedEventArgs e)
 		{
-			GrdMain.Children.Clear();
-			UserControls.UcLogin ucLogin = new UserControls.UcLogin {
+            for (int index = 0; index < GrdMain.Children.Count; index++) {
+                if (index != index_of_measure_in_grid) {
+                    GrdMain.Children.RemoveAt( index );
+                } else {
+                    GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Hidden;
+                }
+            }
+            UserControls.UcLogin ucLogin = new UserControls.UcLogin {
 				Name = "NewLogin",
 				Margin = new Thickness( 0, 0, 0, 0 )
 			};
