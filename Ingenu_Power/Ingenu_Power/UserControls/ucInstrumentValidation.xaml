@@ -31,7 +31,33 @@
 
     <Grid>
         <Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <materialDesign:Card Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360" Height="266" Padding="10"  >
+			<Grid HorizontalAlignment="Left" Margin="0">
+				<Expander ExpandDirection="Left">
+					<Expander.Header>
+						<TextBlock Text="仪表通讯说明" >
+							<TextBlock.LayoutTransform>
+								<RotateTransform Angle="90" />
+							</TextBlock.LayoutTransform>
+						</TextBlock>
+					</Expander.Header>
+					<StackPanel Orientation="Vertical"
+                            TextBlock.Foreground="{DynamicResource MaterialDesignBody}"
+                            Margin="0,5,0,0">
+						<WrapPanel Margin="10">
+							<materialDesign:PackIcon Kind="Bullseye" />
+							<TextBlock FontStyle="Italic" Text="波特率4800"></TextBlock>
+						</WrapPanel>
+						<WrapPanel Margin="10,0">
+							<materialDesign:PackIcon Kind="CrosshairsGps" />
+							<TextBlock FontStyle="Italic" Text="通讯地址"></TextBlock>
+						</WrapPanel>
+						<TextBlock Margin="10,0,10,10" FontSize="11" Opacity=".68" Text="Load-备电:0&#13;Load-Output1:1\2&#13;Load-Output2:3\4&#13;Load-Output3:5\6&#13;ACPower:12&#13;DCPower:13&#13;备电控制板:16&#13;通道分选板:17&#13;"
+                               TextWrapping="Wrap"/>
+					</StackPanel>
+				</Expander>
+			</Grid>
+
+			<materialDesign:Card Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360" Height="266" Padding="10"  >				
                 <StackPanel Margin="0 30 0 0">
                     <Grid Margin="5,10,10,10">
                         <Grid.ColumnDefinitions>
@@ -43,7 +69,7 @@
                         </ComboBox>
                     </Grid>
 
-                    <Grid Margin="10,0">
+                    <Grid Margin="10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="60"/>
                             <ColumnDefinition Width="*"/>
@@ -51,10 +77,12 @@
 						<materialDesign:PackIcon Kind="Barcode" Width="50" Height="45" Grid.ColumnSpan="1" Margin="5,0,0,0"/>
                         <TextBox Margin="20,0" materialDesign:HintAssist.Hint="示波器INS码" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" Name="TxtINS" />
                     </Grid>
-					<WrapPanel Margin="10">
+					
+					<WrapPanel Margin="5">
 						<ProgressBar Margin="20" Height="8" Width="230" Name="PgbStep"/>
 						<materialDesign:PackIcon Kind="LanConnect" Height="30" Width="30" VerticalAlignment="Center" Name="pckConnect" Visibility="Hidden"/>
 					</WrapPanel>
+					<Grid />
 				</StackPanel>
             </materialDesign:Card>
 

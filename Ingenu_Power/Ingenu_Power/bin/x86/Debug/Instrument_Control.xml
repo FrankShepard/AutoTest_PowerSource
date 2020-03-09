@@ -194,10 +194,11 @@
             <param name="sp_acpower">目标串口</param>
             <returns>发送指令的状态信息，返回值为 string.Empty 说明正常传输数据</returns>
         </member>
-        <member name="M:Instrument_Control.AN97002H.ACPower_vCheckRespond(System.IO.Ports.SerialPort)">
+        <member name="M:Instrument_Control.AN97002H.ACPower_vCheckRespond(System.Collections.ArrayList,System.IO.Ports.SerialPort)">
             <summary>
             程控交流电源指令响应与读取数据的判断
             </summary>
+            <param name="command_arrayList">之前发送给设备的命令</param>
             <param name="sp_acpower">程控交流电源连接的电脑串口</param>
             <returns>程控交流电源的响应，正确与否的判定依据之一</returns>
         </member>
@@ -2895,7 +2896,7 @@
             定义管理员模式下的待测电源产品单片机通讯方式和双通道分选板、备电控制板的控制方式
             </summary>
         </member>
-        <member name="F:Instrument_Control.MCU_Control.Address_Bats">
+        <member name="F:Instrument_Control.MCU_Control.Address_BatsControl">
             <summary>
             备电模块的地址
             </summary>

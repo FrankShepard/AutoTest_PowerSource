@@ -46,6 +46,11 @@ namespace Ingenu_Power.UserControls
 			}
 		}
 
+		/// <summary>
+		/// 指定MCU的ISP下载动作
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void BtnDownload_Click(object sender, RoutedEventArgs e)
 		{
             pckHappy.Visibility = Visibility.Hidden;
@@ -74,6 +79,11 @@ namespace Ingenu_Power.UserControls
 			}
 		}
 	
+		/// <summary>
+		/// 限定产品的硬件ID，只能输入数字
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
 		{
 			if (!(((e.Key >= Key.D0) && (e.Key <= Key.D9)) || ((e.Key >= Key.NumPad0) && (e.Key <= Key.NumPad9)) || (e.Key == Key.Back) || (e.Key == Key.Delete) || (e.Key == Key.Left) || (e.Key == Key.Right) || (e.Key == Key.Tab))) {
@@ -126,8 +136,8 @@ namespace Ingenu_Power.UserControls
             try {
                 //检查类型ID和Ver是否相同，若相同则继续使用之前下载的产品程序；若是不同则需要更新程序
                 int type_id = Convert.ToInt32( id.Substring( 5, 3 ) );
-                int ver_id = Convert.ToInt32( id.Substring( 8, 2 ) ); //*产品ID中的硬件版本如何与软件版本进行对应？-  数据库中增加表格，用于对应硬件ID、版本和软件ID、版本*//
-                string bin_filePath = Directory.GetCurrentDirectory() + "\\Download";
+                int ver_id = Convert.ToInt32( id.Substring( 8, 2 ) );
+				string bin_filePath = Directory.GetCurrentDirectory() + "\\Download";
 
                 if (!Directory.Exists( bin_filePath )) {//如果不存在就创建文件夹
                     Directory.CreateDirectory( bin_filePath );
@@ -138,6 +148,7 @@ namespace Ingenu_Power.UserControls
                     using (Database database = new Database()) {
                         database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
                         if (error_information == string.Empty) {
+							//先获取硬件ID对应的程序ID和版本号
                             DataTable dataTable = database.V_SoftwareInfor_Get( type_id, ver_id, out error_information );
                             if (error_information == string.Empty) {
                                 if (dataTable.Rows.Count > 0) {
@@ -164,15 +175,19 @@ namespace Ingenu_Power.UserControls
                                                         File.Delete( bin_filePath );
                                                     }
                                                 }
+												//更新记录中保存的对应硬件ID
+												Properties.Settings.Default.ISP_ID_Hardware = type_id;
+												Properties.Settings.Default.ISP_Ver_Hardware = ver_id;
+												Properties.Settings.Default.Save();
                                             } else {
-                                                error_information += "数据库中缺少指定软件ID及版本号的程序 /r/n";
+                                                error_information += "数据库中缺少指定软件ID及版本号的程序 \r\n";
                                             }
                                         }
                                     } else {
-                                        error_information += "当前电源无法使用ISP进行烧录 /r/n";
+                                        error_information += "当前电源无法使用ISP进行烧录 \r\n";
                                     }
                                 } else {
-                                    error_information += "数据库中缺少指定硬件ID及版本号的对应信息 /r/n";
+                                    error_information += "数据库中缺少指定硬件ID及版本号的对应信息 \r\n";
                                 }
                             }
                         }
@@ -184,7 +199,7 @@ namespace Ingenu_Power.UserControls
 				//执行文件下载操作
                 ISP_vDoFlash( sp_name, out error_information );
             } catch (Exception ex) {
-                error_information += ("/r/n"+ex.ToString());
+                error_information += ex.ToString();
             }
             StaticInfor.Error_Message = error_information;
 			this.Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), error_information, false );
@@ -227,7 +242,7 @@ namespace Ingenu_Power.UserControls
 								//以下执行程序的具体烧录过程
 								FileStream fileStream = new FileStream( bin_filePath, FileMode.Open );
 								if (fileStream.Length == 0) {
-									error_information += "/r/n 读取单片机程序异常，退出烧录程序过程"; return;
+									error_information += "读取单片机程序异常，退出烧录程序过程 \r\n"; return;
 								}
 								byte[] buffer_hex = new byte[ fileStream.Length ];
 								fileStream.Read( buffer_hex, 0, buffer_hex.Length );
@@ -258,7 +273,7 @@ namespace Ingenu_Power.UserControls
 					}
 				}
 			} catch (Exception ex) {
-				error_information += ("/r/n" + ex.ToString());
+				error_information += ex.ToString();
 			}
 		}
 

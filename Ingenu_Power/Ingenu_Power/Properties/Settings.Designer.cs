@@ -121,30 +121,6 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int ISP_ID_Software {
-            get {
-                return ((int)(this["ISP_ID_Software"]));
-            }
-            set {
-                this["ISP_ID_Software"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int ISP_Ver_Software {
-            get {
-                return ((int)(this["ISP_Ver_Software"]));
-            }
-            set {
-                this["ISP_Ver_Software"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string Instrment_OSC_INS {
             get {
@@ -152,6 +128,18 @@ namespace Ingenu_Power.Properties {
             }
             set {
                 this["Instrment_OSC_INS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string UsedSerialport {
+            get {
+                return ((string)(this["UsedSerialport"]));
+            }
+            set {
+                this["UsedSerialport"] = value;
             }
         }
     }

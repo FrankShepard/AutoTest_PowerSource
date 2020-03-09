@@ -41,7 +41,7 @@ namespace Ingenu_Power.Domain
 				objConnection.Close();      //前面能打开则此处可以关闭   防止后续操作异常 
 			} catch                               //'异常可能：数据库用户名或密码输入错误
 			  {
-				error_information = "数据库服务器连接异常，请检查数据库工作环境";
+				error_information = "数据库服务器连接异常，请检查数据库工作环境 \r\n";
 				objConnection.Close();      //前面能打开则此处可以关闭   防止后续操作异常  
 			}
 		}
@@ -85,7 +85,7 @@ namespace Ingenu_Power.Domain
 					V_UpdateInfor( objCommand, out error_information );
 				}
 			} catch {
-				error_information = "Database.V_CreatUserInfor /r/n 数据库操作异常";
+				error_information = "Database.V_CreatUserInfor 数据库操作异常  \r\n";
 			}
 		}
 
@@ -111,7 +111,7 @@ namespace Ingenu_Power.Domain
 					V_UpdateInfor( objCommand, out error_information );
 				}
 			} catch {
-				error_information = "Database.V_UpdateUserInfor /r/n 数据库操作异常";
+				error_information = "Database.V_UpdateUserInfor 数据库操作异常  \r\n";
 			}
 		}
 
@@ -154,7 +154,7 @@ namespace Ingenu_Power.Domain
 
         #endregion
 
-        #region -- 在数据库中查找是否存在待查询信息的数据
+        #region -- 在数据库中具体执行查询命令、插入/更新命令的实际代码
 
         /// <summary>
         /// 在数据库中查询相信息
@@ -216,11 +216,11 @@ namespace Ingenu_Power.Domain
 					objTransaction.Commit();
 				} catch (Exception e) {
 					error_information = e.ToString();
-					error_information += "/r/n Database.V_UpdateInfor";
+					error_information += "Database.V_UpdateInfor  \r\n";
 					try {
 						objTransaction.Rollback();
 					} catch {
-						error_information = "/r/n Transaction  Rollback异常提示";
+						error_information = "Transaction  Rollback异常提示  \r\n";
 					}
 				}
 				objConnection.Close();             //关闭数据库连接

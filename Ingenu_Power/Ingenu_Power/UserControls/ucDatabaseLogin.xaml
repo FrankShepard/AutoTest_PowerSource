@@ -97,40 +97,17 @@
 				</materialDesign:Card>
 
 		<Grid Height="50" VerticalAlignment="Top" HorizontalAlignment="Center" Width="120" Margin="294,330,293,0">
-			<!--<Button IsDefault="True" Name="BtnLogin" Click="BtnLogin_Click"
+			<Button IsDefault="True" Name="BtnLogin" Click="BtnLogin_Click"
                         FontSize="23"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}"
                         Height="Auto" 
                         materialDesign:ButtonAssist.CornerRadius="25">
-				<TextBlock  Text="SQL登录" />
-			</Button>-->
-
-			<Button Style="{StaticResource MaterialDesignFloatingActionLightButton}" Margin="8 0 0 0"
-					 Command="{Binding SaveComand}"
-                    materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding IsSaving}"
-                    materialDesign:ButtonProgressAssist.Value="{Binding SaveProgress}">
-					<materialDesign:PackIcon Height="24" Width="24">
-                    <materialDesign:PackIcon.Style>
-                        <Style TargetType="materialDesign:PackIcon" BasedOn="{StaticResource {x:Type materialDesign:PackIcon}}">
-                            <Setter Property="Kind" Value="CloudSync" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsSaveComplete}" Value="True">
-                                    <Setter Property="Kind" Value="Check" />
-                                    <DataTrigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.8" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </DataTrigger.EnterActions>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </materialDesign:PackIcon.Style>
-                </materialDesign:PackIcon>
-				<!--<TextBlock  Text="SQL登录" />-->
+				<WrapPanel>
+					<materialDesign:PackIcon Kind="Database" Height="30" Width="30"/>
+					<TextBlock  Text="登录" />
+				</WrapPanel>
+				
 			</Button>
-
 		</Grid>
 
 	</Grid>

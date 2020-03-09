@@ -27,7 +27,6 @@ F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\I
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csproj.CopyComplete
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.exe
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.pdb
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csprojAssemblyReference.cache
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\UserControls\ucDatabaseLogin.g.cs
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\UserControls\ucDatabaseLogin.baml
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\UserControls\ucInstrumentValidation.g.cs
@@ -78,3 +77,12 @@ E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\A
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csproj.CopyComplete
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.exe
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.pdb
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\x86\Debug\nationalinstruments.controls.booleans.dll
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\x86\Debug\NationalInstruments.Controls.dll
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\x86\Debug\NationalInstruments.Common.dll
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\x86\Debug\NationalInstruments.NiLmClientDLL.dll
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\x86\Debug\NationalInstruments.MStudioCLM.dll
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\x86\Debug\NationalInstruments.Controls.xml
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\x86\Debug\nationalinstruments.controls.booleans.xml
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\x86\Debug\NationalInstruments.Common.xml
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.exe.licenses
