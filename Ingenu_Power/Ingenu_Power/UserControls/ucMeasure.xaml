@@ -32,7 +32,7 @@
 								<RowDefinition Height="*"/>
 								<RowDefinition Height="*"/>
 							</Grid.RowDefinitions>
-							<Image Grid.Row="0" Source="/Ingenu_Power;component/Resources/logo.jpg" Height="80" Margin="0" />
+							<Image Grid.Row="0" Source="/Ingenu_Power;component/Resources/logo.jpg" Height="80" Margin="5" />
 
 							<Grid Grid.Row="1" Margin="10,0,0,0">
 								<Grid.ColumnDefinitions>
@@ -40,7 +40,7 @@
 									<ColumnDefinition Width="*"/>
 								</Grid.ColumnDefinitions>
 								<materialDesign:PackIcon Kind="BarcodeScan" Width="50" Height="45" Grid.ColumnSpan="1" Margin="5,0,0,0" VerticalAlignment="Center"/>
-								<TextBox Margin="20,0" materialDesign:HintAssist.Hint="产品ID" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" VerticalAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown" PreviewMouseDoubleClick="TextBox_PreviewMouseDoubleClick" MaxLength="15" />
+								<TextBox Margin="20,0" materialDesign:HintAssist.Hint="产品ID" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" VerticalAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown" PreviewMouseDoubleClick="TextBox_PreviewMouseDoubleClick" MaxLength="15" Name="TxtID" />
 							</Grid>
 
 							<Grid Grid.Row="2" >
@@ -70,7 +70,7 @@
 
 							<Grid Grid.Row="3" >
 								<Button IsDefault="True" x:Name="BtnMeasure" Click="BtnMeasure_Click"  FontSize="25" Style="{StaticResource MaterialDesignRaisedDarkButton}" Height="auto" Width="200"
-									materialDesign:ButtonAssist.CornerRadius="25">
+									materialDesign:ButtonAssist.CornerRadius="25" materialDesign:ShadowAssist.ShadowDepth="Depth4" Margin="3">
 									<WrapPanel>
 										<materialDesign:PackIcon Kind="GooglePlay" Margin="0" Height="32" Width="32" />
 										<TextBlock  Text="一键测试" />
@@ -102,15 +102,15 @@
 								</WrapPanel>
 								<Separator Style="{StaticResource MaterialDesignDarkSeparator}" Margin="8 0"/>
 								<WrapPanel>
-									<ni:LED x:Name="Led" Content="LED" FalseContent="Off" Height="100" Width="100" TrueContent="On" />
+									<ni:LED x:Name="Led" Height="110" Width="110" Margin="30,10" Value="False" IsReadOnly="True" />
 								</WrapPanel>
-								
+
 							</StackPanel>
 
 						</Grid>
 					</Grid>
 					<Grid Grid.Row="1">
-						<ProgressBar Value="0" Margin="20,5" Height="10" />
+						<ProgressBar Value="0" Margin="20,5" Height="10" Name="prgStep" />
 					</Grid>
 				</Grid>
 			</materialDesign:Card>

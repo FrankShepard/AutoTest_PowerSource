@@ -14,7 +14,7 @@ namespace Ingenu_Power.Domain
 	{
 		#region -- 枚举参数的类型定义
 
-		/// <summary>
+		/// <summary>prompt
 		/// SQL的相关信息
 		/// </summary>
 		public struct SQL_Information
@@ -33,12 +33,61 @@ namespace Ingenu_Power.Domain
 			public string SQL_Password;
 		}
 
+		/// <summary>
+		/// 开始测试时传递的条件
+		/// </summary>
+		public struct MeasureCondition
+		{
+			/// <summary>
+			/// 待测产品的硬件ID
+			/// </summary>
+			public int ID_Hardware;
+			/// <summary>
+			/// 待测产品的硬件版本
+			/// </summary>
+			public int Ver_Hardware;
+			/// <summary>
+			/// 使能ISP状态
+			/// </summary>
+			public bool ISP_Enable;
+			/// <summary>
+			/// 使能产品校准状态
+			/// </summary>
+			public bool Calibration_Enable;
+			/// <summary>
+			/// 使能全功能测试状态
+			/// </summary>
+			public bool WholeFunction_Enable;
+		}
+
+		/// <summary>
+		/// 在测试界面显示的测试项和数据
+		/// </summary>
+		public struct MeasureItemShow {
+			/// <summary>
+			/// 测试环节
+			/// </summary>
+			public string Measure_Link;
+			/// <summary>
+			/// 测试项
+			/// </summary>
+			public string Measure_Item;
+			/// <summary>
+			/// 测试的具体指
+			/// </summary>
+			public string Measure_Value;
+		}
+
 		#endregion
 
 		/// <summary>
 		/// 用于数据库的登陆的相关参数
 		/// </summary>
 		public static SQL_Information sQL_Information = new SQL_Information();
+		/// <summary>
+		/// 测试环节、测试项和测试结果的显示
+		/// </summary>
+		public static MeasureItemShow measureItemShow = new MeasureItemShow();
 		/// <summary>
 		/// 默认的对话框的点击结果，此处用于特殊显示的窗体传输结果使用
 		/// </summary>

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using Ingenu_Power.Domain;
 using MaterialDesignThemes.Wpf;
 
@@ -91,12 +92,53 @@ namespace Ingenu_Power.UserControls
 			}
 		}
 
+		/// <summary>
+		/// 窗体载入，需要先将之前使用的电源通讯模块的相关信息填充
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			string error_information = string.Empty;
+
+			using (Database database = new Database()) {
+				database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
+				if (error_information == string.Empty) {
+					//先获取硬件ID对应的程序ID和版本号
+					DataTable dataTable = database.V_SoftwareInfor_Get( Properties.Settings.Default.ISP_ID_Hardware, Properties.Settings.Default.ISP_Ver_Hardware, out error_information );
+					if (error_information == string.Empty) {
+						if (dataTable.Rows.Count > 0) {
+							if (Convert.ToBoolean( dataTable.Rows[ 0 ][ "型号_HC89S003F4" ] )) {
+								//获取与产品通讯的串口模块类型，并在提示控件中显示
+								byte type_comm = Convert.ToByte( dataTable.Rows[ 0 ][ "通讯模块类型" ] );
+								switch (type_comm) {
+									case 1://显示含外部供电的485转TTL隔离模块
+										PromptShow( dataTable.Rows[ 0 ][ "通讯模块提示" ].ToString(), "485转TTL.png" );
+										break;
+									case 2://显示不含外部供电的485转TTL/232隔离模块
+										PromptShow( dataTable.Rows[ 0 ][ "通讯模块提示" ].ToString(), "485转232.png" );
+										break;
+									case 3://显示485转485隔离模块
+										PromptShow( dataTable.Rows[ 0 ][ "通讯模块提示" ].ToString(), "485转485.png" );
+										break;
+									default: //不使用串口通讯
+										PromptShow( "无需串口通讯", "null.png" );
+										break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		#endregion
 
 		#region -- 线程间委托及函数
 
 		private delegate void dlg_PackIconShow(PackIconKind packIconKind, bool visable);
 		private delegate void dlg_ProgressBarValueSet(int value);
+		private delegate void dlg_PromptShow(string infor,string source_name);
 
 		/// <summary>
 		/// 图标显示设置
@@ -121,6 +163,14 @@ namespace Ingenu_Power.UserControls
 			}
 		}
 
+		/// <summary>
+		/// Expander中的提示信息
+		/// </summary>
+		/// <param name="infor"></param>
+		private void PromptShow(string infor,string source_name) {
+			ImgPrompt.Source = new BitmapImage( new Uri( Directory.GetCurrentDirectory() + "\\Resources\\"+ source_name));
+			TxtPrompt.Text = infor;
+		}
 
 		#endregion
 
@@ -153,6 +203,23 @@ namespace Ingenu_Power.UserControls
                             if (error_information == string.Empty) {
                                 if (dataTable.Rows.Count > 0) {
                                     if (Convert.ToBoolean( dataTable.Rows[ 0 ][ "型号_HC89S003F4" ] )) {
+										//获取与产品通讯的串口模块类型，并在提示控件中显示
+										byte type_comm = Convert.ToByte( dataTable.Rows[ 0 ][ "通讯模块类型" ] );										
+										switch (type_comm) {
+											case 1://显示含外部供电的485转TTL隔离模块
+												this.Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), dataTable.Rows[ 0 ][ "通讯模块提示" ].ToString(), "485转TTL.png" );
+												break;
+											case 2://显示不含外部供电的485转TTL/232隔离模块
+												this.Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), dataTable.Rows[ 0 ][ "通讯模块提示" ].ToString(), "485转232.png" );
+												break;
+											case 3://显示485转485隔离模块
+												this.Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), dataTable.Rows[ 0 ][ "通讯模块提示" ].ToString(), "485转485.png" );
+												break;
+											default: //不使用串口通讯
+												this.Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), "无需串口通讯", "null.png" );
+												break;
+										}
+
                                         int id_software = Convert.ToInt32( dataTable.Rows[ 0 ][ "程序ID" ] );
                                         int ver_software = Convert.ToInt32( dataTable.Rows[ 0 ][ "程序版本号" ] );
                                         dataTable = database.V_McuCode_Get( id_software, ver_software, out error_information );
@@ -187,17 +254,19 @@ namespace Ingenu_Power.UserControls
                                         error_information += "当前电源无法使用ISP进行烧录 \r\n";
                                     }
                                 } else {
-                                    error_information += "数据库中缺少指定硬件ID及版本号的对应信息 \r\n";
+									this.Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), "缺少信息，无法使用串口通讯", "null.png" );
+									error_information += "数据库中缺少指定硬件ID及版本号的对应信息 \r\n";
                                 }
                             }
                         }
                     }
                 }
 
-				this.Dispatcher.Invoke( new dlg_ProgressBarValueSet( ProgressBarValueSet ), 10 ); //显示烧录进度变化
-
-				//执行文件下载操作
-                ISP_vDoFlash( sp_name, out error_information );
+				if (error_information == string.Empty) {
+					this.Dispatcher.Invoke( new dlg_ProgressBarValueSet( ProgressBarValueSet ), 10 ); //显示烧录进度变化
+					//执行文件下载操作
+					ISP_vDoFlash( sp_name, out error_information );
+				}
             } catch (Exception ex) {
                 error_information += ex.ToString();
             }
@@ -263,7 +332,7 @@ namespace Ingenu_Power.UserControls
 								if (error_information != string.Empty) { return; }
 								error_information = isp.ISP_vProgram( buffer_hex, serialPort, true );
 								this.Dispatcher.Invoke( new dlg_ProgressBarValueSet( ProgressBarValueSet ), 100 ); //显示烧录进度变化
-
+								if (error_information != string.Empty) { return; }
 								serialPort.BaudRate = StaticInfor.Baudrate_Instrument;
 							}
 
@@ -278,6 +347,5 @@ namespace Ingenu_Power.UserControls
 		}
 
 		#endregion
-
 	}
 }

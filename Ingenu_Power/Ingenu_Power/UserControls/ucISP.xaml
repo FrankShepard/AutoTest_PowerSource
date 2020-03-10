@@ -7,92 +7,106 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Ingenu_Power.Domain"
              mc:Ignorable="d" 
-             d:DesignHeight="443" d:DesignWidth="726" >
-    <UserControl.Resources>
-        <SolidColorBrush x:Key="InputBoxHintAssistForegorundBrush" Color="Purple"/>
-        <Style x:Key="InputIcon" TargetType="materialDesign:PackIcon">
-            <Setter Property="Height" Value="30"/>
-            <Setter Property="Width" Value="30"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-        <LinearGradientBrush x:Key="SkyBrush" StartPoint="0 0" EndPoint="0 1">
-            <GradientStop Color="#2196F3" Offset="0"/>
-            <GradientStop Color="#2196F3" Offset=".6"/>
-            <GradientStop Color="#00E676" Offset=".6"/>
-            <GradientStop Color="#00E676" Offset="1"/>
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="GroundBrush" StartPoint="0 0" EndPoint="0 1">
-            <GradientStop Color="#552196F3" Offset="0"/>
-            <GradientStop Color="#FFFFFF" Offset=".3"/>
-            <GradientStop Color="#00E676" Offset="1"/>
-        </LinearGradientBrush>
-    </UserControl.Resources>
+             d:DesignHeight="443" d:DesignWidth="726" Loaded="UserControl_Loaded">
+	<UserControl.Resources>
+		<SolidColorBrush x:Key="InputBoxHintAssistForegorundBrush" Color="Purple"/>
+		<Style x:Key="InputIcon" TargetType="materialDesign:PackIcon">
+			<Setter Property="Height" Value="30"/>
+			<Setter Property="Width" Value="30"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<LinearGradientBrush x:Key="SkyBrush" StartPoint="0 0" EndPoint="0 1">
+			<GradientStop Color="#2196F3" Offset="0"/>
+			<GradientStop Color="#2196F3" Offset=".6"/>
+			<GradientStop Color="#00E676" Offset=".6"/>
+			<GradientStop Color="#00E676" Offset="1"/>
+		</LinearGradientBrush>
+		<LinearGradientBrush x:Key="GroundBrush" StartPoint="0 0" EndPoint="0 1">
+			<GradientStop Color="#552196F3" Offset="0"/>
+			<GradientStop Color="#FFFFFF" Offset=".3"/>
+			<GradientStop Color="#00E676" Offset="1"/>
+		</LinearGradientBrush>
+	</UserControl.Resources>
 
-    <Grid>
-        <Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Grid HorizontalAlignment="Left" Margin="0">
-                <Expander ExpandDirection="Left">
-                    <Expander.Header>
-                        <TextBlock Text="待测产品通讯说明" >
-                            <TextBlock.LayoutTransform>
-                                <RotateTransform Angle="90" />
-                            </TextBlock.LayoutTransform>
-                        </TextBlock>
-                    </Expander.Header>
-                    <StackPanel Orientation="Vertical"
-                            TextBlock.Foreground="{DynamicResource MaterialDesignBody}"
-                            Margin="0,5,0,0">                        
-                        <WrapPanel Margin="10">
-                            <materialDesign:PackIcon Kind="TooltipImage" />
-                            <TextBlock FontStyle="Italic" Text="通讯模块 "></TextBlock>
-                        </WrapPanel>
-                        <!--<Image ></Image>-->
-                        <TextBlock Margin="10,0,10,10" FontSize="11" Opacity=".68" Text=""
+	<Grid>
+		<Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<Grid HorizontalAlignment="Left" Margin="0">
+				<Expander ExpandDirection="Left" >
+					<Expander.Header>
+						<TextBlock Text="待测产品通讯说明" >
+							<TextBlock.LayoutTransform>
+								<RotateTransform Angle="90" />
+							</TextBlock.LayoutTransform>
+						</TextBlock>
+					</Expander.Header>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*"></RowDefinition>
+							<RowDefinition Height="3*"></RowDefinition>
+							<RowDefinition Height="3*"></RowDefinition>
+						</Grid.RowDefinitions>
+
+						<Grid Grid.Row="0" Margin="10">
+							<WrapPanel Margin="10" VerticalAlignment="Center">
+								<materialDesign:PackIcon Kind="TooltipImage" />
+								<TextBlock FontStyle="Italic" Text="通讯模块 "></TextBlock>
+							</WrapPanel>
+						</Grid>
+
+						<Grid Grid.Row="1" Margin="5">
+							<Image x:Name="ImgPrompt">
+							</Image>
+						</Grid>
+
+						<Grid Grid.Row="2" Margin="10">
+							<TextBlock Name="TxtPrompt" Margin="10,0,10,10" FontSize="11" Opacity=".68" Text=""
                                TextWrapping="Wrap"/>
-                    </StackPanel>
-                </Expander>
-            </Grid>
-            <materialDesign:Card Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360" Height="266" Padding="10"  >
-                <StackPanel Margin="0 30 0 0">
-                    <Grid Margin="5,10,10,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="65"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <materialDesign:PackIcon  Kind="SerialPort"  Width="70" Height="60" Grid.ColumnSpan="1" Margin="0"/>
-                        <ComboBox   Grid.Column="2" Margin="20,0" materialDesign:HintAssist.Hint="ISP使用的串口" Name="CobSp" PreviewMouseDown="ComboBox_PreviewMouseDown" Style="{StaticResource MaterialDesignFloatingHintComboBox}"> 
-                        </ComboBox>
-                    </Grid>
+						</Grid>
+						
+					</Grid>					
+				</Expander>
+			</Grid>
+			<materialDesign:Card Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360" Height="266" Padding="10"  >
+				<StackPanel Margin="0 30 0 0">
+					<Grid Margin="5,10,10,10">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="65"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<materialDesign:PackIcon  Kind="SerialPort"  Width="70" Height="60" Grid.ColumnSpan="1" Margin="0"/>
+						<ComboBox   Grid.Column="2" Margin="20,0" materialDesign:HintAssist.Hint="ISP使用的串口" Name="CobSp" PreviewMouseDown="ComboBox_PreviewMouseDown" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+						</ComboBox>
+					</Grid>
 
-                    <Grid Margin="10,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <materialDesign:PackIcon Kind="BarcodeScan" Width="50" Height="45" Grid.ColumnSpan="1" Margin="5,0,0,0"/>
-                        <TextBox Margin="20,0" materialDesign:HintAssist.Hint="产品ID" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="15" Name="TxtID" />
-                    </Grid>
+					<Grid Margin="10,0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="60"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<materialDesign:PackIcon Kind="BarcodeScan" Width="50" Height="45" Grid.ColumnSpan="1" Margin="5,0,0,0"/>
+						<TextBox Margin="20,0" materialDesign:HintAssist.Hint="产品ID" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="15" Name="TxtID" />
+					</Grid>
 					<WrapPanel Margin="10">
 						<ProgressBar Margin="20" Height="8" Width="230" Name="PgbStep"/>
 						<materialDesign:PackIcon Kind="Emoticon" Height="30" Width="30" VerticalAlignment="Center" Name="pckHappy" Visibility="Hidden"/>
 					</WrapPanel>
 				</StackPanel>
-            </materialDesign:Card>
+			</materialDesign:Card>
 
-            <Grid Height="50" VerticalAlignment="Top" HorizontalAlignment="Center" Width="130" Margin="294,330,293,0">
-                <Button IsDefault="True" Name="BtnDownload" Click="BtnDownload_Click"                        
+			<Grid Height="50" VerticalAlignment="Top" HorizontalAlignment="Center" Width="130" Margin="294,330,293,0">
+				<Button IsDefault="True" Name="BtnDownload" Click="BtnDownload_Click"                        
                         FontSize="25"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}"
                         Height="Auto" 
                         materialDesign:ButtonAssist.CornerRadius="25">
-                    <WrapPanel>
-                        <materialDesign:PackIcon Kind="CloudDownload" VerticalAlignment="Center" Width="40" Height="50"/>
-                        <TextBlock  Text=" 烧录" VerticalAlignment="Center"/>
-                    </WrapPanel>
+					<WrapPanel>
+						<materialDesign:PackIcon Kind="CloudDownload" VerticalAlignment="Center" Width="40" Height="50"/>
+						<TextBlock  Text=" 烧录" VerticalAlignment="Center"/>
+					</WrapPanel>
 
-                </Button>
-            </Grid>
-        </Grid>
-    </Grid>
+				</Button>
+			</Grid>
+		</Grid>
+	</Grid>
 </UserControl>
