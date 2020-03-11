@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\App.xaml
-5930012548
-
-12149692226
-16-3907881
-Domain\ResultMessageDialog.xaml;Domain\SampleMessageDialog.xaml;MainWindow.xaml;UserControls\ucFeatureChoose.xaml;UserControls\ucLogin.xaml;
+7-1565001395
+41664572379
+15-684233884
+21359869316
+Domain\ResultMessageDialog.xaml;MainWindow.xaml;UserControls\ucDatabaseLogin.xaml;UserControls\ucInstrumentValidation.xaml;UserControls\ucMeasure.xaml;UserControls\ucISP.xaml;UserControls\ucLogin.xaml;
 resources\spcstart.png
 False
 

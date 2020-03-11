@@ -8,6 +8,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/owl.ico")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/485%e8%bd%ac232.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/485%e8%bd%ac485.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/485%e8%bd%acttl.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/null.png")]
 
 

@@ -1,0 +1,655 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ProductInfor</name>
+    </assembly>
+    <members>
+        <member name="T:ProductInfor.Base">
+            <summary>
+            所有产品的基础类，后续不同产品的基础类用于扩展
+            </summary>
+        </member>
+        <member name="T:ProductInfor.Base.Exist">
+            <summary>
+            是否存在相关参数的标记属性
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Exist.Mp">
+            <summary>
+            是否存在AC/DC的主电部分
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Exist.Sp">
+            <summary>
+            是否存在电池供电的备电部分
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Exist.MandatoryMode">
+            <summary>
+            是否存在强制模式，应急照明电源适用
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Exist.PowerSourceChange">
+            <summary>
+            是否存在功率源的转换（主备电转换）
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Exist.Charge">
+            <summary>
+            是否存在充电器
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Exist.CommunicationProtocol">
+            <summary>
+            是否存在需要软件通讯协议
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Exist.LevelSignal">
+            <summary>
+            是否存在TTL的电平信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Exist.Calibration">
+            <summary>
+            正常工作前是否需要进行校准
+            </summary>
+        </member>
+        <member name="T:ProductInfor.Base.Infor_Calibration">
+            <summary>
+            存在校准情况下的相关信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.Need_MpUnderVoltage">
+            <summary>
+            是否需要主电欠压点的校准
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.MpUnderVoltage">
+            <summary>
+            主电欠压点的校准值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.Need_MpOverVoltage">
+            <summary>
+            是否需要主电过压点的校准
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.MpOverVoltage">
+            <summary>
+            主电过压点的校准值（将J-EI8212的停止充电点在校准过程中认为是过压点）
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.Need_MpVoltage">
+            <summary>
+            是否需要主电电压的校准
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.MpVoltage">
+            <summary>
+            主电电压值校准时的主电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.Need_SpVoltage">
+            <summary>
+            是否需要备电电压的校准
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.Need_SpSingleWork">
+            <summary>
+            是否需要备电单投
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.Need_OutputVoltageCurrent_Mp">
+            <summary>
+            对应输出通道的电压和电流是否需要在主电工作情况下进行校准
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.OutputPower_Mp">
+            <summary>
+            主电工作校准时通道应当带载的功率值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.Need_OutputVoltageCurrent_Sp">
+            <summary>
+            对应输出通道的电压和电流是否需要在备电工作情况下进行校准
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.OutputPower_Sp">
+            <summary>
+            备电工作校准时通道应当带载的功率值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.OutputOXP">
+            <summary>
+            校准时通道需要设置的对应过流点或过功率点
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.Need_BeepTime">
+            <summary>
+            是否需要对蜂鸣器的工作时间进行校准
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.BeepTime">
+            <summary>
+            校准的蜂鸣器工作时间（备电彻底自杀前的维持时间）
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Calibration.CommunicationDisable">
+            <summary>
+            校准的最后一步是否需要将通讯功能禁用（IG-B2053F/2073F系列电源通讯与电平信号冲突的情况下使用）
+            </summary>
+        </member>
+        <member name="T:ProductInfor.Base.Infor_Mp">
+            <summary>
+            主电的相关信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Mp.MpVoltageCount">
+            <summary>
+            需要测试的不同主电电压的数量，常规为187V、220V、252V这3个，简化后只需要220V
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Mp.MpFrequncyCount">
+            <summary>
+            需要测试的不同主电频率的数量，常规为47Hz、50Hz、63Hz这3个，简化后只需要50Hz
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Mp.MeasureDifferentVoltage">
+            <summary>
+            是否需要测试不同的主电电压输入值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Mp.MeasureDifferentFrequncy">
+            <summary>
+            是否需要测试不同的主电频率输入值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Mp.MpVoltage">
+            <summary>
+            AC接入端电源常规测试的三个主电电压值：最低电压、正常电压、最高电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Mp.MpFrequncy">
+            <summary>
+            AC接入端电源常规测试的三个主电频率值：最低频率、正常频率、最高频率
+            </summary>
+        </member>
+        <member name="T:ProductInfor.Base.Infor_Sp">
+            <summary>
+            电池的备电相关信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Sp.UsedBatsCount">
+            <summary>
+            使用的电池数量（按照默认单节电池电压为12V的标准值计，直接决定固定电平的备电电压值）
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Sp.NeedMeasure_BatVoltageSeparate">
+            <summary>
+            是否需要测试对应的单节电池电压（常用于应急照明电源，通过串口数据查看）
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Sp.NeedMeasure_CutoffLevel">
+            <summary>
+            是否需要测试备电切断点
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Sp.Qualified_CutoffLevel">
+            <summary>
+            备电切断点的合格范围
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Sp.Delay_WaitForCutoff">
+            <summary>
+            备电切断的等待时间，单位ms
+            </summary>
+        </member>
+        <member name="T:ProductInfor.Base.Infor_PowerSourceChange">
+            <summary>
+            主备电切换时相关的信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_PowerSourceChange.OutputLoadMode_CW">
+            <summary>
+            主备电切换时对应通道的负载是否为CW模式，为true时负载为CW，为false时负载为CC
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_PowerSourceChange.OutputLoadValue">
+            <summary>
+            主备电切换时对应通道带载的情况，与模式相关；模式为CC时表示带载电流，为CW时表示带载功率
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_PowerSourceChange.Qualified_MpUnderVoltage">
+            <summary>
+            主电欠压点的合格范围
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery">
+            <summary>
+            主电欠压恢复点的合格范围
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_PowerSourceChange.Delay_WaitForUnderVoltageRecovery">
+            <summary>
+            等待主电欠压恢复的时间，单位ms
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_PowerSourceChange.Qualified_MpOverVoltage">
+            <summary>
+            主电过压点的合格范围
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_PowerSourceChange.Qualified_MpOverVoltageRecovery">
+            <summary>
+            主电过压恢复点的合格范围
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_PowerSourceChange.Delay_WaitForOverVoltageRecovery">
+            <summary>
+            等待主电过压恢复的时间，单位ms
+            </summary>
+        </member>
+        <member name="T:ProductInfor.Base.Infor_Charge">
+            <summary>
+            充电相关信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Charge.ChargeDutyMax">
+            <summary>
+            充电的最大占空比
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Charge.UartSetChargeDuty">
+            <summary>
+            是否可以使用串口设置充电的占空比，用于满载可能非100%充电的情况
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Charge.CV_Voltage">
+            <summary>
+            用于检测均充电流的电子负载需要设置的CV模式对应电压，用于保证充电电流处于最大占空比处
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Charge.Qualified_FloatingVoltage">
+            <summary>
+            浮充电压的合格范围
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Charge.Qualified_EqualizedCurrent">
+            <summary>
+            均充电流的合格范围
+            </summary>
+        </member>
+        <member name="T:ProductInfor.Base.Infor_CommunicationProtocol">
+            <summary>
+            软件协议中的相关信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.Baudrate">
+            <summary>
+            通讯使用的波特率
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.ExistMpValue">
+            <summary>
+            是否存在主电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.Measured_MpValue">
+            <summary>
+            软件通讯中测试得到的主电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.ExistSpValue">
+            <summary>
+            是否存在总备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.Measured_SpValue">
+            <summary>
+            软件通讯中测试得到的总的备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.ExistSpValue_Separate">
+            <summary>
+            是否存在分开的电池电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.Measured_SpValue_Separate">
+            <summary>
+            软件通讯中测试得到的单节备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.ExistOutputVoltageValue">
+            <summary>
+            是否存在输出电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.Measured_OutputVoltageValue">
+            <summary>
+            软件通讯中测试得到的输出电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.ExistOutputCurrentValue">
+            <summary>
+            是否存在输出电流值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.Measured_OutputCurrentValue">
+            <summary>
+            软件通讯中测试得到的输出电流值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.ExistMpErrorSignal">
+            <summary>
+            是否存在主电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.Measured_MpErrorSignal">
+            <summary>
+            软件通讯中测试得到的主电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.ExistSpErrorSignal">
+            <summary>
+            是否存在备电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.Measured_SpErrorSignal">
+            <summary>
+            软件通讯中测试得到的备电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.ExistOutputErrorSignal">
+            <summary>
+            是否存在输出故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_CommunicationProtocol.Measured_OutputErrorSignal">
+            <summary>
+            软件通讯中测试得到的输出故障信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor.Base.Infor_LevelSignal">
+            <summary>
+            使用硬件TTL信号电平的相关信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_LevelSignal.Exist_MpErrorSignal">
+            <summary>
+            是否存在主电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_LevelSignal.Measured_MpErrorSignal">
+            <summary>
+            测试得到的主电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_LevelSignal.Exist_SpErrorSignal">
+            <summary>
+            是否存在备电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_LevelSignal.Measured_SpErrorSignal">
+            <summary>
+            测试得到的备电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_LevelSignal.Exist_SpUnderVoltageSignal">
+            <summary>
+            是否存在备电欠压信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_LevelSignal.Measured_SpUnderVoltageSignal">
+            <summary>
+            测试得到的备电欠压信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor.Base.Infor_Output">
+            <summary>
+            输出相关信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.OutputChannelCount">
+            <summary>
+            输出通道数量
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Stabilivolt">
+            <summary>
+            输出通道的稳压状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Isolation">
+            <summary>
+            输出通道的隔离状态，相对备电的地而言
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.NeedShort">
+            <summary>
+            输出是否需要短路
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.SpSingleWorkAbility">
+            <summary>
+            对应输出是否允许备电单投功能
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Qualified_OutputVoltageWithoutLoad">
+            <summary>
+            输出空载电压合格范围
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Delay_WaitForOVWithoutLoad">
+            <summary>
+            测量输出电压所需的稳定时间（空载） 单位ms
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Qualified_OutputVoltageWithLoad">
+            <summary>
+            输出满载电压合格范围
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Delay_WaitForOVWithLoad">
+            <summary>
+            测量输出电压所需的稳定时间（满载）  单位ms
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Qualified_OutputRipple_Max">
+            <summary>
+            输出纹波合格的最大值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Need_TestOXP">
+            <summary>
+            是否需要测试输出通道的过流点或者过功率点
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.SlowOXP_DIF">
+            <summary>
+            输出通道的慢保护相对检测的快保护的差值；OCP时为电流差值，OPP时为功率差值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Delay_WaitForOXP">
+            <summary>
+            等待OCP/OPP生效的等待时间，单位ms
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Qualified_OXP_Value">
+            <summary>
+            输出过流/过功率点的合格范围
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Qualified_LoadEffect_Max">
+            <summary>
+            负载效应的合格最大值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Qualified_SourceEffect_Max">
+            <summary>
+            源效应的合格最大值
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Output.Qualified_Efficiency_Min">
+            <summary>
+            AC/DC电源效率的最小值
+            </summary>
+        </member>
+        <member name="T:ProductInfor.Base.Communicate_HardwarePortcol_Type">
+            <summary>
+            信号通讯部分上报的硬件接口方式
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Communicate_HardwarePortcol_Type.SG_Level">
+            <summary>
+            硬件TTL电平方式
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Communicate_HardwarePortcol_Type.Uart_TTL">
+            <summary>
+            Uart-TTL通讯方式
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Communicate_HardwarePortcol_Type.Uart_232">
+            <summary>
+            Uart-232通讯方式
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Communicate_HardwarePortcol_Type._485">
+            <summary>
+            485通讯方式
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.IDVerion_Product">
+            <summary>
+            整机ID+版本 - 具有唯一性
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Model_Factory">
+            <summary>
+            厂内型号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Model_Customer">
+            <summary>
+            客户型号
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.communicate_HardwarePortcol_Type">
+            <summary>
+            产品与外部通讯使用的硬件基础
+            </summary>
+        </member>
+        <member name="M:ProductInfor.Base.Initalize">
+            <summary>
+            产品相关信息的初始化
+            </summary>
+        </member>
+        <member name="M:ProductInfor.Base.Calibrate(System.Int32,System.String)">
+            <summary>
+            校准的操作
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Measure(System.Int32,System.Boolean,System.String)">
+            <summary>
+            进行实际的测试操作
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="whole_function_test">是否需要全功能测试</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="T:ProductInfor.Measure">
+            <summary>
+            测试过程的具体类，此文件用于存储详细的测试过程
+            </summary>
+        </member>
+        <member name="T:ProductInfor._60010">
+            <summary>
+            继承自Base的 GST5000H 电源的相关信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60010.retry_time">
+            <summary>
+            控制命令出现通讯错误之后重新操作的次数
+            </summary>
+        </member>
+        <member name="M:ProductInfor._60010.Initalize">
+            <summary>
+            相关信息的初始化
+            </summary>
+        </member>
+        <member name="M:ProductInfor._60010.Communicate_User(System.String,System.String@)">
+            <summary>
+            与产品的具体通讯环节
+            <param name="port_name">使用到的实际串口名</param>
+            <param name="error_information">可能存在的异常信息</param>
+            </summary>
+        </member>
+        <member name="M:ProductInfor._60010.Communicate_Admin(System.String,System.String@)">
+            <summary>
+            与产品的通讯 - 进入管理员通讯模式
+            </summary>
+            <param name="port_name">使用到的实际串口名</param>
+            <param name="error_information">可能存在的异常问题</param>
+        </member>
+        <member name="M:ProductInfor._60010.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort)">
+            <summary>
+            对产品串口发送的帧的实际过程
+            </summary>
+            <param name="command_bytes">待发送的命令帧</param>
+            <param name="sp_product">使用到的串口</param>
+            <returns>可能存在的异常</returns>
+        </member>
+        <member name="M:ProductInfor._60010.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
+            <summary>
+            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
+            </summary>
+            <param name="sp_product">使用到的串口</param>
+            <returns>可能存在的异常情况</returns>
+        </member>
+        <member name="M:ProductInfor._60010.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
+            <summary>
+            仪表对用户发送指令的响应数据
+            </summary>
+            <param name="sp_product">仪表连接的电脑串口</param>
+            <param name="SerialportData">串口接收数据</param>
+            <returns>仪表响应，正确与否的判定依据</returns>
+        </member>
+        <member name="M:ProductInfor._60010.Product_vGetQueryedValue(System.Byte[])">
+            <summary>
+            提取接收到的数据中的产品相关信息
+            </summary>
+            <param name="SerialportData">接收到的数组信息</param>
+            <returns>可能存在的异常信息</returns>
+        </member>
+        <member name="M:ProductInfor._60010.Product_vGetCalibrateCode(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            计算校验和
+            </summary>
+            <param name="command_bytes">通讯使用的数组</param>
+            <param name="start_index">数组中的起始字节索引</param>
+            <param name="count">需要计算的字节长度</param>
+            <returns>所需校验和</returns>
+        </member>
+        <member name="M:ProductInfor._60010.Calibrate(System.Int32,System.String)">
+            <summary>
+            60010 的校准步骤重写
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._60010.Measure(System.Int32,System.Boolean,System.String)">
+            <summary>
+            60010 的测试步骤重写
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="whole_function_test">是否需要全功能测试</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+    </members>
+</doc>

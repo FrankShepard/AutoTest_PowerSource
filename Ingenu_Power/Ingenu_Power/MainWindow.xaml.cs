@@ -298,19 +298,28 @@ namespace Ingenu_Power
 			}
 		}
 
+
+
+
+
+
+
+
+
+
+
+
+
 		#endregion
 
+		/// <summary>
+		/// 更新使用到的 ProductInfor.dll 文件
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnRefreshDll_Click(object sender, RoutedEventArgs e)
+		{
 
-
-
-
-
-
-
-
-
-
-
-
+		}
 	}
 }

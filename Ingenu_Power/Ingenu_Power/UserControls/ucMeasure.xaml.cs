@@ -19,6 +19,7 @@ using MaterialDesignThemes.Wpf;
 using System.IO;
 using Instrument_Control;
 using System.IO.Ports;
+using System.Reflection;
 
 namespace Ingenu_Power.UserControls
 {
@@ -86,6 +87,7 @@ namespace Ingenu_Power.UserControls
 				ISP_Enable = ( bool )chkISP.IsChecked,
 				Calibration_Enable = ( bool )chkCalibrate.IsChecked,
 				WholeFunction_Enable = ( bool )chkWholeFunctionTest.IsChecked,
+				Magnification = Convert.ToInt32(SldMagnification.Value),
 			};
 
 			//在新线程中执行文件下载、ISP烧录过程
@@ -197,37 +199,55 @@ namespace Ingenu_Power.UserControls
 			string error_information = string.Empty;
 			//首先查看是否需要ISP
 			if (measureCondition.ISP_Enable) {
-				if ((measureCondition.ID_Hardware != Properties.Settings.Default.ISP_ID_Hardware) || (measureCondition.Ver_Hardware != Properties.Settings.Default.ISP_Ver_Hardware)) {
-					//更新待测产品的程序
-					StaticInfor.measureItemShow.Measure_Link = "MCU程序更新";
-					Measure_vISP_CodeRefresh( measureCondition.ID_Hardware, measureCondition.Ver_Hardware, out error_information );
-					if (error_information != string.Empty) {
-						StaticInfor.measureItemShow.Measure_Value = "更新失败";
-						StaticInfor.Error_Message = error_information;
-						Measure_vFailedShow(); return;
-					} else {
-						StaticInfor.measureItemShow.Measure_Value = "更新成功";
-					}
-				}
-				//执行ISP的实际烧录过程
-				StaticInfor.measureItemShow.Measure_Link = "MCU进行ISP烧录操作";
-				Measure_vISP_DoFlash( out error_information );
-				if (error_information != string.Empty) {
-					StaticInfor.measureItemShow.Measure_Value = "烧录失败";
+				Measure_vISP( measureCondition, out error_information );
+				if(error_information != string.Empty) {
 					StaticInfor.Error_Message = error_information;
-					Measure_vFailedShow(); return;
-				} else {
-					StaticInfor.measureItemShow.Measure_Value = "烧录成功";
+					Measure_vFailedShow();return;
 				}
 			}
 			//然后查看是否需要产品校准
 			if (measureCondition.Calibration_Enable) {
-
+				Measure_vCalibrate( measureCondition, out error_information );
+				if (error_information != string.Empty) {
+					StaticInfor.Error_Message = error_information;
+					Measure_vFailedShow(); return;
+				}
 			}
 			//最后执行具体的测试功能
 		}
 
 		#region -- 测试环节中的ISP操作步骤
+
+		/// <summary>
+		/// 产品的程序烧录
+		/// </summary>
+		/// <param name="measureCondition">产品限定条件</param>
+		/// <param name="error_information">可能出现的问题</param>
+		private void Measure_vISP(StaticInfor.MeasureCondition measureCondition, out string error_information)
+		{
+			error_information = string.Empty;
+
+			if ((measureCondition.ID_Hardware != Properties.Settings.Default.ISP_ID_Hardware) || (measureCondition.Ver_Hardware != Properties.Settings.Default.ISP_Ver_Hardware)) {
+				//更新待测产品的程序
+				StaticInfor.measureItemShow.Measure_Link = "MCU程序更新";
+				Measure_vISP_CodeRefresh( measureCondition.ID_Hardware, measureCondition.Ver_Hardware, out error_information );
+				if (error_information != string.Empty) {
+					StaticInfor.measureItemShow.Measure_Value = "更新失败";
+					return;
+				} else {
+					StaticInfor.measureItemShow.Measure_Value = "更新成功";
+				}
+			}
+			//执行ISP的实际烧录过程
+			StaticInfor.measureItemShow.Measure_Link = "MCU进行ISP烧录操作";
+			Measure_vISP_DoFlash( out error_information );
+			if (error_information != string.Empty) {
+				StaticInfor.measureItemShow.Measure_Value = "烧录失败";
+				return;
+			} else {
+				StaticInfor.measureItemShow.Measure_Value = "烧录成功";
+			}
+		}
 
 		/// <summary>
 		/// 实际进行ISP的操作
@@ -360,6 +380,46 @@ namespace Ingenu_Power.UserControls
 		#endregion
 
 		#region -- 测试环节中的校准操作步骤
+
+		/// <summary>
+		/// 产品的校准
+		/// </summary>
+		/// <param name="measureCondition">产品限定条件</param>
+		/// <param name="error_information">可能出现的问题</param>
+		private void Measure_vCalibrate(StaticInfor.MeasureCondition measureCondition,out string error_information)
+		{
+			error_information = string.Empty;
+			//反射进行动态调用
+			try {
+				Assembly assembly = Assembly.LoadFrom( @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll" );
+				Type[] tys = assembly.GetTypes();
+				bool found_file = false;
+				foreach (Type id_verion in tys) {
+					if (id_verion.Name == "_60010") {
+						//if (id_verion.Name == "_" + measureCondition.ID_Hardware.ToString() + measureCondition.Ver_Hardware.ToString()) {
+						Object obj = Activator.CreateInstance( id_verion );
+						//对象的初始化
+						MethodInfo mi = id_verion.GetMethod( "Initalize" );
+						mi.Invoke( obj, null );
+						//进行校准操作
+						mi = id_verion.GetMethod( "Calibrate" );
+						object[] parameters = new object[] { 1, "COM1" };
+						//object[] parameters = new object[] { measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
+						error_information += mi.Invoke( obj, parameters ).ToString();
+
+						found_file = true;
+						break;
+					}
+				}
+
+				if (!found_file) {
+					error_information = "没有找到对应ID和版本号的产品的测试方法"; return;
+				}
+			} catch {
+				error_information = "没有能正常加载 ProductInfor.dll";
+			}
+
+		}
 
 		#endregion
 

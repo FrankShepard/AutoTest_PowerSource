@@ -81,7 +81,7 @@
 						</Grid>
 						<Grid Grid.Column="1">
 							<StackPanel Margin="10">
-								<Slider Minimum="1" Maximum="6" Style="{StaticResource MaterialDesignDiscreteSlider}" 
+								<Slider Name="SldMagnification" Minimum="1" Maximum="6" Style="{StaticResource MaterialDesignDiscreteSlider}" 
 									Width="313" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="测试过程中的延时时长等级" Margin="0,4,10,4" />
 								<WrapPanel>
 									<materialDesign:PackIcon Kind="Creation" Height="30" Width="30" VerticalAlignment="Center"/>

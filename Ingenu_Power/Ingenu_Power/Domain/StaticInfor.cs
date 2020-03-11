@@ -58,6 +58,10 @@ namespace Ingenu_Power.Domain
 			/// 使能全功能测试状态
 			/// </summary>
 			public bool WholeFunction_Enable;
+			/// <summary>
+			/// 测试时的延时时长延长等级
+			/// </summary>
+			public int Magnification;
 		}
 
 		/// <summary>
@@ -103,22 +107,22 @@ namespace Ingenu_Power.Domain
 		/// <summary>
 		/// 与设备进行通讯的波特率
 		/// </summary>
-		public static int Baudrate_Instrument = 4800;
+		public const int Baudrate_Instrument = 4800;
 		/// <summary>
 		/// 备电负载的通讯地址
 		/// </summary>
-		public static byte Address_Load_Bats = 0;
+		public const byte Address_Load_Bats = 0;
 		/// <summary>
 		/// 输出负载的通讯地址
 		/// </summary>
-		public static byte[] Address_Load_Output = { 1, 2, 3, 4, 5, 6 };
+		public static readonly byte[] Address_Load_Output = { 1, 2, 3, 4, 5, 6 };
 		/// <summary>
 		/// 程控交流电源的通讯地址
 		/// </summary>
-		public static byte Address_ACPower = 12;
+		public const byte Address_ACPower = 12;
 		/// <summary>
 		/// 程控可调直流电源的通讯地址
 		/// </summary>
-		public static byte Address_DCPower = 13;
+		public const byte Address_DCPower = 13;
 	}
 }

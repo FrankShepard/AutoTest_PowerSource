@@ -74,7 +74,7 @@
 			<Grid Grid.Row="0">
 				<materialDesign:ColorZone Padding="1" materialDesign:ShadowAssist.ShadowDepth="Depth2" Mode="PrimaryMid" DockPanel.Dock="Top">
 					<Grid Height="24">
-							<Grid HorizontalAlignment="Left">
+							<WrapPanel HorizontalAlignment="Left">
 								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMenuShow" Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" Click="BtnMenuShow_Click" >
 									<ToggleButton.Content>
 										<materialDesign:PackIcon Kind="Settings" Margin="0" />
@@ -82,8 +82,16 @@
 									<materialDesign:ToggleButtonAssist.OnContent>
 										<materialDesign:PackIcon Kind="Settings" Margin =" 0"/>
 									</materialDesign:ToggleButtonAssist.OnContent>
-								</ToggleButton>								
-							</Grid>
+								</ToggleButton>
+								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnRefreshDll" Click="BtnRefreshDll_Click" ToolTip="执行更新dll文件">
+									<ToggleButton.Content>
+										<materialDesign:PackIcon Kind="Refresh" Margin="0" />
+									</ToggleButton.Content>
+									<materialDesign:ToggleButtonAssist.OnContent>
+										<materialDesign:PackIcon Kind="Refresh" Margin =" 0"/>
+									</materialDesign:ToggleButtonAssist.OnContent>
+								</ToggleButton>
+							</WrapPanel>
 							<WrapPanel HorizontalAlignment="Right">
 								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMessage" Click="BtnMessage_Click" ToolTip="最近一次出现的错误信息">
 									<ToggleButton.Content>
