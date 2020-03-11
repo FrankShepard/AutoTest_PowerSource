@@ -483,10 +483,9 @@ namespace ProductInfor
 		/// <summary>
 		/// 校准的操作
 		/// </summary>
-		/// <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public virtual string Calibrate(int delay_magnification, string port_name)
+		public virtual string Calibrate( string port_name)
 		{
 			string error_information = string.Empty;
 			return error_information;

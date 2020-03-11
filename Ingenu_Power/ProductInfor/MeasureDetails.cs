@@ -92,28 +92,65 @@ namespace ProductInfor
 		/// <param name="output_count">输出通道数量</param>
 		/// <param name="powers">按照输出通道的预计功率值</param>
 		/// <param name="real_powers">分配到电子负载的对应功率值</param>
-		public void Measure_vPowerAllocate(int output_count,decimal[] powers,out decimal[] real_powers)
+		/// <returns>输出使用的电子负载对应的硬件通道索引</returns>
+		public static int[] Measure_vPowerAllocate(int output_count,decimal[] powers,out decimal[] real_powers)
 		{
+			int [ ] AllocateChannel = new int [ MeasureDetails.Address_Load_Output.Length ];
 			real_powers = new decimal[ MeasureDetails.Address_Load_Output.Length ];
+			int used_load_count = 0;
 			for(int index =0;index < output_count; index++) {
-				if (powers[ index ] <= SingleLoadMaxPower) { //输出功率可以被单个负载直接吸收
-					real_powers[ 2 * index ] = powers[ index ];
-					real_powers[ 2 * index + 1 ] = 0;
-				} else if (powers[ index ] <= 2 * SingleLoadMaxPower) { //输出功率可以被两个并联的负载直接吸收
-					real_powers[ 2 * index ] = SingleLoadMaxPower;
-					real_powers[ 2 * index + 1 ] = powers[ index ] - SingleLoadMaxPower;
-				} else if (powers[ index ] <= 4 * SingleLoadMaxPower) { //输出功率需要被4个并联的负载吸收
-					real_powers[ 2 * index ] = SingleLoadMaxPower;
-					real_powers[ 2 * index + 1 ] = SingleLoadMaxPower;
-					if (powers[ index ] <= 3 * SingleLoadMaxPower) {
-						real_powers[ 2 * index + 2 ] = powers[ index ] - 2 * SingleLoadMaxPower;
-						real_powers[ 2 * index + 3 ] = 0;
+				if ( powers [ index ] <= 2 * SingleLoadMaxPower ) { //输出功率可以被两个并联的负载直接吸收
+					if ( powers [ index ] < SingleLoadMaxPower ) {
+						real_powers [ used_load_count ] = powers [ index ];
+						real_powers [ used_load_count + 1 ] = 0;					
 					} else {
-						real_powers[ 2 * index + 2 ] = SingleLoadMaxPower;
-						real_powers[ 2 * index + 3 ] = powers[ index ] - 3 * SingleLoadMaxPower;
+						real_powers [ used_load_count ] = SingleLoadMaxPower;
+						real_powers [ used_load_count + 1 ] = powers [ index ] - SingleLoadMaxPower;
 					}
+					used_load_count += 2;
+					AllocateChannel [ used_load_count ] = index;
+					AllocateChannel [ used_load_count + 1 ] = index;
+				} else if ( powers [ index ] <= 4 * SingleLoadMaxPower ) { //输出功率需要被4个并联的负载吸收
+					real_powers [used_load_count ] = SingleLoadMaxPower;
+					real_powers [used_load_count + 1 ] = SingleLoadMaxPower;
+					if ( powers [ index ] <= 3 * SingleLoadMaxPower ) {
+						real_powers [used_load_count + 2 ] = powers [ index ] - 2 * SingleLoadMaxPower;
+						real_powers [used_load_count + 3 ] = 0;
+					} else {
+						real_powers [used_load_count + 2 ] = SingleLoadMaxPower;
+						real_powers [used_load_count + 3 ] = powers [ index ] - 3 * SingleLoadMaxPower;
+					}
+					used_load_count += 4;
+					AllocateChannel [ used_load_count ] = index;
+					AllocateChannel [ used_load_count + 1 ] = index;
+					AllocateChannel [ used_load_count + 2 ] = index;
+					AllocateChannel [ used_load_count + 3 ] = index;
+				} else if ( powers [ index ] <= 6 * SingleLoadMaxPower ) { //输出功率需要被6个并联的负载吸收
+					real_powers [used_load_count ] = SingleLoadMaxPower;
+					real_powers [used_load_count + 1 ] = SingleLoadMaxPower;
+					real_powers [used_load_count + 2 ] = SingleLoadMaxPower;
+					real_powers [used_load_count + 3 ] = SingleLoadMaxPower;
+					if ( powers [ index ] <= 5 * SingleLoadMaxPower ) {
+						real_powers [used_load_count + 4 ] = powers [ index ] - 4 * SingleLoadMaxPower;
+						real_powers [used_load_count + 5 ] = 0;
+					} else {
+						real_powers [used_load_count + 4 ] = SingleLoadMaxPower;
+						real_powers [used_load_count + 5 ] = powers [ index ] - 5 * SingleLoadMaxPower;
+					}
+					used_load_count += 6;
+					AllocateChannel [ used_load_count ] = index;
+					AllocateChannel [ used_load_count + 1 ] = index;
+					AllocateChannel [ used_load_count + 2 ] = index;
+					AllocateChannel [ used_load_count + 3 ] = index;
+					AllocateChannel [ used_load_count + 4 ] = index;
+					AllocateChannel [ used_load_count + 5 ] = index;
+				}
+
+				if(used_load_count >= 6 ) { //限制最多存在6个输出使用的电子负载
+					break;
 				}
 			}
+			return AllocateChannel;
 		}
 
 		#endregion

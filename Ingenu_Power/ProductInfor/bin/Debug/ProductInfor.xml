@@ -544,11 +544,10 @@
             产品相关信息的初始化
             </summary>
         </member>
-        <member name="M:ProductInfor.Base.Calibrate(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Calibrate(System.String)">
             <summary>
             校准的操作
             </summary>
-            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
@@ -561,9 +560,71 @@
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
-        <member name="T:ProductInfor.Measure">
+        <member name="T:ProductInfor.MeasureDetails">
             <summary>
             测试过程的具体类，此文件用于存储详细的测试过程
+            </summary>
+        </member>
+        <member name="F:ProductInfor.MeasureDetails.Address_ACPower">
+            <summary>
+            交流电源地址
+            </summary>
+        </member>
+        <member name="F:ProductInfor.MeasureDetails.Address_DCPower">
+            <summary>
+            可调直流电源地址
+            </summary>
+        </member>
+        <member name="F:ProductInfor.MeasureDetails.Address_Load_Output">
+            <summary>
+            输出通道电子负载地址
+            </summary>
+        </member>
+        <member name="F:ProductInfor.MeasureDetails.Address_Load_Bats">
+            <summary>
+            检测均充电流电子负载地址
+            </summary>
+        </member>
+        <member name="F:ProductInfor.MeasureDetails.SingleLoadMaxPower">
+            <summary>
+            单个电子负载最大输入功率 - 270W
+            </summary>
+        </member>
+        <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument">
+            <summary>
+            仪表通讯波特率
+            </summary>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vInstrumentInitalize(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            仪表初始化
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vPowerAllocate(System.Int32,System.Decimal[],System.Decimal[]@)">
+            <summary>
+            功率的自动分配，根据预计带载值，将其分配到对应的电子负载上
+            </summary>
+            <param name="output_count">输出通道数量</param>
+            <param name="powers">按照输出通道的预计功率值</param>
+            <param name="real_powers">分配到电子负载的对应功率值</param>
+            <returns>输出使用的电子负载对应的硬件通道索引</returns>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Dispose">
+            <summary>
+            本类资源释放
+            </summary>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Dispose(System.Boolean)">
+            <summary>
+            无法直接调用的资源释放程序
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Finalize">
+            <summary>
+            类释放资源析构函数
             </summary>
         </member>
         <member name="T:ProductInfor._60010">
@@ -581,19 +642,18 @@
             相关信息的初始化
             </summary>
         </member>
-        <member name="M:ProductInfor._60010.Communicate_User(System.String,System.String@)">
+        <member name="M:ProductInfor._60010.Communicate_User(System.IO.Ports.SerialPort,System.String@)">
             <summary>
             与产品的具体通讯环节
-            <param name="port_name">使用到的实际串口名</param>
+            <param name="serialPort">使用到的实际串口</param>
             <param name="error_information">可能存在的异常信息</param>
             </summary>
         </member>
-        <member name="M:ProductInfor._60010.Communicate_Admin(System.String,System.String@)">
+        <member name="M:ProductInfor._60010.Communicate_Admin(System.IO.Ports.SerialPort)">
             <summary>
             与产品的通讯 - 进入管理员通讯模式
             </summary>
-            <param name="port_name">使用到的实际串口名</param>
-            <param name="error_information">可能存在的异常问题</param>
+            <param name="serialPort">使用到的实际串口</param>
         </member>
         <member name="M:ProductInfor._60010.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort)">
             <summary>
@@ -634,13 +694,19 @@
             <param name="count">需要计算的字节长度</param>
             <returns>所需校验和</returns>
         </member>
-        <member name="M:ProductInfor._60010.Calibrate(System.Int32,System.String)">
+        <member name="M:ProductInfor._60010.Calibrate(System.String)">
             <summary>
             60010 的校准步骤重写
             </summary>
-            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._60010.Calibrate_vDoEvent(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            实际进行校准的操作过程，此过程需要根据不同产品的校准步骤进行调整
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
         </member>
         <member name="M:ProductInfor._60010.Measure(System.Int32,System.Boolean,System.String)">
             <summary>

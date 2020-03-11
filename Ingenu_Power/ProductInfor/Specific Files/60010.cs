@@ -335,71 +335,131 @@ namespace ProductInfor
 
 		#endregion
 
-		
+
 
 		#region -- 执行的校准操作
 
 		/// <summary>
 		/// 60010 的校准步骤重写
 		/// </summary>
-		/// <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public override string Calibrate(int delay_magnification,string port_name)
+		public override string Calibrate(  string port_name )
 		{
-			string error_information = string.Empty;
+			string error_information = string.Empty; //整体校准环节可能存在的异常
+			string error_information_Calibrate = string.Empty; //校准环节可能存在的异常
 
 			//针对需要进行校准的产品而言，需要执行以下指令函数
-			using (MeasureDetails measureDetails = new MeasureDetails()) {
-				using (AN97002H acpower = new AN97002H()) {
-					using(Itech itech = new Itech()) {
-						using (MCU_Control mCU_Control = new MCU_Control()) {
-							using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
-								//仪表初始化
-								measureDetails.Measure_vInstrumentInitalize( serialPort, out error_information );
-								if (error_information != string.Empty) { return error_information; }
-								//主电欠压点时启动，先擦除校准数据，后重启防止之前记录的校准数据对MCU采集的影响
-								error_information = acpower.ACPower_vSetParameters( MeasureDetails.Address_ACPower, infor_Calibration.MpUnderVoltage, 50, true, serialPort );
-								error_information = acpower.ACPower_vControlStart( MeasureDetails.Address_ACPower, serialPort );
-								do {
-									Communicate_User( serialPort, out error_information );
-								} while (error_information != string.Empty);
-								Communicate_Admin( serialPort );
-								mCU_Control.McuCalibrate_vClear( serialPort, out error_information );
-								if (error_information != string.Empty) { return error_information; }
-								mCU_Control.McuCalibrate_vReset( serialPort, out error_information );
-								if (error_information != string.Empty) { return error_information; }
-								//等待软件重启完成之后,执行主电欠压点、周期、空载输出的校准
-								do {
-									Communicate_User( serialPort, out error_information );
-								} while (error_information != string.Empty);
-								Communicate_Admin( serialPort );
-								mCU_Control.McuCalibrate_vMp( serialPort, out error_information );
-								if (error_information != string.Empty) { return error_information; }
-								for (int index = 0; index < infor_Output.OutputChannelCount; index++) {
-									Itech.GeneralData_Load generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ 2 * index + 1 ], serialPort, out error_information );
-									if (error_information != string.Empty) { return error_information; }
-									mCU_Control.McuCalibrate_vMpOutputVoltage( index, generalData_Load.ActrulyPower, serialPort, out error_information );
-									if (error_information != string.Empty) { return error_information; }
-								}
-								//正常电压输入、满载电压时，进行输出电流的校准
-								error_information = acpower.ACPower_vSetParameters( MeasureDetails.Address_ACPower, 220, 50, true, serialPort );
-								for (int index = 0; index < infor_Output.OutputChannelCount; index++) {
-									Itech.GeneralData_Load generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ 2 * index + 1 ], serialPort, out error_information );
-									if (error_information != string.Empty) { return error_information; }
-									mCU_Control.McuCalibrate_vMpOutputVoltage( index, generalData_Load.ActrulyPower, serialPort, out error_information );
-									if (error_information != string.Empty) { return error_information; }
-								}
+			using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
 
-							}
+				using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+					//仪表初始化
+					measureDetails.Measure_vInstrumentInitalize ( serialPort, out error_information );
+					if ( error_information != string.Empty ) { return error_information; }
+
+					//真正开始进行待测产品的校准操作
+					Calibrate_vDoEvent ( serialPort, out error_information_Calibrate );
+					if ( error_information_Calibrate != string.Empty ) {
+						measureDetails.Measure_vInstrumentInitalize ( serialPort, out error_information );
+						error_information += "\r\n" + error_information_Calibrate;
+					}
+
+				}
+				return error_information;
+			}
+		}
+
+		/// <summary>
+		/// 实际进行校准的操作过程，此过程需要根据不同产品的校准步骤进行调整
+		/// </summary>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		private void Calibrate_vDoEvent( SerialPort serialPort, out string error_information )
+		{
+			error_information = string.Empty;
+
+			using ( AN97002H acpower = new AN97002H ( ) ) {
+				using ( Itech itech = new Itech ( ) ) {
+					using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
+						/*主电欠压点时启动，先擦除校准数据，后重启防止之前记录的校准数据对MCU采集的影响*/
+						error_information = acpower.ACPower_vSetParameters ( MeasureDetails.Address_ACPower, infor_Calibration.MpUnderVoltage, 50, true, serialPort );
+						error_information = acpower.ACPower_vControlStart ( MeasureDetails.Address_ACPower, serialPort );
+						do {
+							Communicate_User ( serialPort, out error_information );
+						} while ( error_information != string.Empty );
+						Communicate_Admin ( serialPort );
+						mCU_Control.McuCalibrate_vClear ( serialPort, out error_information );
+						if ( error_information != string.Empty ) { return; }
+						mCU_Control.McuCalibrate_vReset ( serialPort, out error_information );
+						if ( error_information != string.Empty ) { return; }
+						/*等待软件重启完成之后,执行主电欠压点、周期、空载输出的校准*/
+						do {
+							Communicate_User ( serialPort, out error_information );
+						} while ( error_information != string.Empty );
+						Communicate_Admin ( serialPort );
+						mCU_Control.McuCalibrate_vMp ( serialPort, out error_information );
+						if ( error_information != string.Empty ) { return; }
+						Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
+						for ( int index = 0 ; index < infor_Output.OutputChannelCount ; index++ ) {
+							generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ 2 * index + 1 ], serialPort, out error_information );
+							if ( error_information != string.Empty ) { return ; }
+							mCU_Control.McuCalibrate_vMpOutputVoltage ( index, generalData_Load.ActrulyPower, serialPort, out error_information );
+							if ( error_information != string.Empty ) { return ; }
 						}
+						/*正常电压输入、满载电压时，进行输出电流的校准*/
+						error_information = acpower.ACPower_vSetParameters ( MeasureDetails.Address_ACPower, 220, 50, true, serialPort );
+						decimal [ ] full_load_powers = new decimal [ MeasureDetails.Address_Load_Output.Length ];
+						int [ ] allocate_channel = MeasureDetails.Measure_vPowerAllocate ( infor_Output.OutputChannelCount, infor_Calibration.OutputPower_Mp, out full_load_powers );
+						for ( int index = 0 ; index < MeasureDetails.Address_Load_Output.Length ; index++ ) {
+							error_information = itech.ElecLoad_vInputStatusSet ( MeasureDetails.Address_Load_Output [ index ], Itech.OperationMode.CW, full_load_powers [ index ], Itech.OnOffStatus.On, serialPort );
+							if ( error_information != string.Empty ) { return; }
+						}
+						
+						Thread.Sleep ( 500 );
+						//等电流采集准确,注意：从电子负载获取测试值时产品MCU依然在进行数据采集，不同产品的此处电流获取方式不同，需要根据实际情况决定
+						for ( int index_of_calibration_channel = 0 ; index_of_calibration_channel < 3 ; index_of_calibration_channel++ ) {
+							generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ 2 * index_of_calibration_channel ], serialPort, out error_information );
+							if ( error_information != string.Empty ) { return ; }
+							decimal current = generalData_Load.ActrulyCurrent;
+							generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ 2 * index_of_calibration_channel + 1 ], serialPort, out error_information );
+							if ( error_information != string.Empty ) { return ; }
+							current += generalData_Load.ActrulyCurrent;
+							mCU_Control.McuCalibrate_vMpOutputCurrent ( index_of_calibration_channel, generalData_Load.ActrulyVoltage, current, serialPort, out error_information );
+							if ( error_information != string.Empty ) { return ; }
+						}
+
+						/*更改输出带载值为备电时的带载情况，之后将单片机进行重启操作以刷新电流的校准显示*/
+						allocate_channel = MeasureDetails.Measure_vPowerAllocate ( infor_Output.OutputChannelCount, infor_Calibration.OutputPower_Sp, out full_load_powers );
+						for ( int index = 0 ; index < MeasureDetails.Address_Load_Output.Length ; index++ ) {
+							error_information = itech.ElecLoad_vInputStatusSet ( MeasureDetails.Address_Load_Output [ index ], Itech.OperationMode.CW, full_load_powers [ index ], Itech.OnOffStatus.On, serialPort );
+							if ( error_information != string.Empty ) { return ; }
+						}
+						mCU_Control.McuCalibrate_vReset ( serialPort, out error_information );
+						if ( error_information != string.Empty ) { return ; }
+						/*等待软件重启完成之后,执行备电电流校准*/
+						do {
+							Communicate_User ( serialPort, out error_information );
+						} while ( error_information != string.Empty );
+						Communicate_Admin ( serialPort );
+						for ( int index_of_calibration_channel = 0 ; index_of_calibration_channel < 3 ; index_of_calibration_channel++ ) {
+							generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ 2 * index_of_calibration_channel ], serialPort, out error_information );
+							if ( error_information != string.Empty ) { return; }
+							decimal current = generalData_Load.ActrulyCurrent;
+							generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ 2 * index_of_calibration_channel + 1 ], serialPort, out error_information );
+							if ( error_information != string.Empty ) { return; }
+							current += generalData_Load.ActrulyCurrent;
+							mCU_Control.McuCalibrate_vSpOutputCurrent ( index_of_calibration_channel, generalData_Load.ActrulyVoltage, current, serialPort, out error_information );
+							if ( error_information != string.Empty ) { return; }
+						}
+
+						/*输出空载情况下，备电电压、OCP、蜂鸣器时常等其它相关的设置*/
+
+
 					}
 				}
 			}
-			return error_information;
 		}
 
-		
 
 		#endregion
 

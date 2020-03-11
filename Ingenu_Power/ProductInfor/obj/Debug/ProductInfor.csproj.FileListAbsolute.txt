@@ -9,3 +9,13 @@ F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\Produ
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.pdb
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.xml
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csprojAssemblyReference.cache
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.xml
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.pdb
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\Instrument_Control.pdb
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\Instrument_Control.xml
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csprojAssemblyReference.cache
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csproj.CoreCompileInputs.cache
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csproj.CopyComplete
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.dll
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.pdb
