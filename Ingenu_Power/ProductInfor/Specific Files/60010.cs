@@ -351,7 +351,6 @@ namespace ProductInfor
 
 			//针对需要进行校准的产品而言，需要执行以下指令函数
 			using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-
 				using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
 					//仪表初始化
 					measureDetails.Measure_vInstrumentInitalize ( serialPort, out error_information );
@@ -436,6 +435,8 @@ namespace ProductInfor
 						}
 						mCU_Control.McuCalibrate_vReset ( serialPort, out error_information );
 						if ( error_information != string.Empty ) { return ; }
+						error_information = acpower.ACPower_vControlStop( MeasureDetails.Address_ACPower, serialPort );
+						if (error_information != string.Empty) { return; }
 						/*等待软件重启完成之后,执行备电电流校准*/
 						do {
 							Communicate_User ( serialPort, out error_information );
@@ -453,7 +454,10 @@ namespace ProductInfor
 						}
 
 						/*输出空载情况下，备电电压、OCP、蜂鸣器时常等其它相关的设置*/
-
+						for(int index = 0;index < MeasureDetails.Address_Load_Output.Length; index++) {
+							error_information = itech.Itech_vInOutOnOffSet( MeasureDetails.Address_Load_Output[ index ], Itech.OnOffStatus.Off, serialPort );
+							if(error_information != string.Empty) { return; }
+						}
 
 					}
 				}

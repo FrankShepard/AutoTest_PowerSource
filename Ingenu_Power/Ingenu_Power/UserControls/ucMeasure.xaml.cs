@@ -36,7 +36,7 @@ namespace Ingenu_Power.UserControls
 		/// <summary>
 		/// 测试线程
 		/// </summary>
-		private Thread trdMeasure;
+		public Thread trdMeasure;
 
 		/// <summary>
 		/// Timer组件中进行进度条和测试项、测试环节、测试结果的显示
@@ -424,6 +424,5 @@ namespace Ingenu_Power.UserControls
 		#endregion
 
 		#endregion
-
 	}
 }

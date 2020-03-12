@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -79,7 +81,15 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnInfor_Click(object sender, RoutedEventArgs e)
 		{
-			MessageTips( "电源自动测试系统 \r\n©北京盈帜新源科技有限公司" );
+			Assembly asm = Assembly.GetExecutingAssembly();//如果是当前程序集
+
+			string name = asm.GetName().Name.ToString();
+			AssemblyCopyrightAttribute asmcpr = ( AssemblyCopyrightAttribute )Attribute.GetCustomAttribute( asm, typeof( AssemblyCopyrightAttribute ) );
+			string copyright = asmcpr.Copyright;
+			AssemblyCompanyAttribute asmcom = ( AssemblyCompanyAttribute )Attribute.GetCustomAttribute( asm, typeof( AssemblyCompanyAttribute ) );
+			string company = asmcom.Company;
+			string verion = asm.GetName().Version.ToString();
+			MessageTips( name +"\r\n" + company +"\r\n" + copyright +"\r\n" + verion );
 		}
 
 		/// <summary>
@@ -313,13 +323,33 @@ namespace Ingenu_Power
 		#endregion
 
 		/// <summary>
-		/// 更新使用到的 ProductInfor.dll 文件
+		/// 鼠标双击同步图标，从数据库中获取新的 ProductInfor.dll 文件
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void BtnRefreshDll_Click(object sender, RoutedEventArgs e)
+		private void PkiSyncDll_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
+			if(ucMeasure.trdMeasure == null) { //测试线程不存在，可以更新dll
 
+			} else {
+				if (!ucMeasure.trdMeasure.IsAlive) {//测试线程没有激活，可以更新dll
+
+				}
+			}
+		}
+
+		/// <summary>
+		/// 鼠标进入，更改提示
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void PkiSyncDll_MouseEnter(object sender, MouseEventArgs e)
+		{
+			if(PkiSyncDll.Kind == MaterialDesignThemes.Wpf.PackIconKind.CloudSync) {
+				PkiSyncDll.ToolTip = "双击鼠标用以更新 测试使用的 dll文件";
+			}else if(PkiSyncDll.Kind == MaterialDesignThemes.Wpf.PackIconKind.Check) {
+				PkiSyncDll.ToolTip = "测试使用的 dll文件，更新完成";
+			}
 		}
 	}
 }
