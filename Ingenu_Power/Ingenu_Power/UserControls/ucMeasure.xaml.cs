@@ -403,7 +403,7 @@ namespace Ingenu_Power.UserControls
 						mi.Invoke( obj, null );
 						//进行校准操作
 						mi = id_verion.GetMethod( "Calibrate" );
-						object[] parameters = new object[] { "COM1" };
+						object[] parameters = new object[] { Properties.Settings.Default.Instrment_OSC_INS,"COM1" };
 						//object[] parameters = new object[] { Properties.Settings.Default.UsedSerialport };
 						error_information += mi.Invoke( obj, parameters ).ToString();
 

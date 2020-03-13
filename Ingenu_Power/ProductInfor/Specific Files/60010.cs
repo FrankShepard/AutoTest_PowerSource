@@ -334,17 +334,16 @@ namespace ProductInfor
 		}
 
 		#endregion
-
-
-
+				
 		#region -- 执行的校准操作
 
 		/// <summary>
 		/// 60010 的校准步骤重写
 		/// </summary>
+		/// <param name="osc_ins">示波器INS码</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public override string Calibrate(  string port_name )
+		public override string Calibrate( string osc_ins , string port_name )
 		{
 			string error_information = string.Empty; //整体校准环节可能存在的异常
 			string error_information_Calibrate = string.Empty; //校准环节可能存在的异常
@@ -353,13 +352,13 @@ namespace ProductInfor
 			using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
 				using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
 					//仪表初始化
-					measureDetails.Measure_vInstrumentInitalize ( serialPort, out error_information );
+					measureDetails.Measure_vInstrumentInitalize ( osc_ins,serialPort, out error_information );
 					if ( error_information != string.Empty ) { return error_information; }
 
 					//真正开始进行待测产品的校准操作
-					Calibrate_vDoEvent ( serialPort, out error_information_Calibrate );
+					Calibrate_vDoEvent (measureDetails, serialPort, out error_information_Calibrate );
 					if ( error_information_Calibrate != string.Empty ) {
-						measureDetails.Measure_vInstrumentInitalize ( serialPort, out error_information );
+						measureDetails.Measure_vInstrumentInitalize ( osc_ins,serialPort, out error_information );
 						error_information += "\r\n" + error_information_Calibrate;
 					}
 
@@ -371,100 +370,129 @@ namespace ProductInfor
 		/// <summary>
 		/// 实际进行校准的操作过程，此过程需要根据不同产品的校准步骤进行调整
 		/// </summary>
+		/// <param name="measureDetails">测试部分的实例化对象</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		private void Calibrate_vDoEvent( SerialPort serialPort, out string error_information )
+		private void Calibrate_vDoEvent(MeasureDetails measureDetails ,SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 
 			using ( AN97002H acpower = new AN97002H ( ) ) {
-				using ( Itech itech = new Itech ( ) ) {
-					using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
+				using (Itech itech = new Itech()) {
+					using (MCU_Control mCU_Control = new MCU_Control()) {
 						/*主电欠压点时启动，先擦除校准数据，后重启防止之前记录的校准数据对MCU采集的影响*/
-						error_information = acpower.ACPower_vSetParameters ( MeasureDetails.Address_ACPower, infor_Calibration.MpUnderVoltage, 50, true, serialPort );
-						error_information = acpower.ACPower_vControlStart ( MeasureDetails.Address_ACPower, serialPort );
+						error_information = acpower.ACPower_vSetParameters( MeasureDetails.Address_ACPower, infor_Calibration.MpUnderVoltage, 50, true, serialPort );
+						error_information = acpower.ACPower_vControlStart( MeasureDetails.Address_ACPower, serialPort );
+						serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
 						do {
-							Communicate_User ( serialPort, out error_information );
-						} while ( error_information != string.Empty );
-						Communicate_Admin ( serialPort );
-						mCU_Control.McuCalibrate_vClear ( serialPort, out error_information );
-						if ( error_information != string.Empty ) { return; }
-						mCU_Control.McuCalibrate_vReset ( serialPort, out error_information );
-						if ( error_information != string.Empty ) { return; }
+							Communicate_User( serialPort, out error_information );
+						} while (error_information != string.Empty);
+						Communicate_Admin( serialPort );
+						mCU_Control.McuCalibrate_vClear( serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
+						mCU_Control.McuCalibrate_vReset( serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
 						/*等待软件重启完成之后,执行主电欠压点、周期、空载输出的校准*/
 						do {
-							Communicate_User ( serialPort, out error_information );
-						} while ( error_information != string.Empty );
-						Communicate_Admin ( serialPort );
-						mCU_Control.McuCalibrate_vMp ( serialPort, out error_information );
-						if ( error_information != string.Empty ) { return; }
-						Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
-						for ( int index = 0 ; index < infor_Output.OutputChannelCount ; index++ ) {
-							generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ 2 * index + 1 ], serialPort, out error_information );
-							if ( error_information != string.Empty ) { return ; }
-							mCU_Control.McuCalibrate_vMpOutputVoltage ( index, generalData_Load.ActrulyPower, serialPort, out error_information );
-							if ( error_information != string.Empty ) { return ; }
+							Communicate_User( serialPort, out error_information );
+						} while (error_information != string.Empty);
+						Communicate_Admin( serialPort );
+						mCU_Control.McuCalibrate_vMp( serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
+						Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
+						for (int index = 0; index < infor_Output.OutputChannelCount; index++) {
+							serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
+							generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ 2 * index + 1 ], serialPort, out error_information );
+							if (error_information != string.Empty) { return; }
+							serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+							mCU_Control.McuCalibrate_vMpOutputVoltage( index, generalData_Load.ActrulyPower, serialPort, out error_information );
+							if (error_information != string.Empty) { return; }
 						}
 						/*正常电压输入、满载电压时，进行输出电流的校准*/
-						error_information = acpower.ACPower_vSetParameters ( MeasureDetails.Address_ACPower, 220, 50, true, serialPort );
-						decimal [ ] full_load_powers = new decimal [ MeasureDetails.Address_Load_Output.Length ];
-						int [ ] allocate_channel = MeasureDetails.Measure_vPowerAllocate ( infor_Output.OutputChannelCount, infor_Calibration.OutputPower_Mp, out full_load_powers );
-						for ( int index = 0 ; index < MeasureDetails.Address_Load_Output.Length ; index++ ) {
-							error_information = itech.ElecLoad_vInputStatusSet ( MeasureDetails.Address_Load_Output [ index ], Itech.OperationMode.CW, full_load_powers [ index ], Itech.OnOffStatus.On, serialPort );
-							if ( error_information != string.Empty ) { return; }
+						serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
+						error_information = acpower.ACPower_vSetParameters( MeasureDetails.Address_ACPower, 220, 50, true, serialPort );
+						decimal[] full_load_powers = new decimal[ MeasureDetails.Address_Load_Output.Length ];
+						int[] allocate_channel = measureDetails.Measure_vPowerAllocate( infor_Output.OutputChannelCount, infor_Calibration.OutputPower_Mp, out full_load_powers );
+						for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
+							error_information = itech.ElecLoad_vInputStatusSet( MeasureDetails.Address_Load_Output[ index ], Itech.OperationMode.CW, full_load_powers[ index ], Itech.OnOffStatus.On, serialPort );
+							if (error_information != string.Empty) { return; }
 						}
-						
-						Thread.Sleep ( 500 );
+
+						Thread.Sleep( 500 );
 						//等电流采集准确,注意：从电子负载获取测试值时产品MCU依然在进行数据采集，不同产品的此处电流获取方式不同，需要根据实际情况决定
-						for ( int index_of_calibration_channel = 0 ; index_of_calibration_channel < 3 ; index_of_calibration_channel++ ) {
-							generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ 2 * index_of_calibration_channel ], serialPort, out error_information );
-							if ( error_information != string.Empty ) { return ; }
+						for (int index_of_calibration_channel = 0; index_of_calibration_channel < 3; index_of_calibration_channel++) {
+							serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
+							generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ 2 * index_of_calibration_channel ], serialPort, out error_information );
+							if (error_information != string.Empty) { return; }
 							decimal current = generalData_Load.ActrulyCurrent;
-							generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ 2 * index_of_calibration_channel + 1 ], serialPort, out error_information );
-							if ( error_information != string.Empty ) { return ; }
+							generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ 2 * index_of_calibration_channel + 1 ], serialPort, out error_information );
+							if (error_information != string.Empty) { return; }
 							current += generalData_Load.ActrulyCurrent;
-							mCU_Control.McuCalibrate_vMpOutputCurrent ( index_of_calibration_channel, generalData_Load.ActrulyVoltage, current, serialPort, out error_information );
-							if ( error_information != string.Empty ) { return ; }
+							serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+							mCU_Control.McuCalibrate_vMpOutputCurrent( index_of_calibration_channel, generalData_Load.ActrulyVoltage, current, serialPort, out error_information );
+							if (error_information != string.Empty) { return; }
 						}
 
 						/*更改输出带载值为备电时的带载情况，之后将单片机进行重启操作以刷新电流的校准显示*/
-						allocate_channel = MeasureDetails.Measure_vPowerAllocate ( infor_Output.OutputChannelCount, infor_Calibration.OutputPower_Sp, out full_load_powers );
-						for ( int index = 0 ; index < MeasureDetails.Address_Load_Output.Length ; index++ ) {
-							error_information = itech.ElecLoad_vInputStatusSet ( MeasureDetails.Address_Load_Output [ index ], Itech.OperationMode.CW, full_load_powers [ index ], Itech.OnOffStatus.On, serialPort );
-							if ( error_information != string.Empty ) { return ; }
+						allocate_channel = measureDetails.Measure_vPowerAllocate( infor_Output.OutputChannelCount, infor_Calibration.OutputPower_Sp, out full_load_powers );
+						serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
+						for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
+							error_information = itech.ElecLoad_vInputStatusSet( MeasureDetails.Address_Load_Output[ index ], Itech.OperationMode.CW, full_load_powers[ index ], Itech.OnOffStatus.On, serialPort );
+							if (error_information != string.Empty) { return; }
 						}
-						mCU_Control.McuCalibrate_vReset ( serialPort, out error_information );
-						if ( error_information != string.Empty ) { return ; }
+						serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+						mCU_Control.McuCalibrate_vReset( serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
+						serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
 						error_information = acpower.ACPower_vControlStop( MeasureDetails.Address_ACPower, serialPort );
 						if (error_information != string.Empty) { return; }
 						/*等待软件重启完成之后,执行备电电流校准*/
+						serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
 						do {
-							Communicate_User ( serialPort, out error_information );
-						} while ( error_information != string.Empty );
-						Communicate_Admin ( serialPort );
-						for ( int index_of_calibration_channel = 0 ; index_of_calibration_channel < 3 ; index_of_calibration_channel++ ) {
-							generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ 2 * index_of_calibration_channel ], serialPort, out error_information );
-							if ( error_information != string.Empty ) { return; }
+							Communicate_User( serialPort, out error_information );
+						} while (error_information != string.Empty);
+						Communicate_Admin( serialPort );
+						for (int index_of_calibration_channel = 0; index_of_calibration_channel < 3; index_of_calibration_channel++) {
+							serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
+							generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ 2 * index_of_calibration_channel ], serialPort, out error_information );
+							if (error_information != string.Empty) { return; }
 							decimal current = generalData_Load.ActrulyCurrent;
-							generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ 2 * index_of_calibration_channel + 1 ], serialPort, out error_information );
-							if ( error_information != string.Empty ) { return; }
+							generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ 2 * index_of_calibration_channel + 1 ], serialPort, out error_information );
+							if (error_information != string.Empty) { return; }
 							current += generalData_Load.ActrulyCurrent;
-							mCU_Control.McuCalibrate_vSpOutputCurrent ( index_of_calibration_channel, generalData_Load.ActrulyVoltage, current, serialPort, out error_information );
-							if ( error_information != string.Empty ) { return; }
+							serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+							mCU_Control.McuCalibrate_vSpOutputCurrent( index_of_calibration_channel, generalData_Load.ActrulyVoltage, current, serialPort, out error_information );
+							if (error_information != string.Empty) { return; }
 						}
 
-						/*输出空载情况下，备电电压、OCP、蜂鸣器时常等其它相关的设置*/
-						for(int index = 0;index < MeasureDetails.Address_Load_Output.Length; index++) {
+						/*输出空载情况下，备电电压、OCP、蜂鸣器时长等其它相关的设置*/
+						serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
+						for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
 							error_information = itech.Itech_vInOutOnOffSet( MeasureDetails.Address_Load_Output[ index ], Itech.OnOffStatus.Off, serialPort );
-							if(error_information != string.Empty) { return; }
+							if (error_information != string.Empty) { return; }
+						}
+						generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Bats, serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
+						serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+						mCU_Control.McuCalibrate_vSpVoltage( generalData_Load.ActrulyVoltage, serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
+
+						for (int index_of_calibration_channel = 0; index_of_calibration_channel < 3; index_of_calibration_channel++) {
+							mCU_Control.McuCalibrate_vOCP( index_of_calibration_channel, infor_Calibration.OutputOXP[ index_of_calibration_channel ], serialPort, out error_information );
+							if (error_information != string.Empty) { return; }
 						}
 
-					}
+						mCU_Control.McuCalibrate_vSetLongBeepTime( serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
+
+						//校准过程完成，软件重启
+						mCU_Control.McuCalibrate_vReset( serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
+					}				
 				}
 			}
 		}
-
-
+		
 		#endregion
 
 		#region -- 执行的测试操作
@@ -474,13 +502,62 @@ namespace ProductInfor
 		/// </summary>
 		/// <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
 		/// <param name="whole_function_test">是否需要全功能测试</param>
+		/// <param name="osc_ins">示波器INS码</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public override string Measure(int delay_magnification,bool whole_function_test,string port_name)
+		public override string Measure(int delay_magnification,bool whole_function_test,string osc_ins,string port_name)
 		{
-			string error_information = string.Empty;
-			return error_information;
+			string error_information = string.Empty; //整体校准环节可能存在的异常
+			string error_information_Measure = string.Empty; //测试环节可能存在的异常
+
+			//针对需要进行校准的产品而言，需要执行以下指令函数
+			using (MeasureDetails measureDetails = new MeasureDetails()) {
+				using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+					//仪表初始化
+					measureDetails.Measure_vInstrumentInitalize( osc_ins,serialPort, out error_information );
+					if (error_information != string.Empty) { return error_information; }
+
+					//真正开始进行待测产品的校准操作
+					Measure_vDoEvent( measureDetails, delay_magnification, whole_function_test,serialPort, out error_information_Measure );
+					if (error_information_Measure != string.Empty) {
+						measureDetails.Measure_vInstrumentInitalize( osc_ins,serialPort, out error_information );
+						error_information += "\r\n" + error_information_Measure;
+					}
+
+				}
+				return error_information;
+			}
 		}
+
+
+
+		#region -- 具体执行的测试步骤
+		/// <summary>
+		///  实际执行测试的函数
+		/// </summary>
+		/// <param name="measureDetails">测试部分的实例化对象</param>
+		/// <param name="delay_magnification">测试过程中延时级别</param>
+		/// <param name="whole_function_test">全项测试</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		private void Measure_vDoEvent(MeasureDetails measureDetails,int delay_magnification, bool whole_function_test, SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			int measure_index = 0; //测试步骤索引
+			while ((error_information == string.Empty) && (++measure_index < 25)) {
+				switch (measure_index) {
+					case 1:/*备电单投启动功能*/
+						break;
+					case 2:/*备电切断点确定*/
+						break;
+					case 3:/*主电单投启动功能*/
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		#endregion
 
 		#endregion
 	}

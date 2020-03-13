@@ -483,9 +483,10 @@ namespace ProductInfor
 		/// <summary>
 		/// 校准的操作
 		/// </summary>
+		/// <param name="osc_ins">使用到的示波器INS</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public virtual string Calibrate( string port_name)
+		public virtual string Calibrate(string osc_ins,string port_name)
 		{
 			string error_information = string.Empty;
 			return error_information;
@@ -496,9 +497,10 @@ namespace ProductInfor
 		/// </summary>
 		/// <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
 		/// <param name="whole_function_test">是否需要全功能测试</param>
+		/// <param name="osc_ins">使用到的示波器INS</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public virtual string Measure(int delay_magnification, bool whole_function_test, string port_name)
+		public virtual string Measure(int delay_magnification, bool whole_function_test, string osc_ins, string port_name)
 		{
 			string error_information = string.Empty;
 			return error_information;
