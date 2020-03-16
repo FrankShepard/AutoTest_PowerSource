@@ -201,8 +201,8 @@ namespace ProductInfor
 						real_currents[ used_load_count ] = (currents[index] * real_voltages[index] - 2*SingleLoadMaxPower) / real_voltages[ index ];
 						real_currents[ used_load_count + 3 ] = 0;
 					} else {
-						real_powers[ used_load_count + 2 ] = SingleLoadMaxPower;
-						real_powers[ used_load_count + 3 ] = powers[ index ] - 3 * SingleLoadMaxPower;
+						real_currents[ used_load_count + 2 ] = SingleLoadMaxPower / real_voltages[ index ]; ;
+						real_currents[ used_load_count + 3 ] = (currents[ index ] * real_voltages[ index ] - 3 * SingleLoadMaxPower) / real_voltages[ index ];
 					}
 					used_load_count += 4;
 					AllocateChannel[ used_load_count ] = index;
@@ -210,16 +210,16 @@ namespace ProductInfor
 					AllocateChannel[ used_load_count + 2 ] = index;
 					AllocateChannel[ used_load_count + 3 ] = index;
 				} else if ((currents[ index ] * real_voltages[ index ]) <= 6 * SingleLoadMaxPower) { //输出功率需要被6个并联的负载吸收
-					real_powers[ used_load_count ] = SingleLoadMaxPower;
-					real_powers[ used_load_count + 1 ] = SingleLoadMaxPower;
-					real_powers[ used_load_count + 2 ] = SingleLoadMaxPower;
-					real_powers[ used_load_count + 3 ] = SingleLoadMaxPower;
-					if (powers[ index ] <= 5 * SingleLoadMaxPower) {
-						real_powers[ used_load_count + 4 ] = powers[ index ] - 4 * SingleLoadMaxPower;
-						real_powers[ used_load_count + 5 ] = 0;
+					real_currents[ used_load_count ] = SingleLoadMaxPower / real_voltages[ index ];
+					real_currents[ used_load_count + 1 ] = SingleLoadMaxPower / real_voltages[ index ];
+					real_currents[ used_load_count + 2 ] = SingleLoadMaxPower / real_voltages[ index ]; 
+					real_currents[ used_load_count + 3 ] = SingleLoadMaxPower / real_voltages[ index ]; 
+					if ((currents[ index ] * real_voltages[ index ]) <= 5 * SingleLoadMaxPower) {
+						real_currents[ used_load_count + 4 ] = (currents[ index ] * real_voltages[ index ] - 4 * SingleLoadMaxPower) / real_voltages[ index ];
+						real_currents[ used_load_count + 5 ] = 0;
 					} else {
-						real_powers[ used_load_count + 4 ] = SingleLoadMaxPower;
-						real_powers[ used_load_count + 5 ] = powers[ index ] - 5 * SingleLoadMaxPower;
+						real_currents[ used_load_count + 4 ] = SingleLoadMaxPower / real_voltages[ index ]; ;
+						real_currents[ used_load_count + 5 ] = (currents[ index ] * real_voltages[ index ] - 5 * SingleLoadMaxPower) / real_voltages[ index ];
 					}
 					used_load_count += 6;
 					AllocateChannel[ used_load_count ] = index;

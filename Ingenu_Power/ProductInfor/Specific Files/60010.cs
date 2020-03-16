@@ -546,12 +546,21 @@ namespace ProductInfor
 			int measure_index = 0; //测试步骤索引
 			while ((error_information == string.Empty) && (++measure_index < 25)) {
 				switch (measure_index) {
-					case 1:/*备电单投启动功能*/
+					case 1:/*备电满载单投启动功能*/
 						break;
 					case 2:/*备电切断点确定*/
 						break;
-					case 3:/*主电单投启动功能*/
+					case 3:/*主电满载单投启动功能、后备电启动500ms再关闭*/
 						break;
+					case 4:/*满载输出电压、输出纹波、AC/DC部分效率、全项：满载时源效应检测*/
+						break;
+					case 4:/*空载输出电压、负载效应、识别备电丢失、全项：空载时源效应检测*/
+						break;
+					case 5:/*均充电压、浮充电流*/
+						break;
+					case 6:/*主电丢失切换与恢复*/
+						break;
+					case 7:/*主电欠压切换与恢复*/
 					default:
 						break;
 				}
