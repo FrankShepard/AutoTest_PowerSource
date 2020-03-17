@@ -396,7 +396,7 @@ namespace Ingenu_Power.UserControls
 				bool found_file = false;
 				foreach (Type id_verion in tys) {
 					if (id_verion.Name == "_60010") {
-						//if (id_verion.Name == "_" + measureCondition.ID_Hardware.ToString() + measureCondition.Ver_Hardware.ToString()) {
+					//if (id_verion.Name == "_" + measureCondition.ID_Hardware.ToString() + measureCondition.Ver_Hardware.ToString()) {
 						Object obj = Activator.CreateInstance( id_verion );
 						//对象的初始化
 						MethodInfo mi = id_verion.GetMethod( "Initalize" );
@@ -404,8 +404,8 @@ namespace Ingenu_Power.UserControls
 						//进行校准操作
 						mi = id_verion.GetMethod( "Calibrate" );
 						object[] parameters = new object[] { Properties.Settings.Default.Instrment_OSC_INS,"COM1" };
-						//object[] parameters = new object[] { Properties.Settings.Default.UsedSerialport };
-						error_information += mi.Invoke( obj, parameters ).ToString();
+						//object[] parameters = new object[] { Properties.Settings.Default.Instrment_OSC_INS,Properties.Settings.Default.UsedSerialport };
+						error_information += mi.Invoke( obj, parameters ).ToString();					
 
 						found_file = true;
 						break;

@@ -379,6 +379,38 @@ namespace ProductInfor
 			/// </summary>
 			public bool[] SpSingleWorkAbility;
 			/// <summary>
+			/// 主电单投时启动输出通道带载模式；0表示CC，1表示CR，2表示CW
+			/// </summary>
+			public int[] StartupLoadType_Mp;
+			/// <summary>
+			/// 备电单投时启动输出通道带载模式；0表示CC，1表示CR，2表示CW
+			/// </summary>
+			public int[] StartupLoadType_Sp;
+			/// <summary>
+			/// 正常测试时的输出通道带载模式；0表示CC，1表示CR，2表示CW
+			/// </summary>
+			public int[] FullLoadType;
+			/// <summary>
+			/// 主备电切换时输出通道带载模式；0表示CC，1表示CR，2表示CW
+			/// </summary>
+			public int[] PowerSourceChangeLoadType;
+			/// <summary>
+			/// 主电单投时输出通道带载值，与输出通道带载模式匹配使用
+			/// </summary>
+			public decimal[] StartupLoadValue_Mp;
+			/// <summary>
+			/// 备电单投时输出通道带载值，与输出通道带载模式匹配使用
+			/// </summary>
+			public decimal[] StartupLoadValue_Sp;
+			/// <summary>
+			/// 满载时对应通道的带载情况，CC模式时为A，CW模式时为W，CR模式时为Ω
+			/// </summary>
+			public decimal[] FullLoadValue;
+			/// <summary>
+			/// 主备电切换时输出通道带载值，与输出通道带载模式匹配使用
+			/// </summary>
+			public decimal[] PowerSourceChangeLoadValue;
+			/// <summary>
 			/// 输出空载电压合格范围
 			/// </summary>
 			public decimal[,] Qualified_OutputVoltageWithoutLoad;

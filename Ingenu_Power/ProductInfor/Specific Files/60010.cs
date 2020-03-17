@@ -543,10 +543,11 @@ namespace ProductInfor
 		private void Measure_vDoEvent(MeasureDetails measureDetails,int delay_magnification, bool whole_function_test, SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
-			int measure_index = 0; //测试步骤索引
+			int measure_index = 0; //测试步骤索引			
 			while ((error_information == string.Empty) && (++measure_index < 25)) {
 				switch (measure_index) {
 					case 1:/*备电满载单投启动功能*/
+						Main_vMeasureProductSingleWorkAbility( itech, acpower, dcpower, true, ref product_Information );
 						break;
 					case 2:/*备电切断点确定*/
 						break;
@@ -554,13 +555,20 @@ namespace ProductInfor
 						break;
 					case 4:/*满载输出电压、输出纹波、AC/DC部分效率、全项：满载时源效应检测*/
 						break;
-					case 4:/*空载输出电压、负载效应、识别备电丢失、全项：空载时源效应检测*/
+					case 5:/*空载输出电压、负载效应、识别备电丢失、全项：空载时源效应检测*/
 						break;
-					case 5:/*均充电压、浮充电流*/
+					case 6:/*浮充电压、均充电流*/
 						break;
-					case 6:/*主电丢失切换与恢复*/
+					case 7:/*主电丢失切换与恢复*/
 						break;
-					case 7:/*主电欠压切换与恢复*/
+					case 8:/*主电欠压切换与恢复、全项：找到具体的欠压点和恢复点*/
+						break;
+					case 9:/*主电过压切换与恢复、全项：找到具体的过压点和恢复点*/
+						break;
+					case 10:/*输出OCP/OWP的检测、全项：找到具体的OCP/OWP值*/
+						break;
+					case 11:/*输出短路保护功能的检测*/
+						break;
 					default:
 						break;
 				}

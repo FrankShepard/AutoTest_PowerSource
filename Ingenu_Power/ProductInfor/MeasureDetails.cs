@@ -307,6 +307,12 @@ namespace ProductInfor
 			return rapple_value;
 		}
 
+
+		public bool Measure_vSpFunctionCheck(SerialPort serialPort,)
+		{
+
+		}
+
 		#endregion
 
 		#region -- 垃圾回收机制 
