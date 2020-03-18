@@ -20,6 +20,7 @@ using System.IO;
 using Instrument_Control;
 using System.IO.Ports;
 using System.Reflection;
+using System.Collections;
 
 namespace Ingenu_Power.UserControls
 {

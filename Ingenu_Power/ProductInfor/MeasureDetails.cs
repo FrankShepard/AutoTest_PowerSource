@@ -308,7 +308,7 @@ namespace ProductInfor
 		}
 
 
-		public bool Measure_vSpFunctionCheck(SerialPort serialPort,)
+		public bool Measure_vSpSingleStartupCheck(SerialPort serialPort, Base.Infor_Output infor_Output,out string error_information)
 		{
 
 		}

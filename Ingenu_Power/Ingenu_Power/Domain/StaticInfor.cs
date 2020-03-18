@@ -82,6 +82,122 @@ namespace Ingenu_Power.Domain
 			public string Measure_Value;
 		}
 
+		/// <summary>
+		/// 测试相关数据
+		/// </summary>
+		public struct MeasuredValue
+		{
+			/// <summary>
+			/// 备电单投功能
+			/// </summary>
+			public bool Check_SingleStartupAbility_Sp;
+			/// <summary>
+			/// 强制启动功能-仅用于应急照明电源
+			/// </summary>
+			public bool Check_MandatoryStartupAbility;
+			/// <summary>
+			/// 备电切断点合格检查
+			/// </summary>
+			public bool Check_SpCutoff;
+			/// <summary>
+			/// 备电切断点，用于全项测试
+			/// </summary>
+			public decimal Voltage_SpCutoff;
+			/// <summary>
+			/// 主电单投功能
+			/// </summary>
+			public bool Check_SingleStartupAbility_Mp;
+			/// <summary>
+			/// 识别备电开路检查
+			/// </summary>
+			public bool Check_DistinguishSpOpen;
+			/// <summary>
+			/// ACDC部分效率
+			/// </summary>
+			public decimal Efficiency;
+			/// <summary>
+			/// 输出的空载电压
+			/// </summary>
+			public decimal [ ] Voltage_WithoutLoad;
+			/// <summary>
+			/// 输出的满载电压
+			/// </summary>
+			public decimal [ ] Voltage_WithLoad;
+			/// <summary>
+			/// 输出的纹波
+			/// </summary>
+			public decimal [ ] Voltage_Rapple;
+			/// <summary>
+			/// 输出的负载效应
+			/// </summary>
+			public decimal [ ] Effect_Load;
+			/// <summary>
+			/// 输出的源效应，用于全项测试
+			/// </summary>
+			public decimal [ ] Effect_Source;
+			/// <summary>
+			/// 输出通道的OCP/OPP保护合格检查
+			/// </summary>
+			public bool [ ] Check_OXP;
+			/// <summary>
+			/// 输出通道的OCP/OPP具体值，用于全项测试
+			/// </summary>
+			public decimal [ ] Value_OXP;
+			/// <summary>
+			/// 输出通道的短路保护功能合格检查
+			/// </summary>
+			public bool [ ] Check_OutputShort;
+			/// <summary>
+			/// 浮充电压
+			/// </summary>
+			public decimal Voltage_FloatingCharge;
+			/// <summary>
+			/// 均充电流
+			/// </summary>
+			public decimal Current_EqualizedCharge;
+			/// <summary>
+			/// 主电丢失切换到备电的功能合格检查
+			/// </summary>
+			public bool Check_SourceChange_MpLost;
+			/// <summary>
+			/// 主电恢复从备电切换到主电的功能合格检查
+			/// </summary>
+			public bool Check_SourceChange_MpRestart;
+			/// <summary>
+			/// 主电欠压切换到备电功能合格检查
+			/// </summary>
+			public bool Check_SourceChange_MpUnderVoltage;
+			/// <summary>
+			/// 主电欠压点，用于全项测试
+			/// </summary>
+			public int Voltage_SourceChange_MpUnderVoltage;
+			/// <summary>
+			/// 主电欠压恢复从备电切换到主电功能合格检查
+			/// </summary>
+			public bool Check_SourceChange_MpUnderVoltageRecovery;
+			/// <summary>
+			/// 主电欠压恢复点，用于全项测试
+			/// </summary>
+			public int Voltage_SourceChange_MpUnderVoltageRecovery;
+			/// <summary>
+			/// 主电过压切换到备电功能合格检查
+			/// </summary>
+			public bool Check_SourceChange_MpOverVoltage;
+			/// <summary>
+			/// 主电过压点，用于全项测试
+			/// </summary>
+			public int Voltage_SourceChange_MpOverVoltage;
+			/// <summary>
+			/// 主电过压恢复从备电切换到主电功能合格检查
+			/// </summary>
+			public bool Check_SourceChange_MpOverVoltageRecovery;
+			/// <summary>
+			/// 主电过压恢复点，用于全项测试
+			/// </summary>
+			public int Voltage_SourceChange_MpOverVoltageRecovery;
+		};
+
+
 		#endregion
 
 		/// <summary>
@@ -104,6 +220,9 @@ namespace Ingenu_Power.Domain
 		/// 用户权限等级，登陆成功之后存在等级1~3；不成功则为0
 		/// </summary>
 		public static int UserRightLevel = 0;
+
+		//后续优化 - 应该将所有的仪表通讯地址相关设置及操作交由 ProductInfor.dll 中进行
+
 		/// <summary>
 		/// 与设备进行通讯的波特率
 		/// </summary>

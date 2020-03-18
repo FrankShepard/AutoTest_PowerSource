@@ -10,15 +10,45 @@ namespace ProductInfor
 	/// </summary>
 	public class _60010 : Base
 	{
+
+		/// <summary>
+		/// 专用于 ID 60010 的软件通讯协议具体值
+		/// </summary>
+		private struct Infor_Uart {
+			/// <summary>
+			/// 主电故障信号
+			/// </summary>
+			public  bool Measured_MpErrorSignal;
+			/// <summary>
+			/// 备电故障信号
+			/// </summary>
+			public bool Measured_SpErrorSignal;
+			/// <summary>
+			/// 输出故障信号
+			/// </summary>
+			public bool [ ] Measured_OutputErrorSignal;
+			/// <summary>
+			/// 备电电压值
+			/// </summary>
+			public decimal Measured_SpValue;
+			/// <summary>
+			/// 输出电压值
+			/// </summary>
+			public decimal [ ] Measured_OutputVoltageValue;
+			/// <summary>
+			/// 输出电流值
+			/// </summary>
+			public decimal [ ] Measured_OutputCurrentValue;
+		}
+
 		Exist exist = new Exist();
 		Infor_Calibration infor_Calibration = new Infor_Calibration() ;
 		Infor_Mp infor_Mp = new Infor_Mp() ;
 		Infor_Sp infor_Sp = new Infor_Sp();
 		Infor_PowerSourceChange infor_PowerSourceChange = new Infor_PowerSourceChange() ;
 		Infor_Charge infor_Charge = new Infor_Charge();
-		Infor_CommunicationProtocol infor_CommunicationProtocol = new Infor_CommunicationProtocol() ;
-		Infor_LevelSignal infor_LevelSignal = new Infor_LevelSignal();
 		Infor_Output infor_Output = new Infor_Output() ;
+		Infor_Uart infor_Uart = new Infor_Uart ( );
 
 		/// <summary>
 		/// 控制命令出现通讯错误之后重新操作的次数
@@ -33,11 +63,9 @@ namespace ProductInfor
 			IDVerion_Product = 60010;
 			Model_Factory = "IG-M3201F";
 			Model_Customer = "GST5000H";
-			communicate_HardwarePortcol_Type = Communicate_HardwarePortcol_Type.Uart_TTL;
+			CommunicateBaudrate = 4800;
 
 			exist = new Exist() {
-				Mp = true,
-				Sp = true,
 				MandatoryMode = false,
 				PowerSourceChange = true,
 				Charge = true,
@@ -47,48 +75,33 @@ namespace ProductInfor
 			};
 
 			infor_Calibration = new Infor_Calibration() {
-				Need_MpUnderVoltage = true,
 				MpUnderVoltage = 170m,
-				Need_MpOverVoltage = false,
 				MpOverVoltage = 0m,
-				Need_MpVoltage = false,
 				MpVoltage = 0m,
-				Need_SpVoltage = true,
-				Need_SpSingleWork = true,
-				Need_OutputVoltageCurrent_Mp = new bool[] { true, true, true },
 				OutputPower_Mp = new decimal[] { 250m, 50m, 250m },
-				Need_OutputVoltageCurrent_Sp = new bool[] { true, true, true },
 				OutputPower_Sp = new decimal[] { 200m, 40m, 200m },
 				OutputOXP = new decimal[] { 12m, 2.5m, 12m },
-				Need_BeepTime = false,
 				BeepTime = 0,
-				CommunicationDisable = false,
 			};
 
 			infor_Mp = new Infor_Mp() {
-				MpVoltageCount = 3,
-				MpFrequncyCount = 3,
-				MeasureDifferentVoltage = new bool[] { true, true, true },
-				MeasureDifferentFrequncy = new bool[] { false, true, false },
 				MpVoltage = new decimal[] { 187m, 220m, 252m },
 				MpFrequncy = new decimal[] { 47m, 50m, 63m },
 			};
 
 			infor_Sp = new Infor_Sp() {
 				UsedBatsCount = 2,
-				NeedMeasure_BatVoltageSeparate = new bool[] { false, false },
-				NeedMeasure_CutoffLevel = true,
 				Qualified_CutoffLevel = new decimal[] { 21m, 21.6m },
 				Delay_WaitForCutoff = 1800,
 			};
 
 			infor_PowerSourceChange = new Infor_PowerSourceChange() {
-				OutputLoadMode_CW = new bool[] { false, false, false },
+				OutputLoadType = new int[] { 0, 0, 0 },
 				OutputLoadValue = new decimal[] { 10m, 2m, 8m },
 				Qualified_MpUnderVoltage = new decimal[] { 160m, 184m },
 				Qualified_MpUnderVoltageRecovery = new decimal[] { 170m, 187m },
-				Qualified_MpOverVoltage = new decimal[] { 0m, 0m },
-				Qualified_MpOverVoltageRecovery = new decimal[] { 0m, 0m },
+				Qualified_MpOverVoltage = new decimal[] { 265m, 295m },
+				Qualified_MpOverVoltageRecovery = new decimal[] { 265m, 295m },
 				Delay_WaitForUnderVoltageRecovery = 3000,
 				Delay_WaitForOverVoltageRecovery = 3000,
 			};
@@ -99,36 +112,7 @@ namespace ProductInfor
 				CV_Voltage = 25m,
 				Qualified_FloatingVoltage = new decimal[] { 27m, 28m },
 				Qualified_EqualizedCurrent = new decimal[] { 3m, 4m },
-			};
-
-			infor_CommunicationProtocol = new Infor_CommunicationProtocol() {
-				Baudrate = 4800,
-				ExistMpValue = false,
-				ExistSpValue = true,
-				ExistSpValue_Separate = new bool[] { false, false },
-				ExistOutputVoltageValue = new bool[] { true, true, false },
-				ExistOutputCurrentValue = new bool[] { true, false, false },
-				ExistMpErrorSignal = true,
-				ExistSpErrorSignal = true,
-				ExistOutputErrorSignal = new bool[] { true, true, true },
-				Measured_MpValue = 0m,
-				Measured_SpValue = 0m,
-				Measured_SpValue_Separate = new decimal[] { 0m, 0m, 0m },
-				Measured_OutputVoltageValue = new decimal[] { 0m, 0m, 0m },
-				Measured_OutputCurrentValue = new decimal[] { 0m, 0m, 0m },
-				Measured_MpErrorSignal = false,
-				Measured_SpErrorSignal = false,
-				Measured_OutputErrorSignal = new bool[] { false, false, false },
-			};
-
-			infor_LevelSignal = new Infor_LevelSignal() {
-				Exist_MpErrorSignal = false,
-				Exist_SpErrorSignal = false,
-				Exist_SpUnderVoltageSignal = false,
-				Measured_MpErrorSignal = false,
-				Measured_SpErrorSignal = false,
-				Measured_SpUnderVoltageSignal = false,
-			};
+			};						
 
 			infor_Output = new Infor_Output() {
 				OutputChannelCount = 3,
@@ -136,6 +120,12 @@ namespace ProductInfor
 				Isolation = new bool[] { false, false, false },
 				NeedShort = new bool[] { true, true, true },
 				SpSingleWorkAbility = new bool[] { true, true, true },
+				StartupLoadType_Mp = new int [ ] {0,0,0},
+				StartupLoadType_Sp = new int [ ] {0,0,0},
+				FullLoadType = new int [ ] {0,0,0},
+				StartupLoadValue_Mp = new decimal [ ] {10m,2m,8m},
+				StartupLoadValue_Sp = new decimal [ ] {10m,2m,8m},
+				FullLoadValue = new decimal [ ] {10m,2m,8m},
 				Qualified_OutputVoltageWithoutLoad = new decimal[,] { { 27m, 28m }, { 27m, 28m }, { 27m, 28m } },
 				Qualified_OutputVoltageWithLoad = new decimal[,] { { 27m, 28m }, { 27m, 28m }, { 27m, 28m } },
 				Qualified_OutputRipple_Max = new decimal[] { 270m, 270m, 270m },
@@ -145,9 +135,17 @@ namespace ProductInfor
 				Qualified_LoadEffect_Max = new decimal[] { 0.01m, 0.01m, 0.01m },
 				Qualified_SourceEffect_Max = new decimal[] { 0.01m, 0.01m, 0.01m },
 				Qualified_Efficiency_Min = 0.85m,
-				Delay_WaitForOVWithLoad = 3000,
-				Delay_WaitForOVWithoutLoad = 200,
 				Delay_WaitForOXP = 1500,
+			};
+
+			infor_Uart = new Infor_Uart ( )
+			{
+				Measured_MpErrorSignal = false,
+				Measured_SpErrorSignal = false,
+				Measured_OutputErrorSignal = new bool [ ] { false, false , false },
+				Measured_SpValue = 0m,
+				Measured_OutputVoltageValue = new decimal [ ] {0m,0m,0m},
+				Measured_OutputCurrentValue = new decimal [ ] {0m,0m,0m},
 			};
 		}
 
@@ -163,7 +161,7 @@ namespace ProductInfor
 			error_information = string.Empty;
 			int index = 0;
 			/*判断串口打开是否正常，若不正常则先要进行打开设置*/
-			serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+			serialPort.BaudRate = CommunicateBaudrate;
 
 			try { if (!serialPort.IsOpen) { serialPort.Open(); } } catch { error_information = "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
 
@@ -286,29 +284,29 @@ namespace ProductInfor
 			try {
 				//提取需要查询的有效数据
 				if ((SerialportData[ 2 ] & 0x04) == 0) {
-					infor_CommunicationProtocol.Measured_MpErrorSignal = false;
+					infor_Uart.Measured_MpErrorSignal = false;
 				} else {
-					infor_CommunicationProtocol.Measured_MpErrorSignal = true;
+					infor_Uart.Measured_MpErrorSignal = true;
 				}
 
 				if ((SerialportData[ 2 ] & 0x08) == 0) {
-					infor_CommunicationProtocol.Measured_SpErrorSignal = false;
+					infor_Uart.Measured_SpErrorSignal = false;
 				} else {
-					infor_CommunicationProtocol.Measured_SpErrorSignal = true;
+					infor_Uart.Measured_SpErrorSignal = true;
 				}
 
 				for (int index = 0; index < 3; index++) {
 					if ((SerialportData[ 2 ] & (0x10 << index)) == 0) {
-						infor_CommunicationProtocol.Measured_OutputErrorSignal[ index ] = false;
+						infor_Uart.Measured_OutputErrorSignal[ index ] = false;
 					} else {
-						infor_CommunicationProtocol.Measured_OutputErrorSignal[ index ] = true;
+						infor_Uart.Measured_OutputErrorSignal[ index ] = true;
 					}
 				}
 
-				infor_CommunicationProtocol.Measured_SpValue = Convert.ToDecimal( BitConverter.ToInt16( SerialportData, 3 ) ) / 10m;
-				infor_CommunicationProtocol.Measured_OutputVoltageValue[ 0 ] = Convert.ToDecimal( BitConverter.ToInt16( SerialportData, 5 ) ) / 10m;
-				infor_CommunicationProtocol.Measured_OutputCurrentValue[ 0 ] = Convert.ToDecimal( SerialportData [ 7 ] ) / 10m;
-				infor_CommunicationProtocol.Measured_OutputVoltageValue[ 1 ] = Convert.ToDecimal( BitConverter.ToInt16( SerialportData, 8 ) ) / 10m;
+				infor_Uart.Measured_SpValue = Convert.ToDecimal( BitConverter.ToInt16( SerialportData, 3 ) ) / 10m;
+				infor_Uart.Measured_OutputVoltageValue[ 0 ] = Convert.ToDecimal( BitConverter.ToInt16( SerialportData, 5 ) ) / 10m;
+				infor_Uart.Measured_OutputCurrentValue[ 0 ] = Convert.ToDecimal( SerialportData [ 7 ] ) / 10m;
+				infor_Uart.Measured_OutputVoltageValue[ 1 ] = Convert.ToDecimal( BitConverter.ToInt16( SerialportData, 8 ) ) / 10m;
 			} catch {
 				error_information = "对产品返回的串口数据提取过程中出现了未知异常";
 			}
@@ -346,6 +344,8 @@ namespace ProductInfor
 		public override string Calibrate( string osc_ins , string port_name )
 		{
 			string error_information = string.Empty; //整体校准环节可能存在的异常
+			if ( !exist.Calibration ) { return error_information; }
+
 			string error_information_Calibrate = string.Empty; //校准环节可能存在的异常
 
 			//针对需要进行校准的产品而言，需要执行以下指令函数
@@ -383,7 +383,7 @@ namespace ProductInfor
 						/*主电欠压点时启动，先擦除校准数据，后重启防止之前记录的校准数据对MCU采集的影响*/
 						error_information = acpower.ACPower_vSetParameters( MeasureDetails.Address_ACPower, infor_Calibration.MpUnderVoltage, 50, true, serialPort );
 						error_information = acpower.ACPower_vControlStart( MeasureDetails.Address_ACPower, serialPort );
-						serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+						serialPort.BaudRate = CommunicateBaudrate;
 						do {
 							Communicate_User( serialPort, out error_information );
 						} while (error_information != string.Empty);
@@ -404,7 +404,7 @@ namespace ProductInfor
 							serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
 							generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ 2 * index + 1 ], serialPort, out error_information );
 							if (error_information != string.Empty) { return; }
-							serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+							serialPort.BaudRate = CommunicateBaudrate;
 							mCU_Control.McuCalibrate_vMpOutputVoltage( index, generalData_Load.ActrulyPower, serialPort, out error_information );
 							if (error_information != string.Empty) { return; }
 						}
@@ -428,7 +428,7 @@ namespace ProductInfor
 							generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ 2 * index_of_calibration_channel + 1 ], serialPort, out error_information );
 							if (error_information != string.Empty) { return; }
 							current += generalData_Load.ActrulyCurrent;
-							serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+							serialPort.BaudRate = CommunicateBaudrate;
 							mCU_Control.McuCalibrate_vMpOutputCurrent( index_of_calibration_channel, generalData_Load.ActrulyVoltage, current, serialPort, out error_information );
 							if (error_information != string.Empty) { return; }
 						}
@@ -440,14 +440,14 @@ namespace ProductInfor
 							error_information = itech.ElecLoad_vInputStatusSet( MeasureDetails.Address_Load_Output[ index ], Itech.OperationMode.CW, full_load_powers[ index ], Itech.OnOffStatus.On, serialPort );
 							if (error_information != string.Empty) { return; }
 						}
-						serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+						serialPort.BaudRate = CommunicateBaudrate;
 						mCU_Control.McuCalibrate_vReset( serialPort, out error_information );
 						if (error_information != string.Empty) { return; }
 						serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
 						error_information = acpower.ACPower_vControlStop( MeasureDetails.Address_ACPower, serialPort );
 						if (error_information != string.Empty) { return; }
 						/*等待软件重启完成之后,执行备电电流校准*/
-						serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+						serialPort.BaudRate = CommunicateBaudrate;
 						do {
 							Communicate_User( serialPort, out error_information );
 						} while (error_information != string.Empty);
@@ -460,7 +460,7 @@ namespace ProductInfor
 							generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ 2 * index_of_calibration_channel + 1 ], serialPort, out error_information );
 							if (error_information != string.Empty) { return; }
 							current += generalData_Load.ActrulyCurrent;
-							serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+							serialPort.BaudRate = CommunicateBaudrate;
 							mCU_Control.McuCalibrate_vSpOutputCurrent( index_of_calibration_channel, generalData_Load.ActrulyVoltage, current, serialPort, out error_information );
 							if (error_information != string.Empty) { return; }
 						}
@@ -473,7 +473,7 @@ namespace ProductInfor
 						}
 						generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Bats, serialPort, out error_information );
 						if (error_information != string.Empty) { return; }
-						serialPort.BaudRate = infor_CommunicationProtocol.Baudrate;
+						serialPort.BaudRate = CommunicateBaudrate;
 						mCU_Control.McuCalibrate_vSpVoltage( generalData_Load.ActrulyVoltage, serialPort, out error_information );
 						if (error_information != string.Empty) { return; }
 
@@ -547,7 +547,7 @@ namespace ProductInfor
 			while ((error_information == string.Empty) && (++measure_index < 25)) {
 				switch (measure_index) {
 					case 1:/*备电满载单投启动功能*/
-						Main_vMeasureProductSingleWorkAbility( itech, acpower, dcpower, true, ref product_Information );
+						Measure_vSpFunctionCheck ( itech, acpower, dcpower, true, ref product_Information );
 						break;
 					case 2:/*备电切断点确定*/
 						break;
