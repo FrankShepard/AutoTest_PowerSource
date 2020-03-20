@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +18,14 @@ namespace ProductInfor
 		/// </summary>
 		public struct Exist
 		{
+			/// <summary>
+			/// 是否存在AC/DC的主电部分
+			/// </summary>
+			public bool Mp;
+			/// <summary>
+			/// 是否存在电池供电的备电部分
+			/// </summary>
+			public bool Sp;
 			/// <summary>
 			/// 是否存在强制模式，应急照明电源适用
 			/// </summary>
@@ -51,21 +58,49 @@ namespace ProductInfor
 		public struct Infor_Calibration
 		{
 			/// <summary>
+			/// 是否需要主电欠压点的校准
+			/// </summary>
+			public bool Need_MpUnderVoltage;
+			/// <summary>
 			/// 主电欠压点的校准值
 			/// </summary>
 			public decimal MpUnderVoltage;
+			/// <summary>
+			/// 是否需要主电过压点的校准
+			/// </summary>
+			public bool Need_MpOverVoltage;
 			/// <summary>
 			/// 主电过压点的校准值（将J-EI8212的停止充电点在校准过程中认为是过压点）
 			/// </summary>
 			public decimal MpOverVoltage;
 			/// <summary>
+			/// 是否需要主电电压的校准
+			/// </summary>
+			public bool Need_MpVoltage;
+			/// <summary>
 			/// 主电电压值校准时的主电电压值
 			/// </summary>
 			public decimal MpVoltage;
 			/// <summary>
+			/// 是否需要备电电压的校准
+			/// </summary>
+			public bool Need_SpVoltage;
+			/// <summary>
+			/// 是否需要备电单投
+			/// </summary>
+			public bool Need_SpSingleWork;
+			/// <summary>
+			/// 对应输出通道的电压和电流是否需要在主电工作情况下进行校准
+			/// </summary>
+			public bool[] Need_OutputVoltageCurrent_Mp;
+			/// <summary>
 			/// 主电工作校准时通道应当带载的功率值
 			/// </summary>
-			public decimal[] OutputPower_Mp;	
+			public decimal[] OutputPower_Mp;
+			/// <summary>
+			/// 对应输出通道的电压和电流是否需要在备电工作情况下进行校准
+			/// </summary>
+			public bool[] Need_OutputVoltageCurrent_Sp;
 			/// <summary>
 			/// 备电工作校准时通道应当带载的功率值
 			/// </summary>
@@ -75,9 +110,17 @@ namespace ProductInfor
 			/// </summary>
 			public decimal[] OutputOXP;
 			/// <summary>
+			/// 是否需要对蜂鸣器的工作时间进行校准
+			/// </summary>
+			public bool Need_BeepTime;
+			/// <summary>
 			/// 校准的蜂鸣器工作时间（备电彻底自杀前的维持时间）
 			/// </summary>
 			public int BeepTime;
+			/// <summary>
+			/// 校准的最后一步是否需要将通讯功能禁用（IG-B2053F/2073F系列电源通讯与电平信号冲突的情况下使用）
+			/// </summary>
+			public bool CommunicationDisable;
 		}
 
 		/// <summary>
@@ -85,6 +128,22 @@ namespace ProductInfor
 		/// </summary>
 		public struct Infor_Mp
 		{
+			/// <summary>
+			/// 需要测试的不同主电电压的数量，常规为187V、220V、252V这3个，简化后只需要220V
+			/// </summary>
+			public int MpVoltageCount;
+			/// <summary>
+			/// 需要测试的不同主电频率的数量，常规为47Hz、50Hz、63Hz这3个，简化后只需要50Hz
+			/// </summary>
+			public int MpFrequncyCount;
+			/// <summary>
+			/// 是否需要测试不同的主电电压输入值
+			/// </summary>
+			public bool[] MeasureDifferentVoltage;
+			/// <summary>
+			/// 是否需要测试不同的主电频率输入值
+			/// </summary>
+			public bool[] MeasureDifferentFrequncy;
 			/// <summary>
 			/// AC接入端电源常规测试的三个主电电压值：最低电压、正常电压、最高电压
 			/// </summary>
@@ -105,6 +164,14 @@ namespace ProductInfor
 			/// </summary>
 			public int UsedBatsCount;
 			/// <summary>
+			/// 是否需要测试对应的单节电池电压（常用于应急照明电源，通过串口数据查看）
+			/// </summary>
+			public bool[] NeedMeasure_BatVoltageSeparate;
+			/// <summary>
+			/// 是否需要测试备电切断点
+			/// </summary>
+			public bool NeedMeasure_CutoffLevel;
+			/// <summary>
 			/// 备电切断点的合格范围
 			/// </summary>
 			public decimal[] Qualified_CutoffLevel;
@@ -120,21 +187,21 @@ namespace ProductInfor
 		public struct Infor_PowerSourceChange
 		{
 			/// <summary>
-			/// 主备电切换时对应通道的负载模式；0表示CC，1表示CR，2表示CW
+			/// 主备电切换时对应通道的负载是否为CW模式，为true时负载为CW，为false时负载为CC
 			/// </summary>
-			public int [ ] OutputLoadType;
+			public bool[] OutputLoadMode_CW;
 			/// <summary>
 			/// 主备电切换时对应通道带载的情况，与模式相关；模式为CC时表示带载电流，为CW时表示带载功率
 			/// </summary>
-			public decimal [ ] OutputLoadValue;
+			public decimal[] OutputLoadValue;
 			/// <summary>
 			/// 主电欠压点的合格范围
 			/// </summary>
-			public decimal [ ] Qualified_MpUnderVoltage;
+			public decimal[] Qualified_MpUnderVoltage;
 			/// <summary>
 			/// 主电欠压恢复点的合格范围
 			/// </summary>
-			public decimal [ ] Qualified_MpUnderVoltageRecovery;
+			public decimal[] Qualified_MpUnderVoltageRecovery;
 			/// <summary>
 			/// 等待主电欠压恢复的时间，单位ms
 			/// </summary>
@@ -142,11 +209,11 @@ namespace ProductInfor
 			/// <summary>
 			/// 主电过压点的合格范围
 			/// </summary>
-			public decimal [ ] Qualified_MpOverVoltage;
+			public decimal[] Qualified_MpOverVoltage;
 			/// <summary>
 			/// 主电过压恢复点的合格范围
 			/// </summary>
-			public decimal [ ] Qualified_MpOverVoltageRecovery;
+			public decimal[] Qualified_MpOverVoltageRecovery;
 			/// <summary>
 			/// 等待主电过压恢复的时间，单位ms
 			/// </summary>
@@ -180,6 +247,111 @@ namespace ProductInfor
 			public decimal[] Qualified_EqualizedCurrent;
 		};
 
+		/// <summary>
+		/// 软件协议中的相关信息
+		/// </summary>
+		public struct Infor_CommunicationProtocol
+		{
+			/// <summary>
+			/// 通讯使用的波特率
+			/// </summary>
+			public int Baudrate;
+			/// <summary>
+			/// 是否存在主电电压值
+			/// </summary>
+			public bool ExistMpValue;
+			/// <summary>
+			/// 软件通讯中测试得到的主电电压值
+			/// </summary>
+			public decimal Measured_MpValue;
+			/// <summary>
+			/// 是否存在总备电电压值
+			/// </summary>
+			public bool ExistSpValue;
+			/// <summary>
+			/// 软件通讯中测试得到的总的备电电压值
+			/// </summary>
+			public decimal Measured_SpValue;
+			/// <summary>
+			/// 是否存在分开的电池电压值
+			/// </summary>
+			public bool[] ExistSpValue_Separate;
+			/// <summary>
+			/// 软件通讯中测试得到的单节备电电压值
+			/// </summary>
+			public decimal[] Measured_SpValue_Separate;
+			/// <summary>
+			/// 是否存在输出电压值
+			/// </summary>
+			public bool[] ExistOutputVoltageValue;
+			/// <summary>
+			/// 软件通讯中测试得到的输出电压值
+			/// </summary>
+			public decimal[] Measured_OutputVoltageValue;
+			/// <summary>
+			/// 是否存在输出电流值
+			/// </summary>
+			public bool[] ExistOutputCurrentValue;
+			/// <summary>
+			/// 软件通讯中测试得到的输出电流值
+			/// </summary>
+			public decimal[] Measured_OutputCurrentValue;
+			/// <summary>
+			/// 是否存在主电故障信号
+			/// </summary>
+			public bool ExistMpErrorSignal;
+			/// <summary>
+			/// 软件通讯中测试得到的主电故障信号
+			/// </summary>
+			public bool Measured_MpErrorSignal;
+			/// <summary>
+			/// 是否存在备电故障信号
+			/// </summary>
+			public bool ExistSpErrorSignal;
+			/// <summary>
+			/// 软件通讯中测试得到的备电故障信号
+			/// </summary>
+			public bool Measured_SpErrorSignal;
+			/// <summary>
+			/// 是否存在输出故障信号
+			/// </summary>
+			public bool[] ExistOutputErrorSignal;
+			/// <summary>
+			/// 软件通讯中测试得到的输出故障信号
+			/// </summary>
+			public bool[] Measured_OutputErrorSignal;
+		};
+
+		/// <summary>
+		/// 使用硬件TTL信号电平的相关信息
+		/// </summary>
+		public struct Infor_LevelSignal
+		{
+			/// <summary>
+			/// 是否存在主电故障信号
+			/// </summary>
+			public bool Exist_MpErrorSignal;
+			/// <summary>
+			/// 测试得到的主电故障信号
+			/// </summary>
+			public bool Measured_MpErrorSignal;
+			/// <summary>
+			/// 是否存在备电故障信号
+			/// </summary>
+			public bool Exist_SpErrorSignal;
+			/// <summary>
+			/// 测试得到的备电故障信号
+			/// </summary>
+			public bool Measured_SpErrorSignal;
+			/// <summary>
+			/// 是否存在备电欠压信号
+			/// </summary>
+			public bool Exist_SpUnderVoltageSignal;
+			/// <summary>
+			/// 测试得到的备电欠压信号
+			/// </summary>
+			public bool Measured_SpUnderVoltageSignal;
+		}
 
 		/// <summary>
 		/// 输出相关信息
@@ -215,37 +387,45 @@ namespace ProductInfor
 			/// </summary>
 			public int[] StartupLoadType_Sp;
 			/// <summary>
-			/// 备电强制模式启动输出通道带载模式；0表示CC，1表示CR，2表示CW
-			/// </summary>
-			public int[] StartupLoadType_Mandatory;
-			/// <summary>
 			/// 正常测试时的输出通道带载模式；0表示CC，1表示CR，2表示CW
 			/// </summary>
 			public int[] FullLoadType;
 			/// <summary>
-			/// 主电单投时输出通道带载值，与输出通道带载模式匹配使用,CC模式时为A，CW模式时为W，CR模式时为Ω
+			/// 主备电切换时输出通道带载模式；0表示CC，1表示CR，2表示CW
 			/// </summary>
-			public decimal [ ] StartupLoadValue_Mp;
+			public int[] PowerSourceChangeLoadType;
 			/// <summary>
-			/// 备电单投时输出通道带载值，与输出通道带载模式匹配使用,CC模式时为A，CW模式时为W，CR模式时为Ω
+			/// 主电单投时输出通道带载值，与输出通道带载模式匹配使用
 			/// </summary>
-			public decimal [ ] StartupLoadValue_Sp;
+			public decimal[] StartupLoadValue_Mp;
 			/// <summary>
-			/// 备电强制模式启动输出通道带载值，与输出通道带载模式匹配使用,CC模式时为A，CW模式时为W，CR模式时为Ω
+			/// 备电单投时输出通道带载值，与输出通道带载模式匹配使用
 			/// </summary>
-			public decimal [ ] StartupLoadValue_Mandatory;
+			public decimal[] StartupLoadValue_Sp;
 			/// <summary>
-			/// 满载时对应通道的带载情况，与输出通道带载模式匹配使用,CC模式时为A，CW模式时为W，CR模式时为Ω
+			/// 满载时对应通道的带载情况，CC模式时为A，CW模式时为W，CR模式时为Ω
 			/// </summary>
-			public decimal [ ] FullLoadValue;
+			public decimal[] FullLoadValue;
+			/// <summary>
+			/// 主备电切换时输出通道带载值，与输出通道带载模式匹配使用
+			/// </summary>
+			public decimal[] PowerSourceChangeLoadValue;
 			/// <summary>
 			/// 输出空载电压合格范围
 			/// </summary>
 			public decimal[,] Qualified_OutputVoltageWithoutLoad;
 			/// <summary>
+			/// 测量输出电压所需的稳定时间（空载） 单位ms
+			/// </summary>
+			public int Delay_WaitForOVWithoutLoad;
+			/// <summary>
 			/// 输出满载电压合格范围
 			/// </summary>
 			public decimal[,] Qualified_OutputVoltageWithLoad;
+			/// <summary>
+			/// 测量输出电压所需的稳定时间（满载）  单位ms
+			/// </summary>
+			public int Delay_WaitForOVWithLoad;
 			/// <summary>
 			/// 输出纹波合格的最大值
 			/// </summary>
@@ -279,6 +459,29 @@ namespace ProductInfor
 			/// </summary>
 			public decimal Qualified_Efficiency_Min;
 		}
+			   
+		/// <summary>
+		/// 信号通讯部分上报的硬件接口方式
+		/// </summary>
+		public enum Communicate_HardwarePortcol_Type : int
+		{
+			/// <summary>
+			/// 硬件TTL电平方式
+			/// </summary>
+			SG_Level = 0,
+			/// <summary>
+			/// Uart-TTL通讯方式
+			/// </summary>
+			Uart_TTL,
+			/// <summary>
+			/// Uart-232通讯方式
+			/// </summary>
+			Uart_232,
+			/// <summary>
+			/// 485通讯方式
+			/// </summary>
+			_485,
+		};
 
 		/// <summary>
 		/// 整机ID+版本 - 具有唯一性
@@ -293,9 +496,9 @@ namespace ProductInfor
 		/// </summary>
 		public string Model_Customer = string.Empty;
 		/// <summary>
-		/// 串口通讯的波特率
+		/// 产品与外部通讯使用的硬件基础
 		/// </summary>
-		public int CommunicateBaudrate;
+		public Communicate_HardwarePortcol_Type communicate_HardwarePortcol_Type = Communicate_HardwarePortcol_Type.SG_Level;
 
 		#endregion
 
@@ -322,7 +525,7 @@ namespace ProductInfor
 		}
 
 		/// <summary>
-		/// 进行实际的测试操作;为了保证能在界面上显示所有的测试进度，需要将此处的测试项目进行详细区分，测试数据填充和上传数据库的操作需要放在测试程序中执行
+		/// 进行实际的测试操作
 		/// </summary>
 		/// <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
 		/// <param name="whole_function_test">是否需要全功能测试</param>
@@ -334,48 +537,6 @@ namespace ProductInfor
 			string error_information = string.Empty;
 			return error_information;
 		}
-
-		#region -- 详细的测试项的声名
-
-		/// <summary>
-		/// 测试备电单投功能
-		/// </summary>
-		/// <param name="delay_magnification"></param>
-		/// <param name="whole_function_test"></param>
-		/// <param name="osc_ins"></param>
-		/// <param name="port_name"></param>
-		/// <returns></returns>
-		public virtual ArrayList Measure_CheckSingleSpStartupAbility( int delay_magnification,string port_name )
-		{
-			//元素0 - 可能存在的错误信息 ； 元素1 - 备电单投启动功能正常与否
-			ArrayList arrayList = new ArrayList ( );
-			string error_information = string.Empty;
-			bool check_okey = false;
-			arrayList.Add ( error_information );
-			arrayList.Add ( check_okey );
-			return arrayList;
-		}
-
-		/// <summary>
-		/// 检查电源的强制启动功能是否正常
-		/// </summary>
-		/// <param name="delay_magnification"></param>
-		/// <param name="port_name"></param>
-		/// <returns></returns>
-		public virtual ArrayList Measure_CheckMandtoryStartupAbility( int delay_magnification, string port_name )
-		{
-			//元素0 - 可能存在的错误信息 ； 元素1 - 是否存在强制模式 ； 元素2 - 强制模式启动功能正常与否
-			ArrayList arrayList = new ArrayList ( );
-			string error_information = string.Empty;
-			bool exist_mandatory = false;
-			bool check_okey = false;
-			arrayList.Add ( error_information );
-			arrayList.Add ( exist_mandatory );
-			arrayList.Add ( check_okey );
-			return arrayList;
-		}
-
-		#endregion
 
 		#endregion
 	}

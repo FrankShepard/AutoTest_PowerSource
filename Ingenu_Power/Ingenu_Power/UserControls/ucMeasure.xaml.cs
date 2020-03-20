@@ -44,6 +44,11 @@ namespace Ingenu_Power.UserControls
 		/// </summary>
 		private System.Timers.Timer timer;
 
+		/// <summary>
+		/// 测试得到的具体数据结构体
+		/// </summary>
+		private StaticInfor.MeasuredValue measuredValue = new StaticInfor.MeasuredValue();
+
 		#region -- 路由事件
 
 		/// <summary>
@@ -215,6 +220,11 @@ namespace Ingenu_Power.UserControls
 				}
 			}
 			//最后执行具体的测试功能
+			Measure_vRealTest( measureCondition, out error_information );
+			if(error_information != string.Empty) {
+				StaticInfor.Error_Message = error_information;
+				Measure_vFailedShow(); return;
+			}
 		}
 
 		#region -- 测试环节中的ISP操作步骤
@@ -423,6 +433,195 @@ namespace Ingenu_Power.UserControls
 		}
 
 		#endregion
+
+		#region -- 测试环节中的测试操作步骤
+
+		/// <summary>
+		/// 测试时的具体执行的参数，为了能在界面上实时显示测试项、进度和结果，需要在此处详细的测试条目
+		/// </summary>
+		/// <param name="measureCondition"></param>
+		/// <param name="error_information"></param>
+		private void Measure_vRealTest(StaticInfor.MeasureCondition measureCondition, out string error_information)
+		{
+			error_information = string.Empty;
+			//反射进行动态调用
+			try {
+				Assembly assembly = Assembly.LoadFrom( @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll" );
+				Type[] tys = assembly.GetTypes();
+				bool found_file = false;
+				foreach (Type id_verion in tys) {
+					if (id_verion.Name == "_60010") {
+						//if (id_verion.Name == "_" + measureCondition.ID_Hardware.ToString() + measureCondition.Ver_Hardware.ToString()) {
+						Object obj = Activator.CreateInstance( id_verion );
+						int measure_index = 0; //测试步骤索引
+
+						//仪表初始化
+						MethodInfo mi = id_verion.GetMethod( "Measure_vInstrumentInitalize" );
+						object[] parameters = new object[] { Properties.Settings.Default.Instrment_OSC_INS, "COM1" };
+						//object[] parameters = new object[] { Properties.Settings.Default.Instrment_OSC_INS,Properties.Settings.Default.UsedSerialport };
+						error_information += mi.Invoke( obj, parameters ).ToString();
+						if(error_information != string.Empty) { return; }
+
+						ArrayList arrayList = new ArrayList();
+						Measure_vParmetersReset(); //测试参数初始化
+
+						//具体的测试过程
+						StaticInfor.measureItemShow.Measure_Link = "产品电性能测试";
+						while ((error_information == string.Empty) && (++measure_index < 25)) {
+							switch (measure_index) {
+								case 0://备电单投启动功能检查						
+									mi = id_verion.GetMethod( "Measure_CheckSingleSpStartupAbility" );
+									parameters = new object[] { "COM1" };
+									//object[] parameters = new object[] { Properties.Settings.Default.UsedSerialport };
+									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
+									error_information = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
+									StaticInfor.measureItemShow.Measure_Item = "备电单投功能检查";
+									if (( bool )arrayList[ 1 ] == true) { //元素1 - 备电单投启动功能正常与否
+										measuredValue.Check_SingleStartupAbility_Sp = true;
+										StaticInfor.measureItemShow.Measure_Value = "SUCCESS";
+									} else {
+										StaticInfor.measureItemShow.Measure_Value = "Failed";
+									}
+									break;
+								case 1://强制模式启动功能检查	
+									mi = id_verion.GetMethod( "Measure_CheckMandtoryStartupAbility" );
+									parameters = new object[] { "COM1" };
+									//object[] parameters = new object[] { Properties.Settings.Default.UsedSerialport };
+									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
+									error_information = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
+									if (( bool )arrayList[ 1 ] == true) { //元素1 - 是否存在强制模式
+										StaticInfor.measureItemShow.Measure_Item = "强制模式启动验证";
+										if (( bool )arrayList[ 2 ] == true) { //元素2 - 强制模式启动功能正常与否
+											measuredValue.Check_MandatoryStartupAbility = true;
+											StaticInfor.measureItemShow.Measure_Value = "SUCCESS";
+										} else {
+											StaticInfor.measureItemShow.Measure_Value = "Failed";
+										}
+									}
+									break;
+								case 2://备电切断点检查
+									mi = id_verion.GetMethod( "Measure_vCutoffVoltageCheck" );
+									parameters = new object[] { measureCondition.WholeFunction_Enable, "COM1" };
+									//object[] parameters = new object[] { Properties.Settings.Default.UsedSerialport };
+									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
+									error_information = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
+									StaticInfor.measureItemShow.Measure_Item = "备电切断点合格检查";
+									if (( bool )arrayList[ 1 ] == true) { //元素1 - 备电切断点的合格检查
+										measuredValue.Check_SpCutoff = true;
+										if (( decimal )arrayList[ 2 ] != 0m) { //元素2 - 具体的备电切断点值
+											measuredValue.Voltage_SpCutoff = ( decimal )arrayList[ 2 ];
+											StaticInfor.measureItemShow.Measure_Value = "SUCCESS			"+ measuredValue.Voltage_SpCutoff.ToString("0.#") + "V"; //具体显示值保留1位小数
+										} else {
+											StaticInfor.measureItemShow.Measure_Value = "SUCCESS";
+										}
+									} else {
+										StaticInfor.measureItemShow.Measure_Value = "Failed";
+									}									
+									break;
+								case 3://主电单投启动功能检查
+									break;
+								case 4://满载电压测试
+									break;								
+								case 5://测试输出纹波
+									break;
+								case 6://备电开启动作，准备充电
+									break;
+								case 7://计算AC/DC部分效率
+									break;
+								case 8://测试空载电压
+									break;
+								case 9://测试均充电流
+									break;
+								case 10://测试浮充电压
+									break;
+								case 11://浮充时关闭备电，用于识别备电丢失（此处可能需要进入电源产品的程序后门，减少充电时间）
+									break;
+								case 12://计算负载效应
+									break;
+								case 13://计算源效应
+									break;
+								case 14://识别备电丢失
+									break;
+								case 15://重新开启备电，用于后续主备电转换
+									break;
+								case 16://主电丢失切换检查
+									break;
+								case 17://主电恢复存在切换检查
+									break;
+								case 18://主电欠压切换检查
+									break;
+								case 19://主电欠压恢复切换检查
+									break;
+								case 20://主电过压切换检查
+									break;
+								case 21://主电过压恢复切换检查
+									break;
+								case 22://测试OXP
+									break;
+								case 23://短路保护检查
+									break;
+								case 24://合格产品数据上传数据库
+									break;
+								default:break;
+							}
+						}
+
+						//仪表状态重置，防止更换产品时带电
+						mi = id_verion.GetMethod( "Measure_vInstrumentInitalize" );
+						parameters = new object[] { Properties.Settings.Default.Instrment_OSC_INS, "COM1" };
+						//object[] parameters = new object[] { Properties.Settings.Default.Instrment_OSC_INS,Properties.Settings.Default.UsedSerialport };
+						error_information += mi.Invoke( obj, parameters ).ToString();
+						if (error_information != string.Empty) { return; }
+
+						found_file = true;
+						break;
+					}
+				}
+
+				if (!found_file) {
+					error_information = "没有找到对应ID和版本号的产品的测试方法"; return;
+				}
+			} catch {
+				error_information = "没有能正常加载 ProductInfor.dll";
+			}
+
+		}
+
+		#endregion
+
+		/// <summary>
+		/// 测试数据的初始化
+		/// </summary>
+		private void Measure_vParmetersReset()
+		{
+			measuredValue.Check_DistinguishSpOpen = false;
+			measuredValue.Check_MandatoryStartupAbility = false;
+			measuredValue.Check_OutputShort = new bool[] { false, false, false };
+			measuredValue.Check_OXP = new bool[] { false, false, false };
+			measuredValue.Check_SingleStartupAbility_Mp = false;
+			measuredValue.Check_SingleStartupAbility_Sp = false;
+			measuredValue.Check_SourceChange_MpLost = false;
+			measuredValue.Check_SourceChange_MpOverVoltage = false;
+			measuredValue.Check_SourceChange_MpOverVoltageRecovery = false;
+			measuredValue.Check_SourceChange_MpRestart = false;
+			measuredValue.Check_SourceChange_MpUnderVoltage = false;
+			measuredValue.Check_SourceChange_MpUnderVoltageRecovery = false;
+			measuredValue.Check_SpCutoff = false;
+			measuredValue.Current_EqualizedCharge = 0m;
+			measuredValue.Effect_Load = new decimal[] { 0m, 0m, 0m };
+			measuredValue.Effect_Source = new decimal[] { 0m, 0m, 0m };
+			measuredValue.Efficiency = 0m;
+			measuredValue.Value_OXP = new decimal[] { 0m, 0m, 0m };
+			measuredValue.Voltage_FloatingCharge = 0m;
+			measuredValue.Voltage_Rapple = new decimal[] { 0m, 0m, 0m };
+			measuredValue.Voltage_SourceChange_MpOverVoltage = 0m;
+			measuredValue.Voltage_SourceChange_MpOverVoltageRecovery = 0m;
+			measuredValue.Voltage_SourceChange_MpUnderVoltage = 0m;
+			measuredValue.Voltage_SourceChange_MpUnderVoltageRecovery = 0m;
+			measuredValue.Voltage_SpCutoff = 0m;
+			measuredValue.Voltage_WithLoad = new decimal[] { 0m, 0m, 0m };
+			measuredValue.Voltage_WithoutLoad = new decimal[] { 0m, 0m, 0m };
+		}
 
 		#endregion
 	}

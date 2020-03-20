@@ -55,10 +55,10 @@ namespace ProductInfor
 		/// </summary>
 		/// <param name="osc_ins">示波器INS</param>
 		/// <param name="serialPort">使用到的串口</param>
-		/// <param name="error_information">可能存在的错误信息</param>
-		public void Measure_vInstrumentInitalize(string osc_ins,SerialPort serialPort, out string error_information)
+		/// <returns>可能存在的错误信息</returns>
+		public string Measure_vInstrumentInitalize(string osc_ins,SerialPort serialPort)
 		{
-			error_information = string.Empty;
+			string error_information = string.Empty;
 			string error_information_temp = string.Empty;
 
 			try {
@@ -99,6 +99,7 @@ namespace ProductInfor
 			} catch (Exception ex) {
 				error_information += ex.ToString();
 			}
+			return error_information;
 		}
 
 		#region -- 其他函数
