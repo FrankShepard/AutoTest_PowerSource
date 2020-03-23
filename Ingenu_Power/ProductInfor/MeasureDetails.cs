@@ -104,6 +104,8 @@ namespace ProductInfor
 
 		#region -- 其他函数
 
+		#region -- 输出通道的带载自动分配
+
 		/// <summary>
 		/// 功率的自动分配，根据预计带载值，将其分配到对应的电子负载上
 		/// </summary>
@@ -199,7 +201,7 @@ namespace ProductInfor
 					real_currents[ used_load_count ] = SingleLoadMaxPower / real_voltages[index];
 					real_currents[ used_load_count + 1 ] = SingleLoadMaxPower / real_voltages[ index ];
 					if ((currents[ index ] * real_voltages[index])  <= 3 * SingleLoadMaxPower) {
-						real_currents[ used_load_count ] = (currents[index] * real_voltages[index] - 2*SingleLoadMaxPower) / real_voltages[ index ];
+						real_currents[ used_load_count + 2 ] = (currents[index] * real_voltages[index] - 2*SingleLoadMaxPower) / real_voltages[ index ];
 						real_currents[ used_load_count + 3 ] = 0;
 					} else {
 						real_currents[ used_load_count + 2 ] = SingleLoadMaxPower / real_voltages[ index ]; ;
@@ -239,6 +241,112 @@ namespace ProductInfor
 		}
 
 		/// <summary>
+		/// 电阻的自动分配，根据测试得到的电压，结合单个电子负载的最大限制功率，将对应电阻分配到电子负载上
+		/// </summary>
+		/// <param name="output_count">输出通道</param>
+		/// <param name="resistances">按照电阻输出通道设计的电阻</param>
+		/// <param name="real_voltages">电源输出通道实际空载电压</param>
+		/// <param name="real_resistances">所有输出电子负载对应的分配电阻</param>
+		/// <returns>输出使用的电子负载对应的硬件通道索引</returns>
+		public int[] Measure_vResistanceAllocate(int output_count, decimal[] resistances, decimal[] real_voltages, out decimal[] real_resistances)
+		{
+			int[] AllocateChannel = new int[ Address_Load_Output.Length ];
+			real_resistances = new decimal[ Address_Load_Output.Length ];
+			int used_load_count = 0;
+			for (int index = 0; index < output_count; index++) {
+				if (real_voltages[ index ] == 0m) { continue; } //输出通道电压为零时，不要进行该路电流的分配，防止错误出现
+				if ((Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ]) <= 2 * SingleLoadMaxPower) { //输出功率可以被两个并联的负载直接吸收
+					if ((Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ]) < SingleLoadMaxPower) {
+						real_resistances[ used_load_count ] = resistances[ index ];
+						real_resistances[ used_load_count + 1 ] = 7500m; //使用最大的电阻，对输出电压影响放到最低
+					} else {
+						real_resistances[ used_load_count ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
+						real_resistances[ used_load_count + 1 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - SingleLoadMaxPower);
+					}
+					used_load_count += 2;
+				} else if ((Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ]) <= 4 * SingleLoadMaxPower) { //输出功率需要被4个并联的负载吸收
+					real_resistances[ used_load_count ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
+					real_resistances[ used_load_count + 1 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
+					if ((resistances[ index ] * real_voltages[ index ]) <= 3 * SingleLoadMaxPower) {
+						real_resistances[ used_load_count + 2 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - 2 * SingleLoadMaxPower);
+						real_resistances[ used_load_count + 3 ] = 7500m; //使用最大的电阻，对输出电压影响放到最低
+					} else {
+						real_resistances[ used_load_count + 2 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
+						real_resistances[ used_load_count + 3 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - 3 * SingleLoadMaxPower);
+					}
+					used_load_count += 4;
+					AllocateChannel[ used_load_count ] = index;
+					AllocateChannel[ used_load_count + 1 ] = index;
+					AllocateChannel[ used_load_count + 2 ] = index;
+					AllocateChannel[ used_load_count + 3 ] = index;
+				} else if ((Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ]) <= 6 * SingleLoadMaxPower) { //输出功率需要被6个并联的负载吸收
+					real_resistances[ used_load_count ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
+					real_resistances[ used_load_count + 1 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
+					real_resistances[ used_load_count + 2 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
+					real_resistances[ used_load_count + 3 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
+					if ((resistances[ index ] * real_voltages[ index ]) <= 5 * SingleLoadMaxPower) {
+						real_resistances[ used_load_count + 4 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - 4 * SingleLoadMaxPower);
+						real_resistances[ used_load_count + 5 ] = 7500m; //使用最大的电阻，对输出电压影响放到最低
+					} else {
+						real_resistances[ used_load_count + 4 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
+						real_resistances[ used_load_count + 5 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - 5 * SingleLoadMaxPower);
+					}
+					used_load_count += 6;
+					AllocateChannel[ used_load_count ] = index;
+					AllocateChannel[ used_load_count + 1 ] = index;
+					AllocateChannel[ used_load_count + 2 ] = index;
+					AllocateChannel[ used_load_count + 3 ] = index;
+					AllocateChannel[ used_load_count + 4 ] = index;
+					AllocateChannel[ used_load_count + 5 ] = index;
+				}
+
+				if (used_load_count >= 6) { //限制最多存在6个输出使用的电子负载
+					break;
+				}
+			}
+			return AllocateChannel;
+		}
+
+		#endregion
+
+		#region -- 读取输出仪表的数据
+
+		/// <summary>
+		/// 读取直流电源实际输出参数
+		/// </summary>
+		/// <param name="serialPort">使用到的串口对象</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		/// <returns>直流电源输出参数</returns>
+		public Itech.GeneralData_DCPower Measure_vReadDCPowerResult(SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			Itech.GeneralData_DCPower generalData_DCPower = new Itech.GeneralData_DCPower();
+			using (Itech itech = new Itech()) {
+				serialPort.BaudRate = Baudrate_Instrument;
+				generalData_DCPower = itech.DCPower_vReadParameter( Address_DCPower, serialPort, out error_information );
+			}
+			return generalData_DCPower;
+		}
+
+		/// <summary>
+		/// 读取交流电源实际输出参数
+		/// </summary>
+		/// <param name="serialPort">使用到的串口对象</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		/// <returns>交流电源输出参数</returns>
+		public AN97002H.Parameters_Woring Measure_vReadACPowerResult(SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			AN97002H.Parameters_Woring parameters_Woring = new AN97002H.Parameters_Woring();
+			using (AN97002H aN97002H = new AN97002H()) {
+				serialPort.BaudRate = Baudrate_Instrument;
+				parameters_Woring = aN97002H.ACPower_vQueryResult( Address_ACPower, serialPort, out error_information );
+			}
+
+			return parameters_Woring;
+		}
+
+		/// <summary>
 		/// 读取输出使用到的电子负载的返回数据
 		/// </summary>
 		/// <param name="serialPort">使用到的串口</param>
@@ -273,7 +381,6 @@ namespace ProductInfor
 			using (Itech itech = new Itech()) {
 				serialPort.BaudRate = Baudrate_Instrument;
 				generalData_Load = itech.ElecLoad_vReadMeasuredValue( Address_Load_Bats, serialPort, out error_information );
-				if (error_information != string.Empty) { return generalData_Load; }
 			}
 			return generalData_Load;
 		}
@@ -283,7 +390,7 @@ namespace ProductInfor
 		/// </summary>
 		/// <param name="error_information">可能存在的错误信息</param>
 		/// <returns>测试得到的纹波值</returns>
-		public decimal Measure_vRappleGet(out string error_information)
+		public decimal Measure_vReadRapple(out string error_information)
 		{
 			decimal rapple_value = 0m;
 			error_information = string.Empty;
@@ -308,11 +415,99 @@ namespace ProductInfor
 			return rapple_value;
 		}
 
+		#endregion
 
-		public bool Measure_vSpSingleStartupCheck(SerialPort serialPort, Base.Infor_Output infor_Output,out string error_information)
+		#region -- 设置电子负载的输入
+
+		/// <summary>
+		/// 对输出通道上使用的电子负载进行统一的参数设置
+		/// </summary>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="loadType">输出电子负载带载类型</param>
+		/// <param name="target_value">电子负载目标带载值</param>
+		/// <param name="input_status">目标输入状态</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vSetOutputLoad(SerialPort serialPort,Base.LoadType loadType, decimal[] target_value, bool input_status,out string error_information)
 		{
+			error_information = string.Empty;
+			using (Itech itech = new Itech()) {
+				Itech.OperationMode operationMode = Itech.OperationMode.CC;
+				Itech.OnOffStatus onOffStatus = Itech.OnOffStatus.Off;
+				if (loadType == Base.LoadType.LoadType_CR) {
+					operationMode = Itech.OperationMode.CR;
+				} else if (loadType == Base.LoadType.LoadType_CW) {
+					operationMode = Itech.OperationMode.CW;
+				}
 
+				if(input_status != false) {
+					onOffStatus = Itech.OnOffStatus.On;
+				}
+
+				serialPort.BaudRate = Baudrate_Instrument;
+				for (int index = 0; index < Address_Load_Output.Length; index++) {
+					error_information = itech.ElecLoad_vInputStatusSet( Address_Load_Output[ index ], operationMode, target_value[ index ], onOffStatus, serialPort );
+					if(error_information != string.Empty) { return; }
+				}
+			}
 		}
+
+		/// <summary>
+		/// 设置充电使用的电子负载的工作参数
+		/// </summary>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="target_value">电子负载目标带载值</param>
+		/// <param name="input_status">目标输入状态</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vSetChargeLoad(SerialPort serialPort, decimal target_value, bool input_status, out string error_information)
+		{
+			error_information = string.Empty;
+			Itech.OnOffStatus onOffStatus = Itech.OnOffStatus.Off;
+			if (input_status != false) {
+				onOffStatus = Itech.OnOffStatus.On;
+			}
+			using (Itech itech = new Itech()) {
+				serialPort.BaudRate = Baudrate_Instrument;
+				error_information = itech.ElecLoad_vInputStatusSet( Address_Load_Bats,  Itech.OperationMode.CV, target_value, onOffStatus, serialPort );
+				if (error_information != string.Empty) { return; }
+			}
+		}
+
+		/// <summary>
+		/// 备电的组合输出控制
+		/// </summary>
+		/// <param name="used_bats_count">产品使用的电池数量，按照单节12V进行设计</param>
+		/// <param name="source_voltage">使用可调电源的目标输出电压</param>
+		/// <param name="used_adjust_power">是否使用可调电源，true为使用可调电源，false使用固定电平电源</param>
+		/// <param name="output_enable">直流电源的输出使能</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vSetDCPowerStatus(int used_bats_count, decimal source_voltage, bool used_adjust_power,bool output_enable,SerialPort serialPort,out string error_information)
+		{
+			error_information = string.Empty;			
+			using (MCU_Control mCU_Control = new MCU_Control()) {
+				using (Itech itech = new Itech()) {
+					MCU_Control.FixedLevel fixedLevel = MCU_Control.FixedLevel.FixedLevel_24V;
+					if (used_bats_count == 3) {
+						fixedLevel = MCU_Control.FixedLevel.FixedLevel_36V;
+					} else if (used_bats_count == 1) {
+						fixedLevel = MCU_Control.FixedLevel.FixedLevel_12V;
+					}
+
+					serialPort.BaudRate = Baudrate_Instrument;
+					if (!output_enable) {
+						mCU_Control.McuControl_vBatsOutput( output_enable, used_adjust_power, fixedLevel, serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
+					} else {
+						error_information = itech.DCPower_vOutputStatusSet( Address_DCPower, source_voltage, output_enable, serialPort );
+						if (error_information != string.Empty) { return; }
+						mCU_Control.McuControl_vBatsOutput( output_enable, used_adjust_power, fixedLevel, serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
+					}
+				}
+			}
+		}
+
+		#endregion
 
 		#endregion
 

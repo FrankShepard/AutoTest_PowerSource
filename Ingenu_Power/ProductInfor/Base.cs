@@ -15,6 +15,24 @@ namespace ProductInfor
 		#region -- 待测产品的相关属性
 
 		/// <summary>
+		/// 电子负载带载类型
+		/// </summary>
+		public enum LoadType :int  {
+			/// <summary>
+			/// CC模式
+			/// </summary>
+			LoadType_CC = 0,
+			/// <summary>
+			/// CR模式
+			/// </summary>
+			LoadType_CR = 1,
+			/// <summary>
+			/// CW模式
+			/// </summary>
+			LoadType_CW = 2,
+		}
+
+		/// <summary>
 		/// 是否存在相关参数的标记属性
 		/// </summary>
 		public struct Exist
@@ -59,7 +77,7 @@ namespace ProductInfor
 			/// </summary>
 			public decimal MpOverVoltage;
 			/// <summary>
-			/// 主电电压值校准时的主电电压值
+			/// 主电电压值校准时的主电电压值（应急照明电源主电电压需要校准）
 			/// </summary>
 			public decimal MpVoltage;
 			/// <summary>
@@ -122,7 +140,7 @@ namespace ProductInfor
 			/// <summary>
 			/// 主备电切换时对应通道的负载模式；0表示CC，1表示CR，2表示CW
 			/// </summary>
-			public int [ ] OutputLoadType;
+			public LoadType OutputLoadType;
 			/// <summary>
 			/// 主备电切换时对应通道带载的情况，与模式相关；模式为CC时表示带载电流，为CW时表示带载功率
 			/// </summary>
@@ -159,13 +177,13 @@ namespace ProductInfor
 		public struct Infor_Charge
 		{
 			/// <summary>
-			/// 充电的最大占空比
+			/// 是否可以使用串口设置充电的最小周期，用于加快验证是否能识别出充电时备电丢失情况
 			/// </summary>
-			public decimal ChargeDutyMax;
+			public bool UartSetChargeMinPeriod;
 			/// <summary>
 			/// 是否可以使用串口设置充电的占空比，用于满载可能非100%充电的情况
 			/// </summary>
-			public bool UartSetChargeDuty;
+			public bool UartSetChargeMaxDuty;
 			/// <summary>
 			/// 用于检测均充电流的电子负载需要设置的CV模式对应电压，用于保证充电电流处于最大占空比处
 			/// </summary>
@@ -209,19 +227,23 @@ namespace ProductInfor
 			/// <summary>
 			/// 主电单投时启动输出通道带载模式；0表示CC，1表示CR，2表示CW
 			/// </summary>
-			public int[] StartupLoadType_Mp;
+			public LoadType StartupLoadType_Mp;
 			/// <summary>
 			/// 备电单投时启动输出通道带载模式；0表示CC，1表示CR，2表示CW
 			/// </summary>
-			public int[] StartupLoadType_Sp;
+			public LoadType StartupLoadType_Sp;
 			/// <summary>
 			/// 备电强制模式启动输出通道带载模式；0表示CC，1表示CR，2表示CW
 			/// </summary>
-			public int[] StartupLoadType_Mandatory;
+			public LoadType StartupLoadType_Mandatory;
 			/// <summary>
 			/// 正常测试时的输出通道带载模式；0表示CC，1表示CR，2表示CW
 			/// </summary>
-			public int[] FullLoadType;
+			public LoadType FullLoadType;
+			/// <summary>
+			/// 测试OXP时的负载类型；0表示CC，1表示CR，2表示CW
+			/// </summary>
+			public LoadType OXPLoadType;
 			/// <summary>
 			/// 主电单投时输出通道带载值，与输出通道带载模式匹配使用,CC模式时为A，CW模式时为W，CR模式时为Ω
 			/// </summary>
@@ -321,31 +343,15 @@ namespace ProductInfor
 			return error_information;
 		}
 
-		/// <summary>
-		/// 进行实际的测试操作;为了保证能在界面上显示所有的测试进度，需要将此处的测试项目进行详细区分，测试数据填充和上传数据库的操作需要放在测试程序中执行
-		/// </summary>
-		/// <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
-		/// <param name="whole_function_test">是否需要全功能测试</param>
-		/// <param name="osc_ins">使用到的示波器INS</param>
-		/// <param name="port_name">使用到的串口名</param>
-		/// <returns>可能存在的故障信息</returns>
-		public virtual string Measure(int delay_magnification, bool whole_function_test, string osc_ins, string port_name)
-		{
-			string error_information = string.Empty;
-			return error_information;
-		}
-
 		#region -- 详细的测试项的声名
 
 		/// <summary>
 		/// 测试备电单投功能
 		/// </summary>
-		/// <param name="delay_magnification"></param>
-		/// <param name="whole_function_test"></param>
-		/// <param name="osc_ins"></param>
-		/// <param name="port_name"></param>
-		/// <returns></returns>
-		public virtual ArrayList Measure_CheckSingleSpStartupAbility( int delay_magnification,string port_name )
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCheckSingleSpStartupAbility( int delay_magnification,string port_name )
 		{
 			//元素0 - 可能存在的错误信息 ； 元素1 - 备电单投启动功能正常与否
 			ArrayList arrayList = new ArrayList ( );
@@ -359,10 +365,10 @@ namespace ProductInfor
 		/// <summary>
 		/// 检查电源的强制启动功能是否正常
 		/// </summary>
-		/// <param name="delay_magnification"></param>
-		/// <param name="port_name"></param>
-		/// <returns></returns>
-		public virtual ArrayList Measure_CheckMandtoryStartupAbility( int delay_magnification, string port_name )
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCheckMandtoryStartupAbility( int delay_magnification, string port_name )
 		{
 			//元素0 - 可能存在的错误信息 ； 元素1 - 是否存在强制模式 ； 元素2 - 强制模式启动功能正常与否
 			ArrayList arrayList = new ArrayList ( );
@@ -374,6 +380,411 @@ namespace ProductInfor
 			arrayList.Add ( check_okey );
 			return arrayList;
 		}
+
+		/// <summary>
+		/// 检查电源的备电切断点
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCutoffVoltageCheck(int delay_magnification, bool whole_function_enable,string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 备电切断点的合格检查 ； 元素2 - 具体的备电切断点值
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;		
+			bool check_okey = false;
+			decimal specific_value = 0m;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			arrayList.Add( specific_value );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 测试主电单投功能
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCheckSingleMpStartupAbility(int delay_magnification, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 主电单投启动功能正常与否
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 测试满载输出电压
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vVoltageWithLoad(int delay_magnification, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1(count) - 输出通道数量 ； 元素(2~(2+count)) - 测试通道的满载输出电压合格与否判断；元素((2+count + 1) - (2+2*count ))) -  测试通道的具体满载输出电压
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			int output_count = 3;		
+			bool[] check_okey = { false, false, false };
+			decimal[] specific_value = { 0m, 0m, 0m };
+			arrayList.Add( error_information );
+			arrayList.Add( output_count );
+			for(int index = 0;index < output_count; index++) {
+				arrayList.Add(check_okey[ index ]);
+			}
+			for( int index = 0; index < output_count; index++) {
+				arrayList.Add( specific_value[ index ] );
+			}
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 测试输出纹波
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vRapple(int delay_magnification, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1(count) - 输出通道数量 ； 元素(2~(2+count)) - 测试通道的输出纹波合格与否判断；元素((2+count + 1) - (2+2*count ))) -  测试通道的具体纹波
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			int output_count = 3;
+			bool[] check_okey = { false, false, false };
+			decimal[] specific_value = { 0m, 0m, 0m };
+			arrayList.Add( error_information );
+			arrayList.Add( output_count );
+			for (int index = 0; index < output_count; index++) {
+				arrayList.Add( check_okey[ index ] );
+			}
+			for (int index = 0; index < output_count; index++) {
+				arrayList.Add( specific_value[ index ] );
+			}
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 备电输入状态的设置
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <param name="target_status">欲设置的目标状态</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vSpStatusSet(int delay_magnification, string port_name,bool target_status)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 备电设置状态的正常执行与否
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 计算AC/DC部分效率
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vEfficiency(int delay_magnification, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 效率合格与否的判断 ； 元素2 - 具体效率值
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			decimal specific_value = 0m;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			arrayList.Add( specific_value );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 测试空载电压
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vVoltageWithoutLoad(int delay_magnification, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1(count) - 输出通道数量 ； 元素(2~(2+count)) - 测试通道的满载输出电压合格与否判断；元素((2+count + 1) - (2+2*count ))) -  测试通道的具体满载输出电压
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			int output_count = 3;
+			bool[] check_okey = { false, false, false };
+			decimal[] specific_value = { 0m, 0m, 0m };
+			arrayList.Add( error_information );
+			arrayList.Add( output_count );
+			for (int index = 0; index < output_count; index++) {
+				arrayList.Add( check_okey[ index ] );
+			}
+			for (int index = 0; index < output_count; index++) {
+				arrayList.Add( specific_value[ index ] );
+			}
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 测试均充电流
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCurrentEqualizedCharge(int delay_magnification, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 均充电流合格与否的判断 ; 元素2 - 具体的均充电流
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			decimal specific_value = 0m;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			arrayList.Add( specific_value );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 测试浮充电压
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vVoltageFloatingCharge(int delay_magnification, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 浮充电压合格与否的判断 ; 元素2 - 具体的浮充电压
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			decimal specific_value = 0m;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			arrayList.Add( specific_value );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 计算源效应
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vEffectSource(int delay_magnification, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1(count) - 输出通道数量 ； 元素(2~(2+count)) - 测试通道的源效应合格与否判断；元素((2+count + 1) - (2+2*count ))) -  测试通道的具体源效应
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			int output_count = 3;
+			bool[] check_okey = { false, false, false };
+			decimal[] specific_value = { 0m, 0m, 0m };
+			arrayList.Add( error_information );
+			arrayList.Add( output_count );
+			for (int index = 0; index < output_count; index++) {
+				arrayList.Add( check_okey[ index ] );
+			}
+			for (int index = 0; index < output_count; index++) {
+				arrayList.Add( specific_value[ index ] );
+			}
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 识别备电丢失
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCheckDistinguishSpOpen(int delay_magnification, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 检查到备电丢失与否的判断
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 主电丢失切换检查
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="ins">使用到示波器的INS码</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCheckSourceChangeMpLost(int delay_magnification, string ins,string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 检查主电丢失主备电切换功能正常与否的判断
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 主电恢复存在切换检查
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="ins">使用到示波器的INS码</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCheckSourceChangeMpRestart(int delay_magnification, string ins, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 检查主电恢复主备电切换功能正常与否的判断
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 主电欠压切换检查
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="whole_function_enable">全项测试，为true时需要获取具体的主电欠压点</param>
+		/// <param name="ins">使用到示波器的INS码</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCheckSourceChangeMpUnderVoltage(int delay_magnification, bool whole_function_enable,string ins, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 检查主电欠压点主备电切换功能正常与否的判断 ； 元素2 - 具体的主电欠压点
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			decimal specific_value = 0m;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			arrayList.Add( specific_value );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 主电欠压恢复切换检查
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="whole_function_enable">全项测试，为true时需要获取具体的主电欠压恢复点</param>
+		/// <param name="ins">使用到示波器的INS码</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCheckSourceChangeMpUnderVoltageRecovery(int delay_magnification, bool whole_function_enable, string ins, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 检查主电欠压恢复点主备电切换功能正常与否的判断 ； 元素2 - 具体的主电欠压恢复点
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			decimal specific_value = 0m;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			arrayList.Add( specific_value );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 主电过压切换检查
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="whole_function_enable">全项测试，为true时需要获取具体的主电过压点</param>
+		/// <param name="ins">使用到示波器的INS码</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCheckSourceChangeMpOverVoltage(int delay_magnification, bool whole_function_enable, string ins, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 检查主电过压点主备电切换功能正常与否的判断 ； 元素2 - 具体的主电过压点
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			decimal specific_value = 0m;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			arrayList.Add( specific_value );
+			return arrayList;
+		}
+
+
+		/// <summary>
+		/// 主电过压恢复切换检查
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="whole_function_enable">全项测试，为true时需要获取具体的主电过压恢复点</param>
+		/// <param name="ins">使用到示波器的INS码</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vCheckSourceChangeMpOverVoltageRecovery(int delay_magnification, bool whole_function_enable, string ins, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 检查主电过压恢复点主备电切换功能正常与否的判断 ； 元素2 - 具体的主电过压恢复点
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			decimal specific_value = 0m;
+			arrayList.Add( error_information );
+			arrayList.Add( check_okey );
+			arrayList.Add( specific_value );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 测试OXP
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="whole_function_enable">全项测试，为true时需要获取具体的主电过压恢复点</param>
+		/// <param name="ins">使用到示波器的INS码</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vOXP(int delay_magnification, bool whole_function_enable, string ins, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 输出通道数量 ； 元素(2~(2+count)) - 测试通道的OXP合格与否判断；元素((2+count + 1) - (2+2*count ))) -  测试通道的具体OXP值
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			int output_count = 3;
+			bool[] check_okey = { false, false, false };
+			decimal[] specific_value = { 0m, 0m, 0m };
+			arrayList.Add( error_information );
+			arrayList.Add( output_count );
+			for (int index = 0; index < output_count; index++) {
+				arrayList.Add( check_okey[ index ] );
+			}
+			for (int index = 0; index < output_count; index++) {
+				arrayList.Add( specific_value[ index ] );
+			}
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 短路保护检查
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="whole_function_enable">全项测试，为true时需要获取具体的主电过压恢复点</param>
+		/// <param name="ins">使用到示波器的INS码</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public virtual ArrayList Measure_vOutputShortProtect(int delay_magnification, bool whole_function_enable, string ins, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 输出通道数量 ； 元素(2~(2+count)) - 测试通道是否需要短路保护；元素((2+count + 1) - (2+2*count ))) -  测试通道的短路保护合格与否判断
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			int output_count = 3;
+			bool[] need_short_protect = { false, false, false };
+			bool[] check_okey = { false, false, false };
+			arrayList.Add( error_information );
+			arrayList.Add( output_count );
+			for (int index = 0; index < output_count; index++) {
+				arrayList.Add( need_short_protect[ index ] );
+			}
+			for (int index = 0; index < output_count; index++) {
+				arrayList.Add( check_okey[ index ] );
+			}
+			return arrayList;
+		}
+
 
 		#endregion
 
