@@ -417,7 +417,7 @@ namespace ProductInfor
 
 		#endregion
 
-		#region -- 设置电子负载的输入
+		#region -- 设置电子负载的输入和电源的输出
 
 		/// <summary>
 		/// 对输出通道上使用的电子负载进行统一的参数设置
@@ -503,6 +503,30 @@ namespace ProductInfor
 						mCU_Control.McuControl_vBatsOutput( output_enable, used_adjust_power, fixedLevel, serialPort, out error_information );
 						if (error_information != string.Empty) { return; }
 					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// 设置交流电源的输出状态
+		/// </summary>
+		/// <param name="output_enable">交流输出使能</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		/// <param name="target_voltage">目标输出交流电压，默认为220V</param>
+		/// <param name="frequncy">目标输出频率，默认为50Hz</param>
+		public void Measure_vSetACPowerStatus(bool output_enable, SerialPort serialPort, out string error_information, decimal target_voltage = 220m , decimal frequncy= 50m)
+		{
+			error_information = string.Empty;
+			using (AN97002H aN97002H = new AN97002H()) {
+				serialPort.BaudRate = Baudrate_Instrument;
+				if (output_enable) {
+					error_information = aN97002H.ACPower_vSetParameters( Address_ACPower, target_voltage, frequncy, true, serialPort );
+					if (error_information != string.Empty) {
+						aN97002H.ACPower_vControlStart( Address_ACPower, serialPort );
+					}
+				} else {
+					aN97002H.ACPower_vControlStop( Address_ACPower, serialPort );
 				}
 			}
 		}
