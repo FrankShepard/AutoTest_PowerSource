@@ -578,11 +578,10 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
 									}
 									break;
-								case 6://备电开启动作，准备充电
-								case 15://重新开启备电，用于后续主备电转换
-									mi = id_verion.GetMethod ( "Measure_vSpStatusSet" );
-									parameters = new object [ ] { measureCondition.Magnification, "COM1",true };
-									//object[] parameters = new object[] {measureCondition.Magnification, Properties.Settings.Default.UsedSerialport ,false};
+								case 6://备电（可调直流电源）输出打开动作，准备充电
+									mi = id_verion.GetMethod ( "Measure_vAdjustDCPowerOutputSet" );
+									parameters = new object [ ] { measureCondition.Magnification, "COM1", true };
+									//object[] parameters = new object[] {measureCondition.Magnification, Properties.Settings.Default.UsedSerialport ,true};
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "备电开启动作";
@@ -644,7 +643,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
 									}
 									break;
-								case 10://测试浮充电压
+								case 10://测试浮充电压（此处可能需要进入电源产品的程序后门，减少充电时间）
 									mi = id_verion.GetMethod ( "Measure_vVoltageFloatingCharge" );
 									parameters = new object [ ] { measureCondition.Magnification, "COM1" };
 									//object[] parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
@@ -658,8 +657,8 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
 									}
 									break;
-								case 11://浮充时关闭备电，用于识别备电丢失（此处可能需要进入电源产品的程序后门，减少充电时间）
-									mi = id_verion.GetMethod ( "Measure_vSpStatusSet" );
+								case 11://浮充时关闭备电，用于识别备电丢失
+									mi = id_verion.GetMethod ( "Measure_vAdjustDCPowerOutputSet" );
 									parameters = new object [ ] { measureCondition.Magnification, "COM1", false };
 									//object[] parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport ,false};
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -682,8 +681,8 @@ namespace Ingenu_Power.UserControls
 									}
 									break;
 								case 13://计算源效应
-									mi = id_verion.GetMethod ( "Measure_vEffectSource" );
 									if ( measureCondition.WholeFunction_Enable != false ) {
+										mi = id_verion.GetMethod ( "Measure_vEffectSource" );
 										parameters = new object [ ] { measureCondition.Magnification, "COM1" };
 										//object[] parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 										arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -715,6 +714,20 @@ namespace Ingenu_Power.UserControls
 									StaticInfor.measureItemShow.Measure_Item = "检查备电丢失识别功能";
 									if ( ( bool ) arrayList [ 1 ] != false ) { //元素1 - 检查到备电丢失与否的判断
 										measuredValue.Check_DistinguishSpOpen = true;
+										StaticInfor.measureItemShow.Measure_Value = "SUCCESS";
+									} else {
+										StaticInfor.measureItemShow.Measure_Value = "Failed";
+									}
+									break;
+								case 15://重新开启备电，用于后续主备电转换
+									mi = id_verion.GetMethod ( "Measure_vFixedDCPowerOutputSet" );
+									parameters = new object [ ] { measureCondition.Magnification, "COM1", true };
+									//object[] parameters = new object[] {measureCondition.Magnification, Properties.Settings.Default.UsedSerialport ,false};
+									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
+									error_information = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
+									StaticInfor.measureItemShow.Measure_Item = "备电开启动作";
+									StaticInfor.measureItemShow.Measure_Value = string.Empty;
+									if ( ( bool ) arrayList [ 1 ] != false ) { //元素1 - 备电设置状态的正常执行与否
 										StaticInfor.measureItemShow.Measure_Value = "SUCCESS";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";

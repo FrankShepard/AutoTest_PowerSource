@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Instrument_Control;
 
 namespace ProductInfor
 {
@@ -469,13 +471,13 @@ namespace ProductInfor
 		}
 
 		/// <summary>
-		/// 备电输入状态的设置
+		/// 固定电平备电输出的设置
 		/// </summary>
 		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
 		/// <param name="port_name">使用到的串口名</param>
-		/// <param name="target_status">欲设置的目标状态</param>
+		/// <param name="output_enable">备电输出与否</param>
 		/// <returns>包含多个信息的动态数组</returns>
-		public virtual ArrayList Measure_vSpStatusSet(int delay_magnification, string port_name,bool target_status)
+		public virtual ArrayList Measure_vFixedDCPowerOutputSet( int delay_magnification, string port_name,bool output_enable )
 		{
 			//元素0 - 可能存在的错误信息 ； 元素1 - 备电设置状态的正常执行与否
 			ArrayList arrayList = new ArrayList();
@@ -483,6 +485,44 @@ namespace ProductInfor
 			bool check_okey = false;
 			arrayList.Add( error_information );
 			arrayList.Add( check_okey );
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 可调直流电源输出的设置
+		/// </summary>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <param name="output_enable">备电输出与否</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public ArrayList Measure_vAdjustDCPowerOutputSet( int delay_magnification, string port_name, bool output_enable )
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 备电设置状态的正常执行与否
+			ArrayList arrayList = new ArrayList ( );
+			string error_information = string.Empty;
+			bool check_okey = false;
+			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
+				if ( temp_index == 0 ) {
+					using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
+						using ( Itech itech = new Itech ( ) ) {
+							using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+								if ( output_enable ) {
+									error_information = itech.Itech_vInOutOnOffSet ( MeasureDetails.Address_DCPower, Itech.OnOffStatus.On, serialPort );
+								} else {
+									error_information = itech.Itech_vInOutOnOffSet ( MeasureDetails.Address_DCPower, Itech.OnOffStatus.Off, serialPort );
+								}
+								if ( error_information != string.Empty ) { continue; }
+								mCU_Control.McuControl_vBatsOutput ( output_enable, true,  MCU_Control.FixedLevel.FixedLevel_24V, serialPort, out error_information );
+								if ( error_information != string.Empty ) { continue; }
+								check_okey = true;
+							}
+						}
+					}
+				} else {
+					arrayList.Add ( error_information );
+					arrayList.Add ( check_okey );
+				}
+			}			
 			return arrayList;
 		}
 

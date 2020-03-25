@@ -69,7 +69,12 @@ namespace ProductInfor
 								/* 示波器初始化 */
 								SessionRM = siglentOSC.SiglentOSC_vOpenSessionRM();
 								SessionOSC = siglentOSC.SiglentOSC_vOpenSession( SessionRM, "USB0::62700::60986::" + osc_ins + "::0::INSTR" );
-								error_information = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC );
+								error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC );
+								error_information += error_information_temp;
+								error_information_temp = siglentOSC.SiglentOSC_vInitializate ( SessionRM, SessionOSC, 1, SiglentOSC.Coupling_Type.AC, SiglentOSC.Voltage_DIV._100mV );
+								error_information += error_information_temp;
+								error_information = siglentOSC.SiglentOSC_vSetScanerDIV ( SessionRM, SessionOSC, SiglentOSC.ScanerTime_DIV._10ms );
+								error_information += error_information_temp;
 								/*关主电、关备电、负载初始化、备电控制继电器板和通道分选板软件复位*/
 								error_information_temp = acpower.ACPower_vControlStop( Address_ACPower, serialPort );
 								error_information += error_information_temp;
@@ -395,13 +400,8 @@ namespace ProductInfor
 			decimal rapple_value = 0m;
 			error_information = string.Empty;
 			SiglentOSC.Parameter_Type parameter_Type = SiglentOSC.Parameter_Type.Peak_to_peak;
-			/*设置示波器为交流耦合，电压档位100mV*/
-			using (SiglentOSC siglentOSC = new SiglentOSC()) {				
-				error_information = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC, 1, SiglentOSC.Coupling_Type.AC, SiglentOSC.Voltage_DIV._100mV );
-				if (error_information != string.Empty) { return rapple_value; }
-				error_information = siglentOSC.SiglentOSC_vSetScanerDIV( SessionRM, SessionOSC, SiglentOSC.ScanerTime_DIV._10ms );
-				if (error_information != string.Empty) { return rapple_value; }
-
+			/*前面设置示波器为交流耦合，电压档位100mV*/
+			using (SiglentOSC siglentOSC = new SiglentOSC()) {
 				try {
 					/*为了减少误报的可能性，需要将纹波多测几次*/
 					for (int index = 0; index < 3; index++) {
