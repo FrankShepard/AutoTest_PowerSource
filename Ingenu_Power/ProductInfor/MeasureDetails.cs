@@ -390,31 +390,6 @@ namespace ProductInfor
 			return generalData_Load;
 		}
 
-		/// <summary>
-		/// 输出通道的纹波测试值
-		/// </summary>
-		/// <param name="error_information">可能存在的错误信息</param>
-		/// <returns>测试得到的纹波值</returns>
-		public decimal Measure_vReadRapple(out string error_information)
-		{
-			decimal rapple_value = 0m;
-			error_information = string.Empty;
-			SiglentOSC.Parameter_Type parameter_Type = SiglentOSC.Parameter_Type.Peak_to_peak;
-			/*前面设置示波器为交流耦合，电压档位100mV*/
-			using (SiglentOSC siglentOSC = new SiglentOSC()) {
-				try {
-					/*为了减少误报的可能性，需要将纹波多测几次*/
-					for (int index = 0; index < 3; index++) {
-						rapple_value += siglentOSC.SiglentOSC_vQueryValue( SessionRM, SessionOSC, 1, parameter_Type );
-						Thread.Sleep( 50 );
-					}
-					rapple_value /= 3;
-
-				} catch {; }
-			}
-			return rapple_value;
-		}
-
 		#endregion
 
 		#region -- 设置电子负载的输入和电源的输出
@@ -532,6 +507,65 @@ namespace ProductInfor
 		}
 
 		#endregion
+
+		#region -- 示波器的相关动作
+
+		/// <summary>
+		/// 设置示波器的捕获
+		/// </summary>
+		/// <param name="captrue_value">捕获电平值</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vSetOscCapture(decimal captrue_value,out string error_information)
+		{
+			error_information = string.Empty;
+			using (SiglentOSC siglentOSC = new SiglentOSC()) {
+				error_information = siglentOSC.SiglentOSC_vClearError( SessionRM, SessionOSC );
+				if(error_information != string.Empty) { return; }
+				error_information = siglentOSC.SiglentOSC_vTrigParametersSet( SessionRM, SessionOSC, 1, SiglentOSC.TrigCoupling_Type.TrigCoupling_DC, captrue_value, SiglentOSC.TrigSlope_Type.TrigSlope_Down );
+			}
+		}
+
+		/// <summary>
+		/// 读取示波器采集的Vpp值
+		/// </summary>
+		/// <param name="error_information">可能存在的错误信息</param>
+		/// <returns>Vpp值</returns>
+		public decimal Measure_vReadVpp(out string error_information)
+		{
+			decimal value = 0m;
+			error_information = string.Empty;
+			using (SiglentOSC siglentOSC = new SiglentOSC()) {
+				value = siglentOSC.SiglentOSC_vQueryValue( SessionRM, SessionOSC, 1, SiglentOSC.Parameter_Type.Peak_to_peak );
+			}
+			return value;
+		}
+
+		/// <summary>
+		/// 输出通道的纹波测试值
+		/// </summary>
+		/// <param name="error_information">可能存在的错误信息</param>
+		/// <returns>测试得到的纹波值</returns>
+		public decimal Measure_vReadRapple(out string error_information)
+		{
+			decimal rapple_value = 0m;
+			error_information = string.Empty;
+			/*前面设置示波器为交流耦合，电压档位100mV*/
+			using (SiglentOSC siglentOSC = new SiglentOSC()) {
+				try {
+					/*为了减少误报的可能性，需要将纹波多测几次*/
+					for (int index = 0; index < 3; index++) {
+						rapple_value += siglentOSC.SiglentOSC_vQueryValue( SessionRM, SessionOSC, 1, SiglentOSC.Parameter_Type.Peak_to_peak );
+						Thread.Sleep( 50 );
+					}
+					rapple_value /= 3;
+
+				} catch {; }
+			}
+			return rapple_value;
+		}
+
+		#endregion
+
 
 		#endregion
 

@@ -736,8 +736,8 @@ namespace Ingenu_Power.UserControls
 								case 16://主电丢失切换检查
 									Thread.Sleep ( 500 );
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpLost" );
-									parameters = new object [ ] { measureCondition.Magnification, Properties.Settings.Default.Instrment_OSC_INS,"COM1" };
-									//object[] parameters = new object[] {measureCondition.Magnification,Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
+									parameters = new object [ ] { measureCondition.Magnification, "COM1" };
+									//object[] parameters = new object[] {measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电丢失主备电切换功能";
@@ -750,8 +750,8 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 17://主电恢复存在切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpRestart" );
-									parameters = new object [ ] { measureCondition.Magnification, Properties.Settings.Default.Instrment_OSC_INS, "COM1" };
-									//object[] parameters = new object[] {measureCondition.Magnification,Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
+									parameters = new object [ ] { measureCondition.Magnification,  "COM1" };
+									//object[] parameters = new object[] {measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电恢复主备电切换功能";
@@ -764,8 +764,8 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 18://主电欠压切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpUnderVoltage" );
-									parameters = new object [ ] { measureCondition.Magnification, measureCondition.WholeFunction_Enable,Properties.Settings.Default.Instrment_OSC_INS, "COM1" };
-									//object[] parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable,Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
+									parameters = new object [ ] { measureCondition.Magnification, measureCondition.WholeFunction_Enable, "COM1" };
+									//object[] parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电欠压点主备电切换功能";
@@ -783,8 +783,8 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 19://主电欠压恢复切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpUnderVoltageRecovery" );
-									parameters = new object [ ] { measureCondition.Magnification, measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS, "COM1" };
-									//object[] parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable,Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
+									parameters = new object [ ] { measureCondition.Magnification, measureCondition.WholeFunction_Enable, "COM1" };
+									//object[] parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电欠压恢复点主备电切换功能";
@@ -802,8 +802,8 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 20://主电过压切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpOverVoltage" );
-									parameters = new object [ ] { measureCondition.Magnification, measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS, "COM1" };
-									//object[] parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable,Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
+									parameters = new object [ ] { measureCondition.Magnification, measureCondition.WholeFunction_Enable, "COM1" };
+									//object[] parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电过压点主备电切换功能";
@@ -821,8 +821,8 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 21://主电过压恢复切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpOverVoltageRecovery" );
-									parameters = new object [ ] { measureCondition.Magnification, measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS, "COM1" };
-									//object[] parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable,Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
+									parameters = new object [ ] { measureCondition.Magnification, measureCondition.WholeFunction_Enable,  "COM1" };
+									//object[] parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电过压恢复点主备电切换功能";
@@ -840,8 +840,8 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 22://测试OXP
 									mi = id_verion.GetMethod ( "Measure_vOXP" );
-									parameters = new object [ ] { measureCondition.Magnification, measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS, "COM1" };
-									//object[] parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable,Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
+									parameters = new object [ ] { measureCondition.Magnification, measureCondition.WholeFunction_Enable, "COM1" };
+									//object[] parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查输出OCP/OWP功能";
