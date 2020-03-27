@@ -263,7 +263,9 @@ namespace Ingenu_Power.Domain
 
 			}
 			// 在这里释放非托管资源
-			objConnection.Dispose();
+			if (objConnection != null) {
+				objConnection.Dispose();
+			}
 
 			disposed = true; // Indicate that the instance has been disposed
 

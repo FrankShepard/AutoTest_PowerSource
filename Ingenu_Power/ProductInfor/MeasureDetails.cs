@@ -55,10 +55,10 @@ namespace ProductInfor
 		/// </summary>
 		/// <param name="osc_ins">示波器INS</param>
 		/// <param name="serialPort">使用到的串口</param>
-		/// <returns>可能存在的错误信息</returns>
-		public string Measure_vInstrumentInitalize(string osc_ins,SerialPort serialPort)
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vInstrumentInitalize(string osc_ins,SerialPort serialPort,out string error_information)
 		{
-			string error_information = string.Empty;
+			error_information = string.Empty;
 			string error_information_temp = string.Empty;
 
 			try {
@@ -104,7 +104,6 @@ namespace ProductInfor
 			} catch (Exception ex) {
 				error_information += ex.ToString();
 			}
-			return error_information;
 		}
 
 		#region -- 其他函数
@@ -132,9 +131,9 @@ namespace ProductInfor
 						real_powers [ used_load_count ] = SingleLoadMaxPower;
 						real_powers [ used_load_count + 1 ] = powers [ index ] - SingleLoadMaxPower;
 					}
-					used_load_count += 2;
 					AllocateChannel [ used_load_count ] = index;
 					AllocateChannel [ used_load_count + 1 ] = index;
+					used_load_count += 2;
 				} else if ( powers [ index ] <= 4 * SingleLoadMaxPower ) { //输出功率需要被4个并联的负载吸收
 					real_powers [used_load_count ] = SingleLoadMaxPower;
 					real_powers [used_load_count + 1 ] = SingleLoadMaxPower;
@@ -144,12 +143,12 @@ namespace ProductInfor
 					} else {
 						real_powers [used_load_count + 2 ] = SingleLoadMaxPower;
 						real_powers [used_load_count + 3 ] = powers [ index ] - 3 * SingleLoadMaxPower;
-					}
-					used_load_count += 4;
+					}					
 					AllocateChannel [ used_load_count ] = index;
 					AllocateChannel [ used_load_count + 1 ] = index;
 					AllocateChannel [ used_load_count + 2 ] = index;
 					AllocateChannel [ used_load_count + 3 ] = index;
+					used_load_count += 4;
 				} else if ( powers [ index ] <= 6 * SingleLoadMaxPower ) { //输出功率需要被6个并联的负载吸收
 					real_powers [used_load_count ] = SingleLoadMaxPower;
 					real_powers [used_load_count + 1 ] = SingleLoadMaxPower;
@@ -161,14 +160,14 @@ namespace ProductInfor
 					} else {
 						real_powers [used_load_count + 4 ] = SingleLoadMaxPower;
 						real_powers [used_load_count + 5 ] = powers [ index ] - 5 * SingleLoadMaxPower;
-					}
-					used_load_count += 6;
+					}					
 					AllocateChannel [ used_load_count ] = index;
 					AllocateChannel [ used_load_count + 1 ] = index;
 					AllocateChannel [ used_load_count + 2 ] = index;
 					AllocateChannel [ used_load_count + 3 ] = index;
 					AllocateChannel [ used_load_count + 4 ] = index;
 					AllocateChannel [ used_load_count + 5 ] = index;
+					used_load_count += 6;
 				}
 
 				if(used_load_count >= 6 ) { //限制最多存在6个输出使用的电子负载
@@ -201,6 +200,8 @@ namespace ProductInfor
 						real_currents[ used_load_count ] = SingleLoadMaxPower / real_voltages[ index ];
 						real_currents[ used_load_count + 1 ] = (currents[ index ] * real_voltages[ index ] - SingleLoadMaxPower) / real_voltages[ index ];
 					}
+					AllocateChannel[ used_load_count ] = index;
+					AllocateChannel[ used_load_count + 1 ] = index;
 					used_load_count += 2;
 				} else if ((currents[ index ] * real_voltages[index]) <= 4 * SingleLoadMaxPower) { //输出功率需要被4个并联的负载吸收
 					real_currents[ used_load_count ] = SingleLoadMaxPower / real_voltages[index];
@@ -211,12 +212,12 @@ namespace ProductInfor
 					} else {
 						real_currents[ used_load_count + 2 ] = SingleLoadMaxPower / real_voltages[ index ]; ;
 						real_currents[ used_load_count + 3 ] = (currents[ index ] * real_voltages[ index ] - 3 * SingleLoadMaxPower) / real_voltages[ index ];
-					}
-					used_load_count += 4;
+					}					
 					AllocateChannel[ used_load_count ] = index;
 					AllocateChannel[ used_load_count + 1 ] = index;
 					AllocateChannel[ used_load_count + 2 ] = index;
 					AllocateChannel[ used_load_count + 3 ] = index;
+					used_load_count += 4;
 				} else if ((currents[ index ] * real_voltages[ index ]) <= 6 * SingleLoadMaxPower) { //输出功率需要被6个并联的负载吸收
 					real_currents[ used_load_count ] = SingleLoadMaxPower / real_voltages[ index ];
 					real_currents[ used_load_count + 1 ] = SingleLoadMaxPower / real_voltages[ index ];
@@ -228,14 +229,14 @@ namespace ProductInfor
 					} else {
 						real_currents[ used_load_count + 4 ] = SingleLoadMaxPower / real_voltages[ index ]; ;
 						real_currents[ used_load_count + 5 ] = (currents[ index ] * real_voltages[ index ] - 5 * SingleLoadMaxPower) / real_voltages[ index ];
-					}
-					used_load_count += 6;
+					}					
 					AllocateChannel[ used_load_count ] = index;
 					AllocateChannel[ used_load_count + 1 ] = index;
 					AllocateChannel[ used_load_count + 2 ] = index;
 					AllocateChannel[ used_load_count + 3 ] = index;
 					AllocateChannel[ used_load_count + 4 ] = index;
 					AllocateChannel[ used_load_count + 5 ] = index;
+					used_load_count += 6;
 				}
 
 				if (used_load_count >= 6) { //限制最多存在6个输出使用的电子负载
@@ -268,6 +269,8 @@ namespace ProductInfor
 						real_resistances[ used_load_count ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
 						real_resistances[ used_load_count + 1 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - SingleLoadMaxPower);
 					}
+					AllocateChannel[ used_load_count ] = index;
+					AllocateChannel[ used_load_count + 1 ] = index;
 					used_load_count += 2;
 				} else if ((Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ]) <= 4 * SingleLoadMaxPower) { //输出功率需要被4个并联的负载吸收
 					real_resistances[ used_load_count ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
@@ -278,12 +281,12 @@ namespace ProductInfor
 					} else {
 						real_resistances[ used_load_count + 2 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
 						real_resistances[ used_load_count + 3 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - 3 * SingleLoadMaxPower);
-					}
-					used_load_count += 4;
+					}					
 					AllocateChannel[ used_load_count ] = index;
 					AllocateChannel[ used_load_count + 1 ] = index;
 					AllocateChannel[ used_load_count + 2 ] = index;
 					AllocateChannel[ used_load_count + 3 ] = index;
+					used_load_count += 4;
 				} else if ((Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ]) <= 6 * SingleLoadMaxPower) { //输出功率需要被6个并联的负载吸收
 					real_resistances[ used_load_count ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
 					real_resistances[ used_load_count + 1 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
@@ -295,14 +298,14 @@ namespace ProductInfor
 					} else {
 						real_resistances[ used_load_count + 4 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
 						real_resistances[ used_load_count + 5 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - 5 * SingleLoadMaxPower);
-					}
-					used_load_count += 6;
+					}					
 					AllocateChannel[ used_load_count ] = index;
 					AllocateChannel[ used_load_count + 1 ] = index;
 					AllocateChannel[ used_load_count + 2 ] = index;
 					AllocateChannel[ used_load_count + 3 ] = index;
 					AllocateChannel[ used_load_count + 4 ] = index;
 					AllocateChannel[ used_load_count + 5 ] = index;
+					used_load_count += 6;
 				}
 
 				if (used_load_count >= 6) { //限制最多存在6个输出使用的电子负载
@@ -393,6 +396,28 @@ namespace ProductInfor
 		#endregion
 
 		#region -- 设置电子负载的输入和电源的输出
+
+		/// <summary>
+		/// 设置输出通道上的电子负载进行统一的短路模式与否
+		/// </summary>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="short_status">短路与否</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vSetOutputLoadShort(SerialPort serialPort, bool[] short_status, out string error_information)
+		{
+			error_information = string.Empty;
+			using (Itech itech = new Itech()) {
+				serialPort.BaudRate = Baudrate_Instrument;
+				for (int index = 0; index < Address_Load_Output.Length; index++) {
+					if (short_status[ index ]) {
+						error_information = itech.ElecLoad_vInputStatusSet( Address_Load_Output[ index ], Itech.WorkingMode.Short, Itech.OnOffStatus.On, serialPort );
+					} else {
+						error_information = itech.ElecLoad_vInputStatusSet( Address_Load_Output[ index ], Itech.WorkingMode.Fixed, Itech.OnOffStatus.On, serialPort );
+					}
+					if (error_information != string.Empty) { return; }
+				}
+			}
+		}
 
 		/// <summary>
 		/// 对输出通道上使用的电子负载进行统一的参数设置

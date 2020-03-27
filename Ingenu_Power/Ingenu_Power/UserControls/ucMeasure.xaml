@@ -100,13 +100,8 @@
 									<TextBlock Text="测试值" FontSize="22" FontStyle="Italic" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" FontWeight="Bold" />
 									<TextBlock Text="" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Padding="25,5" x:Name="TxtMeasuredResult"/>
 								</WrapPanel>
-								<Separator Style="{StaticResource MaterialDesignDarkSeparator}" Margin="8 0"/>
-								<WrapPanel>
-									<ni:LED x:Name="Led" Height="110" Width="110" Margin="30,10" Value="False" IsReadOnly="True" />
-								</WrapPanel>
-
 							</StackPanel>
-
+							<ni:LED x:Name="Led" Height="110" Width="110" Margin="197,247,36,16" Value="False" IsReadOnly="True" />
 						</Grid>
 					</Grid>
 					<Grid Grid.Row="1">

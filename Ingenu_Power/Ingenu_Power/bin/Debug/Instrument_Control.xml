@@ -3091,6 +3091,11 @@
             读取单片机内指定地址的Flash数据
             </summary>
         </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.ChargePeriodSet">
+            <summary>
+            充电周期设置
+            </summary>
+        </member>
         <member name="F:Instrument_Control.MCU_Control.Config.ExitAdminMode">
             <summary>
             退出管理员模式的代码
@@ -3337,13 +3342,6 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vAlwaysCharging(System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            对待测产品MCU进行校准 - 强制充电的控制逻辑
-            </summary>
-            <param name="serialPort">使用到的串口</param>
-            <param name="error_information">可能存在的错误信息</param>
-        </member>
         <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vBatsSingleWorkEnableSet(System.IO.Ports.SerialPort,System.String@)">
             <summary>
             对待测产品MCU进行校准 - 在应急照明电源中禁止备电单投功能
@@ -3390,6 +3388,22 @@
             <summary>
             对待测产品MCU进行校准 - 软件重启MCU
             </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vAlwaysCharging(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行后门控制 - 强制充电的控制逻辑
+            </summary>
+            <param name="always_charging">始终100%充电</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vChargePeriodSet(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行后门控制 - 设置充电周期的长短类型
+            </summary>
+            <param name="use_short_period">命令产品使用短周期进行充电</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>

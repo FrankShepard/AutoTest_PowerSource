@@ -132,7 +132,8 @@ namespace ProductInfor
 				Need_TestOXP = new bool[ ] { true, true, true },
 				OXPLoadType = LoadType.LoadType_CC,
 				SlowOXP_DIF = new decimal[] { 0m, 0m, 0m },
-				OXP_Index = new int[] {0,1,2},
+				OXP_OrderIndex = new int[] {0,1,2},
+				Short_OrderIndex = new int[] {0,1,2},
 				Qualified_OXP_Value = new decimal[,] { { 12m, 13m }, { 2.3m, 2.7m }, { 12m, 13, } },
 				Qualified_LoadEffect_Max = new decimal[] { 0.01m, 0.01m, 0.01m },
 				Qualified_SourceEffect_Max = new decimal[] { 0.01m, 0.01m, 0.01m },
@@ -233,7 +234,7 @@ namespace ProductInfor
 			Int32 waittime = 0;
 			while (sp_product.BytesToRead == 0) {
 				Thread.Sleep( 5 );
-				if (++waittime > 100) {
+				if (++waittime > 20) {
 					error_information = "待测产品通讯响应超时";//仪表响应超时
 					return error_information;
 				}
@@ -355,13 +356,13 @@ namespace ProductInfor
 			using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
 				using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
 					//仪表初始化
-					error_information = measureDetails.Measure_vInstrumentInitalize( osc_ins, serialPort );
+					measureDetails.Measure_vInstrumentInitalize( osc_ins, serialPort,out error_information );
 					if ( error_information != string.Empty ) { return error_information; }
 
 					//真正开始进行待测产品的校准操作
 					Calibrate_vDoEvent (measureDetails, serialPort, out error_information_Calibrate );
 					if ( error_information_Calibrate != string.Empty ) {
-						error_information = measureDetails.Measure_vInstrumentInitalize( osc_ins, serialPort );
+						measureDetails.Measure_vInstrumentInitalize( osc_ins, serialPort, out error_information );
 						error_information += "\r\n" + error_information_Calibrate;
 					}
 
@@ -580,7 +581,7 @@ namespace ProductInfor
 								if ((infor_Uart.Measured_MpErrorSignal != false) || (infor_Uart.Measured_SpErrorSignal == false)) {
 									Thread.Sleep( 50 * delay_magnification );
 								}
-							} while (++wait_count < 30);
+							} while (++wait_count < 10);
 							if (error_information != string.Empty) { continue; }
 							if ((infor_Uart.Measured_MpErrorSignal != false) || (infor_Uart.Measured_SpErrorSignal == false)) { continue; }
 
