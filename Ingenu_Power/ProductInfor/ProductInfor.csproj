@@ -33,8 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Instrument_Control">
-      <HintPath>E:\测试项目\仪表程控\Instrument_Control\Instrument_Control\bin\Debug\Instrument_Control.dll</HintPath>
+    <Reference Include="Instrument_Control, Version=3.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Instrument_Control\bin\Debug\Instrument_Control.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -85,7 +85,7 @@
 								</ToggleButton>
 								<materialDesign:PackIcon Name="PkiSyncDll" Kind="CloudSync" Height="20" Width="20" Margin="2" MouseEnter="PkiSyncDll_MouseEnter" MouseDoubleClick="PkiSyncDll_MouseDoubleClick" />
 							</WrapPanel>
-							<TextBlock Text="盈帜电源自动测试系统" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFB0A5A5" FontFamily="YouYuan" FontStyle="Italic" FontSize="16" FontWeight="Normal" />
+							<TextBlock Text="盈帜电源自动测试系统" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFB0A5A5" FontFamily="YouYuan" FontStyle="Italic" FontSize="16" FontWeight="Normal" MouseDown="TextBlock_MouseDown"/>
 							<WrapPanel HorizontalAlignment="Right">
 								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMessage" Click="BtnMessage_Click" ToolTip="最近一次出现的错误信息">
 									<ToggleButton.Content>

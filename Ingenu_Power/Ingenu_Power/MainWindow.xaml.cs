@@ -14,18 +14,28 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Microsoft.Office.Interop.Excel;
 using Ingenu_Power.Domain;
+using System.Runtime.InteropServices;
 
 namespace Ingenu_Power
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
-    {
+    public partial class MainWindow : System.Windows.Window
+	{
         public MainWindow()
         {
             InitializeComponent();
+
+		/*
+		 * 开启定时器（周期性的进行内存回收使用）
+		 */
+			myTimer = new System.Timers.Timer ( TIM_MemoryClearTime );
+			myTimer.Elapsed += MyTimer_Elapsed;
+			myTimer.AutoReset = true;
+			myTimer.Enabled = true;
 		}
 
 		#region -- 涉及到主线程控件的全局变量及函数
@@ -42,6 +52,15 @@ namespace Ingenu_Power
         /// 测试窗体在主窗体中的children的索引
         /// </summary>
         int index_of_measure_in_grid = 0;
+
+		/// <summary>
+		/// 定义一个定时器，功能为显示窗体时改变透明度及在窗体使用过程中回收内存
+		/// </summary>
+		System.Timers.Timer myTimer;
+		/// <summary>
+		/// 内存回收周期（单位ms）
+		/// </summary>
+		public const double TIM_MemoryClearTime = ( double ) 30000;
 
 		#endregion
 
@@ -351,5 +370,101 @@ namespace Ingenu_Power
 				PkiSyncDll.ToolTip = "测试使用的 dll文件，更新完成";
 			}
 		}
+
+		private void TextBlock_MouseDown( object sender, MouseButtonEventArgs e )
+		{
+			ExcelPrint ( @"C:\Users\Administrator\Desktop\新建.xlsx", "Sheet1" );
+		}
+
+		public void ExcelPrint( string strFilePath, string strSheetName )
+		{
+			ApplicationClass xlApp = new ApplicationClass ( );
+			Workbooks xlWorkbooks;
+			Workbook xlWorkbook;
+			Worksheet xlWorksheet;
+			System.Type tyWorkbooks;
+			System.Reflection.MethodInfo [ ] methods;
+			object objFilePath;
+
+			object oMissing = System.Reflection.Missing.Value;
+			//strFilePath = Server.MapPath ( strFilePath );
+			if ( !System.IO.File.Exists ( strFilePath ) ) {
+				throw new System.IO.FileNotFoundException ( );
+			}
+			try {
+				xlApp.Visible = true;
+				xlWorkbooks = xlApp.Workbooks;
+				tyWorkbooks = xlWorkbooks.GetType ( );
+				methods = tyWorkbooks.GetMethods ( );
+				objFilePath = strFilePath;
+				object Nothing = System.Reflection.Missing.Value;
+				xlWorkbook = xlApp.Workbooks.Open ( strFilePath, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing );
+
+				//xlWorkbook = (Microsoft.Office.Interop.Excel.Workbook)tyWorkbooks.InvokeMember("Open ",
+				//System.Reflection.BindingFlags.InvokeMethod,
+				//null,
+				//xlWorkbooks,
+				//new object[] { objFilePath, true, true });
+				xlWorksheet = ( Microsoft.Office.Interop.Excel.Worksheet ) xlWorkbook.Worksheets [ strSheetName ];
+
+				xlWorksheet.PrintPreview ( true );
+				xlWorkbook.Close ( oMissing, oMissing, oMissing );
+			} catch ( Exception ex ) {
+				throw ex;
+			} finally {
+				if ( xlApp != null ) {
+					xlApp.Quit ( );
+					System.Runtime.InteropServices.Marshal.ReleaseComObject ( xlApp );
+					xlApp = null;
+				}
+				GC.Collect ( );
+			}
+		}
+
+		#region -- 内存回收 
+
+		/// <summary>
+		/// 引用kernel32.dll中封装的函数“SetProcessWorkingSetSize”；
+		/// 用于及时回收电脑内存资源
+		/// </summary>
+		/// <param name="process">当前程序进程的句柄</param>
+		/// <param name="minSize">设置的最小资源占用量</param>
+		/// <param name="maxSize">设置的最大资源占用量</param>
+		/// <returns></returns>
+		[DllImport ( "kernel32.dll", EntryPoint = "SetProcessWorkingSetSize" )]
+		private static extern int SetProcessWorkingSetSize( IntPtr process, int minSize, int maxSize );
+
+		/// <summary>   
+		/// 释放内存  
+		/// </summary>   
+		private static void Memory_Clear( )
+		{
+			GC.Collect ( );
+			GC.WaitForPendingFinalizers ( );
+			if ( Environment.OSVersion.Platform == PlatformID.Win32NT ) {
+				SetProcessWorkingSetSize ( System.Diagnostics.Process.GetCurrentProcess ( ).Handle, -1, -1 );
+			}
+		}
+
+		/// <summary>
+		/// 定时器执行的周期性触发动作 -- 内存回收及改变窗体透明度（此处需要减少内存的消耗，CPU使用率会相应提升）
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void MyTimer_Elapsed( object sender, System.Timers.ElapsedEventArgs e )
+		{
+			if ( myTimer.Interval == TIM_MemoryClearTime ) {
+				/*
+                 * 此时定时器功能为内存回收功能
+                 */
+				Memory_Clear ( );
+			}
+		}
+
+
+
+
+		#endregion
+
 	}
 }

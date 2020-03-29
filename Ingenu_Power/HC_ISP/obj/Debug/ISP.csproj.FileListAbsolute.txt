@@ -1,0 +1,12 @@
+E:\测试项目\芯圣程序烧录\HC_ISP\HC_ISP\HC_ISP\bin\Debug\ISP.dll
+E:\测试项目\芯圣程序烧录\HC_ISP\HC_ISP\HC_ISP\bin\Debug\ISP.pdb
+E:\测试项目\芯圣程序烧录\HC_ISP\HC_ISP\HC_ISP\obj\Debug\ISP.dll
+E:\测试项目\芯圣程序烧录\HC_ISP\HC_ISP\HC_ISP\obj\Debug\ISP.pdb
+E:\测试项目\芯圣程序烧录\HC_ISP\HC_ISP\HC_ISP\bin\Debug\ISP.XML
+E:\测试项目\芯圣程序烧录\HC_ISP\HC_ISP\HC_ISP\obj\Debug\ISP.csproj.CoreCompileInputs.cache
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\HC_ISP\bin\Debug\ISP.XML
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\HC_ISP\bin\Debug\ISP.dll
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\HC_ISP\bin\Debug\ISP.pdb
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.csproj.CoreCompileInputs.cache
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.dll
+E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.pdb

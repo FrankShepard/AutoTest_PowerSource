@@ -404,6 +404,12 @@
             输出相关参数的结构体实例化对象
             </summary>
         </member>
+        <member name="M:ProductInfor.Base.BaudrateInstrumentGet">
+            <summary>
+            返回仪表通讯的波特率，用于不包含在本Dll中的ISP功能的实现
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:ProductInfor.Base.Initalize">
             <summary>
             产品相关信息的初始化

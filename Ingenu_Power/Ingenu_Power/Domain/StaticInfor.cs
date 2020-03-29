@@ -220,28 +220,5 @@ namespace Ingenu_Power.Domain
 		/// 用户权限等级，登陆成功之后存在等级1~3；不成功则为0
 		/// </summary>
 		public static int UserRightLevel = 0;
-
-		//后续优化 - 应该将所有的仪表通讯地址相关设置及操作交由 ProductInfor.dll 中进行
-
-		/// <summary>
-		/// 与设备进行通讯的波特率
-		/// </summary>
-		public const int Baudrate_Instrument = 4800;
-		/// <summary>
-		/// 备电负载的通讯地址
-		/// </summary>
-		public const byte Address_Load_Bats = 0;
-		/// <summary>
-		/// 输出负载的通讯地址
-		/// </summary>
-		public static readonly byte[] Address_Load_Output = { 1, 2, 3, 4, 5, 6 };
-		/// <summary>
-		/// 程控交流电源的通讯地址
-		/// </summary>
-		public const byte Address_ACPower = 12;
-		/// <summary>
-		/// 程控可调直流电源的通讯地址
-		/// </summary>
-		public const byte Address_DCPower = 13;
 	}
 }

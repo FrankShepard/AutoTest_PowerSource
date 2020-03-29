@@ -7,7 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Ingenu_Power.Domain"
              mc:Ignorable="d" 
-             d:DesignHeight="443" d:DesignWidth="726" Loaded="UserControl_Loaded">
+             d:DesignHeight="443" d:DesignWidth="726" >
 	<UserControl.Resources>
 		<SolidColorBrush x:Key="InputBoxHintAssistForegorundBrush" Color="Purple"/>
 		<Style x:Key="InputIcon" TargetType="materialDesign:PackIcon">
