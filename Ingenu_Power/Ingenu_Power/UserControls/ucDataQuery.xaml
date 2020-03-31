@@ -8,32 +8,177 @@
              xmlns:domain="clr-namespace:Ingenu_Power.Domain"
              mc:Ignorable="d" 
              d:DesignHeight="443" d:DesignWidth="726" >
-    <UserControl.Resources>
+	<UserControl.Resources>
 		<SolidColorBrush x:Key="InputBoxHintAssistForegorundBrush" Color="Purple"/>
-        <Style x:Key="InputIcon" TargetType="materialDesign:PackIcon">
-            <Setter Property="Height" Value="30"/>
-            <Setter Property="Width" Value="30"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-        <LinearGradientBrush x:Key="SkyBrush" StartPoint="0 0" EndPoint="0 1">
-            <GradientStop Color="#2196F3" Offset="0"/>
-            <GradientStop Color="#2196F3" Offset=".6"/>
-            <GradientStop Color="#00E676" Offset=".6"/>
-            <GradientStop Color="#00E676" Offset="1"/>
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="GroundBrush" StartPoint="0 0" EndPoint="0 1">
-            <GradientStop Color="#552196F3" Offset="0"/>
-            <GradientStop Color="#FFFFFF" Offset=".3"/>
-            <GradientStop Color="#00E676" Offset="1"/>
-        </LinearGradientBrush>
-    </UserControl.Resources>
+		<Style x:Key="InputIcon" TargetType="materialDesign:PackIcon">
+			<Setter Property="Height" Value="30"/>
+			<Setter Property="Width" Value="30"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<LinearGradientBrush x:Key="SkyBrush" StartPoint="0 0" EndPoint="0 1">
+			<GradientStop Color="#2196F3" Offset="0"/>
+			<GradientStop Color="#2196F3" Offset=".6"/>
+			<GradientStop Color="#00E676" Offset=".6"/>
+			<GradientStop Color="#00E676" Offset="1"/>
+		</LinearGradientBrush>
+		<LinearGradientBrush x:Key="GroundBrush" StartPoint="0 0" EndPoint="0 1">
+			<GradientStop Color="#552196F3" Offset="0"/>
+			<GradientStop Color="#FFFFFF" Offset=".3"/>
+			<GradientStop Color="#00E676" Offset="1"/>
+		</LinearGradientBrush>
+	</UserControl.Resources>
 
-    <Grid>
-        <Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <materialDesign:Card Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360" Height="266" Padding="10"  />
+	<Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*" />
+			<RowDefinition Height="2*" />
+		</Grid.RowDefinitions>
+		
+		<Grid Grid.Row="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="2*" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<materialDesign:Card Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" 
+								 Width="479" Height="Auto" Padding="10" Margin="5">
+				<Grid >
+					<Grid.RowDefinitions>
+						<RowDefinition  Height="*"></RowDefinition>
+						<RowDefinition  Height="4*"></RowDefinition>
+					</Grid.RowDefinitions>
+					<WrapPanel Grid.Row="0" VerticalAlignment="Center">
+						<TextBlock Text="单支产品数据查询" Margin="5" VerticalAlignment="Center"/>
+						<ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}"  Margin="5" VerticalAlignment="Center" ToolTip="查询方式" IsChecked="True" />
+						<TextBlock Text="多支产品数据查询" Margin="5" VerticalAlignment="Center"/>
+						<Button IsDefault="True" x:Name="BtnQueryData" FontSize="12" Style="{StaticResource MaterialDesignRaisedDarkButton}" Height="24" Width="100"
+									materialDesign:ButtonAssist.CornerRadius="12" materialDesign:ShadowAssist.ShadowDepth="Depth4" Margin="30,0,0,0" VerticalAlignment="Center">
+							<WrapPanel>
+								<materialDesign:PackIcon Kind="FileFind" Margin="0" Height="16" Width="16" />
+								<TextBlock  Text="数据查询" />
+							</WrapPanel>
+						</Button>
+					</WrapPanel>
+					<Grid Grid.Row="1" >
+						<GroupBox Header="单支产品数据筛选方式" Style="{DynamicResource MaterialDesignGroupBox}" Margin="5" Name="GpbSingleProductQuery" 
+								  materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="3" Visibility="Hidden">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="1.3*"/>
+								</Grid.ColumnDefinitions>
+								<WrapPanel Grid.Column="0" VerticalAlignment="Center">
+									<TextBlock Text="产品ID" Margin="5" VerticalAlignment="Center"/>
+									<ToggleButton Style="{StaticResource MaterialDesignSwitchAccentToggleButton}"  Margin="5" VerticalAlignment="Center" ToolTip="ID类别" IsChecked="False" />
+									<TextBlock Text="客户产品ID" Margin="5" VerticalAlignment="Center"/>
+								</WrapPanel>
+								<TextBox Grid.Column="1"  materialDesign:HintAssist.Hint="ID" Margin="5,0"/>
+							</Grid>
+						</GroupBox>
+						<Grid Name="GrdProductQuery" Visibility="Visible">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="3*"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
 
-			<Grid Height="50" VerticalAlignment="Top" HorizontalAlignment="Center" Width="120" Margin="294,330,293,0"/>
+							<Grid Grid.Column="0">
+								<Grid.RowDefinitions>
+									<RowDefinition Height="*"/>
+									<RowDefinition Height="*"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+								<WrapPanel Grid.Row="0" VerticalAlignment="Center">
+									<CheckBox Name="ChkProduct" Content="产品型号" />
+									<TextBox materialDesign:HintAssist.Hint="产品型号" Margin="10,0" Width="220"/>
+								</WrapPanel>
+								<WrapPanel Grid.Row="1" VerticalAlignment="Center">
+									<CheckBox Name="ChkPackingBatch" Content="包装编号" />
+									<TextBox materialDesign:HintAssist.Hint="包装编号" Margin="10,0" Width="220"/>
+								</WrapPanel>
+								<WrapPanel Grid.Row="2" VerticalAlignment="Center">
+									<CheckBox Name="ChkMeasureTime" Content="测试时间" />
+									
+									<StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Margin="0 0 0 0">
+										<TextBlock Text="{Binding Date, StringFormat=d}" VerticalAlignment="Center" FontSize="24" />
+										<Button Margin="8 0 0 0" Content="..." 
+                    Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                    materialDesign:DialogHost.DialogOpenedAttached="CalendarDialogOpenedEventHandler"
+                    materialDesign:DialogHost.DialogClosingAttached="CalendarDialogClosingEventHandler">
+											<Button.CommandParameter>
+												<Grid>
+													<Grid.RowDefinitions>
+														<RowDefinition Height="Auto" />
+														<RowDefinition Height="Auto" />
+													</Grid.RowDefinitions>
+													<Calendar x:Name="Calendar_Start" Margin="-1 -4 -1 0" />
+													<StackPanel Grid.Row="1" Margin="8" HorizontalAlignment="Right" Orientation="Horizontal">
+														<Button Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="1" Style="{DynamicResource MaterialDesignFlatButton}">OK</Button>
+														<Button Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="0" Style="{DynamicResource MaterialDesignFlatButton}">CANCEL</Button>
+													</StackPanel>
+												</Grid>
+											</Button.CommandParameter>
+										</Button>
+									</StackPanel>
+									<TextBlock Text="   ~   "/>
+									<StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Margin="0 0 0 0">
+										<TextBlock Text="{Binding Date, StringFormat=d}" VerticalAlignment="Center" FontSize="24" />
+										<Button Margin="8 0 0 0" Content="..." 
+                    Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                    materialDesign:DialogHost.DialogOpenedAttached="CalendarDialogOpenedEventHandler"
+                    materialDesign:DialogHost.DialogClosingAttached="CalendarDialogClosingEventHandler">
+											<Button.CommandParameter>
+												<Grid>
+													<Grid.RowDefinitions>
+														<RowDefinition Height="Auto" />
+														<RowDefinition Height="Auto" />
+													</Grid.RowDefinitions>
+													<Calendar x:Name="Calendar_End" Margin="-1 -4 -1 0" />
+													<StackPanel Grid.Row="1" Margin="8" HorizontalAlignment="Right" Orientation="Horizontal">
+														<Button Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="1" Style="{DynamicResource MaterialDesignFlatButton}">OK</Button>
+														<Button Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="0" Style="{DynamicResource MaterialDesignFlatButton}">CANCEL</Button>
+													</StackPanel>
+												</Grid>
+											</Button.CommandParameter>
+										</Button>
+									</StackPanel>
+								</WrapPanel>
+							
+							</Grid>
+							
+						</Grid>
+					</Grid>
+				</Grid>
+			</materialDesign:Card>
+			<Grid Grid.Column="1">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+				<Button Grid.Row="0" IsDefault="True" x:Name="BtnUpdataNewValue" FontSize="20" 
+						Style="{StaticResource MaterialDesignRaisedDarkButton}" Height="36" Width="150"				
+						materialDesign:ButtonAssist.CornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" 
+						VerticalAlignment="Center" HorizontalAlignment="Center">
+					<WrapPanel>
+						<materialDesign:PackIcon Kind="Update" Margin="0" Height="28" Width="28" />
+						<TextBlock  Text="数据更新" />
+					</WrapPanel>
+				</Button>
+				<Button Grid.Row="1" IsDefault="True" x:Name="BtnExportData" FontSize="20" 
+						Style="{StaticResource MaterialDesignRaisedDarkButton}" Height="36" Width="150"				
+						materialDesign:ButtonAssist.CornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" 
+						VerticalAlignment="Center" HorizontalAlignment="Center">
+					<WrapPanel>
+						<materialDesign:PackIcon Kind="FileExportOutline" Margin="0" Height="28" Width="28" />
+						<TextBlock  Text="数据导出" />
+					</WrapPanel>
+				</Button>
+			</Grid>
 		</Grid>
-    </Grid>
+		<Grid Grid.Row="1" HorizontalAlignment="Left" Height="Auto" Margin="5" VerticalAlignment="Top" Width="Auto" >
+				<DataGrid Name="DtgData" ScrollViewer.CanContentScroll="False">
+
+				</DataGrid>
+
+			</Grid>
+		</Grid>
 </UserControl>

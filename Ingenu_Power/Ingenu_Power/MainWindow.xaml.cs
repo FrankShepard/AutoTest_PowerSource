@@ -278,32 +278,11 @@ namespace Ingenu_Power
                     GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Hidden;
                 }
             }
-            UserControls.UcLogin ucLogin = new UserControls.UcLogin {
-				Name = "NewLogin",
+            UserControls.UcDataQuery ucDataQuery = new UserControls.UcDataQuery {
+				Name = "NewDataQuery",
 				Margin = new Thickness( 0, 0, 0, 0 )
 			};
-			GrdMain.Children.Add( ucLogin );
-		}
-
-		/// <summary>
-		/// 菜单选择待打印数据预览
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void BtnMenu_DataView_Click(object sender, RoutedEventArgs e)
-		{
-            for (int index = 0; index < GrdMain.Children.Count; index++) {
-                if (index != index_of_measure_in_grid) {
-                    GrdMain.Children.RemoveAt( index );
-                } else {
-                    GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Hidden;
-                }
-            }
-            UserControls.UcLogin ucLogin = new UserControls.UcLogin {
-				Name = "NewLogin",
-				Margin = new Thickness( 0, 0, 0, 0 )
-			};
-			GrdMain.Children.Add( ucLogin );
+			GrdMain.Children.Add( ucDataQuery );
 		}
 
 		#endregion

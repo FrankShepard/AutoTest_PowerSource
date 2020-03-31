@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -79,7 +80,7 @@ namespace Ingenu_Power.UserControls
 				ISP_Enable = ( bool )chkISP.IsChecked,
 				Calibration_Enable = ( bool )chkCalibrate.IsChecked,
 				WholeFunction_Enable = ( bool )chkWholeFunctionTest.IsChecked,
-				Magnification = Convert.ToInt32(SldMagnification.Value),
+				Magnification = Convert.ToInt32( BasicRatingBar.Value),
 			};
 
 			//在新线程中执行文件下载、ISP烧录过程
@@ -310,8 +311,13 @@ namespace Ingenu_Power.UserControls
 			error_information = string.Empty;
 			//反射进行动态调用
 			try {
-				//Assembly assembly = Assembly.LoadFrom( @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll" );
-				Assembly assembly = Assembly.LoadFrom ( @"E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll" );
+				error_information = string.Empty;
+				string bin_filePath = Directory.GetCurrentDirectory() + "\\Download";
+				if (!Directory.Exists( bin_filePath )) {//如果不存在就创建文件夹
+					Directory.CreateDirectory( bin_filePath );
+				}
+				bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
+				Assembly assembly = Assembly.LoadFrom( bin_filePath );
 				Type [ ] tys = assembly.GetTypes();
 				bool found_file = false;
 				foreach (Type id_verion in tys) {

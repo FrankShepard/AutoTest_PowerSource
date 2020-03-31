@@ -147,6 +147,7 @@
       <DependentUpon>ResultMessageDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Domain\StaticInfor.cs" />
+    <Compile Include="UserControls\PickersViewModel.cs" />
     <Compile Include="UserControls\ucDatabaseLogin.xaml.cs">
       <DependentUpon>ucDatabaseLogin.xaml</DependentUpon>
     </Compile>

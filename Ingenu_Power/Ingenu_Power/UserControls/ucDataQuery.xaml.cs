@@ -29,7 +29,23 @@ namespace Ingenu_Power.UserControls
             InitializeComponent();			
 		}
 
-		
+		public void CalendarDialogOpenedEventHandler(object sender, DialogOpenedEventArgs eventArgs)
+		{
+			//Calendar_Start.SelectedDate = (( PickersViewModel )DataContext).Date;
+			Calendar_Start.SelectedDate = DateTime.Now;
+		}
+
+		public void CalendarDialogClosingEventHandler(object sender, DialogClosingEventArgs eventArgs)
+		{
+			if (!Equals( eventArgs.Parameter, "1" )) return;
+
+			if (!Calendar_Start.SelectedDate.HasValue) {
+				eventArgs.Cancel();
+				return;
+			}
+
+			(( PickersViewModel )DataContext).Date = Calendar_Start.SelectedDate.Value;
+		}
 
 	}
 }

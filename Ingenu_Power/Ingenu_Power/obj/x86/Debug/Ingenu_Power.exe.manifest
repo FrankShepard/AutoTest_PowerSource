@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="774672">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="781872">
       <assemblyIdentity name="Ingenu_Power" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>HDLl5DVLhjH9/1eQbOqv2KJ2xvEMINeUWPcLWbSot/c=</dsig:DigestValue>
+        <dsig:DigestValue>54z6p2l6rzfkOcBbh1rykx375UN7QsKhvgq9LdZFLic=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
