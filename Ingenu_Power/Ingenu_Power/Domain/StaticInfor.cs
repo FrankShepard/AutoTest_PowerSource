@@ -39,6 +39,10 @@ namespace Ingenu_Power.Domain
 		public struct MeasureCondition
 		{
 			/// <summary>
+			/// 产品ID
+			/// </summary>
+			public string Product_ID;
+			/// <summary>
 			/// 待测产品的硬件ID
 			/// </summary>
 			public int ID_Hardware;
@@ -88,6 +92,18 @@ namespace Ingenu_Power.Domain
 		public struct MeasuredValue
 		{
 			/// <summary>
+			/// 产品ID - 内部ID编号
+			/// </summary>
+			public string ProudctID;
+			/// <summary>
+			/// 客户ID - 可能不存在
+			/// </summary>
+			public string CustmerID;
+			/// <summary>
+			/// 输出通道数量
+			/// </summary>
+			public int OutputCount;
+			/// <summary>
 			/// 备电单投功能
 			/// </summary>
 			public bool Check_SingleStartupAbility_Sp;
@@ -103,6 +119,14 @@ namespace Ingenu_Power.Domain
 			/// 备电切断点，用于全项测试
 			/// </summary>
 			public decimal Voltage_SpCutoff;
+			/// <summary>
+			/// 备电欠压点合格检查
+			/// </summary>
+			public bool Check_SpUnderVoltage;
+			/// <summary>
+			/// 备电欠压点，用于最终显示时使用
+			/// </summary>
+			public decimal Voltage_SpUnder;
 			/// <summary>
 			/// 主电单投功能
 			/// </summary>

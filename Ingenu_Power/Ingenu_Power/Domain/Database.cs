@@ -150,19 +150,257 @@ namespace Ingenu_Power.Domain
             return dtTarget;
         }
 
-        #endregion
+		#endregion
 
-        #endregion
+		#region -- 产品测试数据的获取与更新
 
-        #region -- 在数据库中具体执行查询命令、插入/更新命令的实际代码
+		/// <summary>
+		/// 获取指定产品ID（包含客户ID和工厂内部ID）的测试数据
+		/// </summary>
+		/// <param name="product_id">产品ID</param>
+		/// <param name="error_information"> 可能存在的错误信息</param>
+		/// <param name="use_factory_id">是否使用工厂内部ID</param>
+		/// <returns>单片机程序相关信息</returns>
+		public DataTable V_MeasuredValue_Get(string product_id ,out string error_information,bool use_factory_id = true)
+		{
+			error_information = string.Empty;
+//			objConnection = new SqlConnection( "Data Source=192.168.1.99; Initial Catalog=盈帜产品程序;Persist Security Info=True;User ID=yanfa;Password=admin123456" );
+			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456");
+			DataTable dtTarget = new DataTable();
+			if (use_factory_id) {
+				dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE [产品ID] = '" + product_id.ToString() + "' ORDER BY [测试日期] DESC", out error_information );
+			} else {
+				dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE [客户ID] = '" + product_id.ToString() + "' ORDER BY [测试日期] DESC", out error_information );
+			}
+			return dtTarget;
+		}
 
-        /// <summary>
-        /// 在数据库中查询相信息
-        /// </summary>
-        /// <param name="infor">查询的SQL语言</param>\
-        /// <param name="error_information" >可能存在的相关错误信息</param>
-        /// <returns>在数据库中查询数据是否存在的情况</returns>
-        private DataTable V_QueryInfor(string infor, out string error_information)
+		/// <summary>
+		/// 判断是否插入空值
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns></returns>
+		static public object SqlNull(object obj)
+		{
+			if (obj == null)
+				return DBNull.Value;
+
+			return obj;
+		}
+
+		/// <summary>
+		/// 测试结果在数据库中的保存项
+		/// </summary>
+		static string[] SQL_MeasureItems = new string[]{ "产品ID", "硬件IDVerion", "客户ID", "备电单投功能检查", " 备电切断点", " 备电切断点检查", " 备电欠压点", " 备电欠压点检查", " 主电单投功能检查", " 产品识别备电丢失检查", " ACDC效率", " 输出空载电压1", " 输出满载电压1", " 输出纹波1", " 负载效应1", " 源效应1", " 输出OCP保护点1", " 输出OCP保护检查1", " 输出空载电压2", " 输出满载电压2", " 输出纹波2", " 负载效应2", " 源效应2", " 输出OCP保护点2", " 输出OCP保护检查2", " 输出空载电压3", " 输出满载电压3", " 输出纹波3", " 负载效应3", " 源效应3", " 输出OCP保护点3", " 输出OCP保护检查3", " 浮充电压", " 均充电流", " 主备电切换跌落检查", " 备主电切换跌落检查", " 主电欠压点", " 主电欠压点检查", " 主电欠压恢复点", " 主电欠压恢复点检查", " 主电过压点", " 主电过压点检查", " 主电过压恢复点", " 主电过压恢复点检查", " 测试日期" };
+
+		/// <summary>
+		/// 测试数据的整体重新插入；若数据库中已经存储了数据，则需要先将数据库中的对应数据清除，再重新上传数据
+		/// </summary>
+		/// <param name="measuredValue">测试数据结构体的实例化对象</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void V_MeasuredValue_Insert(StaticInfor.MeasuredValue measuredValue, out string error_information)
+		{
+			error_information = string.Empty;
+			try {
+				using (SqlCommand objCommand = objConnection.CreateCommand()) {
+					objCommand.Connection = objConnection;
+					objCommand.CommandType = CommandType.Text;
+					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[电源产品测试数据] (";
+					for(int index = 0;index < SQL_MeasureItems.Length; index++) {
+						objCommand.CommandText += SQL_MeasureItems[ index ];
+						if(index == SQL_MeasureItems.Length - 1) {
+							objCommand.CommandText += ") VALUES (";
+						} else {
+							objCommand.CommandText += ",";
+						}
+					}
+					for (int index = 0; index < SQL_MeasureItems.Length; index++) {
+						objCommand.CommandText += ("@" + SQL_MeasureItems[ index ]);
+						if (index == SQL_MeasureItems.Length - 1) {
+							objCommand.CommandText += ")";
+						} else {
+							objCommand.CommandText += ",";
+						}
+					}
+				
+					//插入数据的填充
+					objCommand.Parameters.Clear();
+					objCommand.Parameters.AddWithValue( "@产品ID", measuredValue.ProudctID );
+					objCommand.Parameters.AddWithValue( "@硬件IDVerion", measuredValue.ProudctID.Substring( 5, 5 ) );					
+					if (measuredValue.CustmerID == string.Empty) {
+						////为空的时需要先加一个SqlDbType.NChar 参数，再给它DBNull.Value才行
+						//objCommand.Parameters.Add( "@客户ID", SqlDbType.NChar );
+						//objCommand.Parameters[ "@客户ID" ].Value = DBNull.Value;
+						objCommand.Parameters.AddWithValue( "@客户ID", DBNull.Value );
+					} else {
+						objCommand.Parameters.AddWithValue( "@客户ID", measuredValue.CustmerID );
+					}
+
+					objCommand.Parameters.AddWithValue( "@备电单投功能检查", measuredValue.Check_SingleStartupAbility_Sp );
+					if (measuredValue.Voltage_SpCutoff == 0m) {
+						objCommand.Parameters.AddWithValue( "@备电切断点", DBNull.Value );
+					} else {
+						objCommand.Parameters.AddWithValue( "@备电切断点", measuredValue.Voltage_SpCutoff );
+					}
+					objCommand.Parameters.AddWithValue( "@备电切断点检查", measuredValue.Check_SpCutoff );
+					if (measuredValue.Voltage_SpUnder == 0m) {
+						objCommand.Parameters.AddWithValue( "@备电欠压点", DBNull.Value );
+					} else {
+						objCommand.Parameters.AddWithValue( "@备电欠压点", measuredValue.Voltage_SpUnder );
+					}
+					objCommand.Parameters.AddWithValue( "@备电欠压点检查", measuredValue.Check_SpUnderVoltage );
+					objCommand.Parameters.AddWithValue( "@主电单投功能检查", measuredValue.Check_SingleStartupAbility_Mp );
+					objCommand.Parameters.AddWithValue( "@产品识别备电丢失检查", measuredValue.Check_DistinguishSpOpen );
+					objCommand.Parameters.AddWithValue( "@ACDC效率", measuredValue.Efficiency );
+
+					objCommand.Parameters.AddWithValue( "@输出空载电压1", measuredValue.Voltage_WithoutLoad[ 0 ] );
+					objCommand.Parameters.AddWithValue( "@输出满载电压1", measuredValue.Voltage_WithLoad[ 0 ] );
+					objCommand.Parameters.AddWithValue( "@输出纹波1", measuredValue.Voltage_Rapple[ 0 ] );
+					objCommand.Parameters.AddWithValue( "@负载效应1", measuredValue.Effect_Load[ 0 ] );
+					if (measuredValue.Effect_Source[ 0 ] == 0m) {
+						objCommand.Parameters.AddWithValue( "@源效应1", DBNull.Value );
+					} else {
+						objCommand.Parameters.AddWithValue( "@源效应1", measuredValue.Effect_Source[ 0 ] );
+					}
+					if (measuredValue.Value_OXP[ 0 ] == 0m) {
+						objCommand.Parameters.AddWithValue( "@输出OCP保护点1", DBNull.Value );
+					} else {
+						objCommand.Parameters.AddWithValue( "@输出OCP保护点1", measuredValue.Value_OXP[ 0 ] );
+					}
+					objCommand.Parameters.AddWithValue( "@输出OCP保护检查1", measuredValue.Check_OXP[ 0 ] );
+
+					if (measuredValue.OutputCount >= 2) {
+						objCommand.Parameters.AddWithValue( "@输出空载电压2", measuredValue.Voltage_WithoutLoad[ 1 ] );
+						objCommand.Parameters.AddWithValue( "@输出满载电压2", measuredValue.Voltage_WithLoad[ 1 ] );
+						objCommand.Parameters.AddWithValue( "@输出纹波2", measuredValue.Voltage_Rapple[ 1 ] );
+						objCommand.Parameters.AddWithValue( "@负载效应2", measuredValue.Effect_Load[ 1 ] );
+						if (measuredValue.Effect_Source[ 1 ] == 0m) {
+							objCommand.Parameters.AddWithValue( "@源效应2", DBNull.Value );
+						} else {
+							objCommand.Parameters.AddWithValue( "@源效应2", measuredValue.Effect_Source[ 1 ] );
+						}
+						if (measuredValue.Value_OXP[ 1 ] == 0m) {
+							objCommand.Parameters.AddWithValue( "@输出OCP保护点2", DBNull.Value );
+						} else {
+							objCommand.Parameters.AddWithValue( "@输出OCP保护点2", measuredValue.Value_OXP[ 1 ] );
+						}
+						objCommand.Parameters.AddWithValue( "@输出OCP保护检查2", measuredValue.Check_OXP[ 1 ] );
+					} else {
+						objCommand.Parameters.AddWithValue( "@输出空载电压2", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@输出满载电压2", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@输出纹波2", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@负载效应2", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@源效应2", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@输出OCP保护点2", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@输出OCP保护检查2", DBNull.Value );
+					}
+
+					if (measuredValue.OutputCount >= 3) {
+						objCommand.Parameters.AddWithValue( "@输出空载电压3", measuredValue.Voltage_WithoutLoad[ 2 ] );
+						objCommand.Parameters.AddWithValue( "@输出满载电压3", measuredValue.Voltage_WithLoad[ 2 ] );
+						objCommand.Parameters.AddWithValue( "@输出纹波3", measuredValue.Voltage_Rapple[ 2 ] );
+						objCommand.Parameters.AddWithValue( "@负载效应3", measuredValue.Effect_Load[ 2 ] );
+						if (measuredValue.Effect_Source[ 2 ] == 0m) {
+							objCommand.Parameters.AddWithValue( "@源效应3", DBNull.Value );
+						} else {
+							objCommand.Parameters.AddWithValue( "@源效应3", measuredValue.Effect_Source[ 2 ] );
+						}
+						if (measuredValue.Value_OXP[ 2 ] == 0m) {
+							objCommand.Parameters.AddWithValue( "@输出OCP保护点3", DBNull.Value );
+						} else {
+							objCommand.Parameters.AddWithValue( "@输出OCP保护点3", measuredValue.Value_OXP[ 2 ] );
+						}
+						objCommand.Parameters.AddWithValue( "@输出OCP保护检查3", measuredValue.Check_OXP[ 2 ] );
+					} else {
+						objCommand.Parameters.AddWithValue( "@输出空载电压3", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@输出满载电压3", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@输出纹波3", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@负载效应3", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@源效应3", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@输出OCP保护点3", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@输出OCP保护检查3", DBNull.Value );
+					}
+					objCommand.Parameters.AddWithValue( "@浮充电压", measuredValue.Voltage_FloatingCharge );
+					objCommand.Parameters.AddWithValue( "@均充电流", measuredValue.Current_EqualizedCharge );
+					objCommand.Parameters.AddWithValue( "@主备电切换跌落检查", measuredValue.Check_SourceChange_MpLost );
+					objCommand.Parameters.AddWithValue( "@备主电切换跌落检查", measuredValue.Check_SourceChange_MpRestart );
+					if (measuredValue.Voltage_SourceChange_MpUnderVoltage == 0m) {
+						objCommand.Parameters.AddWithValue( "@主电欠压点", DBNull.Value );
+					} else {
+						objCommand.Parameters.AddWithValue( "@主电欠压点", measuredValue.Voltage_SourceChange_MpUnderVoltage );
+					}
+					objCommand.Parameters.AddWithValue( "@主电欠压点检查", measuredValue.Check_SourceChange_MpUnderVoltage );
+					if (measuredValue.Voltage_SourceChange_MpUnderVoltageRecovery == 0m) {
+						objCommand.Parameters.AddWithValue( "@主电欠压恢复点", DBNull.Value );
+					} else {
+						objCommand.Parameters.AddWithValue( "@主电欠压恢复点", measuredValue.Voltage_SourceChange_MpUnderVoltageRecovery );
+					}
+					objCommand.Parameters.AddWithValue( "@主电欠压恢复点检查", measuredValue.Check_SourceChange_MpUnderVoltageRecovery );
+					if (measuredValue.Voltage_SourceChange_MpOverVoltage == 0m) {
+						objCommand.Parameters.AddWithValue( "@主电过压点", DBNull.Value );
+					} else {
+						objCommand.Parameters.AddWithValue( "@主电过压点", measuredValue.Voltage_SourceChange_MpOverVoltage );
+					}
+					objCommand.Parameters.AddWithValue( "@主电过压点检查", measuredValue.Check_SourceChange_MpOverVoltage );
+					if (measuredValue.Voltage_SourceChange_MpOverVoltageRecovery == 0m) {
+						objCommand.Parameters.AddWithValue( "@主电过压恢复点", DBNull.Value );
+					} else {
+						objCommand.Parameters.AddWithValue( "@主电过压恢复点", measuredValue.Voltage_SourceChange_MpOverVoltageRecovery );
+					}
+					objCommand.Parameters.AddWithValue( "@主电过压恢复点检查", measuredValue.Check_SourceChange_MpOverVoltageRecovery );
+					objCommand.Parameters.AddWithValue( "@测试日期", DateTime.Now );
+
+					V_UpdateInfor( objCommand, out error_information );
+				}
+			} catch {
+				error_information = "Database.V_MeasuredValue_Insert 数据库操作异常  \r\n";
+			}
+		}
+
+		/// <summary>
+		/// 更新数据表中的数据并将其更新到数据库中
+		/// </summary>
+		/// <param name="dataTable">dataGrid控件对应的数据集</param>
+		/// <param name="row_index">dataGrid控件中的修改行索引</param>
+		/// <param name="column_index">dataGrid控件中的修改列索引</param>
+		/// <param name="new_value">对应行列索引上的新地址</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		/// <returns>数据更新之前的表格中数据的备份</returns>
+		public object V_MeasuredValue_Update(DataTable dataTable, int row_index, int column_index, object new_value,out string error_information)
+		{
+			error_information = string.Empty;
+			object value_backup = dataTable.Rows[ row_index ][ column_index ]; //修改数据之前的备份
+
+			try {
+				using (SqlCommand objCommand = objConnection.CreateCommand()) {
+					objCommand.Connection = objConnection;
+					objCommand.CommandType = CommandType.Text;
+					objCommand.CommandText = "UPDATE [盈帜电源].[dbo].[电源产品测试数据] SET "+ SQL_MeasureItems[column_index] + " = @"+SQL_MeasureItems[column_index] + " WHERE "+ SQL_MeasureItems[0] +" = '" + dataTable.Rows[row_index][0] + "'";
+					objCommand.Parameters.Clear();
+					objCommand.Parameters.AddWithValue( "@" + SQL_MeasureItems[ column_index ], new_value );
+
+					V_UpdateInfor( objCommand, out error_information );
+				}
+			} catch {
+				error_information = "Database.V_MeasuredValue_Update 数据库操作异常  \r\n";
+			}
+
+			return value_backup;
+		}
+
+		#endregion
+
+		#endregion
+
+		#region -- 在数据库中具体执行查询命令、插入/更新命令的实际代码
+
+		/// <summary>
+		/// 在数据库中查询相信息
+		/// </summary>
+		/// <param name="infor">查询的SQL语言</param>\
+		/// <param name="error_information" >可能存在的相关错误信息</param>
+		/// <returns>在数据库中查询数据是否存在的情况</returns>
+		private DataTable V_QueryInfor(string infor, out string error_information)
 		{
 			DataTable dtTarget = new DataTable();
 			error_information = string.Empty;
@@ -226,9 +464,7 @@ namespace Ingenu_Power.Domain
 				objConnection.Close();             //关闭数据库连接
 			}
 		}
-
-
-
+		
 		#endregion
 
 		

@@ -33,7 +33,20 @@ namespace Ingenu_Power.UserControls
 			//绑定路由事件
 			TgbChoose.Checked += new RoutedEventHandler ( TgbChoose_Checked );
 			TgbChoose.Unchecked += new RoutedEventHandler ( TgbChoose_Unchecked );
+
+			if(StaticInfor.UserRightLevel >= 3) { //最高权限才可以修改DataGrid中的数据
+				DtgData.IsReadOnly = false;
+			}
 		}
+
+		#region -- 全局变量
+
+		/// <summary>
+		/// 数据查询操作中使用到的数据表
+		/// </summary>
+		private DataTable objDataTable = new DataTable();
+
+		#endregion
 
 		#region -- 选定日期的操作
 
@@ -102,12 +115,22 @@ namespace Ingenu_Power.UserControls
 
 		#region -- 路由事件
 
+		/// <summary>
+		/// 查询方式的选择，多支产品数据选择
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void TgbChoose_Checked( object sender, RoutedEventArgs e )
 		{
 			GrdSingleProductQuery.Visibility = Visibility.Hidden;
 			GrdProductQuery.Visibility = Visibility.Visible;			
 		}
 
+		/// <summary>
+		/// 查询方式的选择，单支产品数据选择
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void TgbChoose_Unchecked( object sender, RoutedEventArgs e )
 		{
 			GrdProductQuery.Visibility = Visibility.Hidden;
@@ -200,7 +223,43 @@ namespace Ingenu_Power.UserControls
 			//	MessageBox.Show ( "请选择待筛选的条件", "操作提示" );
 			//}
 		}
+				
+		/// <summary>
+		/// 将DataGrid中的数据导出到Excel中
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnExportData_Click(object sender, RoutedEventArgs e)
+		{
+			
+		}
+		
+		/// <summary>
+		/// DataGrid中单元格编辑之后触发本事件
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void DtgData_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+		{
+			string error_information = string.Empty;
+			using (Database database = new Database()) {
+				database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
+				if (error_information != string.Empty) { StaticInfor.Error_Message = error_information; return; }
+
+				DataGrid dataGrid = sender as DataGrid;
+				var _cells = dataGrid.SelectedCells;//获取选中单元格的列表
+				if (_cells.Any()) {
+					rowIndex = dataGrid.Items.IndexOf( _cells.First().Item );
+					columnIndex = dataGrid.First().Column.DisplayIndex;
+					return true;
+				}
+
+				database.V_MeasuredValue_Update( objDataTable, e. , e.Column, dataGrid.CurrentCell.Item, out error_information );
+
+			}
+		}
 
 		#endregion
+
 	}
 }

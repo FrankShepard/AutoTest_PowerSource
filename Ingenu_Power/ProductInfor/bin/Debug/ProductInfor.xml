@@ -134,6 +134,21 @@
             备电切断点的合格范围
             </summary>
         </member>
+        <member name="F:ProductInfor.Base.Infor_Sp.NeedTestUnderVoltage">
+            <summary>
+            是否需要测试备电欠压点
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Sp.Target_UnderVoltageLevel">
+            <summary>
+            标称的备电欠压点
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Sp.Target_CutoffVoltageLevel">
+            <summary>
+            标称的备电切断点
+            </summary>
+        </member>
         <member name="F:ProductInfor.Base.Infor_Sp.Delay_WaitForCutoff">
             <summary>
             备电切断的等待时间，单位ms
@@ -354,16 +369,6 @@
             整机ID+版本 - 具有唯一性
             </summary>
         </member>
-        <member name="F:ProductInfor.Base.Model_Factory">
-            <summary>
-            厂内型号
-            </summary>
-        </member>
-        <member name="F:ProductInfor.Base.Model_Customer">
-            <summary>
-            客户型号
-            </summary>
-        </member>
         <member name="F:ProductInfor.Base.CommunicateBaudrate">
             <summary>
             串口通讯的波特率
@@ -410,10 +415,12 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ProductInfor.Base.Initalize">
+        <member name="M:ProductInfor.Base.Initalize(System.String)">
             <summary>
-            产品相关信息的初始化
+            产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
             </summary>
+            <param name="product_id">产品的厂内ID</param>
+            <returns>用户ID</returns>
         </member>
         <member name="M:ProductInfor.Base.Calibrate(System.String,System.String)">
             <summary>
@@ -859,10 +866,12 @@
             控制命令出现通讯错误之后重新操作的次数
             </summary>
         </member>
-        <member name="M:ProductInfor._60010.Initalize">
+        <member name="M:ProductInfor._60010.Initalize(System.String)">
             <summary>
-            相关信息的初始化
+            产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
             </summary>
+            <param name="product_id">产品的厂内ID</param>
+            <returns>用户ID</returns>
         </member>
         <member name="M:ProductInfor._60010.Communicate_User(System.IO.Ports.SerialPort,System.String@)">
             <summary>

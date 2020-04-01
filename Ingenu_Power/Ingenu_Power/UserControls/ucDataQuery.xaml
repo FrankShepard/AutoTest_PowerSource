@@ -142,23 +142,10 @@
 				</Grid>
 			</materialDesign:Card>
 			<Grid Grid.Column="1">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="*"/>
-					<RowDefinition Height="*"/>
-				</Grid.RowDefinitions>
-				<Button Grid.Row="0" IsDefault="True" x:Name="BtnUpdataNewValue" FontSize="24" 
+				<Button IsDefault="True" x:Name="BtnExportData" FontSize="24" 
 						Style="{StaticResource MaterialDesignRaisedDarkButton}" Height="44" Width="160"				
 						materialDesign:ButtonAssist.CornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" 
-						VerticalAlignment="Center" HorizontalAlignment="Center" >
-					<WrapPanel>
-						<materialDesign:PackIcon Kind="Update" Margin="0" Height="30" Width="30" />
-						<TextBlock  Text="数据更新" />
-					</WrapPanel>
-				</Button>
-				<Button Grid.Row="1" IsDefault="True" x:Name="BtnExportData" FontSize="24" 
-						Style="{StaticResource MaterialDesignRaisedDarkButton}" Height="44" Width="160"				
-						materialDesign:ButtonAssist.CornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" 
-						VerticalAlignment="Center" HorizontalAlignment="Center">
+						VerticalAlignment="Center" HorizontalAlignment="Center" Click="BtnExportData_Click">
 					<WrapPanel>
 						<materialDesign:PackIcon Kind="FileExportOutline" Margin="0" Height="30" Width="30" />
 						<TextBlock  Text="数据导出" />
@@ -167,7 +154,7 @@
 			</Grid>
 		</Grid>
 		<Grid Grid.Row="1" HorizontalAlignment="Left" Height="Auto" Margin="5" VerticalAlignment="Top" Width="Auto" >
-			<DataGrid Name="DtgData" ScrollViewer.CanContentScroll="False">
+			<DataGrid Name="DtgData" ScrollViewer.CanContentScroll="False" IsReadOnly="True" SelectedCellsChanged="DtgData_SelectedCellsChanged" >
 
 			</DataGrid>
 

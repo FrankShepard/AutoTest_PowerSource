@@ -50,13 +50,14 @@ namespace ProductInfor
 		static int retry_time = 0;
 
 		/// <summary>
-		/// 相关信息的初始化
+		/// 产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
 		/// </summary>
-		public override void Initalize( )
+		/// <param name="product_id">产品的厂内ID</param>
+		/// <returns>用户ID</returns>
+		public override string Initalize(string product_id)
 		{
+			string custmer_id = string.Empty;
 			IDVerion_Product = 60010;
-			Model_Factory = "IG-M3201F";
-			Model_Customer = "GST5000H";
 			CommunicateBaudrate = 4800;
 
 			exist = new Exist ( )
@@ -86,10 +87,12 @@ namespace ProductInfor
 				MpFrequncy = new decimal [ ] { 47m, 50m, 63m },
 			};
 
-			infor_Sp = new Infor_Sp ( )
-			{
+			infor_Sp = new Infor_Sp() {
 				UsedBatsCount = 2,
-				Qualified_CutoffLevel = new decimal [ ] { 21m, 21.6m },
+				NeedTestUnderVoltage = true,
+				Qualified_CutoffLevel = new decimal[] { 21m, 21.6m },
+				Target_UnderVoltageLevel = 22m,
+				Target_CutoffVoltageLevel = 21.3m,
 				Delay_WaitForCutoff = 1800,
 			};
 
@@ -151,6 +154,7 @@ namespace ProductInfor
 				Measured_OutputVoltageValue = new decimal [ ] { 0m, 0m, 0m },
 				Measured_OutputCurrentValue = new decimal [ ] { 0m, 0m, 0m },
 			};
+			return custmer_id;
 		}
 
 		#region -- 产品的具体通讯方式
@@ -511,10 +515,13 @@ namespace ProductInfor
 		/// <returns>可能存在的故障信息</returns>
 		public override ArrayList Measure_vCutoffVoltageCheck( int delay_magnification, bool whole_function_enable, string port_name )
 		{
-			ArrayList arrayList = new ArrayList ( );//元素0 - 可能存在的错误信息；元素1 - 备电切断点的合格检查 ；元素2 - 具体的备电切断点值
+			//元素0 - 可能存在的错误信息；元素1 - 备电切断点的合格检查 ；元素2 - 具体的备电切断点值；元素3 - 是否需要测试备电欠压点；元素4 - 具体的备电欠压点
+			ArrayList arrayList = new ArrayList ( );
 			string error_information = string.Empty;
 			bool check_okey = false;
 			decimal specific_value = 0m;
+			bool need_test_UnderVoltage = infor_Sp.NeedTestUnderVoltage;
+			decimal undervoltage_value = 0m;
 
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
@@ -608,6 +615,8 @@ namespace ProductInfor
 									if ( generalData_DCPower.ActrulyCurrent < 0.05m ) {
 										check_okey = true;
 										specific_value = target_value;
+										decimal distance = specific_value - infor_Sp.Target_CutoffVoltageLevel; //实际电压与目标电压的设计差值
+										undervoltage_value = infor_Sp.Target_UnderVoltageLevel + distance; //根据实际的计算偏差得到的备电欠压点
 										break;
 									}
 								}
@@ -621,6 +630,8 @@ namespace ProductInfor
 					arrayList.Add ( error_information );
 					arrayList.Add ( check_okey );
 					arrayList.Add ( specific_value );
+					arrayList.Add( need_test_UnderVoltage );
+					arrayList.Add( undervoltage_value );
 				}
 			}
 			return arrayList;

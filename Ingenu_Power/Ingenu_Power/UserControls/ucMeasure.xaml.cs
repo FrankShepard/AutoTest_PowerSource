@@ -75,6 +75,7 @@ namespace Ingenu_Power.UserControls
 				return;
 			}
 			StaticInfor.MeasureCondition measureCondition = new StaticInfor.MeasureCondition {
+				Product_ID = TxtID.Text,
 				ID_Hardware = Convert.ToInt32( TxtID.Text.Substring( 5, 3 ) ),
 				Ver_Hardware = Convert.ToInt32( TxtID.Text.Substring( 8, 2 ) ),
 				ISP_Enable = ( bool )chkISP.IsChecked,
@@ -328,8 +329,8 @@ namespace Ingenu_Power.UserControls
 
 						//对象的初始化
 						MethodInfo mi = id_verion.GetMethod( "Initalize" );
-						object[] parameters;
-						mi.Invoke( obj, null );
+						object[] parameters = new object[]{ measureCondition.Product_ID);
+						measuredValue.CustmerID = mi.Invoke( obj, parameters ).ToString();
 
 						//仪表初始化
 						//MethodInfo mi = id_verion.GetMethod( "Measure_vInstrumentInitalize" );
@@ -385,8 +386,12 @@ namespace Ingenu_Power.UserControls
 									StaticInfor.measureItemShow.Measure_Item = "备电切断点合格检查";
 									if (( bool )arrayList[ 1 ] != false) { //元素1 - 备电切断点的合格检查
 										measuredValue.Check_SpCutoff = true;
-										if (( decimal )arrayList[ 2 ] != 0m) { //元素2 - 具体的备电切断点值
-											measuredValue.Voltage_SpCutoff = ( decimal )arrayList[ 2 ];
+										if (measureCondition.WholeFunction_Enable) {  //具体测试的情况，需要将数据填充
+											measuredValue.Voltage_SpCutoff = ( decimal )arrayList[ 2 ];//元素2 - 具体的备电切断点值
+											if (( bool )arrayList[ 3 ] != false) { //元素3 - 需要进行备电欠压点的检查测试
+												measuredValue.Check_SpUnderVoltage = true;
+												measuredValue.Voltage_SpUnder = ( decimal )arrayList[ 4 ]; //元素4 - 具体的备电欠压点值
+											}
 											StaticInfor.measureItemShow.Measure_Value = "Pass			" + measuredValue.Voltage_SpCutoff.ToString("0.#") + "V"; //具体显示值保留1位小数
 										} else {
 											StaticInfor.measureItemShow.Measure_Value = "Pass";
@@ -418,6 +423,7 @@ namespace Ingenu_Power.UserControls
 									StaticInfor.measureItemShow.Measure_Item = "输出满载电压测试";
 									StaticInfor.measureItemShow.Measure_Value = string.Empty;
 									if (( int )arrayList[ 1 ] > 0) { //元素1 - 输出通道数量
+										measuredValue.OutputCount = ( int )arrayList[ 1 ];
 										for (int index = 0; index < ( int )arrayList[ 1 ]; index++) {
 											if (( bool )arrayList[ 2 + index ] != false) { //元素2+index 为输出满载电压的合格与否判断
 												measuredValue.Voltage_WithLoad[ index ] = ( decimal )arrayList[ 2 + ( int )arrayList[ 1 ] + index ]; //元素 2+ index + arrayList[1] 为满载输出电压具体值
@@ -790,6 +796,9 @@ namespace Ingenu_Power.UserControls
 		/// </summary>
 		private void Measure_vParmetersReset()
 		{
+			measuredValue.ProudctID = string.Empty;
+			measuredValue.CustmerID = string.Empty;
+			measuredValue.OutputCount = 1;
 			measuredValue.Check_DistinguishSpOpen = false;
 			measuredValue.Check_MandatoryStartupAbility = false;
 			measuredValue.Check_OutputShort = new bool[] { false, false, false };
@@ -803,6 +812,7 @@ namespace Ingenu_Power.UserControls
 			measuredValue.Check_SourceChange_MpUnderVoltage = false;
 			measuredValue.Check_SourceChange_MpUnderVoltageRecovery = false;
 			measuredValue.Check_SpCutoff = false;
+			measuredValue.Check_SpUnderVoltage = false;
 			measuredValue.Current_EqualizedCharge = 0m;
 			measuredValue.Effect_Load = new decimal[] { 0m, 0m, 0m };
 			measuredValue.Effect_Source = new decimal[] { 0m, 0m, 0m };
@@ -814,7 +824,8 @@ namespace Ingenu_Power.UserControls
 			measuredValue.Voltage_SourceChange_MpOverVoltageRecovery = 0m;
 			measuredValue.Voltage_SourceChange_MpUnderVoltage = 0m;
 			measuredValue.Voltage_SourceChange_MpUnderVoltageRecovery = 0m;
-			measuredValue.Voltage_SpCutoff = 0m;
+			measuredValue.Voltage_SpCutoff = 0m;			
+			measuredValue.Voltage_SpUnder = 0m;
 			measuredValue.Voltage_WithLoad = new decimal[] { 0m, 0m, 0m };
 			measuredValue.Voltage_WithoutLoad = new decimal[] { 0m, 0m, 0m };
 		}
