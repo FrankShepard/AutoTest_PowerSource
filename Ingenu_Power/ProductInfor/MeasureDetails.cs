@@ -106,6 +106,44 @@ namespace ProductInfor
 			}
 		}
 
+		/// <summary>
+		/// 电源输出关闭
+		/// </summary>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vInstrumentPowerOff(SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			string error_information_temp = string.Empty;
+
+			try {
+				using (AN97002H acpower = new AN97002H()) {
+					using (Itech itech = new Itech()) {
+						using (MCU_Control mcu = new MCU_Control()) {
+							using (SiglentOSC siglentOSC = new SiglentOSC()) {
+								//关交流电源
+								int retry_index = 0;
+								do {
+									error_information = acpower.ACPower_vControlStop( Address_ACPower, serialPort );
+								} while ((++retry_index < 3) && (error_information != string.Empty));
+								//关直流电源
+								retry_index = 0;
+								do {
+									mcu.McuControl_vBatsOutput( false, false, MCU_Control.FixedLevel.FixedLevel_24V, serialPort, out error_information );
+									error_information = itech.Itech_vInOutOnOffSet( Address_DCPower, Itech.OnOffStatus.Off, serialPort );
+								} while ((++retry_index < 3) && (error_information != string.Empty));
+								/* 释放示波器的连接 */
+								siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
+								siglentOSC.SiglentOSC_vCloseSession( SessionRM );
+							}
+						}
+					}
+				}
+			} catch (Exception ex) {
+				error_information += ex.ToString();
+			}
+		}
+
 		#region -- 其他函数
 
 		#region -- 输出通道的带载自动分配

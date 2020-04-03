@@ -29,47 +29,36 @@
 		</LinearGradientBrush>
 	</UserControl.Resources>
 
-	<Grid>
-		<Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
-			<Grid HorizontalAlignment="Left" Margin="0">
-				<Expander ExpandDirection="Left" >
+	<Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
+		 <materialDesign:Card Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360" Height="266" Padding="10">
+			<StackPanel Margin="0 0 0 0">
+				<Expander ExpandDirection="Up" >
 					<Expander.Header>
-						<TextBlock Text="待测产品通讯说明" >
-							<TextBlock.LayoutTransform>
-								<RotateTransform Angle="90" />
-							</TextBlock.LayoutTransform>
-						</TextBlock>
+						<TextBlock Text="待测产品通讯说明" FontSize="16"></TextBlock>
 					</Expander.Header>
 					<Grid>
-						<Grid.RowDefinitions>
-							<RowDefinition Height="*"></RowDefinition>
-							<RowDefinition Height="3*"></RowDefinition>
-							<RowDefinition Height="3*"></RowDefinition>
-						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*"></ColumnDefinition>
+								<ColumnDefinition Width="*"></ColumnDefinition>
+							</Grid.ColumnDefinitions>
 
-						<Grid Grid.Row="0" Margin="10">
-							<WrapPanel Margin="10" VerticalAlignment="Center">
-								<materialDesign:PackIcon Kind="TooltipImage" />
-								<TextBlock FontStyle="Italic" Text="通讯模块 "></TextBlock>
-							</WrapPanel>
-						</Grid>
+							<Grid Grid.Column="1" Margin="0">
+								<Image x:Name="ImgPrompt"/>
+							</Grid>
 
-						<Grid Grid.Row="1" Margin="5">
-							<Image x:Name="ImgPrompt">
-							</Image>
-						</Grid>
-
-						<Grid Grid.Row="2" Margin="10">
-							<TextBlock Name="TxtPrompt" Margin="10,0,10,10" FontSize="11" Opacity=".68" Text=""
+							<Grid Grid.Column="0" Margin="0">
+								<StackPanel>
+									<WrapPanel Margin="0" VerticalAlignment="Center">
+										<materialDesign:PackIcon Kind="TooltipImage" />
+										<TextBlock FontStyle="Italic" Text="通讯模块 "></TextBlock>
+									</WrapPanel>
+									<TextBlock Name="TxtPrompt" Margin="0" FontSize="11" Opacity=".68" Text=""
                                TextWrapping="Wrap"/>
+								</StackPanel>
+							</Grid>
 						</Grid>
-						
-					</Grid>					
-				</Expander>
-			</Grid>
-			<materialDesign:Card Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360" Height="266" Padding="10"  >
-				<StackPanel Margin="0 30 0 0">
-					<Grid Margin="5,10,10,10">
+					</Expander>
+					<Grid Margin="5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="65"/>
 							<ColumnDefinition Width="*"/>
@@ -78,8 +67,7 @@
 						<ComboBox   Grid.Column="2" Margin="20,0" materialDesign:HintAssist.Hint="ISP使用的串口" Name="CobSp" PreviewMouseDown="ComboBox_PreviewMouseDown" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
 						</ComboBox>
 					</Grid>
-
-					<Grid Margin="10,0">
+					<Grid Margin="5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="60"/>
 							<ColumnDefinition Width="*"/>
@@ -87,7 +75,7 @@
 						<materialDesign:PackIcon Kind="BarcodeScan" Width="50" Height="45" Grid.ColumnSpan="1" Margin="5,0,0,0"/>
 						<TextBox Margin="20,0" materialDesign:HintAssist.Hint="产品ID" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="15" Name="TxtID" />
 					</Grid>
-					<WrapPanel Margin="10">
+					<WrapPanel Margin="5">
 						<ProgressBar Margin="20" Height="8" Width="230" Name="PgbStep"/>
 						<materialDesign:PackIcon Kind="Emoticon" Height="30" Width="30" VerticalAlignment="Center" Name="pckHappy" Visibility="Hidden"/>
 					</WrapPanel>
@@ -107,6 +95,5 @@
 
 				</Button>
 			</Grid>
-		</Grid>
 	</Grid>
 </UserControl>

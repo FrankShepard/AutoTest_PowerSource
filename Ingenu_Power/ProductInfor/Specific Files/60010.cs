@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Data;
 using System.IO.Ports;
 using System.Threading;
 using Instrument_Control;
@@ -53,108 +54,44 @@ namespace ProductInfor
 		/// 产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
 		/// </summary>
 		/// <param name="product_id">产品的厂内ID</param>
-		/// <returns>用户ID</returns>
-		public override string Initalize(string product_id)
+		/// <param name="sql_name">sql数据库名</param>
+		/// <param name="sql_username">sql用户名</param>
+		/// <param name="sql_password">sql登录密码</param>
+		/// <returns>可能存在的错误信息和用户ID</returns>
+		public override ArrayList Initalize(string product_id, string sql_name, string sql_username, string sql_password)
 		{
+			ArrayList arrayList = new ArrayList();//元素0 - 可能存在的错误信息；元素1 - 客户ID
+			string error_information = string.Empty;
 			string custmer_id = string.Empty;
-			IDVerion_Product = 60010;
-			CommunicateBaudrate = 4800;
+			for (int temp_index = 0; temp_index < 2; temp_index++) {
+				if (temp_index == 0) {
+					//从数据库中更新测试时的相关信息，包含了测试的细节和产品的合格范围
+					using (Database database = new Database()) {
+						database.V_Initialize( sql_name, sql_username, sql_password, out error_information );
+						if (error_information != string.Empty) { continue; }
+						DataTable dataTable = database.V_QualifiedValue_Get( product_id, out error_information );
+						if (error_information != string.Empty) { continue; }
+						//以下进行校准数据的填充
+						if ((dataTable.Rows.Count == 0) || (dataTable.Rows.Count > 1)) { error_information = "数据库中保存的合格参数范围信息无法匹配"; continue; }
+						InitalizeParemeters( dataTable,out error_information );
+						if (error_information != string.Empty) { continue; }
 
-			exist = new Exist ( )
-			{
-				MandatoryMode = false,
-				PowerSourceChange = true,
-				Charge = true,
-				CommunicationProtocol = true,
-				LevelSignal = false,
-				Calibration = true,
-			};
-
-			infor_Calibration = new Infor_Calibration ( )
-			{
-				MpUnderVoltage = 170m,
-				MpOverVoltage = 0m,
-				MpVoltage = 0m,
-				OutputPower_Mp = new decimal [ ] { 250m, 50m, 250m },
-				OutputPower_Sp = new decimal [ ] { 200m, 40m, 200m },
-				OutputOXP = new decimal [ ] { 12m, 2.5m, 12m },
-				BeepTime = 0,
-			};
-
-			infor_Mp = new Infor_Mp ( )
-			{
-				MpVoltage = new decimal [ ] { 187m, 220m, 252m },
-				MpFrequncy = new decimal [ ] { 47m, 50m, 63m },
-			};
-
-			infor_Sp = new Infor_Sp() {
-				UsedBatsCount = 2,
-				NeedTestUnderVoltage = true,
-				Qualified_CutoffLevel = new decimal[] { 21m, 21.6m },
-				Target_UnderVoltageLevel = 22m,
-				Target_CutoffVoltageLevel = 21.3m,
-				Delay_WaitForCutoff = 1800,
-			};
-
-			infor_PowerSourceChange = new Infor_PowerSourceChange ( )
-			{
-				OutputLoadType = LoadType.LoadType_CC,
-				OutputLoadValue = new decimal [ ] { 10m, 2m, 8m },
-				Qualified_MpUnderVoltage = new decimal [ ] { 160m, 184m },
-				Qualified_MpUnderVoltageRecovery = new decimal [ ] { 170m, 187m },
-				Qualified_MpOverVoltage = new decimal [ ] { 265m, 295m },
-				Qualified_MpOverVoltageRecovery = new decimal [ ] { 265m, 295m },
-				Delay_WaitForUnderVoltageRecovery = 3000,
-				Delay_WaitForOverVoltageRecovery = 3000,
-			};
-
-			infor_Charge = new Infor_Charge ( )
-			{
-				UartSetChargeMinPeriod = true, //需要代码设置最小充电周期，用于加快备电丢失识别
-				UartSetChargeMaxDuty = false,
-				CV_Voltage = 25m,
-				Qualified_FloatingVoltage = new decimal [ ] { 27m, 28m },
-				Qualified_EqualizedCurrent = new decimal [ ] { 3m, 4m },
-			};
-
-			infor_Output = new Infor_Output ( )
-			{
-				OutputChannelCount = 3,
-				Stabilivolt = new bool [ ] { false, false, false },
-				Isolation = new bool [ ] { false, false, false },
-				NeedShort = new bool [ ] { true, true, true },
-				SpSingleWorkAbility = new bool [ ] { true, true, true },
-				StartupLoadType_Mp = LoadType.LoadType_CC,
-				StartupLoadType_Sp = LoadType.LoadType_CC,
-				FullLoadType = LoadType.LoadType_CC,
-				StartupLoadValue_Mp = new decimal [ ] { 10m, 2m, 8m },
-				StartupLoadValue_Sp = new decimal [ ] { 10m, 2m, 8m },
-				FullLoadValue = new decimal [ ] { 10m, 2m, 8m },
-				Qualified_OutputVoltageWithoutLoad = new decimal [ , ] { { 27m, 28m }, { 27m, 28m }, { 27m, 28m } },
-				Qualified_OutputVoltageWithLoad = new decimal [ , ] { { 27m, 28m }, { 27m, 28m }, { 27m, 28m } },
-				Qualified_OutputRipple_Max = new decimal [ ] { 270m, 270m, 270m },
-				Need_TestOXP = new bool [ ] { true, true, true },
-				OXPLoadType = LoadType.LoadType_CC,
-				SlowOXP_DIF = new decimal [ ] { 0m, 0m, 0m },
-				OXP_OrderIndex = new int [ ] { 0, 1, 2 },
-				Short_OrderIndex = new int [ ] { 0, 1, 2 },
-				Qualified_OXP_Value = new decimal [ , ] { { 12m, 13m }, { 2.3m, 2.7m }, { 12m, 13, } },
-				Qualified_LoadEffect_Max = new decimal [ ] { 0.01m, 0.01m, 0.01m },
-				Qualified_SourceEffect_Max = new decimal [ ] { 0.01m, 0.01m, 0.01m },
-				Qualified_Efficiency_Min = 0.85m,
-				Delay_WaitForOXP = 1500,
-			};
-
-			infor_Uart = new Infor_Uart ( )
-			{
-				Measured_MpErrorSignal = false,
-				Measured_SpErrorSignal = false,
-				Measured_OutputErrorSignal = new bool [ ] { false, false, false },
-				Measured_SpValue = 0m,
-				Measured_OutputVoltageValue = new decimal [ ] { 0m, 0m, 0m },
-				Measured_OutputCurrentValue = new decimal [ ] { 0m, 0m, 0m },
-			};
-			return custmer_id;
+						//添加专用的通讯部分
+						infor_Uart = new Infor_Uart() {
+							Measured_MpErrorSignal = false,
+							Measured_SpErrorSignal = false,
+							Measured_OutputErrorSignal = new bool[] { false, false, false },
+							Measured_SpValue = 0m,
+							Measured_OutputVoltageValue = new decimal[] { 0m, 0m, 0m },
+							Measured_OutputCurrentValue = new decimal[] { 0m, 0m, 0m },
+						};
+					}
+				} else {
+					arrayList.Add( error_information );
+					arrayList.Add( custmer_id );
+				}
+			}
+			return arrayList;
 		}
 
 		#region -- 产品的具体通讯方式

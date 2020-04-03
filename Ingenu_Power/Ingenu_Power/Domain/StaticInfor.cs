@@ -102,7 +102,7 @@ namespace Ingenu_Power.Domain
 			/// <summary>
 			/// 输出通道数量
 			/// </summary>
-			public int OutputCount;
+			public byte OutputCount;
 			/// <summary>
 			/// 备电单投功能
 			/// </summary>
@@ -194,7 +194,7 @@ namespace Ingenu_Power.Domain
 			/// <summary>
 			/// 主电欠压点，用于全项测试
 			/// </summary>
-			public decimal Voltage_SourceChange_MpUnderVoltage;
+			public Int16 Voltage_SourceChange_MpUnderVoltage;
 			/// <summary>
 			/// 主电欠压恢复从备电切换到主电功能合格检查
 			/// </summary>
@@ -202,7 +202,7 @@ namespace Ingenu_Power.Domain
 			/// <summary>
 			/// 主电欠压恢复点，用于全项测试
 			/// </summary>
-			public decimal Voltage_SourceChange_MpUnderVoltageRecovery;
+			public Int16 Voltage_SourceChange_MpUnderVoltageRecovery;
 			/// <summary>
 			/// 主电过压切换到备电功能合格检查
 			/// </summary>
@@ -210,7 +210,7 @@ namespace Ingenu_Power.Domain
 			/// <summary>
 			/// 主电过压点，用于全项测试
 			/// </summary>
-			public decimal Voltage_SourceChange_MpOverVoltage;
+			public Int16 Voltage_SourceChange_MpOverVoltage;
 			/// <summary>
 			/// 主电过压恢复从备电切换到主电功能合格检查
 			/// </summary>
@@ -218,7 +218,7 @@ namespace Ingenu_Power.Domain
 			/// <summary>
 			/// 主电过压恢复点，用于全项测试
 			/// </summary>
-			public decimal Voltage_SourceChange_MpOverVoltageRecovery;
+			public Int16 Voltage_SourceChange_MpOverVoltageRecovery;
 		};
 
 

@@ -34,6 +34,16 @@
             是否存在相关参数的标记属性
             </summary>
         </member>
+        <member name="F:ProductInfor.Base.Exist.Mp">
+            <summary>
+            是否存在主电
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Exist.Sp">
+            <summary>
+            是否存在备电
+            </summary>
+        </member>
         <member name="F:ProductInfor.Base.Exist.MandatoryMode">
             <summary>
             是否存在强制模式，应急照明电源适用
@@ -132,6 +142,11 @@
         <member name="F:ProductInfor.Base.Infor_Sp.Qualified_CutoffLevel">
             <summary>
             备电切断点的合格范围
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Sp.Qualified_UnderLevel">
+            <summary>
+            备电欠压点的合格范围
             </summary>
         </member>
         <member name="F:ProductInfor.Base.Infor_Sp.NeedTestUnderVoltage">
@@ -415,12 +430,22 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ProductInfor.Base.Initalize(System.String)">
+        <member name="M:ProductInfor.Base.InitalizeParemeters(System.Data.DataTable,System.String@)">
+            <summary>
+            具体参数的初始化
+            </summary>
+            <param name="dataTable">从数据库中查找到的数据表</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.Base.Initalize(System.String,System.String,System.String,System.String)">
             <summary>
             产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
             </summary>
             <param name="product_id">产品的厂内ID</param>
-            <returns>用户ID</returns>
+            <param name="sql_name">sql数据库名</param>
+            <param name="sql_username">sql用户名</param>
+            <param name="sql_password">sql登录密码</param>
+            <returns>可能存在的错误信息和用户ID</returns>
         </member>
         <member name="M:ProductInfor.Base.Calibrate(System.String,System.String)">
             <summary>
@@ -437,6 +462,13 @@
             <param name="osc_ins">示波器INS码</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的错误信息</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Measure_vInstrumentOff(System.String)">
+            <summary>
+            测试结束时使用，为了增加测试速度，只将交流电源和直流电源的输出关闭
+            </summary>
+            <param name="port_name">使用到的串口</param>
+            <returns>可能存在的错误信息学</returns>
         </member>
         <member name="M:ProductInfor.Base.Measure_vCheckSingleSpStartupAbility(System.Int32,System.String)">
             <summary>
@@ -622,6 +654,57 @@
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
+        <member name="T:ProductInfor.Database">
+            <summary>
+            SQL数据库的操作，带返回可能存在异常信息的class
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Database.objConnection">
+            <summary>
+            执行连接数据库操作连接的全局变量声名；
+            </summary>
+        </member>
+        <member name="M:ProductInfor.Database.V_Initialize(System.String,System.String,System.String,System.String@)">
+            <summary>
+            测试数据库类实例化之后执行的初始化，针对SqlConnection的实例化，一定要在实例化本类后执行
+            </summary>
+            <param name="servername">SQL 数据库的服务器名称</param>
+            <param name="user_name">SQL用户名</param>
+            <param name="password">用户登录密码</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.Database.V_QualifiedValue_Get(System.String,System.String@)">
+            <summary>
+            获取指定产品ID+Verion的产品合格范围和测试细节
+            </summary>
+            <param name="product_id">产品ID</param>
+            <param name="error_information"> 可能存在的错误信息</param>
+            <returns>单片机程序相关信息</returns>
+        </member>
+        <member name="M:ProductInfor.Database.V_QueryInfor(System.String,System.String@)">
+            <summary>
+            在数据库中查询相信息
+            </summary>
+            <param name="infor">查询的SQL语言</param>\
+            <param name="error_information" >可能存在的相关错误信息</param>
+            <returns>在数据库中查询数据是否存在的情况</returns>
+        </member>
+        <member name="M:ProductInfor.Database.Dispose">
+            <summary>
+            本类资源释放
+            </summary>
+        </member>
+        <member name="M:ProductInfor.Database.Dispose(System.Boolean)">
+            <summary>
+            无法直接调用的资源释放程序
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:ProductInfor.Database.Finalize">
+            <summary>
+            类释放资源析构函数
+            </summary>
+        </member>
         <member name="T:ProductInfor.MeasureDetails">
             <summary>
             测试过程的具体类，此文件用于存储详细的测试过程
@@ -672,6 +755,13 @@
             仪表初始化
             </summary>
             <param name="osc_ins">示波器INS</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vInstrumentPowerOff(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            电源输出关闭
+            </summary>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
@@ -866,12 +956,15 @@
             控制命令出现通讯错误之后重新操作的次数
             </summary>
         </member>
-        <member name="M:ProductInfor._60010.Initalize(System.String)">
+        <member name="M:ProductInfor._60010.Initalize(System.String,System.String,System.String,System.String)">
             <summary>
             产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
             </summary>
             <param name="product_id">产品的厂内ID</param>
-            <returns>用户ID</returns>
+            <param name="sql_name">sql数据库名</param>
+            <param name="sql_username">sql用户名</param>
+            <param name="sql_password">sql登录密码</param>
+            <returns>可能存在的错误信息和用户ID</returns>
         </member>
         <member name="M:ProductInfor._60010.Communicate_User(System.IO.Ports.SerialPort,System.String@)">
             <summary>

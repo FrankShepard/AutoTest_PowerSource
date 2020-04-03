@@ -30,6 +30,8 @@ namespace Ingenu_Power.UserControls
 			//初始化时日期定为当日日期
 			BtnStartDate.Content = DateTime.Today.ToString ( "yyyy/MM/dd" );
 			BtnEndDate.Content = DateTime.Today.ToString ( "yyyy/MM/dd" );
+			Calendar_Start.SelectedDate = DateTime.Today;
+			Calendar_End.SelectedDate = DateTime.Today;
 			//绑定路由事件
 			TgbChoose.Checked += new RoutedEventHandler ( TgbChoose_Checked );
 			TgbChoose.Unchecked += new RoutedEventHandler ( TgbChoose_Unchecked );
@@ -45,6 +47,22 @@ namespace Ingenu_Power.UserControls
 		/// 数据查询操作中使用到的数据表
 		/// </summary>
 		private DataTable objDataTable = new DataTable();
+		/// <summary>
+		/// 选中待修改的objDataTable的行索引
+		/// </summary>
+		int ShouldChange_RowIndex = 0;
+		/// <summary>
+		/// 标记是否需要用户更新数据
+		/// </summary>
+		bool NeedUpdateQueryedValue = false;
+		/// <summary>
+		/// 数据查询线程
+		/// </summary>
+		Thread trdQueryData;
+		/// <summary>
+		/// 数据导出线程
+		/// </summary>
+		Thread trdExportDate;
 
 		#endregion
 
@@ -113,7 +131,37 @@ namespace Ingenu_Power.UserControls
 
 		#endregion
 
+		#region -- 线程间操作
+
+		/// <summary>
+		/// 数据绑定函数的委托
+		/// </summary>
+		private delegate void DataQuery_dlgDataBinding(DataTable dataTable);
+
+		/// <summary>
+		/// DataGrid控件的数据绑定
+		/// </summary>
+		/// <param name="dataTable"></param>
+		private void DataQuery_vDataBinding(DataTable dataTable)
+		{
+			DtgData.DataContext = objDataTable;
+		}
+
+		#endregion
+
 		#region -- 路由事件
+
+		/// <summary>
+		/// 限定产品的硬件ID类型，只能输入数字
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+		{
+			if (!(((e.Key >= Key.D0) && (e.Key <= Key.D9)) || ((e.Key >= Key.NumPad0) && (e.Key <= Key.NumPad9)) || (e.Key == Key.Back) || (e.Key == Key.Delete) || (e.Key == Key.Left) || (e.Key == Key.Right) || (e.Key == Key.Tab))) {
+				e.Handled = true;
+			}
+		}
 
 		/// <summary>
 		/// 查询方式的选择，多支产品数据选择
@@ -142,86 +190,74 @@ namespace Ingenu_Power.UserControls
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void BtnQueryData_Click( object sender, RoutedEventArgs e )
+		private void BtnQueryData_Click(object sender, RoutedEventArgs e)
 		{
-			//string error_information = string.Empty;
-			//if ( ( ( bool ) ChkProduct.IsChecked && ( TxtProductModel.Text != "" ) )
-			//	|| ( ( bool ) ChkPackingBatch.IsChecked && ( TxtBatchCode.Text != "" ) )
-			//	|| ( ( bool ) ChkMeasureTime.IsChecked && ( Calendar_Start.SelectedDate != null ) && ( Calendar_End.SelectedDate != null ) ) ) {
-			//	using ( Database database = new Database ( ) ) {
+			string error_information = string.Empty;
+			using (Database database = new Database()) {
+				if (( bool )TgbChoose.IsChecked == false) { //单支产品数据查询
+					if (TxtSingleID.Text == string.Empty) {
+						StaticInfor.Error_Message = "请输入需要查询的单支产品ID";
+						MainWindow.MessageTips( StaticInfor.Error_Message );
+						return;
+					}
+					string product_id = TxtSingleID.Text;
+					bool use_custmer_id = ( bool )TgbIDType.IsChecked;
+					//在新线程中执行数据查询
+					if (trdQueryData == null) {
+						trdQueryData = new Thread( () => DataQuery_vQuerySingleData( product_id, use_custmer_id ) ) {
+							Name = "数据查询线程",
+							Priority = ThreadPriority.Lowest,
+							IsBackground = false,
+						};
+						trdQueryData.SetApartmentState( ApartmentState.STA );
+						trdQueryData.Start();
+					} else {
+						if (trdQueryData.ThreadState != ThreadState.Stopped) { return; }
+						trdQueryData = new Thread( () => DataQuery_vQuerySingleData( product_id, use_custmer_id ) );
+						trdQueryData.Start();
+					}
+				} else { //多支产品数据查询
+					if ((( bool )ChkProductModel.IsChecked == false) && (( bool )ChkMeasureTime.IsChecked == false)) {
+						StaticInfor.Error_Message = "请选择需要的查询条件，在对应条件前勾选";
+						MainWindow.MessageTips( StaticInfor.Error_Message );
+						return;
+					}
+					if ((( bool )ChkProductModel.IsChecked && (TxtProductModel.Text == string.Empty))
+			|| (( bool )ChkMeasureTime.IsChecked && ((Calendar_Start.DisplayDate == null) || (Calendar_End.DisplayDate == null)))) {
+						StaticInfor.Error_Message = "请正确填写需要查询的条件";
+						MainWindow.MessageTips( StaticInfor.Error_Message );
+						return;
+					}
 
-			//		error_information = database.V_Initialize ( MainWindow.SQL_IP, MainWindow.SQL_User, MainWindow.SQL_Password, MainWindow.SQL_DatabaseName_Data );
-			//		if ( error_information != string.Empty ) {
-			//			MessageBox.Show ( "需要使用的数据库连接异常，请保证电脑正常联网" ); return;
-			//		}
-
-			//		DataSet objDataSet = new DataSet ( );
-			//		try {
-			//			string limit_patch_word = "";
-
-			//			string model = TxtProductModel.Text;
-			//			if ( ( model != "" ) && ( ( bool ) ChkProduct.IsChecked ) ) {
-			//				limit_patch_word += "产品型号 = '" + model + "'";
-			//			}
-			//			string batch_code = TxtBatchCode.Text;
-			//			if ( ( model != string.Empty ) && ( ( bool ) ChkPackingBatch.IsChecked ) ) {
-			//				if ( limit_patch_word != "" ) {
-			//					limit_patch_word += " AND ";
-			//				}
-			//				limit_patch_word += "包装编号 = '" + batch_code + "'";
-			//			}
-			//			DateTime start_date = default ( DateTime );
-			//			DateTime end_date = default ( DateTime );
-			//			if ( Calendar_Start.SelectedDate != null ) { start_date = Calendar_Start.SelectedDate.Value; }
-			//			if ( Calendar_End.SelectedDate != null ) { end_date = Calendar_End.SelectedDate.Value; }
-			//			if ( start_date > end_date ) {
-			//				DateTime temp_date = start_date;
-			//				start_date = end_date;
-			//				end_date = temp_date;
-			//			}
-
-			//			if ( ( start_date != default ( DateTime ) ) && ( end_date != default ( DateTime ) ) && ( ( bool ) ChkMeasureTime.IsChecked ) ) {
-			//				if ( limit_patch_word != "" ) {
-			//					limit_patch_word += " AND ";
-			//				}
-			//				int index_start = 0, index_end = 0; //不同系统条件下 ToShortDateString（）的表述形式不同，需要注意
-			//				if ( start_date.ToShortDateString ( ).Contains ( "星" ) ) {
-			//					index_start = start_date.ToShortDateString ( ).IndexOf ( " " );
-			//				}
-			//				if ( end_date.ToShortDateString ( ).Contains ( "星" ) ) {
-			//					index_end = end_date.ToShortDateString ( ).IndexOf ( " " );
-			//				}
-			//				if ( ( index_start > 0 ) && ( index_end > 0 ) ) {
-			//					limit_patch_word += "测试日期 >= '" + start_date.ToShortDateString ( ).Remove ( index_start ) + "' AND 测试日期 <= '" + end_date.ToShortDateString ( ).Remove ( index_end ) + "'";
-			//				} else {
-			//					limit_patch_word += "测试日期 >= '" + start_date.ToShortDateString ( ) + "' AND 测试日期 <= '" + end_date.ToShortDateString ( ) + "'";
-			//				}
-			//			}
-
-			//			objDataSet = database.GetDataFromSQL ( limit_patch_word );
-
-			//			//检查数据集中是否存在查询到数据
-			//			if ( objDataSet.Tables [ Database.TargetTableName ].Rows.Count == 0 ) {
-			//				MessageBox.Show ( "数据库中不包含待查询数据", "操作提示" ); return;
-			//			}
-
-			//			SaveFileDialog saveFileDialog = new SaveFileDialog
-			//			{
-			//				RestoreDirectory = true, //保护对话框记忆的上次打开的目录
-			//				Filter = "Excel表格(*.xls)|*.xls",
-			//			};
-			//			if ( ( bool ) saveFileDialog.ShowDialog ( ) == true ) {
-			//				string file_path = saveFileDialog.FileName;
-			//				DataTableToCsv ( objDataSet.Tables [ Database.TargetTableName ], file_path );
-			//				System.Diagnostics.Process.Start ( file_path ); //打开excel文件
-			//			}
-			//		} catch ( Exception ex ) {
-			//			MessageBox.Show ( ex.ToString ( ) );
-			//		}
-			//	}
-			//} else {
-			//	MessageBox.Show ( "请选择待筛选的条件", "操作提示" );
-			//}
+					bool[] limit = new bool[] { false, false };
+					if (( bool )ChkProductModel.IsChecked) { limit[ 0 ] = true; }
+					if (( bool )ChkMeasureTime.IsChecked) { limit[ 1 ] = true; }
+					string product_type = TxtProductModel.Text;
+					DateTime start_date;
+					DateTime end_date;
+					if (( DateTime )Calendar_Start.SelectedDate <= ( DateTime )Calendar_End.SelectedDate) {
+						start_date = ( DateTime )Calendar_Start.SelectedDate;
+						end_date = ( DateTime )Calendar_End.SelectedDate;
+					} else {
+						start_date = ( DateTime )Calendar_End.SelectedDate;
+						end_date = ( DateTime )Calendar_Start.SelectedDate;
+					}
+					//在新线程中执行数据查询
+					if (trdQueryData == null) {
+						trdQueryData = new Thread( () => DataQuery_vQueryMultiData( limit, product_type, start_date, end_date ) ) {
+							Name = "数据查询线程",
+							Priority = ThreadPriority.Lowest,
+							IsBackground = false,
+						};
+						trdQueryData.SetApartmentState( ApartmentState.STA );
+						trdQueryData.Start();
+					} else {
+						if (trdQueryData.ThreadState != ThreadState.Stopped) { return; }
+						trdQueryData = new Thread( () => DataQuery_vQueryMultiData( limit, product_type, start_date, end_date ) );
+						trdQueryData.Start();
+					}
+				}				
+			}
 		}
 				
 		/// <summary>
@@ -232,34 +268,113 @@ namespace Ingenu_Power.UserControls
 		private void BtnExportData_Click(object sender, RoutedEventArgs e)
 		{
 			
-		}
-		
+		}	
+
 		/// <summary>
-		/// DataGrid中单元格编辑之后触发本事件
+		/// 选中其他单元格时触发本事件，紧跟着 RowEditEnding 后触发；此时与之绑定的 objDataTable 中的数据已经完成更改
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void DtgData_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+		private void DtgData_CurrentCellChanged(object sender, EventArgs e)
 		{
+			if (!NeedUpdateQueryedValue) { return; }
+			NeedUpdateQueryedValue = false;
+
 			string error_information = string.Empty;
 			using (Database database = new Database()) {
 				database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
 				if (error_information != string.Empty) { StaticInfor.Error_Message = error_information; return; }
-
-				DataGrid dataGrid = sender as DataGrid;
-				var _cells = dataGrid.SelectedCells;//获取选中单元格的列表
-				if (_cells.Any()) {
-					rowIndex = dataGrid.Items.IndexOf( _cells.First().Item );
-					columnIndex = dataGrid.First().Column.DisplayIndex;
-					return true;
+				database.V_QueryedValue_Update( objDataTable, ShouldChange_RowIndex, out error_information );
+				if (error_information != string.Empty) { //更新数据库中的数据失败，需要将之前的数据还原
 				}
-
-				database.V_MeasuredValue_Update( objDataTable, e. , e.Column, dataGrid.CurrentCell.Item, out error_information );
-
 			}
+		}
+
+
+		/// <summary>
+		/// 退出行编辑前触发本事件；注意：此时与之绑定的 objDataTable 中的数据尚未更改
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void DtgData_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+		{
+			if (e.EditAction == DataGridEditAction.Cancel) { return; }
+			//记录当前修改的数据的行列索引
+			ShouldChange_RowIndex = e.Row.GetIndex();
+			//标记需要更新数据
+			NeedUpdateQueryedValue = true;			
 		}
 
 		#endregion
 
+		#region -- 具体的数据查询功能
+
+		/// <summary>
+		/// 多线程中具体执行数据库中数据查询的函数
+		/// </summary>
+		private void DataQuery_vQuerySingleData(string product_id, bool use_custmer_id = false)
+		{
+			string error_information = string.Empty;
+			using (Database database = new Database()) {
+				database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
+				if (error_information != string.Empty) {
+					StaticInfor.Error_Message = error_information;
+					Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), error_information, false );
+					return;
+				}
+
+				objDataTable = database.V_QueryedValue_Get( product_id, out error_information, use_custmer_id );
+				if (error_information != string.Empty) {
+					StaticInfor.Error_Message = error_information;
+					Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), error_information, false );
+					return;
+				}
+
+				//将查询到的数据填充到DataGrid中进行显示
+				if (objDataTable.Rows.Count <= 0) {
+					StaticInfor.Error_Message = "数据库中不存在限定条件的产品测试数据，请重新确认待查条件";
+					Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), StaticInfor.Error_Message, false );
+					return;
+				}
+
+				//将数据表中的数据与DataGrid控件进行绑定，这样从DataGrid控件中修改后的数据与数据表会同步修改
+				Dispatcher.Invoke( new DataQuery_dlgDataBinding( DataQuery_vDataBinding ), objDataTable );
+			}
+		}
+
+		/// <summary>
+		/// 多线程中具体执行数据库中数据查询的函数
+		/// </summary>
+		private void DataQuery_vQueryMultiData(bool[] limit, string product_type, DateTime start_date, DateTime end_date)
+		{
+			string error_information = string.Empty;
+			using (Database database = new Database()) {
+				database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
+				if (error_information != string.Empty) {
+					StaticInfor.Error_Message = error_information;
+					Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), error_information, false );
+					return;
+				}
+
+				objDataTable = database.V_QueryedValue_Get( limit, product_type, start_date, end_date, out error_information );
+				if (error_information != string.Empty) {
+					StaticInfor.Error_Message = error_information;
+					Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), error_information, false );
+					return;
+				}
+
+				//将查询到的数据填充到DataGrid中进行显示
+				if (objDataTable.Rows.Count <= 0) {
+					StaticInfor.Error_Message = "数据库中不存在限定条件的产品测试数据，请重新确认待查条件";
+					Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), StaticInfor.Error_Message, false );
+					return;
+				}
+
+				//将数据表中的数据与DataGrid控件进行绑定，这样从DataGrid控件中修改后的数据与数据表会同步修改
+				Dispatcher.Invoke( new DataQuery_dlgDataBinding( DataQuery_vDataBinding ), objDataTable );
+			}
+		}
+
+		#endregion
 	}
 }

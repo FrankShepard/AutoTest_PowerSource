@@ -159,15 +159,15 @@ namespace Ingenu_Power.Domain
 		/// </summary>
 		/// <param name="product_id">产品ID</param>
 		/// <param name="error_information"> 可能存在的错误信息</param>
-		/// <param name="use_factory_id">是否使用工厂内部ID</param>
+		/// <param name="use_custmer_id">是否使用客户ID</param>
 		/// <returns>单片机程序相关信息</returns>
-		public DataTable V_MeasuredValue_Get(string product_id ,out string error_information,bool use_factory_id = true)
+		public DataTable V_QueryedValue_Get(string product_id ,out string error_information,bool use_custmer_id = false)
 		{
 			error_information = string.Empty;
 //			objConnection = new SqlConnection( "Data Source=192.168.1.99; Initial Catalog=盈帜产品程序;Persist Security Info=True;User ID=yanfa;Password=admin123456" );
 			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456");
 			DataTable dtTarget = new DataTable();
-			if (use_factory_id) {
+			if (!use_custmer_id) {
 				dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE [产品ID] = '" + product_id.ToString() + "' ORDER BY [测试日期] DESC", out error_information );
 			} else {
 				dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE [客户ID] = '" + product_id.ToString() + "' ORDER BY [测试日期] DESC", out error_information );
@@ -176,16 +176,45 @@ namespace Ingenu_Power.Domain
 		}
 
 		/// <summary>
-		/// 判断是否插入空值
+		/// 获取多项限定条件的测试数据
 		/// </summary>
-		/// <param name="obj"></param>
-		/// <returns></returns>
-		static public object SqlNull(object obj)
+		/// <param name="limit">筛选条件的限定类型，分别为  产品硬件ID+Verion，测试限定日期</param>
+		/// <param name="product_type">产品硬件ID+Verion</param>
+		/// <param name="start_date">测试日期</param>
+		/// <param name="end_date">截止日期</param>
+		/// <param name="error_information"> 可能存在的错误信息</param>
+		/// <returns>单片机程序相关信息</returns>
+		public DataTable V_QueryedValue_Get(bool[] limit,string product_type, DateTime start_date, DateTime end_date, out string error_information )
 		{
-			if (obj == null)
-				return DBNull.Value;
+			error_information = string.Empty;
+			//			objConnection = new SqlConnection( "Data Source=192.168.1.99; Initial Catalog=盈帜产品程序;Persist Security Info=True;User ID=yanfa;Password=admin123456" );
+			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456" );
+			DataTable dtTarget = new DataTable();
 
-			return obj;
+			string SQL_SELECT_TEXT = "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE ";
+			if (limit[ 0 ]) {
+				SQL_SELECT_TEXT += (SQL_MeasureItems[ 1 ] + " = '" + product_type + "'");
+			}
+			if (limit[ 1 ]) {
+				if (limit[ 0 ]) { SQL_SELECT_TEXT += " AND "; }
+				int index_start = 0, index_end = 0; //不同系统条件下 ToShortDateString（）的表述形式不同，需要注意
+				if (start_date.ToShortDateString().Contains( "星" )) {
+					index_start = start_date.ToShortDateString().IndexOf( " " );
+				}
+				if (end_date.ToShortDateString().Contains( "星" )) {
+					index_end = end_date.ToShortDateString().IndexOf( " " );
+				}
+				if ((index_start > 0) && (index_end > 0)) {
+					SQL_SELECT_TEXT += "测试日期 BETWEEN '" + start_date.ToShortDateString().Remove( index_start ) + " 0:0:0' AND '" + end_date.ToShortDateString().Remove( index_end ) + " 23:59:59'";
+				} else {
+					SQL_SELECT_TEXT += "测试日期 BETWEEN '" + start_date.ToShortDateString() + " 0:0:0' AND '" + end_date.ToShortDateString() + " 23:59:59'";
+				}
+
+				SQL_SELECT_TEXT += " ORDER BY 产品ID";
+			}
+			dtTarget = V_QueryInfor(SQL_SELECT_TEXT, out error_information );
+
+			return dtTarget;
 		}
 
 		/// <summary>
@@ -358,34 +387,73 @@ namespace Ingenu_Power.Domain
 		}
 
 		/// <summary>
-		/// 更新数据表中的数据并将其更新到数据库中
+		/// 查询数据的整体重新插入；
 		/// </summary>
-		/// <param name="dataTable">dataGrid控件对应的数据集</param>
-		/// <param name="row_index">dataGrid控件中的修改行索引</param>
-		/// <param name="column_index">dataGrid控件中的修改列索引</param>
-		/// <param name="new_value">对应行列索引上的新地址</param>
+		/// <param name="measuredValue">测试数据结构体的实例化对象</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		/// <returns>数据更新之前的表格中数据的备份</returns>
-		public object V_MeasuredValue_Update(DataTable dataTable, int row_index, int column_index, object new_value,out string error_information)
+		public void V_QueryedValue_Insert(DataTable dataTable, int row_index ,out string error_information)
 		{
 			error_information = string.Empty;
-			object value_backup = dataTable.Rows[ row_index ][ column_index ]; //修改数据之前的备份
-
 			try {
 				using (SqlCommand objCommand = objConnection.CreateCommand()) {
 					objCommand.Connection = objConnection;
 					objCommand.CommandType = CommandType.Text;
-					objCommand.CommandText = "UPDATE [盈帜电源].[dbo].[电源产品测试数据] SET "+ SQL_MeasureItems[column_index] + " = @"+SQL_MeasureItems[column_index] + " WHERE "+ SQL_MeasureItems[0] +" = '" + dataTable.Rows[row_index][0] + "'";
+					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[电源产品测试数据] (";
+					for (int index = 0; index < SQL_MeasureItems.Length; index++) {
+						objCommand.CommandText += SQL_MeasureItems[ index ].Trim();
+						if (index == SQL_MeasureItems.Length - 1) {
+							objCommand.CommandText += ") VALUES (";
+						} else {
+							objCommand.CommandText += ",";
+						}
+					}
+					for (int index = 0; index < SQL_MeasureItems.Length; index++) {
+						objCommand.CommandText += ("@" + SQL_MeasureItems[ index ].Trim());
+						if (index == SQL_MeasureItems.Length - 1) {
+							objCommand.CommandText += ")";
+						} else {
+							objCommand.CommandText += ",";
+						}
+					}
+
+					//插入数据的填充
 					objCommand.Parameters.Clear();
-					objCommand.Parameters.AddWithValue( "@" + SQL_MeasureItems[ column_index ], new_value );
+					for (int colum_index = 0; colum_index < dataTable.Columns.Count ; colum_index++) {
+						objCommand.Parameters.AddWithValue( "@" + SQL_MeasureItems[ colum_index ].Trim(), dataTable.Rows[ row_index ][ colum_index ] );
+					}
 
 					V_UpdateInfor( objCommand, out error_information );
+				}
+			} catch {
+				error_information = "Database.V_QueryedValue_Insert 数据库操作异常  \r\n";
+			}
+		}
+
+		/// <summary>
+		/// 更新数据表中的数据并将其更新到数据库中，具体操作为先将数据库中的整条数据清除，后整条插入
+		/// </summary>
+		/// <param name="dataTable">dataGrid控件对应的数据集</param>
+		/// <param name="row_index">dataGrid控件中的修改行索引</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		/// <returns>数据更新之前的表格中数据的备份</returns>
+		public void V_QueryedValue_Update(DataTable dataTable, int row_index, out string error_information)
+		{
+			error_information = string.Empty;
+			try {
+				using (SqlCommand objCommand = objConnection.CreateCommand()) {
+					objCommand.Connection = objConnection;
+					objCommand.CommandType = CommandType.Text;
+					//删除数据
+					objCommand.CommandText = "DELETE FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE " + SQL_MeasureItems[ 0 ].Trim() + " = '" + dataTable.Rows[ row_index ][ SQL_MeasureItems[ 0 ] ].ToString().Trim() + "'";
+					V_UpdateInfor( objCommand, out error_information );
+					if( error_information != string.Empty) { return; }
+					//重新插入整条数据
+					V_QueryedValue_Insert( dataTable, row_index, out error_information );
 				}
 			} catch {
 				error_information = "Database.V_MeasuredValue_Update 数据库操作异常  \r\n";
 			}
 
-			return value_backup;
 		}
 
 		#endregion
@@ -450,7 +518,12 @@ namespace Ingenu_Power.Domain
 				objCommand.Transaction = objTransaction;
 
 				try {
-					objCommand.ExecuteNonQuery();      //执行SQL语句，并返回受影响的行数
+					int row_count = 0;
+					int retry_time = 0;
+					do {
+						row_count = objCommand.ExecuteNonQuery();      //执行SQL语句，并返回受影响的行数
+						if(++retry_time > 3) { break; }
+					} while (row_count == 0);
 					objTransaction.Commit();
 				} catch (Exception e) {
 					error_information = e.ToString();

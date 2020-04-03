@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Data;
 using System.IO.Ports;
 using System.Linq;
 using System.Threading;
@@ -38,6 +39,14 @@ namespace ProductInfor
 		/// </summary>
 		public struct Exist
 		{
+			/// <summary>
+			/// 是否存在主电
+			/// </summary>
+			public bool Mp;
+			/// <summary>
+			/// 是否存在备电
+			/// </summary>
+			public bool Sp;
 			/// <summary>
 			/// 是否存在强制模式，应急照明电源适用
 			/// </summary>
@@ -107,11 +116,11 @@ namespace ProductInfor
 			/// <summary>
 			/// AC接入端电源常规测试的三个主电电压值：最低电压、正常电压、最高电压
 			/// </summary>
-			public decimal [ ] MpVoltage;
+			public int [ ] MpVoltage;
 			/// <summary>
 			/// AC接入端电源常规测试的三个主电频率值：最低频率、正常频率、最高频率
 			/// </summary>
-			public decimal [ ] MpFrequncy;
+			public byte [ ] MpFrequncy;
 		};
 
 		/// <summary>
@@ -122,11 +131,15 @@ namespace ProductInfor
 			/// <summary>
 			/// 使用的电池数量（按照默认单节电池电压为12V的标准值计，直接决定固定电平的备电电压值）
 			/// </summary>
-			public int UsedBatsCount;
+			public byte UsedBatsCount;
 			/// <summary>
 			/// 备电切断点的合格范围
 			/// </summary>
 			public decimal [ ] Qualified_CutoffLevel;
+			/// <summary>
+			/// 备电欠压点的合格范围
+			/// </summary>
+			public decimal [ ] Qualified_UnderLevel;
 			/// <summary>
 			/// 是否需要测试备电欠压点
 			/// </summary>
@@ -161,11 +174,11 @@ namespace ProductInfor
 			/// <summary>
 			/// 主电欠压点的合格范围
 			/// </summary>
-			public decimal [ ] Qualified_MpUnderVoltage;
+			public Int16 [ ] Qualified_MpUnderVoltage;
 			/// <summary>
 			/// 主电欠压恢复点的合格范围
 			/// </summary>
-			public decimal [ ] Qualified_MpUnderVoltageRecovery;
+			public Int16[ ] Qualified_MpUnderVoltageRecovery;
 			/// <summary>
 			/// 等待主电欠压恢复的时间，单位ms
 			/// </summary>
@@ -173,11 +186,11 @@ namespace ProductInfor
 			/// <summary>
 			/// 主电过压点的合格范围
 			/// </summary>
-			public decimal [ ] Qualified_MpOverVoltage;
+			public Int16[ ] Qualified_MpOverVoltage;
 			/// <summary>
 			/// 主电过压恢复点的合格范围
 			/// </summary>
-			public decimal [ ] Qualified_MpOverVoltageRecovery;
+			public Int16[ ] Qualified_MpOverVoltageRecovery;
 			/// <summary>
 			/// 等待主电过压恢复的时间，单位ms
 			/// </summary>
@@ -220,7 +233,7 @@ namespace ProductInfor
 			/// <summary>
 			/// 输出通道数量
 			/// </summary>
-			public int OutputChannelCount;
+			public byte OutputChannelCount;
 			/// <summary>
 			/// 输出通道的稳压状态
 			/// </summary>
@@ -300,11 +313,11 @@ namespace ProductInfor
 			/// <summary>
 			/// 测试OXP的顺序
 			/// </summary>
-			public int [ ] OXP_OrderIndex;
+			public byte[ ] OXP_OrderIndex;
 			/// <summary>
 			/// 输出短路的顺序
 			/// </summary>
-			public int [ ] Short_OrderIndex;
+			public byte[ ] Short_OrderIndex;
 			/// <summary>
 			/// 输出过流/过功率点的合格范围，按照说明书中的设计，为慢保护的值
 			/// </summary>
@@ -326,11 +339,11 @@ namespace ProductInfor
 		/// <summary>
 		/// 整机ID+版本 - 具有唯一性
 		/// </summary>
-		public int IDVerion_Product = 0;
+		public string IDVerion_Product = "00000";
 		/// <summary>
 		/// 串口通讯的波特率
 		/// </summary>
-		public int CommunicateBaudrate;
+		public int CommunicateBaudrate = 0;
 		/// <summary>
 		/// 大类存在的实例化对象
 		/// </summary>
@@ -375,17 +388,393 @@ namespace ProductInfor
 
 		#endregion
 
+		#region -- 初始化数据填充子函数
+
+		/// <summary>
+		/// 具体参数的初始化
+		/// </summary>
+		/// <param name="dataTable">从数据库中查找到的数据表</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void InitalizeParemeters(DataTable dataTable,out string error_information)
+		{
+			error_information = string.Empty;
+			try {
+				IDVerion_Product = dataTable.Rows[ 0 ][ "硬件IdVerion" ].ToString().Trim();
+				if (!Equals( dataTable.Rows[ 0 ][ "CommunicateBaudrate" ], DBNull.Value )) {
+					CommunicateBaudrate = ( int )dataTable.Rows[ 0 ][ "CommunicateBaudrate" ];
+				}
+				exist.Mp = ( bool )dataTable.Rows[ 0 ][ "Exist_Mp" ];
+				exist.Sp = ( bool )dataTable.Rows[ 0 ][ "Exist_Sp" ];
+				exist.MandatoryMode = ( bool )dataTable.Rows[ 0 ][ "Exist_MandatoryMode" ];
+				exist.PowerSourceChange = ( bool )dataTable.Rows[ 0 ][ "Exist_PowerSourceChange" ];
+				exist.Charge = ( bool )dataTable.Rows[ 0 ][ "Exist_Charge" ];
+				exist.CommunicationProtocol = ( bool )dataTable.Rows[ 0 ][ "Exist_CommunicationProtocol" ];
+				exist.LevelSignal = ( bool )dataTable.Rows[ 0 ][ "Exist_LevelSignal" ];
+				exist.Calibration = ( bool )dataTable.Rows[ 0 ][ "Exist_Calibration" ];
+
+				string[] items;
+				if (exist.Calibration) {
+					if (!Equals( dataTable.Rows[ 0 ][ "InforCali_MpUnderVoltage" ], DBNull.Value )) {
+						infor_Calibration.MpUnderVoltage = ( decimal )dataTable.Rows[ 0 ][ "InforCali_MpUnderVoltage" ];
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforCali_MpOverVoltage" ], DBNull.Value )) {
+						infor_Calibration.MpOverVoltage = ( decimal )dataTable.Rows[ 0 ][ "InforCali_MpOverVoltage" ];
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforCali_MpVoltage" ], DBNull.Value )) {
+						infor_Calibration.MpVoltage = ( decimal )dataTable.Rows[ 0 ][ "InforCali_MpVoltage" ];
+					}
+					items = new string[] { "InforCali_OutputPowerMp_CH1", "InforCali_OutputPowerMp_CH2", "InforCali_OutputPowerMp_CH3" };
+					infor_Calibration.OutputPower_Mp = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Calibration.OutputPower_Mp[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforCali_OutputPowerSp_CH1", "InforCali_OutputPowerSp_CH2", "InforCali_OutputPowerSp_CH3" };
+					infor_Calibration.OutputPower_Sp = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Calibration.OutputPower_Sp[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforCali_OutputOXP_CH1", "InforCali_OutputOXP_CH2", "InforCali_OutputOXP_CH3" };
+					infor_Calibration.OutputOXP = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Calibration.OutputOXP[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforCali_BeepTime" ], DBNull.Value )) {
+						infor_Calibration.BeepTime = ( int )dataTable.Rows[ 0 ][ "InforCali_BeepTime" ];
+					}
+				}
+
+				if (exist.Mp) {
+					items = new string[] { "InforMp_MpVoltage_Lowest", "InforMp_MpVoltage_Normal", "InforMp_MpVoltage_Highest" };
+					infor_Mp.MpVoltage = new int[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Mp.MpVoltage[ index ] = ( int )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforMp_MpFrequncy_Lowest", "InforMp_MpFrequncy_Normal", "InforMp_MpFrequncy_Highest" };
+					infor_Mp.MpFrequncy = new byte[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Mp.MpFrequncy[ index ] = ( byte )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+				}
+
+				if (exist.Sp) {
+					if (!Equals( dataTable.Rows[ 0 ][ "InforSp_UsedBatsCount" ], DBNull.Value )) {
+						infor_Sp.UsedBatsCount = ( byte )dataTable.Rows[ 0 ][ "InforSp_UsedBatsCount" ];
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforSp_NeedTestUnderVoltage" ], DBNull.Value )) {
+						infor_Sp.NeedTestUnderVoltage = ( bool )dataTable.Rows[ 0 ][ "InforSp_NeedTestUnderVoltage" ];
+					}
+					items = new string[] { "备电切断点_Min", "备电切断点_Max" };
+					infor_Sp.Qualified_CutoffLevel = new decimal[ 2 ];
+					for (int index = 0; index < 2; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Sp.Qualified_CutoffLevel[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "备电欠压点_Min", "备电欠压点_Max" };
+					infor_Sp.Qualified_UnderLevel = new decimal[ 2 ];
+					for (int index = 0; index < 2; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Sp.Qualified_UnderLevel[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforSp_Target_UnderVoltageLevel" ], DBNull.Value )) {
+						infor_Sp.Target_UnderVoltageLevel = ( decimal )dataTable.Rows[ 0 ][ "InforSp_Target_UnderVoltageLevel" ];
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforSp_Target_CutoffVoltageLevel" ], DBNull.Value )) {
+						infor_Sp.Target_CutoffVoltageLevel = ( decimal )dataTable.Rows[ 0 ][ "InforSp_Target_CutoffVoltageLevel" ];
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforSp_Delay_WaitForCutoff" ], DBNull.Value )) {
+						infor_Sp.Delay_WaitForCutoff = ( int )dataTable.Rows[ 0 ][ "InforSp_Delay_WaitForCutoff" ];
+					}
+				}
+
+				if (exist.PowerSourceChange) {
+					if (!Equals( dataTable.Rows[ 0 ][ "InforSC_OutputLoadType" ], DBNull.Value )) {
+						byte temp = ( byte )dataTable.Rows[ 0 ][ "InforSC_OutputLoadType" ];
+						infor_PowerSourceChange.OutputLoadType = ( LoadType )temp;
+					}
+					items = new string[] { "InforSC_OutputLoadValue_CH1", "InforSC_OutputLoadValue_CH2", "InforSC_OutputLoadValue_CH3" };
+					infor_PowerSourceChange.OutputLoadValue = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_PowerSourceChange.OutputLoadValue[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "主电欠压点_Min", "主电欠压点_Max" };
+					infor_PowerSourceChange.Qualified_MpUnderVoltage = new Int16[ 2 ];
+					for (int index = 0; index < 2; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_PowerSourceChange.Qualified_MpUnderVoltage[ index ] = ( Int16 )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "主电欠压恢复点_Min", "主电欠压恢复点_Max" };
+					infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery = new Int16[ 2 ];
+					for (int index = 0; index < 2; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery[ index ] = ( Int16 )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "主电过压点_Min", "主电过压点_Max" };
+					infor_PowerSourceChange.Qualified_MpOverVoltage = new Int16[ 2 ];
+					for (int index = 0; index < 2; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_PowerSourceChange.Qualified_MpOverVoltage[ index ] = ( Int16 )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "主电过压恢复点_Min", "主电过压恢复点_Max" };
+					infor_PowerSourceChange.Qualified_MpOverVoltageRecovery = new Int16[ 2 ];
+					for (int index = 0; index < 2; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_PowerSourceChange.Qualified_MpOverVoltageRecovery[ index ] = ( Int16 )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforSC_DelayWaitForUvRec" ], DBNull.Value )) {
+						infor_PowerSourceChange.Delay_WaitForUnderVoltageRecovery = ( int )dataTable.Rows[ 0 ][ "InforSC_DelayWaitForUvRec" ];
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforSC_DelayWaitForOvRec" ], DBNull.Value )) {
+						infor_PowerSourceChange.Delay_WaitForOverVoltageRecovery = ( int )dataTable.Rows[ 0 ][ "InforSC_DelayWaitForOvRec" ];
+					}
+				}
+
+				if (exist.Charge) {
+					if (!Equals( dataTable.Rows[ 0 ][ "InforChar_MinPeriodSet" ], DBNull.Value )) {
+						infor_Charge.UartSetChargeMinPeriod = ( bool )dataTable.Rows[ 0 ][ "InforChar_MinPeriodSet" ];
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforChar_MaxDutySet" ], DBNull.Value )) {
+						infor_Charge.UartSetChargeMaxDuty = ( bool )dataTable.Rows[ 0 ][ "InforChar_MaxDutySet" ];
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforChar_CV_Voltage" ], DBNull.Value )) {
+						infor_Charge.CV_Voltage = ( decimal )dataTable.Rows[ 0 ][ "InforChar_CV_Voltage" ];
+					}
+					items = new string[] { "浮充电压_Min", "浮充电压_Max" };
+					infor_Charge.Qualified_FloatingVoltage = new decimal[ 2 ];
+					for (int index = 0; index < 2; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Charge.Qualified_FloatingVoltage[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "均充电流_Min", "均充电流_Max" };
+					infor_Charge.Qualified_EqualizedCurrent = new decimal[ 2 ];
+					for (int index = 0; index < 2; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Charge.Qualified_EqualizedCurrent[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+				}
+
+				/*输出参数的填充设置 */
+				if (true) {
+					infor_Output.OutputChannelCount = ( byte )dataTable.Rows[ 0 ][ "InforOut_ChannelCount" ];
+					items = new string[] { "InforOut_Stabilivolt_CH1", "InforOut_Stabilivolt_CH2", "InforOut_Stabilivolt_CH3" };
+					infor_Output.Stabilivolt = new bool[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.Stabilivolt[ index ] = ( bool )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforOut_Isolation_CH1", "InforOut_Isolation_CH2", "InforOut_Isolation_CH3" };
+					infor_Output.Isolation = new bool[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.Isolation[ index ] = ( bool )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforOut_NeedShort_CH1", "InforOut_NeedShort_CH2", "InforOut_NeedShort_CH3" };
+					infor_Output.NeedShort = new bool[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.NeedShort[ index ] = ( bool )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforOut_SpSingleWorkAbility_CH1", "InforOut_SpSingleWorkAbility_CH2", "InforOut_SpSingleWorkAbility_CH3" };
+					infor_Output.SpSingleWorkAbility = new bool[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.SpSingleWorkAbility[ index ] = ( bool )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforOut_StartupLoadType_Mp" ], DBNull.Value )) {
+						byte temp = ( byte )dataTable.Rows[ 0 ][ "InforOut_StartupLoadType_Mp" ];
+						infor_Output.StartupLoadType_Mp = ( LoadType )temp;
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforOut_StartupLoadType_Sp" ], DBNull.Value )) {
+						byte temp = ( byte )dataTable.Rows[ 0 ][ "InforOut_StartupLoadType_Sp" ];
+						infor_Output.StartupLoadType_Sp = ( LoadType )temp;
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforOut_StartupLoadType_FullLoadType" ], DBNull.Value )) {
+						byte temp = ( byte )dataTable.Rows[ 0 ][ "InforOut_StartupLoadType_FullLoadType" ];
+						infor_Output.FullLoadType = ( LoadType )temp;
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforOut_StartupLoadType_OXPLoadType" ], DBNull.Value )) {
+						byte temp = ( byte )dataTable.Rows[ 0 ][ "InforOut_StartupLoadType_OXPLoadType" ];
+						infor_Output.OXPLoadType = ( LoadType )temp;
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforOut_StartupLoadType_Mandatory" ], DBNull.Value )) {
+						byte temp = ( byte )dataTable.Rows[ 0 ][ "InforOut_StartupLoadType_Mandatory" ];
+						infor_Output.StartupLoadType_Mandatory = ( LoadType )temp;
+					}
+					items = new string[] { "InforOut_StartupLoadValue_Mp_CH1", "InforOut_StartupLoadValue_Mp_CH2", "InforOut_StartupLoadValue_Mp_CH3" };
+					infor_Output.StartupLoadValue_Mp = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.StartupLoadValue_Mp[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforOut_StartupLoadValue_Sp_CH1", "InforOut_StartupLoadValue_Sp_CH2", "InforOut_StartupLoadValue_Sp_CH3" };
+					infor_Output.StartupLoadValue_Sp = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.StartupLoadValue_Sp[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforOut_FullLoadValue_CH1", "InforOut_FullLoadValue_CH2", "InforOut_FullLoadValue_CH3" };
+					infor_Output.FullLoadValue = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.FullLoadValue[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforOut_StartupLoadValue_Mandatory_CH1", "InforOut_StartupLoadValue_Mandatory_CH2", "InforOut_StartupLoadValue_Mandatory_CH3" };
+					infor_Output.StartupLoadValue_Mandatory = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.StartupLoadValue_Mandatory[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforOut_NeedTestOXP_CH1", "InforOut_NeedTestOXP_CH2", "InforOut_NeedTestOXP_CH3" };
+					infor_Output.Need_TestOXP = new bool[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.Need_TestOXP[ index ] = ( bool )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforOut_SlowOXP_DIF_CH1", "InforOut_SlowOXP_DIF_CH2", "InforOut_SlowOXP_DIF_CH3" };
+					infor_Output.SlowOXP_DIF = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.SlowOXP_DIF[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforOut_OXP_OrderIndex_CH1", "InforOut_OXP_OrderIndex_CH2", "InforOut_OXP_OrderIndex_CH3" };
+					infor_Output.OXP_OrderIndex = new byte[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.OXP_OrderIndex[ index ] = ( byte )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "InforOut_Short_OrderIndex_CH1", "InforOut_Short_OrderIndex_CH2", "InforOut_Short_OrderIndex_CH3" };
+					infor_Output.Short_OrderIndex = new byte[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.Short_OrderIndex[ index ] = ( byte )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "InforOut_DelayWaitForOXP" ], DBNull.Value )) {
+						infor_Output.Delay_WaitForOXP = ( int )dataTable.Rows[ 0 ][ "InforOut_DelayWaitForOXP" ];
+					}
+					if (!Equals( dataTable.Rows[ 0 ][ "ACDC效率_Min" ], DBNull.Value )) {
+						infor_Output.Qualified_Efficiency_Min = ( decimal )dataTable.Rows[ 0 ][ "ACDC效率_Min" ];
+					}
+					items = new string[] { "输出纹波1_Max", "输出纹波2_Max", "输出纹波3_Max" };
+					infor_Output.Qualified_OutputRipple_Max = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.Qualified_OutputRipple_Max[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "负载效应1_Max", "负载效应2_Max", "负载效应3_Max" };
+					infor_Output.Qualified_LoadEffect_Max = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.Qualified_LoadEffect_Max[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "源效应1_Max", "源效应2_Max", "源效应3_Max" };
+					infor_Output.Qualified_SourceEffect_Max = new decimal[ 3 ];
+					for (int index = 0; index < 3; index++) {
+						if (!Equals( dataTable.Rows[ 0 ][ items[ index ] ], DBNull.Value )) {
+							infor_Output.Qualified_SourceEffect_Max[ index ] = ( decimal )dataTable.Rows[ 0 ][ items[ index ] ];
+						}
+					}
+					items = new string[] { "输出空载电压1_Min", "输出空载电压1_Max", "输出空载电压2_Min", "输出空载电压2_Max", "输出空载电压3_Min", "输出空载电压3_Max" };
+					infor_Output.Qualified_OutputVoltageWithoutLoad = new decimal[ 3, 2 ];
+					for (int index = 0; index < 3; index++) {
+						for (int i = 0; i < 2; i++) {
+							if (!Equals( dataTable.Rows[ 0 ][ items[ 2 * index + i ] ], DBNull.Value )) {
+								infor_Output.Qualified_OutputVoltageWithoutLoad[ index, i ] = ( decimal )dataTable.Rows[ 0 ][ items[ 2 * index + i ] ];
+							}
+						}
+					}
+					items = new string[] { "输出满载电压1_Min", "输出满载电压1_Max", "输出满载电压2_Min", "输出满载电压2_Max", "输出满载电压3_Min", "输出满载电压3_Max" };
+					infor_Output.Qualified_OutputVoltageWithLoad = new decimal[ 3, 2 ];
+					for (int index = 0; index < 3; index++) {
+						for (int i = 0; i < 2; i++) {
+							if (!Equals( dataTable.Rows[ 0 ][ items[ 2 * index + i ] ], DBNull.Value )) {
+								infor_Output.Qualified_OutputVoltageWithLoad[ index, i ] = ( decimal )dataTable.Rows[ 0 ][ items[ 2 * index + i ] ];
+							}
+						}
+					}
+					items = new string[] { "输出OCP保护点1_Min", "输出OCP保护点1_Max", "输出OCP保护点2_Min", "输出OCP保护点2_Max", "输出OCP保护点3_Min", "输出OCP保护点3_Max" };
+					infor_Output.Qualified_OXP_Value = new decimal[ 3, 2 ];
+					for (int index = 0; index < 3; index++) {
+						for (int i = 0; i < 2; i++) {
+							if (!Equals( dataTable.Rows[ 0 ][ items[ 2 * index + i ] ], DBNull.Value )) {
+								infor_Output.Qualified_OXP_Value[ index, i ] = ( decimal )dataTable.Rows[ 0 ][ items[ 2 * index + i ] ];
+							}
+						}
+					}
+				}
+			} catch (Exception ex){
+				error_information = ex.ToString();
+			}
+		}
+
+		#endregion
+
 		#region -- 待测产品中可以被重写的函数，包含了参数初始化、通讯进入管理员校准模式、测试的统一入口
 
 		/// <summary>
 		/// 产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
 		/// </summary>
 		/// <param name="product_id">产品的厂内ID</param>
-		/// <returns>用户ID</returns>
-		public virtual string Initalize( string product_id)
+		/// <param name="sql_name">sql数据库名</param>
+		/// <param name="sql_username">sql用户名</param>
+		/// <param name="sql_password">sql登录密码</param>
+		/// <returns>可能存在的错误信息和用户ID</returns>
+		public virtual ArrayList Initalize( string product_id,string sql_name,string sql_username,string sql_password)
 		{
+			ArrayList arrayList = new ArrayList(); //元素0 - 可能存在的错误信息；元素1 - 客户ID
+			string error_information = string.Empty;
 			string custmer_id = string.Empty;
-			return custmer_id;
+			for (int temp_index = 0; temp_index < 2; temp_index++) {
+				if (temp_index == 0) {
+					//从数据库中更新测试时的相关信息，包含了测试的细节和产品的合格范围
+					using (Database database = new Database()) {
+						database.V_Initialize( sql_name, sql_username, sql_password, out error_information );
+						if (error_information != string.Empty) { continue; }
+						DataTable dataTable = database.V_QualifiedValue_Get( product_id, out error_information );
+						if (error_information != string.Empty) { continue; }
+						//以下进行校准数据的填充
+						if((dataTable.Rows.Count == 0) || (dataTable.Rows.Count > 1)) { error_information = "数据库中保存的合格参数范围信息无法匹配"; continue; }
+						InitalizeParemeters( dataTable, out error_information );
+						if (error_information != string.Empty) { continue; }
+					}
+				} else {
+					arrayList.Add( error_information );
+					arrayList.Add( custmer_id );
+				}
+			}
+			return arrayList;
 		}
 
 		/// <summary>
@@ -412,6 +801,22 @@ namespace ProductInfor
 			using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
 				using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
 					measureDetails.Measure_vInstrumentInitalize ( osc_ins, serialPort, out error_information );
+				}
+			}
+			return error_information;
+		}
+
+		/// <summary>
+		/// 测试结束时使用，为了增加测试速度，只将交流电源和直流电源的输出关闭
+		/// </summary>
+		/// <param name="port_name">使用到的串口</param>
+		/// <returns>可能存在的错误信息学</returns>
+		public string Measure_vInstrumentOff(string port_name)
+		{
+			string error_information = string.Empty;
+			using (MeasureDetails measureDetails = new MeasureDetails()) {
+				using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+					measureDetails.Measure_vInstrumentPowerOff( serialPort, out error_information );
 				}
 			}
 			return error_information;
@@ -1718,7 +2123,6 @@ namespace ProductInfor
 			//元素0 - 可能存在的错误信息 ； 元素1 - 输出通道数量 ； 元素(2~(2+count)) - 测试通道的OXP合格与否判断；元素((2+count + 1) - (2+2*count ))) -  测试通道的具体OXP值
 			ArrayList arrayList = new ArrayList ( );
 			string error_information = string.Empty;
-			int output_count = infor_Output.OutputChannelCount;
 			bool [ ] check_okey = new bool [ infor_Output.OutputChannelCount ];
 			decimal [ ] specific_value = new decimal [ infor_Output.OutputChannelCount ];
 			for ( int index = 0 ; index < infor_Output.OutputChannelCount ; index++ ) {
@@ -1849,11 +2253,11 @@ namespace ProductInfor
 
 				} else {
 					arrayList.Add ( error_information );
-					arrayList.Add ( output_count );
-					for ( int index = 0 ; index < output_count ; index++ ) {
+					arrayList.Add( infor_Output.OutputChannelCount );
+					for ( byte index = 0 ; index < infor_Output.OutputChannelCount; index++ ) {
 						arrayList.Add ( check_okey [ index ] );
 					}
-					for ( int index = 0 ; index < output_count ; index++ ) {
+					for (byte index = 0 ; index < infor_Output.OutputChannelCount; index++ ) {
 						arrayList.Add ( specific_value [ index ] );
 					}
 				}
@@ -1872,7 +2276,6 @@ namespace ProductInfor
 			//元素0 - 可能存在的错误信息 ； 元素1 - 输出通道数量 ； 元素(2~(2+count)) - 测试通道是否需要短路保护；元素((2+count + 1) ~ (2+2*count ))) -  测试通道的短路保护合格与否判断
 			ArrayList arrayList = new ArrayList ( );
 			string error_information = string.Empty;
-			int output_count = infor_Output.OutputChannelCount;
 			bool [ ] need_short = new bool [ infor_Output.OutputChannelCount ];
 			bool [ ] check_okey = new bool [ infor_Output.OutputChannelCount ];
 			for ( int index = 0 ; index < infor_Output.OutputChannelCount ; index++ ) {
@@ -1969,11 +2372,11 @@ namespace ProductInfor
 					}
 				} else {
 					arrayList.Add ( error_information );
-					arrayList.Add ( output_count );
-					for ( int index = 0 ; index < output_count ; index++ ) {
+					arrayList.Add( infor_Output.OutputChannelCount );
+					for ( int index = 0 ; index < infor_Output.OutputChannelCount; index++ ) {
 						arrayList.Add ( need_short [ index ] );
 					}
-					for ( int index = 0 ; index < output_count ; index++ ) {
+					for ( int index = 0 ; index < infor_Output.OutputChannelCount; index++ ) {
 						arrayList.Add ( check_okey [ index ] );
 					}
 				}
