@@ -37,11 +37,12 @@
 
 		<Grid Grid.Row="0" >
 			<materialDesign:Card HorizontalAlignment="Left" VerticalAlignment="Top" 
-								 Width="510" Height="130" Padding="10" Margin="5">
+								 Width="650" Height="130" Padding="10" Margin="5">
 				<Grid Grid.Column="0" >
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="1.8*"/>
 						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="0.5*"/>
 					</Grid.ColumnDefinitions>
 					<Grid Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left">
 						<Grid.RowDefinitions>
@@ -62,10 +63,10 @@
 									</Grid.RowDefinitions>
 									<WrapPanel Grid.Row="0" Margin="5" VerticalAlignment="Center" Width="260" HorizontalAlignment="Left">
 										<TextBlock Text="产品ID" Margin="5" VerticalAlignment="Center"/>
-										<ToggleButton Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" Margin="5"  VerticalAlignment="Center" ToolTip="ID类别" Name="TgbIDType" IsChecked="False" />
+										<ToggleButton Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" Margin="5"  VerticalAlignment="Center" ToolTip="ID类别" Name="TgbIDType" IsChecked="False" Checked="TgbIDType_Checked" Unchecked="TgbIDType_Unchecked" />
 										<TextBlock Text="客户产品ID" VerticalAlignment="Center" Margin="5"/>
 									</WrapPanel>
-									<TextBox Grid.Row="1" Margin="5"  HorizontalAlignment="Left" materialDesign:HintAssist.Hint="ID" VerticalContentAlignment="Center" VerticalAlignment="Center" Width="275" Name="TxtSingleID"/>
+									<TextBox Grid.Row="1" Margin="5"  HorizontalAlignment="Left" materialDesign:HintAssist.Hint="ID" VerticalContentAlignment="Center" VerticalAlignment="Center" Width="275" Name="TxtSingleID" MaxLength="15" PreviewKeyDown="TextBox_PreviewKeyDown"/>
 								</Grid>
 								<Grid Grid.Column="0" Name="GrdProductQuery" Visibility="Visible">
 									<Grid.RowDefinitions>
@@ -127,7 +128,7 @@
 							<RowDefinition Height="*"/>
 						</Grid.RowDefinitions>
 						<Button Grid.Row="0" IsDefault="True" x:Name="BtnQueryData" FontSize="24" Style="{StaticResource MaterialDesignRaisedDarkButton}" Height="44"
-									materialDesign:ButtonAssist.CornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4"  VerticalAlignment="Center" HorizontalAlignment="Center"  Width="160" Click="BtnQueryData_Click" >
+									materialDesign:ButtonAssist.CornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4"  VerticalAlignment="Center" HorizontalAlignment="Center"  Width="160" Click="BtnQueryData_Click" ToolTip="仅可查询合格产品的数据" >
 							<WrapPanel>
 								<materialDesign:PackIcon Kind="FileFind" Margin="0" Height="32" Width="32" />
 								<TextBlock  Text="数据筛选" />
@@ -144,11 +145,17 @@
 							</WrapPanel>
 						</Button>
 					</Grid>
+					<Grid Grid.Column="2">
+						<Grid Name="GrdPrintShow" VerticalAlignment="Center" HorizontalAlignment="Center" Height="80" Width="80" Visibility="Hidden">
+							<materialDesign:PackIcon Kind="CloudPrintOutline" VerticalAlignment="Center" HorizontalAlignment="Center" Height="50" Width="50" />
+							<ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Value="33" IsIndeterminate="True" Height="70" Margin="0" Width="70" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+						</Grid>
+					</Grid>
 				</Grid>
 			</materialDesign:Card>
 		</Grid>
 		<Grid Grid.Row="1" HorizontalAlignment="Left" Height="Auto" Margin="0" VerticalAlignment="Top" Width="Auto" >
-			<DataGrid Name="DtgData" FontSize="12" FontFamily="微软雅黑"   IsReadOnly="False" AlternatingRowBackground="AliceBlue" RowBackground="White"  CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False" MinColumnWidth="20" FrozenColumnCount="1" ScrollViewer.CanContentScroll="True" ItemsSource="{Binding}"  RowEditEnding="DtgData_RowEditEnding" CurrentCellChanged="DtgData_CurrentCellChanged" >
+			<DataGrid Name="DtgData" FontSize="12" FontFamily="微软雅黑"   IsReadOnly="True" AlternatingRowBackground="AliceBlue" RowBackground="White"  CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False" MinColumnWidth="20" FrozenColumnCount="1" ScrollViewer.CanContentScroll="True" ItemsSource="{Binding}"  RowEditEnding="DtgData_RowEditEnding" CurrentCellChanged="DtgData_CurrentCellChanged" >
 			</DataGrid>
 
 		</Grid>

@@ -1,29 +1,17 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Microsoft.Office.Interop.Excel;
-using Ingenu_Power.Domain;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Input;
+using Ingenu_Power.Domain;
+using Microsoft.Office.Interop.Excel;
 
 namespace Ingenu_Power
 {
-    /// <summary>
-    /// MainWindow.xaml 的交互逻辑
-    /// </summary>
-    public partial class MainWindow : System.Windows.Window
+	/// <summary>
+	/// MainWindow.xaml 的交互逻辑
+	/// </summary>
+	public partial class MainWindow : System.Windows.Window
 	{
         public MainWindow()
         {
@@ -118,35 +106,33 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void BtnMenuShow_Click(object sender, RoutedEventArgs e)
 		{
-			//switch (StaticInfor.UserRightLevel) {
-			//	case 0: //未登陆成功时
-			//		BtnMenu_InstumentValidate.IsEnabled = false;
-			//		BtnMenu_ISP.IsEnabled = false;					
-			//		BtnMenu_Measure.IsEnabled = false;
+			switch ( StaticInfor.UserRightLevel ) {
+				case 0: //未登陆成功时
+					BtnMenu_InstumentValidate.IsEnabled = false;
+					BtnMenu_ISP.IsEnabled = false;
+					BtnMenu_Measure.IsEnabled = false;
 
-			//		BtnMenu_DataQuery.IsEnabled = false;
-			//		BtnMenu_DataView.IsEnabled = false;					
-			//		break;
-			//	case 1: //仅用于查询与打印数据
-			//		BtnMenu_InstumentValidate.IsEnabled = false;
-			//		BtnMenu_ISP.IsEnabled = false;
-			//		BtnMenu_Measure.IsEnabled = false;
+					BtnMenu_DataQuery.IsEnabled = false;
+					break;
+				case 1: //仅用于查询与打印数据
+					BtnMenu_InstumentValidate.IsEnabled = false;
+					BtnMenu_ISP.IsEnabled = false;
+					BtnMenu_Measure.IsEnabled = false;
 
-			//		BtnMenu_DataQuery.IsEnabled = true;
-			//		BtnMenu_DataView.IsEnabled = true;
-			//		break;
-			//	case 2: //可以执行产品测试
-			//	case 3: //全功能
-			//		BtnMenu_InstumentValidate.IsEnabled = true;
-			//		BtnMenu_ISP.IsEnabled = true;
-			//		BtnMenu_Measure.IsEnabled = true;
+					BtnMenu_DataQuery.IsEnabled = true;
+					break;
+				case 2: //可以执行产品测试
+				case 3: //全功能(异常产品数据不包含)
+				case 4: //全功能(异常产品数据包含)
+					BtnMenu_InstumentValidate.IsEnabled = true;
+					BtnMenu_ISP.IsEnabled = true;
+					BtnMenu_Measure.IsEnabled = true;
 
-			//		BtnMenu_DataQuery.IsEnabled = true;
-			//		BtnMenu_DataView.IsEnabled = true;
-			//		break;
-			//	default:
-			//		break;
-			//}
+					BtnMenu_DataQuery.IsEnabled = true;
+					break;
+				default:
+					break;
+			}
 		}
 
 		/// <summary>
@@ -306,18 +292,6 @@ namespace Ingenu_Power
 			}
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
 		#endregion
 
 		/// <summary>
@@ -347,56 +321,6 @@ namespace Ingenu_Power
 				PkiSyncDll.ToolTip = "双击鼠标用以更新 测试使用的 dll文件";
 			}else if(PkiSyncDll.Kind == MaterialDesignThemes.Wpf.PackIconKind.Check) {
 				PkiSyncDll.ToolTip = "测试使用的 dll文件，更新完成";
-			}
-		}
-
-		private void TextBlock_MouseDown( object sender, MouseButtonEventArgs e )
-		{
-			ExcelPrint ( @"C:\Users\Administrator\Desktop\新建.xlsx", "Sheet1" );
-		}
-
-		public void ExcelPrint( string strFilePath, string strSheetName )
-		{
-			ApplicationClass xlApp = new ApplicationClass ( );
-			Workbooks xlWorkbooks;
-			Workbook xlWorkbook;
-			Worksheet xlWorksheet;
-			System.Type tyWorkbooks;
-			System.Reflection.MethodInfo [ ] methods;
-			object objFilePath;
-
-			object oMissing = System.Reflection.Missing.Value;
-			//strFilePath = Server.MapPath ( strFilePath );
-			if ( !System.IO.File.Exists ( strFilePath ) ) {
-				throw new System.IO.FileNotFoundException ( );
-			}
-			try {
-				xlApp.Visible = true;
-				xlWorkbooks = xlApp.Workbooks;
-				tyWorkbooks = xlWorkbooks.GetType ( );
-				methods = tyWorkbooks.GetMethods ( );
-				objFilePath = strFilePath;
-				object Nothing = System.Reflection.Missing.Value;
-				xlWorkbook = xlApp.Workbooks.Open ( strFilePath, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing );
-
-				//xlWorkbook = (Microsoft.Office.Interop.Excel.Workbook)tyWorkbooks.InvokeMember("Open ",
-				//System.Reflection.BindingFlags.InvokeMethod,
-				//null,
-				//xlWorkbooks,
-				//new object[] { objFilePath, true, true });
-				xlWorksheet = ( Microsoft.Office.Interop.Excel.Worksheet ) xlWorkbook.Worksheets [ strSheetName ];
-
-				xlWorksheet.PrintPreview ( true );
-				xlWorkbook.Close ( oMissing, oMissing, oMissing );
-			} catch ( Exception ex ) {
-				throw ex;
-			} finally {
-				if ( xlApp != null ) {
-					xlApp.Quit ( );
-					System.Runtime.InteropServices.Marshal.ReleaseComObject ( xlApp );
-					xlApp = null;
-				}
-				GC.Collect ( );
 			}
 		}
 

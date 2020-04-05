@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="795696">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="807952">
       <assemblyIdentity name="Ingenu_Power" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>xU7HHG6S4ZGz2o9kDQ15zDdyRf4aWBYaariz9bgA3DA=</dsig:DigestValue>
+        <dsig:DigestValue>KmGZNXOjQZBj600AoflkwdUyd5gTfi3TskVoPc0nRRE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -62,7 +62,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>JpI0D5qByekQ7OQH1gSaxcLy8yQ9mhFyBer3kkxTFME=</dsig:DigestValue>
+        <dsig:DigestValue>UKagTR01VCk7jq8FSywalTnM7kKJ2HfOg55KDM+gRlE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -226,6 +226,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
       <dsig:DigestValue>6fMYIF06LLgNFpo4of5jp4cDdG9NMBjnWVNJ0nDlOwM=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Resources\消防电源检验报告(标准定版）.xls" size="133120">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>RvAlXWGDMQABOdjj9+F9V6NOJwTRjLeDrAwppFzjM6M=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

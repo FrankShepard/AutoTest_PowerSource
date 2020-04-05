@@ -66,6 +66,10 @@ namespace Ingenu_Power.Domain
 			/// 测试时的延时时长延长等级
 			/// </summary>
 			public int Magnification;
+			/// <summary>
+			/// 忽略测试项异常，继续测试选项
+			/// </summary>
+			public bool IgnoreFault_KeepMeasure;
 		}
 
 		/// <summary>
@@ -103,6 +107,14 @@ namespace Ingenu_Power.Domain
 			/// 输出通道数量
 			/// </summary>
 			public byte OutputCount;
+			/// <summary>
+			/// 产品是否存在通讯或者TTL 信号
+			/// </summary>
+			public bool exist_comOrTTL;
+			/// <summary>
+			/// 通讯或者TTL信号检查
+			/// </summary>
+			public bool CommunicateOrTTL_Okey;
 			/// <summary>
 			/// 备电单投功能
 			/// </summary>
@@ -219,6 +231,10 @@ namespace Ingenu_Power.Domain
 			/// 主电过压恢复点，用于全项测试
 			/// </summary>
 			public Int16 Voltage_SourceChange_MpOverVoltageRecovery;
+			/// <summary>
+			/// 所有电性能检测OK的标志，用于打印时显示
+			/// </summary>
+			public bool AllCheckOkey;
 		};
 
 

@@ -60,7 +60,7 @@ namespace ProductInfor
 		/// <returns>可能存在的错误信息和用户ID</returns>
 		public override ArrayList Initalize(string product_id, string sql_name, string sql_username, string sql_password)
 		{
-			ArrayList arrayList = new ArrayList();//元素0 - 可能存在的错误信息；元素1 - 客户ID
+			ArrayList arrayList = new ArrayList();//元素0 - 可能存在的错误信息；元素1 - 客户ID ;   元素2 - 声名产品是否存在通讯或者TTL电平信号功能
 			string error_information = string.Empty;
 			string custmer_id = string.Empty;
 			for (int temp_index = 0; temp_index < 2; temp_index++) {
@@ -89,6 +89,7 @@ namespace ProductInfor
 				} else {
 					arrayList.Add( error_information );
 					arrayList.Add( custmer_id );
+					arrayList.Add ( exist.CommunicationProtocol | exist.LevelSignal );
 				}
 			}
 			return arrayList;

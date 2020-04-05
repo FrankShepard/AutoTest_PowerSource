@@ -31,8 +31,9 @@ namespace Ingenu_Power.Domain
 		public void V_Initialize(string servername, string user_name, string password,out string error_information)
 		{
 			error_information = string.Empty;
-//			objConnection = new SqlConnection( "Data Source=" + servername + ";Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
-			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
+			//			objConnection = new SqlConnection( "Data Source=" + servername + ";Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
+			//			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
+			objConnection = new SqlConnection ( "Data Source=SC-201901112337\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456" );
 			/*以下验证SQL用户名与密码是否能够和SQL数据库正常通讯*/
 			try {
 				/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作-----可能的原因是另一台电脑正在调用数据库，需要等待*/
@@ -165,7 +166,8 @@ namespace Ingenu_Power.Domain
 		{
 			error_information = string.Empty;
 //			objConnection = new SqlConnection( "Data Source=192.168.1.99; Initial Catalog=盈帜产品程序;Persist Security Info=True;User ID=yanfa;Password=admin123456" );
-			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456");
+//			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456");
+			objConnection = new SqlConnection( "Data Source=SC-201901112337\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456" );
 			DataTable dtTarget = new DataTable();
 			if (!use_custmer_id) {
 				dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE [产品ID] = '" + product_id.ToString() + "' ORDER BY [测试日期] DESC", out error_information );
@@ -178,7 +180,7 @@ namespace Ingenu_Power.Domain
 		/// <summary>
 		/// 获取多项限定条件的测试数据
 		/// </summary>
-		/// <param name="limit">筛选条件的限定类型，分别为  产品硬件ID+Verion，测试限定日期</param>
+		/// <param name="limit">筛选条件的限定类型，分别为  产品硬件ID+Verion，测试限定日期，是否可以打印不合格产品的数据</param>
 		/// <param name="product_type">产品硬件ID+Verion</param>
 		/// <param name="start_date">测试日期</param>
 		/// <param name="end_date">截止日期</param>
@@ -186,14 +188,15 @@ namespace Ingenu_Power.Domain
 		/// <returns>单片机程序相关信息</returns>
 		public DataTable V_QueryedValue_Get(bool[] limit,string product_type, DateTime start_date, DateTime end_date, out string error_information )
 		{
-			error_information = string.Empty;
-			//			objConnection = new SqlConnection( "Data Source=192.168.1.99; Initial Catalog=盈帜产品程序;Persist Security Info=True;User ID=yanfa;Password=admin123456" );
-			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456" );
+			error_information = string.Empty;			
 			DataTable dtTarget = new DataTable();
 
 			string SQL_SELECT_TEXT = "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE ";
 			if (limit[ 0 ]) {
 				SQL_SELECT_TEXT += (SQL_MeasureItems[ 1 ] + " = '" + product_type + "'");
+				if ( !limit [ 2 ] ) {
+					SQL_SELECT_TEXT += " AND 合格判断 = 1 ";
+				}
 			}
 			if (limit[ 1 ]) {
 				if (limit[ 0 ]) { SQL_SELECT_TEXT += " AND "; }
@@ -209,9 +212,12 @@ namespace Ingenu_Power.Domain
 				} else {
 					SQL_SELECT_TEXT += "测试日期 BETWEEN '" + start_date.ToShortDateString() + " 0:0:0' AND '" + end_date.ToShortDateString() + " 23:59:59'";
 				}
-
+				if ( !limit [ 2 ] ) {
+					SQL_SELECT_TEXT += " AND 合格判断 = 1 ";
+				}
 				SQL_SELECT_TEXT += " ORDER BY 产品ID";
-			}
+			}			
+
 			dtTarget = V_QueryInfor(SQL_SELECT_TEXT, out error_information );
 
 			return dtTarget;
@@ -220,10 +226,38 @@ namespace Ingenu_Power.Domain
 		/// <summary>
 		/// 测试结果在数据库中的保存项
 		/// </summary>
-		static string[] SQL_MeasureItems = new string[]{ "产品ID", "硬件IDVerion", "客户ID", "备电单投功能检查", " 备电切断点", " 备电切断点检查", " 备电欠压点", " 备电欠压点检查", " 主电单投功能检查", " 产品识别备电丢失检查", " ACDC效率", " 输出空载电压1", " 输出满载电压1", " 输出纹波1", " 负载效应1", " 源效应1", " 输出OCP保护点1", " 输出OCP保护检查1", " 输出空载电压2", " 输出满载电压2", " 输出纹波2", " 负载效应2", " 源效应2", " 输出OCP保护点2", " 输出OCP保护检查2", " 输出空载电压3", " 输出满载电压3", " 输出纹波3", " 负载效应3", " 源效应3", " 输出OCP保护点3", " 输出OCP保护检查3", " 浮充电压", " 均充电流", " 主备电切换跌落检查", " 备主电切换跌落检查", " 主电欠压点", " 主电欠压点检查", " 主电欠压恢复点", " 主电欠压恢复点检查", " 主电过压点", " 主电过压点检查", " 主电过压恢复点", " 主电过压恢复点检查", " 测试日期" };
+		static string [ ] SQL_MeasureItems = new string [ ] { "产品ID", "硬件IDVerion", "客户ID", "通讯或信号检查", "备电单投功能检查", "备电切断点", "备电切断点检查", "备电欠压点", "备电欠压点检查", "主电单投功能检查", "产品识别备电丢失检查", "ACDC效率", "输出空载电压1", "输出满载电压1", "输出纹波1", "负载效应1", "源效应1", "输出OCP保护点1", "输出OCP保护检查1", "输出短路保护检查1", "输出空载电压2", "输出满载电压2", "输出纹波2", "负载效应2", "源效应2", "输出OCP保护点2", "输出OCP保护检查2", "输出短路保护检查2", "输出空载电压3", "输出满载电压3", "输出纹波3", "负载效应3", "源效应3", "输出OCP保护点3", "输出OCP保护检查3", "输出短路保护检查3", "浮充电压", "均充电流", "主备电切换跌落检查", "备主电切换跌落检查", "主电欠压点", "主电欠压点检查", "主电欠压恢复点", "主电欠压恢复点检查", "主电过压点", "主电过压点检查", "主电过压恢复点", "主电过压恢复点检查", "测试日期", "合格判断" };
 
 		/// <summary>
-		/// 测试数据的整体重新插入；若数据库中已经存储了数据，则需要先将数据库中的对应数据清除，再重新上传数据
+		///   测试数据的整体重新插入；若数据库中已经存储了数据，则需要先将数据库中的对应数据清除，再重新上传数据
+		/// </summary>
+		/// <param name="measuredValue">测试数据结构体的实例化对象</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void V_MeasuredValue_Update( StaticInfor.MeasuredValue measuredValue, out string error_information )
+		{
+			error_information = string.Empty;
+			try {
+				DataTable dtTarget = V_QueryInfor ( "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE [产品ID] = '" + measuredValue.ProudctID + "'", out error_information );
+				if ( dtTarget.Rows.Count > 0 ) {
+
+					using ( SqlCommand objCommand = objConnection.CreateCommand ( ) ) {
+						objCommand.Connection = objConnection;
+						objCommand.CommandType = CommandType.Text;
+						//删除数据
+						objCommand.CommandText = "DELETE FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE 产品ID = '" + measuredValue.ProudctID + "'";
+						V_UpdateInfor ( objCommand, out error_information );
+						if ( error_information != string.Empty ) { return; }
+					}
+				}
+				//重新插入整条数据
+				V_MeasuredValue_Insert ( measuredValue, out error_information );
+			} catch {
+				error_information = "Database.V_MeasuredValue_Update 数据库操作异常  \r\n";
+			}
+		}
+
+		/// <summary>
+		/// 测试数据的整体重新插入；
 		/// </summary>
 		/// <param name="measuredValue">测试数据结构体的实例化对象</param>
 		/// <param name="error_information">可能存在的错误信息</param>
@@ -236,7 +270,7 @@ namespace Ingenu_Power.Domain
 					objCommand.CommandType = CommandType.Text;
 					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[电源产品测试数据] (";
 					for(int index = 0;index < SQL_MeasureItems.Length; index++) {
-						objCommand.CommandText += SQL_MeasureItems[ index ];
+						objCommand.CommandText += SQL_MeasureItems [ index ].Trim ( ); ;
 						if(index == SQL_MeasureItems.Length - 1) {
 							objCommand.CommandText += ") VALUES (";
 						} else {
@@ -244,7 +278,7 @@ namespace Ingenu_Power.Domain
 						}
 					}
 					for (int index = 0; index < SQL_MeasureItems.Length; index++) {
-						objCommand.CommandText += ("@" + SQL_MeasureItems[ index ]);
+						objCommand.CommandText += ( ( "@" + SQL_MeasureItems [ index ] ) ).Trim ( );
 						if (index == SQL_MeasureItems.Length - 1) {
 							objCommand.CommandText += ")";
 						} else {
@@ -264,7 +298,11 @@ namespace Ingenu_Power.Domain
 					} else {
 						objCommand.Parameters.AddWithValue( "@客户ID", measuredValue.CustmerID );
 					}
-
+					if ( measuredValue.exist_comOrTTL ) {
+						objCommand.Parameters.AddWithValue ( "@通讯或信号检查", measuredValue.CommunicateOrTTL_Okey );
+					} else {
+						objCommand.Parameters.AddWithValue ( "@通讯或信号检查", DBNull.Value );
+					}
 					objCommand.Parameters.AddWithValue( "@备电单投功能检查", measuredValue.Check_SingleStartupAbility_Sp );
 					if (measuredValue.Voltage_SpCutoff == 0m) {
 						objCommand.Parameters.AddWithValue( "@备电切断点", DBNull.Value );
@@ -297,6 +335,7 @@ namespace Ingenu_Power.Domain
 						objCommand.Parameters.AddWithValue( "@输出OCP保护点1", measuredValue.Value_OXP[ 0 ] );
 					}
 					objCommand.Parameters.AddWithValue( "@输出OCP保护检查1", measuredValue.Check_OXP[ 0 ] );
+					objCommand.Parameters.AddWithValue( "@输出短路保护检查1", measuredValue.Check_OutputShort[ 0 ] );
 
 					if (measuredValue.OutputCount >= 2) {
 						objCommand.Parameters.AddWithValue( "@输出空载电压2", measuredValue.Voltage_WithoutLoad[ 1 ] );
@@ -314,6 +353,7 @@ namespace Ingenu_Power.Domain
 							objCommand.Parameters.AddWithValue( "@输出OCP保护点2", measuredValue.Value_OXP[ 1 ] );
 						}
 						objCommand.Parameters.AddWithValue( "@输出OCP保护检查2", measuredValue.Check_OXP[ 1 ] );
+						objCommand.Parameters.AddWithValue ( "@输出短路保护检查2", measuredValue.Check_OutputShort [ 1 ] );
 					} else {
 						objCommand.Parameters.AddWithValue( "@输出空载电压2", DBNull.Value );
 						objCommand.Parameters.AddWithValue( "@输出满载电压2", DBNull.Value );
@@ -322,6 +362,7 @@ namespace Ingenu_Power.Domain
 						objCommand.Parameters.AddWithValue( "@源效应2", DBNull.Value );
 						objCommand.Parameters.AddWithValue( "@输出OCP保护点2", DBNull.Value );
 						objCommand.Parameters.AddWithValue( "@输出OCP保护检查2", DBNull.Value );
+						objCommand.Parameters.AddWithValue ( "@输出短路保护检查2", DBNull.Value );
 					}
 
 					if (measuredValue.OutputCount >= 3) {
@@ -340,6 +381,7 @@ namespace Ingenu_Power.Domain
 							objCommand.Parameters.AddWithValue( "@输出OCP保护点3", measuredValue.Value_OXP[ 2 ] );
 						}
 						objCommand.Parameters.AddWithValue( "@输出OCP保护检查3", measuredValue.Check_OXP[ 2 ] );
+						objCommand.Parameters.AddWithValue ( "@输出短路保护检查3", measuredValue.Check_OutputShort [ 2 ] );
 					} else {
 						objCommand.Parameters.AddWithValue( "@输出空载电压3", DBNull.Value );
 						objCommand.Parameters.AddWithValue( "@输出满载电压3", DBNull.Value );
@@ -348,6 +390,7 @@ namespace Ingenu_Power.Domain
 						objCommand.Parameters.AddWithValue( "@源效应3", DBNull.Value );
 						objCommand.Parameters.AddWithValue( "@输出OCP保护点3", DBNull.Value );
 						objCommand.Parameters.AddWithValue( "@输出OCP保护检查3", DBNull.Value );
+						objCommand.Parameters.AddWithValue( "@输出短路保护检查3", DBNull.Value );
 					}
 					objCommand.Parameters.AddWithValue( "@浮充电压", measuredValue.Voltage_FloatingCharge );
 					objCommand.Parameters.AddWithValue( "@均充电流", measuredValue.Current_EqualizedCharge );
@@ -378,11 +421,13 @@ namespace Ingenu_Power.Domain
 					}
 					objCommand.Parameters.AddWithValue( "@主电过压恢复点检查", measuredValue.Check_SourceChange_MpOverVoltageRecovery );
 					objCommand.Parameters.AddWithValue( "@测试日期", DateTime.Now );
+					objCommand.Parameters.AddWithValue( "@合格判断", measuredValue.AllCheckOkey );
 
 					V_UpdateInfor( objCommand, out error_information );
 				}
-			} catch {
-				error_information = "Database.V_MeasuredValue_Insert 数据库操作异常  \r\n";
+			} catch (Exception ex){
+				error_information += ex.ToString ( );
+				error_information += "Database.V_MeasuredValue_Insert 数据库操作异常  \r\n";
 			}
 		}
 
@@ -454,6 +499,24 @@ namespace Ingenu_Power.Domain
 				error_information = "Database.V_MeasuredValue_Update 数据库操作异常  \r\n";
 			}
 
+		}
+
+		#endregion
+
+		#region -- 产品合格参数的获取
+
+		/// <summary>
+		/// 获取指定产品ID+Verion的产品合格范围和测试细节
+		/// </summary>
+		/// <param name="id_verion">硬件ID+Verion</param>
+		/// <param name="error_information"> 可能存在的错误信息</param>
+		/// <returns>单片机程序相关信息</returns>
+		public DataTable V_QualifiedValue_Get( string id_verion, out string error_information )
+		{
+			error_information = string.Empty;
+			DataTable dtTarget = new DataTable ( );
+			dtTarget = V_QueryInfor ( "SELECT *  FROM [盈帜电源].[dbo].[电源产品合格范围] WHERE [硬件IdVerion] = '" + id_verion.Trim ( ) + "'", out error_information );
+			return dtTarget;
 		}
 
 		#endregion

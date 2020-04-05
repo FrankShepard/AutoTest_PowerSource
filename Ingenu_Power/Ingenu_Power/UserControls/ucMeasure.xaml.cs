@@ -82,6 +82,7 @@ namespace Ingenu_Power.UserControls
 				Calibration_Enable = ( bool )chkCalibrate.IsChecked,
 				WholeFunction_Enable = ( bool )chkWholeFunctionTest.IsChecked,
 				Magnification = Convert.ToInt32( BasicRatingBar.Value),
+				IgnoreFault_KeepMeasure = (bool)ChkMeasureIgnoreFault.IsChecked,
 			};
 
 			//在新线程中执行文件下载、ISP烧录过程
@@ -312,7 +313,6 @@ namespace Ingenu_Power.UserControls
 			error_information = string.Empty;
 			//反射进行动态调用
 			try {
-				error_information = string.Empty;
 				string bin_filePath = Directory.GetCurrentDirectory() + "\\Download";
 				if (!Directory.Exists( bin_filePath )) {//如果不存在就创建文件夹
 					Directory.CreateDirectory( bin_filePath );
@@ -345,22 +345,26 @@ namespace Ingenu_Power.UserControls
 						//if (error_information != string.Empty) { return; }
 						error_information = string.Empty;
 
-						Measure_vParmetersReset(); //测试参数初始化
+						Measure_vParmetersReset( measureCondition.Product_ID ); //测试参数初始化
 
 						//具体的测试过程
 						StaticInfor.measureItemShow.Measure_Link = "产品电性能测试";
-						//while ((error_information == string.Empty) && (++measure_index < 25)) {
-						while ((++measure_index < 30)) {
+						bool limit_status = true;
+
+						//while ((error_information == string.Empty) && (++measure_index < 27) && (limit_status)) {
+						while ( (++measure_index < 30)) {
 							switch (measure_index) {
 								case 1:
 									//对象的初始化
 									mi = id_verion.GetMethod( "Initalize" );
 									//parameters = new object[] { measureCondition.Product_ID, Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password };
-									parameters = new object[] { measureCondition.Product_ID, "PC_瞿浩\\SQLEXPRESS", "quhao", "admin123456" };
+//									parameters = new object[] { measureCondition.Product_ID, "PC_瞿浩\\SQLEXPRESS", "quhao", "admin123456" };
+									parameters = new object[] { measureCondition.Product_ID, "SC-201901112337\\SQLEXPRESS", "quhao", "admin123456" };
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
 									error_information = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
 									if(error_information != string.Empty) { return; } //初始化时出现错误属于严重错误，产品的合格范围等相关信息都无法获取
 									measuredValue.CustmerID = arrayList[ 1 ].ToString(); //元素1 - 由产品ID关联得到的用户ID
+									measuredValue.exist_comOrTTL = (bool)arrayList [ 2 ]; //元素2 - 声名产品是否存在通讯或者TTL电平信号功能
 									break;
 								case 2://备电单投启动功能检查
 									mi = id_verion.GetMethod( "Measure_vCheckSingleSpStartupAbility" );
@@ -374,6 +378,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Pass";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 3://强制模式启动功能检查	
@@ -389,6 +394,7 @@ namespace Ingenu_Power.UserControls
 											StaticInfor.measureItemShow.Measure_Value = "Pass";
 										} else {
 											StaticInfor.measureItemShow.Measure_Value = "Failed";
+											measuredValue.AllCheckOkey &= false;
 										}
 									}
 									break;
@@ -413,6 +419,7 @@ namespace Ingenu_Power.UserControls
 										}
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}									
 									break;
 								case 5://主电单投启动功能检查
@@ -427,6 +434,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Pass";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 6://满载电压测试
@@ -451,6 +459,7 @@ namespace Ingenu_Power.UserControls
 										}
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;								
 								case 7://测试输出纹波
@@ -474,6 +483,7 @@ namespace Ingenu_Power.UserControls
 										}
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 8://备电（可调直流电源）输出打开动作，准备充电
@@ -488,6 +498,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Pass";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 9://计算AC/DC部分效率
@@ -502,6 +513,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = measuredValue.Efficiency.ToString ( "P2" ); //百分数显示，使用两位小数
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 10://测试空载电压
@@ -525,6 +537,7 @@ namespace Ingenu_Power.UserControls
 										}
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 11://测试均充电流
@@ -539,6 +552,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = measuredValue.Current_EqualizedCharge.ToString("0.0#") +"A";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 12://测试浮充电压（此处可能需要进入电源产品的程序后门，减少充电时间）
@@ -553,6 +567,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = measuredValue.Voltage_FloatingCharge.ToString ( "0.0#" ) + "V";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 13://浮充时关闭备电，用于识别备电丢失
@@ -567,6 +582,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Pass";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 14://计算负载效应
@@ -595,11 +611,13 @@ namespace Ingenu_Power.UserControls
 												} else {
 													error_information = "第 " + index.ToString() + " 路源效应超过合格范围";
 													StaticInfor.measureItemShow.Measure_Value = "Failed";
+													measuredValue.AllCheckOkey &= false;
 													break;
 												}
 											}
 										} else {
 											StaticInfor.measureItemShow.Measure_Value = "Failed";
+											measuredValue.AllCheckOkey &= false;
 										}
 									}
 									break;
@@ -615,6 +633,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Pass";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 17://重新开启备电，用于后续主备电转换
@@ -629,6 +648,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Pass";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 18://主电丢失切换检查
@@ -644,6 +664,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Pass";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 19://主电恢复存在切换检查
@@ -658,6 +679,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Pass";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 20://主电欠压切换检查
@@ -674,6 +696,7 @@ namespace Ingenu_Power.UserControls
 											StaticInfor.measureItemShow.Measure_Value = "Pass		" + measuredValue.Voltage_SourceChange_MpUnderVoltage.ToString("0");
 										} else {
 											StaticInfor.measureItemShow.Measure_Value = "Pass";
+											measuredValue.AllCheckOkey &= false;
 										}
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
@@ -696,6 +719,7 @@ namespace Ingenu_Power.UserControls
 										}
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 22://主电过压切换检查
@@ -715,6 +739,7 @@ namespace Ingenu_Power.UserControls
 										}
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 23://主电过压恢复切换检查
@@ -734,6 +759,7 @@ namespace Ingenu_Power.UserControls
 										}
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 24://测试OXP
@@ -753,6 +779,7 @@ namespace Ingenu_Power.UserControls
 											}
 										} else {
 											StaticInfor.measureItemShow.Measure_Value += "Failed";
+											measuredValue.AllCheckOkey &= false;
 										}
 									}
 									break;
@@ -771,24 +798,40 @@ namespace Ingenu_Power.UserControls
 												StaticInfor.measureItemShow.Measure_Value += "Pass		";
 											} else {
 												StaticInfor.measureItemShow.Measure_Value += "Failed		";
+												measuredValue.AllCheckOkey &= false;
 											}
 										}
-									}									
+									}
+									break;
+								case 26://填充串口通讯部分或者TTL部分的检查状态；执行到此处且没有错误，则说明串口或者TTL部分检查为正常(不含串口或者TTL信号的产品也认为此项正常)
+									if ( measuredValue.exist_comOrTTL ) {
+										measuredValue.CommunicateOrTTL_Okey = true;
+									}
 									break;
 								default:break;
 							}
+
+							//限定条件-决定是否忽略异常的测试项结果而执行后续操作
+							if ( !measureCondition.IgnoreFault_KeepMeasure ) {
+								limit_status &= measuredValue.AllCheckOkey;
+							}
+							
 						}
+
+						//仪表状态重置，防止更换产品时带电
+						mi = id_verion.GetMethod ( "Measure_vInstrumentOff" );
+						parameters = new object [ ] { "COM1" };
+						//parameters = new object[] { Properties.Settings.Default.UsedSerialport };
+						mi.Invoke ( obj, parameters );
 
 						//产品测试数据上传
 						using (Database database = new Database()) {
 							StaticInfor.measureItemShow.Measure_Link = "产品测试数据上传";
+							database.V_Initialize ( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
+							if(error_information != string.Empty ) { return; }
+							database.V_MeasuredValue_Update ( measuredValue, out error_information );
+							if ( error_information != string.Empty ) { return; }
 						}
-
-						//仪表状态重置，防止更换产品时带电
-						mi = id_verion.GetMethod( "Measure_vInstrumentOff" );
-						parameters = new object[] { "COM1" };
-						//parameters = new object[] { Properties.Settings.Default.UsedSerialport };
-						mi.Invoke( obj, parameters );
 
 						break;
 					}
@@ -807,10 +850,12 @@ namespace Ingenu_Power.UserControls
 		/// <summary>
 		/// 测试数据的初始化
 		/// </summary>
-		private void Measure_vParmetersReset()
+		private void Measure_vParmetersReset( string product_id)
 		{
-			measuredValue.ProudctID = string.Empty;
+			measuredValue.ProudctID = product_id;
 			measuredValue.CustmerID = string.Empty;
+			measuredValue.exist_comOrTTL = false;
+			measuredValue.CommunicateOrTTL_Okey = false;
 			measuredValue.OutputCount = 1;
 			measuredValue.Check_DistinguishSpOpen = false;
 			measuredValue.Check_MandatoryStartupAbility = false;
@@ -841,6 +886,7 @@ namespace Ingenu_Power.UserControls
 			measuredValue.Voltage_SpUnder = 0m;
 			measuredValue.Voltage_WithLoad = new decimal[] { 0m, 0m, 0m };
 			measuredValue.Voltage_WithoutLoad = new decimal[] { 0m, 0m, 0m };
+			measuredValue.AllCheckOkey = true;
 		}
 
 		#endregion
