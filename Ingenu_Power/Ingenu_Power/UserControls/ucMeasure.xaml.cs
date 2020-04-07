@@ -358,8 +358,8 @@ namespace Ingenu_Power.UserControls
 									//对象的初始化
 									mi = id_verion.GetMethod( "Initalize" );
 									//parameters = new object[] { measureCondition.Product_ID, Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password };
-//									parameters = new object[] { measureCondition.Product_ID, "PC_瞿浩\\SQLEXPRESS", "quhao", "admin123456" };
-									parameters = new object[] { measureCondition.Product_ID, "SC-201901112337\\SQLEXPRESS", "quhao", "admin123456" };
+									parameters = new object[] { measureCondition.Product_ID, "PC_瞿浩\\SQLEXPRESS", "quhao", "admin123456" };
+//									parameters = new object[] { measureCondition.Product_ID, "SC-201901112337\\SQLEXPRESS", "quhao", "admin123456" };
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
 									error_information = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
 									if(error_information != string.Empty) { return; } //初始化时出现错误属于严重错误，产品的合格范围等相关信息都无法获取

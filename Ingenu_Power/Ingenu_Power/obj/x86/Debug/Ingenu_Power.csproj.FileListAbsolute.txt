@@ -169,3 +169,4 @@ E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\A
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Instrument_Control.xml
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\ISP.xml
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csprojAssemblyReference.cache
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\消防电源检验报告(标准定版）.xls

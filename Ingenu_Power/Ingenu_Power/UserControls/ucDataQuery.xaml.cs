@@ -644,7 +644,7 @@ namespace Ingenu_Power.UserControls
 								if ( ( bool ) dt_data.Rows [ row_index ] [ "备电切断点检查" ] ) {
 									objExcelWorkSheet.Range [ "J" + ( row_index + 8 ).ToString ( ) ].Value2 = "√";
 								} else { 
-									objExcelWorkSheet.Range [ "J" + ( row_index + 8 ).ToString ( ) ].Value2 = "√";
+									objExcelWorkSheet.Range [ "J" + ( row_index + 8 ).ToString ( ) ].Value2 = "X";
 								}
 							}
 							if ( !Equals ( dt_data.Rows [ row_index ] [ "通讯或信号检查" ], DBNull.Value ) ) {

@@ -32,8 +32,8 @@ namespace Ingenu_Power.Domain
 		{
 			error_information = string.Empty;
 			//			objConnection = new SqlConnection( "Data Source=" + servername + ";Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
-			//			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
-			objConnection = new SqlConnection ( "Data Source=SC-201901112337\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456" );
+			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
+			//objConnection = new SqlConnection ( "Data Source=SC-201901112337\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456" );
 			/*以下验证SQL用户名与密码是否能够和SQL数据库正常通讯*/
 			try {
 				/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作-----可能的原因是另一台电脑正在调用数据库，需要等待*/
@@ -165,9 +165,6 @@ namespace Ingenu_Power.Domain
 		public DataTable V_QueryedValue_Get(string product_id ,out string error_information,bool use_custmer_id = false)
 		{
 			error_information = string.Empty;
-//			objConnection = new SqlConnection( "Data Source=192.168.1.99; Initial Catalog=盈帜产品程序;Persist Security Info=True;User ID=yanfa;Password=admin123456" );
-//			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456");
-			objConnection = new SqlConnection( "Data Source=SC-201901112337\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456" );
 			DataTable dtTarget = new DataTable();
 			if (!use_custmer_id) {
 				dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE [产品ID] = '" + product_id.ToString() + "' ORDER BY [测试日期] DESC", out error_information );
