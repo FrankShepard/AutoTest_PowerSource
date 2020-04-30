@@ -142,5 +142,17 @@ namespace Ingenu_Power.Properties {
                 this["UsedSerialport"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int MeasureDelayMagnification {
+            get {
+                return ((int)(this["MeasureDelayMagnification"]));
+            }
+            set {
+                this["MeasureDelayMagnification"] = value;
+            }
+        }
     }
 }

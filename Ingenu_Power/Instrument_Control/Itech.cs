@@ -4,11 +4,11 @@ using System.Threading;
 
 namespace Instrument_Control
 {
-    /// <summary>
-    /// 定义艾德克斯生产的非SCPI控制的电子负载和电源的通讯类，具体包含的时IT8512+和IT6823
-    /// </summary>
-    public class Itech : IDisposable
-    {
+	/// <summary>
+	/// 定义艾德克斯生产的非SCPI控制的电子负载和电源的通讯类，具体包含的时IT8512+和IT6823
+	/// </summary>
+	public class Itech : IDisposable
+	{
 		#region -- 仪表程控的通讯命令字节枚举
 
 		#region -- 电子负载通讯的功能枚举
@@ -16,7 +16,7 @@ namespace Instrument_Control
 		/// <summary>
 		/// 电子负载使用到命令位置的枚举
 		/// </summary>
-		private  enum ElecLoad_Command : byte
+		private enum ElecLoad_Command : byte
 		{
 			/// <summary>
 			/// 默认，无意义
@@ -65,7 +65,7 @@ namespace Instrument_Control
 			/// <summary>
 			/// 电子负载最大输入电压值设置
 			/// </summary>
-			Max_Voltage_Set = 0x22,			
+			Max_Voltage_Set = 0x22,
 			/// <summary>
 			/// 电子负载最大输入电压值读取
 			/// </summary>
@@ -358,7 +358,7 @@ namespace Instrument_Control
 			/// <summary>
 			/// 电子负载的条形码信息读取（ASIC码）
 			/// </summary>
-			Communicate_BarCodeInfor_Get= 0x6B,
+			Communicate_BarCodeInfor_Get = 0x6B,
 
 			/// <summary>
 			/// 过流保护值设置 
@@ -698,7 +698,7 @@ namespace Instrument_Control
 			/// <summary>
 			/// 默认，无意义
 			/// </summary>
-			Defalut_No_Sense = 0x00,			
+			Defalut_No_Sense = 0x00,
 			/// <summary>
 			/// 通讯校验命令(负载应答时使用)
 			/// </summary>
@@ -766,7 +766,7 @@ namespace Instrument_Control
 			/// <summary>
 			/// 校准信息的读取（ASIC码）
 			/// </summary>
-			Calibration_Infor_Get = 0x2F,			
+			Calibration_Infor_Get = 0x2F,
 			/// <summary>
 			/// 本台电子负载的产品序号等信息的读取
 			/// </summary>
@@ -789,38 +789,38 @@ namespace Instrument_Control
 
 		#region -- 电子负载使用到的相关枚举		
 
-        /// <summary>
-        /// 负载操作模式
-        /// </summary>
-        public enum OperationMode : byte
-        {
-            /// <summary>
-            /// 恒流模式
-            /// </summary>
-            CC = 0x00,
-            /// <summary>
-            /// 恒压模式
-            /// </summary>
-            CV = 0x01,
-            /// <summary>
-            /// 恒功率模式
-            /// </summary>
-            CW = 0x02,
-            /// <summary>
-            /// 恒阻模式
-            /// </summary>
-            CR = 0x03
-        }
+		/// <summary>
+		/// 负载操作模式
+		/// </summary>
+		public enum OperationMode : byte
+		{
+			/// <summary>
+			/// 恒流模式
+			/// </summary>
+			CC = 0x00,
+			/// <summary>
+			/// 恒压模式
+			/// </summary>
+			CV = 0x01,
+			/// <summary>
+			/// 恒功率模式
+			/// </summary>
+			CW = 0x02,
+			/// <summary>
+			/// 恒阻模式
+			/// </summary>
+			CR = 0x03
+		}
 
-        /// <summary>
-        /// 负载的List操作模式
-        /// </summary>
-        public enum OperationMode_List : byte
-        {
-            /// <summary>
-            /// List模式下使用恒流模式
-            /// </summary>
-            CC = 0x00,
+		/// <summary>
+		/// 负载的List操作模式
+		/// </summary>
+		public enum OperationMode_List : byte
+		{
+			/// <summary>
+			/// List模式下使用恒流模式
+			/// </summary>
+			CC = 0x00,
 			/// <summary>
 			/// List模式下使用恒压模式，新IT8500时无效
 			/// </summary>
@@ -833,225 +833,225 @@ namespace Instrument_Control
 			/// List模式下使用恒阻模式，新IT8500时无效
 			/// </summary>
 			CR = 0x03,
-        }
+		}
 
-        /// <summary>
-        /// List循环模式的枚举
-        /// </summary>
-        public enum List_CyclicalMode : ushort
-        {
-            /// <summary>
-            /// 当前List只操作1次
-            /// </summary>
-            Once = 0x0000,
-            /// <summary>
-            /// 当前List按照设定的Repeat次数进行循环操作
-            /// </summary>
-            Repeat = 0x0001,
+		/// <summary>
+		/// List循环模式的枚举
+		/// </summary>
+		public enum List_CyclicalMode : ushort
+		{
+			/// <summary>
+			/// 当前List只操作1次
+			/// </summary>
+			Once = 0x0000,
+			/// <summary>
+			/// 当前List按照设定的Repeat次数进行循环操作
+			/// </summary>
+			Repeat = 0x0001,
 			/// <summary>
 			/// 只在新IT8500机器上此值有效
 			/// </summary>
 			Infinite = 0xFFFF,
-        }
+		}
 
-        /// <summary>
-        /// List存储区的划分模式
-        /// </summary>
-        public enum List_DivisionMode : byte
-        {
-            /// <summary>
-            /// 存储区不划分
-            /// </summary>
-            One = 0x00,
-            /// <summary>
-            /// 存储器划分为两个部分
-            /// </summary>
-            Two = 0x02,
-            /// <summary>
-            /// 存储器划分为4个部分
-            /// </summary>
-            Four = 0x04,
-            /// <summary>
-            /// 存储器划分为8个部分
-            /// </summary>
-            Eight = 0x08
-        }
+		/// <summary>
+		/// List存储区的划分模式
+		/// </summary>
+		public enum List_DivisionMode : byte
+		{
+			/// <summary>
+			/// 存储区不划分
+			/// </summary>
+			One = 0x00,
+			/// <summary>
+			/// 存储器划分为两个部分
+			/// </summary>
+			Two = 0x02,
+			/// <summary>
+			/// 存储器划分为4个部分
+			/// </summary>
+			Four = 0x04,
+			/// <summary>
+			/// 存储器划分为8个部分
+			/// </summary>
+			Eight = 0x08
+		}
 
-        /// <summary>
-        /// 存储区域的枚举，取值只能在1~7之间
-        /// </summary>
-        public enum Save_Location : byte
-        {
-            /// <summary>
-            /// 默认状态，无意义
-            /// </summary>
-            Defalut_No_Sense = 0,
-            /// <summary>
-            /// 保存位置1号
-            /// </summary>
-            One = 1,
-            /// <summary>
-            /// 保存位置2号
-            /// </summary>
-            Two = 2,
-            /// <summary>
-            /// 保存位置3号
-            /// </summary>
-            Three = 3,
-            /// <summary>
-            /// 保存位置4号
-            /// </summary>
-            Four = 4,
-            /// <summary>
-            /// 保存位置5号
-            /// </summary>
-            Five = 5,
-            /// <summary>
-            /// 保存位置6号
-            /// </summary>
-            Six = 6,
-            /// <summary>
-            /// 保存位置7号
-            /// </summary>
-            Seven = 7
-        }        
-	
-        /// <summary>
-        /// 触发模式，用于设置或读取负载的触发模式
-        /// </summary>
-        public enum TrigerMode : byte
-        {
-            /// <summary>
-            /// 手动触发
-            /// </summary>
-            MANUal = 0x00,
-            /// <summary>
-            /// 外部触发
-            /// </summary>
-            EXTemal = 0x01,
-            /// <summary>
-            /// 总线触发
-            /// </summary>
-            BUS = 0x02,
-            /// <summary>
-            /// 触发保持
-            /// </summary>
-            HOLD = 0x03
-        }
+		/// <summary>
+		/// 存储区域的枚举，取值只能在1~7之间
+		/// </summary>
+		public enum Save_Location : byte
+		{
+			/// <summary>
+			/// 默认状态，无意义
+			/// </summary>
+			Defalut_No_Sense = 0,
+			/// <summary>
+			/// 保存位置1号
+			/// </summary>
+			One = 1,
+			/// <summary>
+			/// 保存位置2号
+			/// </summary>
+			Two = 2,
+			/// <summary>
+			/// 保存位置3号
+			/// </summary>
+			Three = 3,
+			/// <summary>
+			/// 保存位置4号
+			/// </summary>
+			Four = 4,
+			/// <summary>
+			/// 保存位置5号
+			/// </summary>
+			Five = 5,
+			/// <summary>
+			/// 保存位置6号
+			/// </summary>
+			Six = 6,
+			/// <summary>
+			/// 保存位置7号
+			/// </summary>
+			Seven = 7
+		}
 
-        /// <summary>
-        /// 负载工作模式，用于设置正常工作模式、短路、list模式、电池测试模式、transition过渡模式
-        /// </summary>
-        public enum WorkingMode : byte
-        {
-            /// <summary>
-            /// 正常模式
-            /// </summary>
-            Fixed = 0x00,
-            /// <summary>
-            /// 输入短路模式
-            /// </summary>
-            Short = 0x01,
-            /// <summary>
-            /// 过渡模式
-            /// </summary>
-            Transition = 0x02,
-            /// <summary>
-            /// List模式
-            /// </summary>
-            List = 0x03,
+		/// <summary>
+		/// 触发模式，用于设置或读取负载的触发模式
+		/// </summary>
+		public enum TrigerMode : byte
+		{
+			/// <summary>
+			/// 手动触发
+			/// </summary>
+			MANUal = 0x00,
+			/// <summary>
+			/// 外部触发
+			/// </summary>
+			EXTemal = 0x01,
+			/// <summary>
+			/// 总线触发
+			/// </summary>
+			BUS = 0x02,
+			/// <summary>
+			/// 触发保持
+			/// </summary>
+			HOLD = 0x03
+		}
+
+		/// <summary>
+		/// 负载工作模式，用于设置正常工作模式、短路、list模式、电池测试模式、transition过渡模式
+		/// </summary>
+		public enum WorkingMode : byte
+		{
+			/// <summary>
+			/// 正常模式
+			/// </summary>
+			Fixed = 0x00,
+			/// <summary>
+			/// 输入短路模式
+			/// </summary>
+			Short = 0x01,
+			/// <summary>
+			/// 过渡模式
+			/// </summary>
+			Transition = 0x02,
+			/// <summary>
+			/// List模式
+			/// </summary>
+			List = 0x03,
 			/// <summary>
 			/// Battery模式，新IT8500机器无效
 			/// </summary>
 			Battery = 0x04,
-        }
-		  
-        /// <summary>
-        /// 电子负载校准点 1~4
-        /// </summary>
-        public enum CalibrationPoint_Load : byte
-        {
-            /// <summary>
-            /// 第一较准点
-            /// </summary>
-            First = 0x01,
-            /// <summary>
-            /// 第二校准点
-            /// </summary>
-            Second = 0x02,
-            /// <summary>
-            /// 第三较准点
-            /// </summary>
-            Third = 0x03,
-            /// <summary>
-            /// 第四较准点
-            /// </summary>
-            Fourth = 0x04
-        }
+		}
 
-        /// <summary>
-        /// VFD的显示模式
-        /// </summary>
-        public enum VFDShowMode : byte
-        {
-            /// <summary>
-            /// 正常模式、实时显示接入的电压
-            /// </summary>
-            Normal = 0x00,
-            /// <summary>
-            /// 文本模式，不随接入电压的变化而实时变化
-            /// </summary>
-            Text = 0x01
-        }
+		/// <summary>
+		/// 电子负载校准点 1~4
+		/// </summary>
+		public enum CalibrationPoint_Load : byte
+		{
+			/// <summary>
+			/// 第一较准点
+			/// </summary>
+			First = 0x01,
+			/// <summary>
+			/// 第二校准点
+			/// </summary>
+			Second = 0x02,
+			/// <summary>
+			/// 第三较准点
+			/// </summary>
+			Third = 0x03,
+			/// <summary>
+			/// 第四较准点
+			/// </summary>
+			Fourth = 0x04
+		}
 
-        /// <summary>
-        /// 自动测试停止条件
-        /// </summary>
-        public enum AutoTest_StopCondiation : byte
-        {
-            /// <summary>
-            /// 测试完成停止
-            /// </summary>
-            Complete = 0x00,
-            /// <summary>
-            /// 测试失败停止
-            /// </summary>
-            Failed = 0x01
-        }
+		/// <summary>
+		/// VFD的显示模式
+		/// </summary>
+		public enum VFDShowMode : byte
+		{
+			/// <summary>
+			/// 正常模式、实时显示接入的电压
+			/// </summary>
+			Normal = 0x00,
+			/// <summary>
+			/// 文本模式，不随接入电压的变化而实时变化
+			/// </summary>
+			Text = 0x01
+		}
 
-        /// <summary>
-        /// 动态操作模式
-        /// </summary>
-        public enum DynamicMode : byte
-        {
-            /// <summary>
-            /// 连续模式
-            /// </summary>
-            Continues = 0x00,
-            /// <summary>
-            /// 脉冲模式
-            /// </summary>
-            Pulse = 0x01,
-            /// <summary>
-            /// 触发模式
-            /// </summary>
-            Toggled = 0x02
-        }
+		/// <summary>
+		/// 自动测试停止条件
+		/// </summary>
+		public enum AutoTest_StopCondiation : byte
+		{
+			/// <summary>
+			/// 测试完成停止
+			/// </summary>
+			Complete = 0x00,
+			/// <summary>
+			/// 测试失败停止
+			/// </summary>
+			Failed = 0x01
+		}
 
-        /// <summary>
-        /// Von模式的设置
-        /// </summary>
-        public enum VonLatchMode : byte
-        {
-            /// <summary>
-            /// Living模式，低于Von目标值则停止带载
-            /// </summary>
-            Living = 0x00,
-            /// <summary>
-            /// Latch模式，带载启动后低于Von目标值继续带载
-            /// </summary>
-            Latch = 0x01
-        }
+		/// <summary>
+		/// 动态操作模式
+		/// </summary>
+		public enum DynamicMode : byte
+		{
+			/// <summary>
+			/// 连续模式
+			/// </summary>
+			Continues = 0x00,
+			/// <summary>
+			/// 脉冲模式
+			/// </summary>
+			Pulse = 0x01,
+			/// <summary>
+			/// 触发模式
+			/// </summary>
+			Toggled = 0x02
+		}
+
+		/// <summary>
+		/// Von模式的设置
+		/// </summary>
+		public enum VonLatchMode : byte
+		{
+			/// <summary>
+			/// Living模式，低于Von目标值则停止带载
+			/// </summary>
+			Living = 0x00,
+			/// <summary>
+			/// Latch模式，带载启动后低于Von目标值继续带载
+			/// </summary>
+			Latch = 0x01
+		}
 
 		#endregion
 
@@ -1183,211 +1183,211 @@ namespace Instrument_Control
 		/// 用于得到电子负载在List模式下指定单步中的电流值、计时器时间及最大斜率，对应单位都是各自模式下的主单位
 		/// </summary>
 		public struct ListParmeters
-        {
-            /// <summary>
-            /// List模式下的目标单步序号
-            /// </summary>
-            public Int32 Target_Step;
-            /// <summary>
-            /// 单步电流值
-            /// </summary>
-            public decimal Current_Value;
-            /// <summary>
-            /// 计时器时间
-            /// </summary>
-            public decimal Time;
-            /// <summary>
-            /// 最大斜率，设置List的对应单步电流值时有效
-            /// </summary>
-            public Int32 Max_Slope;
-        }
-    
-        /// <summary>
-        /// 用于得到负载的输入电压、输入电流、功率、操作状态寄存器、查询状态寄存器、散热器温度、工作模式及List模式下当前List步数、循环次数
-        /// </summary>
-        public struct GeneralData_Load
-        {
-            /// <summary>
-            /// 实际输入电压 - 单位1V
-            /// </summary>
-            public decimal ActrulyVoltage;
-            /// <summary>
-            /// 实际需输入电流-单位1A
-            /// </summary>
-            public decimal ActrulyCurrent;
-            /// <summary>
-            /// 实际输入功率-单位1W
-            /// </summary>
-            public decimal ActrulyPower;
-            /// <summary>
-            /// 操作状态寄存器的状态
-            /// </summary>
-            public Register_Operation register_Operation;
-            /// <summary>
-            /// 查询状态寄存器的状态
-            /// </summary>
-            public Register_Query register_Query;
-            /// <summary>
-            /// 散热器温度 - 单位 摄氏度
-            /// </summary>
-            public Int32 Temprature;
-            /// <summary>
-            /// 工作模式
-            /// </summary>
-            public WorkingMode workingMode;
-            /// <summary>
-            /// 当前List的步数
-            /// </summary>
-            public Int32 List_Step_Num;
-            /// <summary>
-            /// 当前List的循环次数
-            /// </summary>
-            public Int32 List_Cyclical_Times;
-        }
-
-        /// <summary>
-        /// 查询状态寄存器中定义的结构体
-        /// </summary>
-        public struct Register_Query
 		{
-            /// <summary>
-            /// 输入极性反接
-            /// </summary>
-            public bool RV;
-            /// <summary>
-            /// 过电压
-            /// </summary>
-            public bool OV;
-            /// <summary>
-            /// 过电流
-            /// </summary>
-            public bool OC;
-            /// <summary>
-            /// 过功率
-            /// </summary>
-            public bool OP;
-            /// <summary>
-            /// 过温度
-            /// </summary>
-            public bool OT;
-            /// <summary>
-            /// 远端测量端子没接
-            /// </summary>
-            public bool SV;
-            /// <summary>
-            /// 恒流
-            /// </summary>
-            public bool CC;
-            /// <summary>
-            /// 恒压
-            /// </summary>
-            public bool CV;
-            /// <summary>
-            /// 恒功率
-            /// </summary>
-            public bool CW;
-            /// <summary>
-            /// 恒阻
-            /// </summary>
-            public bool CR;
-            /// <summary>
-            /// 自动测试成功
-            /// </summary>
-            public bool PASS;
-            /// <summary>
-            /// 自动测试失败
-            /// </summary>
-            public bool FAULT;
-            /// <summary>
-            /// 自动测试完成
-            /// </summary>
-            public bool COMPLET;
-        }
+			/// <summary>
+			/// List模式下的目标单步序号
+			/// </summary>
+			public Int32 Target_Step;
+			/// <summary>
+			/// 单步电流值
+			/// </summary>
+			public decimal Current_Value;
+			/// <summary>
+			/// 计时器时间
+			/// </summary>
+			public decimal Time;
+			/// <summary>
+			/// 最大斜率，设置List的对应单步电流值时有效
+			/// </summary>
+			public Int32 Max_Slope;
+		}
 
-        /// <summary>
-        /// 操作状态寄存器中定义的结构体
-        /// </summary>
-        public struct Register_Operation
+		/// <summary>
+		/// 用于得到负载的输入电压、输入电流、功率、操作状态寄存器、查询状态寄存器、散热器温度、工作模式及List模式下当前List步数、循环次数
+		/// </summary>
+		public struct GeneralData_Load
 		{
-            /// <summary>
-            /// 负载在校准模式
-            /// </summary>
-            public bool CAL;
-            /// <summary>
-            /// 负载在等待触发信号
-            /// </summary>
-            public bool WTG;
-            /// <summary>
-            /// 负载远端控制模式
-            /// </summary>
-            public bool REMote;
-            /// <summary>
-            /// 负载输出状态
-            /// </summary>
-            public bool OUT;
-            /// <summary>
-            /// 负载LOCAL按键状态（0 禁止，1 允许）  
-            /// </summary>
-            public bool LOCAL;
-            /// <summary>
-            /// 负载远端测量模式状态
-            /// </summary>
-            public bool SENSE;
-            /// <summary>
-            /// FOR LOAD ON定时器状态
-            /// </summary>
-            public bool LOT;
-        }
-		 
-        /// <summary>
-        /// 获得负载的设计参数信息
-        /// </summary>
-        public struct HardwareLimit_Information
-        {
-            /// <summary>
-            /// 硬件设计的最大输入电流
-            /// </summary>
-            public decimal  MaxCurrent;
-            /// <summary>
-            /// 硬件设计的最大输入电压
-            /// </summary>
-            public decimal  MaxVoltage;
-            /// <summary>
-            /// 硬件设计的最小输入电压
-            /// </summary>
-            public decimal  MinVoltage;
-            /// <summary>
-            /// 硬件设计的最大输入功率
-            /// </summary>
-            public decimal  MaxPower;
-            /// <summary>
-            /// 硬件设计的最大接入电阻
-            /// </summary>
-            public decimal  MaxRestance;
-            /// <summary>
-            /// 硬件设计的最小接入电阻
-            /// </summary>
-            public decimal  MinRestance;
-        }
+			/// <summary>
+			/// 实际输入电压 - 单位1V
+			/// </summary>
+			public decimal ActrulyVoltage;
+			/// <summary>
+			/// 实际需输入电流-单位1A
+			/// </summary>
+			public decimal ActrulyCurrent;
+			/// <summary>
+			/// 实际输入功率-单位1W
+			/// </summary>
+			public decimal ActrulyPower;
+			/// <summary>
+			/// 操作状态寄存器的状态
+			/// </summary>
+			public Register_Operation register_Operation;
+			/// <summary>
+			/// 查询状态寄存器的状态
+			/// </summary>
+			public Register_Query register_Query;
+			/// <summary>
+			/// 散热器温度 - 单位 摄氏度
+			/// </summary>
+			public Int32 Temprature;
+			/// <summary>
+			/// 工作模式
+			/// </summary>
+			public WorkingMode workingMode;
+			/// <summary>
+			/// 当前List的步数
+			/// </summary>
+			public Int32 List_Step_Num;
+			/// <summary>
+			/// 当前List的循环次数
+			/// </summary>
+			public Int32 List_Cyclical_Times;
+		}
 
-        /// <summary>
-        /// 获得带载容量、带载上升/下降时间、定时器剩余时间信息
-        /// </summary>
-        public struct Capacity_Timer
-        {
-            /// <summary>
-            /// 带载容量
-            /// </summary>
-            public Int32 Capacity;
-            /// <summary>
-            /// 带载上升/下降时间
-            /// </summary>
-            public Int32 Working_Time;
-            /// <summary>
-            /// 定时器剩余时间
-            /// </summary>
-            public Int32 Timer_Left_Time;
-        }
+		/// <summary>
+		/// 查询状态寄存器中定义的结构体
+		/// </summary>
+		public struct Register_Query
+		{
+			/// <summary>
+			/// 输入极性反接
+			/// </summary>
+			public bool RV;
+			/// <summary>
+			/// 过电压
+			/// </summary>
+			public bool OV;
+			/// <summary>
+			/// 过电流
+			/// </summary>
+			public bool OC;
+			/// <summary>
+			/// 过功率
+			/// </summary>
+			public bool OP;
+			/// <summary>
+			/// 过温度
+			/// </summary>
+			public bool OT;
+			/// <summary>
+			/// 远端测量端子没接
+			/// </summary>
+			public bool SV;
+			/// <summary>
+			/// 恒流
+			/// </summary>
+			public bool CC;
+			/// <summary>
+			/// 恒压
+			/// </summary>
+			public bool CV;
+			/// <summary>
+			/// 恒功率
+			/// </summary>
+			public bool CW;
+			/// <summary>
+			/// 恒阻
+			/// </summary>
+			public bool CR;
+			/// <summary>
+			/// 自动测试成功
+			/// </summary>
+			public bool PASS;
+			/// <summary>
+			/// 自动测试失败
+			/// </summary>
+			public bool FAULT;
+			/// <summary>
+			/// 自动测试完成
+			/// </summary>
+			public bool COMPLET;
+		}
+
+		/// <summary>
+		/// 操作状态寄存器中定义的结构体
+		/// </summary>
+		public struct Register_Operation
+		{
+			/// <summary>
+			/// 负载在校准模式
+			/// </summary>
+			public bool CAL;
+			/// <summary>
+			/// 负载在等待触发信号
+			/// </summary>
+			public bool WTG;
+			/// <summary>
+			/// 负载远端控制模式
+			/// </summary>
+			public bool REMote;
+			/// <summary>
+			/// 负载输出状态
+			/// </summary>
+			public bool OUT;
+			/// <summary>
+			/// 负载LOCAL按键状态（0 禁止，1 允许）  
+			/// </summary>
+			public bool LOCAL;
+			/// <summary>
+			/// 负载远端测量模式状态
+			/// </summary>
+			public bool SENSE;
+			/// <summary>
+			/// FOR LOAD ON定时器状态
+			/// </summary>
+			public bool LOT;
+		}
+
+		/// <summary>
+		/// 获得负载的设计参数信息
+		/// </summary>
+		public struct HardwareLimit_Information
+		{
+			/// <summary>
+			/// 硬件设计的最大输入电流
+			/// </summary>
+			public decimal MaxCurrent;
+			/// <summary>
+			/// 硬件设计的最大输入电压
+			/// </summary>
+			public decimal MaxVoltage;
+			/// <summary>
+			/// 硬件设计的最小输入电压
+			/// </summary>
+			public decimal MinVoltage;
+			/// <summary>
+			/// 硬件设计的最大输入功率
+			/// </summary>
+			public decimal MaxPower;
+			/// <summary>
+			/// 硬件设计的最大接入电阻
+			/// </summary>
+			public decimal MaxRestance;
+			/// <summary>
+			/// 硬件设计的最小接入电阻
+			/// </summary>
+			public decimal MinRestance;
+		}
+
+		/// <summary>
+		/// 获得带载容量、带载上升/下降时间、定时器剩余时间信息
+		/// </summary>
+		public struct Capacity_Timer
+		{
+			/// <summary>
+			/// 带载容量
+			/// </summary>
+			public Int32 Capacity;
+			/// <summary>
+			/// 带载上升/下降时间
+			/// </summary>
+			public Int32 Working_Time;
+			/// <summary>
+			/// 定时器剩余时间
+			/// </summary>
+			public Int32 Timer_Left_Time;
+		}
 
 		/// <summary>
 		/// 获得负载最大最小输入电压、电流值
@@ -1518,10 +1518,10 @@ namespace Instrument_Control
 
 		#region -- 具体执行与仪表之间的通讯的方法
 
-        /// <summary>
-        /// 定义一个26个元素的字节数组,用于放置接收和待发送的通讯数据
-        /// </summary>
-        static byte[] SerialportData = new byte[Communicate_Code_Length];
+		/// <summary>
+		/// 定义一个26个元素的字节数组,用于放置接收和待发送的通讯数据
+		/// </summary>
+		static byte[] SerialportData = new byte[ Communicate_Code_Length ];
 		/// <summary>
 		/// 控制命令出现通讯错误之后重新操作的次数
 		/// </summary>
@@ -1537,12 +1537,12 @@ namespace Instrument_Control
 		/// 需要计算校验和的数组中的字节长度
 		/// </summary>
 		const Int32 NeedCalibrateCodeLength = 25;
-        /*同步头*/
-        private const byte Head = 0xAA;
-        /// <summary>
-        /// 仪表返回的数据异常情况，有可能时485模块异常导致
-        /// </summary>
-        public const string Infor_CommuncateError = "仪表 通讯协议中出现传输错误，请检查连接仪表的485模块是否存在故障 \r\n";
+		/*同步头*/
+		private const byte Head = 0xAA;
+		/// <summary>
+		/// 仪表返回的数据异常情况，有可能时485模块异常导致
+		/// </summary>
+		public const string Infor_CommuncateError = "仪表 通讯协议中出现传输错误，请检查连接仪表的485模块是否存在故障 \r\n";
 		/// <summary>
 		/// 仪表返回的数据异常情况，有可能是退出了程控模式导致
 		/// </summary>
@@ -1550,12 +1550,12 @@ namespace Instrument_Control
 		/// <summary>
 		/// 仪表无法打开通讯串口时返回信息
 		/// </summary>
-		public const string Information_LoadError_OpenSP = "仪表 出现了不能通讯的情况（无法打开串口），请注意此状态 \r\n";       
-        /// <summary>
-        /// 给仪表发送指令，但是出现响应超时的情况
-        /// </summary>
-        public const string Infor_CommuncateErrorTimeOverflow = "仪表响应超时，请更换串口进行操作 \r\n";
-				
+		public const string Information_LoadError_OpenSP = "仪表 出现了不能通讯的情况（无法打开串口），请注意此状态 \r\n";
+		/// <summary>
+		/// 给仪表发送指令，但是出现响应超时的情况
+		/// </summary>
+		public const string Infor_CommuncateErrorTimeOverflow = "仪表响应超时，请更换串口进行操作 \r\n";
+
 		#endregion
 
 		#region  --  函数
@@ -1569,22 +1569,22 @@ namespace Instrument_Control
 		/// <param name="start_index">数组中的起始字节索引</param>
 		/// <param name="count">需要计算的字节长度</param>
 		/// <returns>所需校验和</returns>
-		private byte Itech_vGetCalibrateCode ( byte [ ] command_bytes , Int32 start_index , Int32 count )
+		private byte Itech_vGetCalibrateCode(byte[] command_bytes, Int32 start_index, Int32 count)
 		{
 			UInt16 added_code = 0;
 			Int32 index = 0;
 			do {
 				added_code += command_bytes[ start_index + index ];
 			} while (++index < count);
-			byte [ ] aByte = BitConverter.GetBytes ( added_code );
-			return aByte [ 0 ];
+			byte[] aByte = BitConverter.GetBytes( added_code );
+			return aByte[ 0 ];
 		}
 
 		/*使用串口发送指令代码*/
-		private string Itech_vCommandSend ( byte [ ] command_bytes , SerialPort sp_instrument )
+		private string Itech_vCommandSend(byte[] command_bytes, SerialPort sp_instrument)
 		{
 			/*判断串口打开是否正常，若不正常则先要进行打开设置*/
-			if ( !sp_instrument.IsOpen ) {
+			if (!sp_instrument.IsOpen) {
 				try {
 					sp_instrument.Open();
 				} catch {
@@ -1592,8 +1592,8 @@ namespace Instrument_Control
 				}
 			}
 			/*以下执行串口数据传输指令*/
-			string temp = sp_instrument.ReadExisting ( ); 
-			sp_instrument.Write ( command_bytes , 0 , command_bytes.Length );
+			string temp = sp_instrument.ReadExisting();
+			sp_instrument.Write( command_bytes, 0, command_bytes.Length );
 			return string.Empty;
 		}
 
@@ -1608,44 +1608,49 @@ namespace Instrument_Control
 			string error_information = string.Empty;
 			//先将之前发送出去的命令字节做一个备份，需要在查询指令时使用
 			byte[] command_before = new byte[ SerialportData.Length ];
+			byte[] received_data = new byte[ sp_instrument.BytesToRead ];
 			int index = 0;
 			do {
 				command_before[ index ] = SerialportData[ index ];
 			} while (++index < SerialportData.Length);
 
-			if (sp_instrument.BytesToRead == Communicate_Code_Length) {
-				//将串口受到的数据移到aByte数组中，并依据读取的数量进行判断0
-				sp_instrument.Read( SerialportData, 0, Communicate_Code_Length );
-
-				//防止串口异常出现的接收数据与发送数据相同的情况
-				index = 0;
-				do {
-					if (SerialportData[ index ] != command_before[ index ]) { break; }
-				} while (++index < SerialportData.Length);
-				if (index >= SerialportData.Length) { return "使用到的串口出现了接收数据与发送数据相同的异常 \r\n"; }
-
-				//先判断同步头字节和校验和是否满足要求
-				if (SerialportData[ 0 ] != Head) { error_information = "地址为 " + address.ToString() + " 的" + Infor_CommuncateError; return error_information; }
-				if (SerialportData[ NeedCalibrateCodeLength ] != Itech_vGetCalibrateCode( SerialportData, 0, NeedCalibrateCodeLength )) { error_information = "地址为 " + address.ToString() + " 的" + Infor_CommuncateError; return error_information; }
-				//依据校验命令判断上位机给下位机发送的指令代码是否正常，设置命令时需要包含0x12 0x80；查询命令时不可以包含0x12 0x90，且命令因该与发送的查询命令保持一致
-				if (SerialportData[ 2 ] == ( byte )ElecLoad_Command.Communicate_Check_Anwser) {
-					if (SerialportData[ 3 ] != 0x80) {
-						if (SerialportData[ 3 ] == 0xB0) {
-							error_information = Infor_CommuncateError_CannotDoEvent;
-						} else {
-							error_information = Infor_CommuncateError;
-						}
-					}
-				} else if (SerialportData[ 2 ] == command_before[ 2 ]) {
-					//在查询指令时仪表返回的命令字节与之前发送的需要保持一致；待后续步骤提取有效数据
-				} else {
-					//其他异常情况，肯定存在数据的错误
-					error_information = "地址为 " + address.ToString() + " 的" + Infor_CommuncateError;
+			//个别产品电源会在上电和下电时不受控的回传异常多余字节(产品硬件决定)，此处需要对串口接收数据进行提取，只保留帧头以后的数据
+			sp_instrument.Read( received_data, 0, sp_instrument.BytesToRead );
+			int index_of_header = -1;
+			for (index = 0; index < received_data.Length; index++) {
+				if (received_data[ index ] == Head) {
+					index_of_header = index;
+					break;
 				}
+			}
+			if(index_of_header < 0) { error_information = address.ToString() + "数据传输受到干扰，请重试";return error_information; }
+			Buffer.BlockCopy( received_data, index_of_header, SerialportData, 0, (received_data.Length - index_of_header) );
+
+			//防止串口异常出现的接收数据与发送数据相同的情况
+			index = 0;
+			do {
+				if (SerialportData[ index ] != command_before[ index ]) { break; }
+			} while (++index < SerialportData.Length);
+			if (index >= SerialportData.Length) { return "使用到的串口出现了接收数据与发送数据相同的异常 \r\n"; }
+
+			//先判断同步头字节和校验和是否满足要求
+			if (SerialportData[ NeedCalibrateCodeLength ] != Itech_vGetCalibrateCode( SerialportData, 0, NeedCalibrateCodeLength )) { error_information = "地址为 " + address.ToString() + " 的" + Infor_CommuncateError; return error_information; }
+			//依据校验命令判断上位机给下位机发送的指令代码是否正常，设置命令时需要包含0x12 0x80；查询命令时不可以包含0x12 0x90，且命令因该与发送的查询命令保持一致
+			if (SerialportData[ 2 ] == ( byte )ElecLoad_Command.Communicate_Check_Anwser) {
+				if (SerialportData[ 3 ] != 0x80) {
+					if (SerialportData[ 3 ] == 0xB0) {
+						error_information = Infor_CommuncateError_CannotDoEvent;
+					} else {
+						error_information = Infor_CommuncateError;
+					}
+				}
+			} else if (SerialportData[ 2 ] == command_before[ 2 ]) {
+				//在查询指令时仪表返回的命令字节与之前发送的需要保持一致；待后续步骤提取有效数据
 			} else {
-				sp_instrument.ReadExisting();
+				//其他异常情况，肯定存在数据的错误
 				error_information = "地址为 " + address.ToString() + " 的" + Infor_CommuncateError;
 			}
+			sp_instrument.ReadExisting();
 			return error_information;
 		}
 
@@ -1897,7 +1902,7 @@ namespace Instrument_Control
 					} while ((++index < 3) && (error_information == string.Empty));
 
 					if (error_information != string.Empty){
-						if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+						if (++retry_time < 10) {//连续10次异常才可以真实上报故障
 							obj = ElecLoad_vTransferOneCommand( address, elecLoad_Command,  sp_instrument, out error_information, para1, para2, para3, para4 );
 						} else {
 							retry_time = 0;
@@ -1977,7 +1982,7 @@ namespace Instrument_Control
 					} while ((++index < 4) && (error_information == string.Empty));
 
 					if (error_information != string.Empty) {
-						if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+						if (++retry_time < 10) {//连续10次异常才可以真实上报故障
 							obj = ElecLoad_vTransferOneCommand( address, elecLoad_Command,  sp_instrument, out error_information, para1, para2, para3, para4 );
 						} else {
 							obj = null;
@@ -2018,7 +2023,7 @@ namespace Instrument_Control
 					} while ((++index < 4) && (error_information == string.Empty));
 
 					if (error_information != string.Empty) {
-						if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+						if (++retry_time < 10) {//连续10次异常才可以真实上报故障
 							obj = ElecLoad_vTransferOneCommand( address, elecLoad_Command,  sp_instrument, out error_information, para1, para2, para3, para4 );
 						} else {
 							obj = null;
@@ -2105,7 +2110,7 @@ namespace Instrument_Control
 					} while ((++index < 4) && (error_information == string.Empty));
 
 					if (error_information != string.Empty) {
-						if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+						if (++retry_time < 10) {//连续10次异常才可以真实上报故障
 							obj = ElecLoad_vTransferOneCommand( address, elecLoad_Command,  sp_instrument, out error_information, para1, para2, para3, para4 );
 						} else {
 							obj = null;
@@ -2193,7 +2198,7 @@ namespace Instrument_Control
 						} while ((++index < 3) && (error_information == string.Empty));
 
 						if (error_information != string.Empty) {
-							if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+							if (++retry_time < 10) {//连续10次异常才可以真实上报故障
 								obj = ElecLoad_vTransferOneCommand( address, elecLoad_Command,  sp_instrument, out error_information, obj );
 							} else {
 								obj = null;
@@ -2250,7 +2255,7 @@ namespace Instrument_Control
 						} while ((++index < 3) && (error_information == string.Empty));
 
 						if (error_information != string.Empty) {
-							if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+							if (++retry_time < 10) {//连续10次异常才可以真实上报故障
 								obj = ElecLoad_vTransferOneCommand( address, elecLoad_Command,  sp_instrument, out error_information, obj );
 							} else {
 								obj = null;
@@ -2296,7 +2301,7 @@ namespace Instrument_Control
 							}
 						} while ((++index < 4) && (error_information == string.Empty));
 						if (error_information != string.Empty) {
-							if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+							if (++retry_time < 10) {//连续10次异常才可以真实上报故障
 								obj = ElecLoad_vTransferOneCommand( address, elecLoad_Command,  sp_instrument, out error_information, obj );
 							} else {
 								obj = null;
@@ -2361,7 +2366,7 @@ namespace Instrument_Control
 						}
 					} while ((++index < 4) && (error_information == string.Empty));
 					if (error_information != string.Empty) {
-						if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+						if (++retry_time < 10) {//连续10次异常才可以真实上报故障
 							obj = DCPower_vTransferOneCommand( address, dCPower_Command,  sp_instrument, out error_information, para1, para2, para3 , para4 );
 						} else {
 							obj = null;
@@ -2395,7 +2400,7 @@ namespace Instrument_Control
 						}
 					} while ((++index < 4) && (error_information == string.Empty));
 					if (error_information != string.Empty) {
-						if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+						if (++retry_time < 10) {//连续10次异常才可以真实上报故障
 							obj = DCPower_vTransferOneCommand( address, dCPower_Command,  sp_instrument, out error_information, para1, para2, para3, para4 );
 						} else {
 							obj = null;
@@ -2454,7 +2459,7 @@ namespace Instrument_Control
 							}
 						} while ((++index < 4) && (error_information == string.Empty));
 						if (error_information != string.Empty) {
-							if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+							if (++retry_time < 10) {//连续10次异常才可以真实上报故障
 								obj = DCPower_vTransferOneCommand( address, dCPower_Command,  sp_instrument, out error_information, obj );
 							} else {
 								obj = null;

@@ -141,7 +141,7 @@ namespace Ingenu_Power.UserControls
 						Dispatcher.Invoke ( new dlg_ProgressBarWorkingSet ( ProgressBarWorkingSet ), true );
 						//仪表初始化
 						MethodInfo mi = id_verion.GetMethod ( "Measure_vInstrumentInitalize" );
-						object [ ] parameters = new object [ ] { Properties.Settings.Default.Instrment_OSC_INS, sp_name };
+						object [ ] parameters = new object [ ] { ins, sp_name };
 						string error_information = mi.Invoke ( obj, parameters ).ToString ( );
 
 						StaticInfor.Error_Message = error_information;
@@ -149,6 +149,7 @@ namespace Ingenu_Power.UserControls
 						if ( error_information == string.Empty ) {
 							Dispatcher.Invoke ( new dlg_PackIconShow ( PackIconShow ), PackIconKind.LanConnect, true );
 							Properties.Settings.Default.UsedSerialport = sp_name;
+							Properties.Settings.Default.Instrment_OSC_INS = ins;
 							Properties.Settings.Default.Save ( );
 						} else {
 							Dispatcher.Invoke ( new dlg_PackIconShow ( PackIconShow ), PackIconKind.LanDisconnect, true );

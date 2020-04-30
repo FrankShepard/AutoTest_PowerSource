@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Ports;
+using System.Text;
 using System.Threading;
 
 namespace Instrument_Control
@@ -78,43 +79,43 @@ namespace Instrument_Control
 			/// <summary>
 			/// Write : 输出通道3设定输出电压，用于后续扩展
 			/// </summary>
-			OverCurrentSet_1OutputTargetSet_3 = 0x42,
+			OutputTargetSet_3 = 0x42,
 			/// <summary>
-			/// Write : 输出通道1的零点校准
+			/// Write : 输出通道1的空载电压的校准
 			/// </summary>
-			ZeroCalibrate_1 = 0x43,
+			DisplayVoltage_Ratio_1 = 0x43,
 			/// <summary>
-			/// Write : 输出通道2的零点校准
+			/// Write : 输出通道2的空载电压的校准
 			/// </summary>
-			ZeroCalibrate_2 = 0x44,
+			DisplayVoltage_Ratio_2 = 0x44,
 			/// <summary>
-			/// Write : 输出通道3的零点校准
+			/// Write : 输出通道3的空载电压的校准
 			/// </summary>
-			ZeroCalibrate_3 = 0x45,
+			DisplayVoltage_Ratio_3 = 0x45,
 			/// <summary>
-			/// Write : 设置输出通道1的软件过流点
+			/// Write : 设置输出通道1的软件过流/过功率点
 			/// </summary>
-			OverCurrentSet_1 = 0x46,
+			OxpSet_1 = 0x46,
 			/// <summary>
-			/// Write : 设置输出通道2的软件过流点
+			/// Write : 设置输出通道2的软件过流/过功率点
 			/// </summary>
-			OverCurrentSet_2 = 0x47,
+			OxpSet_2 = 0x47,
 			/// <summary>
-			/// Write : 设置输出通道3的软件过流点
+			/// Write : 设置输出通道3的软件过流/过功率点
 			/// </summary>
-			OverCurrentSet_3 = 0x48,
+			OxpSet_3 = 0x48,
 			/// <summary>
-			/// Write : 输出通道1的电压与电流校准
+			/// Write : 输出通道1的电流校准
 			/// </summary>
-			DisplayVoltage_Ratio_1 = 0x49,
+			DisplayCurrent_Ratio_1 = 0x49,
 			/// <summary>
-			/// Write : 输出通道2的电压与电流校准
+			/// Write : 输出通道2的电流校准
 			/// </summary>
-			DisplayVoltage_Ratio_2 = 0x4A,
+			DisplayCurrent_Ratio_2 = 0x4A,
 			/// <summary>
-			/// Write : 输出通道3的电压与电流校准
+			/// Write : 输出通道3的电流校准
 			/// </summary>
-			DisplayVoltage_Ratio_3 = 0x4B,
+			DisplayCurrent_Ratio_3 = 0x4B,
 			/// <summary>
 			/// Write : 输出电压的调整(硬件设计问题，所有通道的电压时调整，待后续扩展)
 			/// </summary>
@@ -144,13 +145,17 @@ namespace Instrument_Control
 			/// </summary>
 			RatioSpCurrentToMp_1 = 0x52,
 			/// <summary>
-			/// 管理员指令，对特定的产品而言，使用本指令来保证始终处于充电的状态（应急照明电源）
+			/// 管理员指令，对特定的产品而言，使用本指令来保证始终处于充电的状态
 			/// </summary>
 			AlwaysCharging = 0x53,
 			/// <summary>
-			/// 管理员指令，对特定产品，使用本指令之后会造成备电单投功能无效（应急照明电源）
+			/// 管理员指令，对特定产品，使用本指令之后会造成备电单投功能无效
 			/// </summary>
 			BatsSingleWorkDisable = 0x54,
+			/// <summary>
+			/// 管理员指令，对特定产品，使用本指令之后会减少充电周期
+			/// </summary>
+			ChargePeriodSet = 0x55,
 			/// <summary>
 			/// 清除单片机中相应的扇区中的校准数据
 			/// </summary>
@@ -179,10 +184,6 @@ namespace Instrument_Control
 			/// 读取单片机内指定地址的Flash数据
 			/// </summary>
 			FlashDataRead = 0x71,
-			/// <summary>
-			/// 充电周期设置
-			/// </summary>
-			ChargePeriodSet = 0x72,
 			/// <summary>
 			/// 退出管理员模式的代码
 			/// </summary>
@@ -447,15 +448,17 @@ namespace Instrument_Control
 			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
 			datas[ 0 ] = ( byte )Cmd.Cmd_Set;
 			switch (channel_index) {
-				case 0: datas[ 1 ] = ( byte )Config.ZeroCalibrate_1; break;
-				case 1: datas[ 1 ] = ( byte )Config.ZeroCalibrate_2; break;
-				case 2: datas[ 1 ] = ( byte )Config.ZeroCalibrate_3; break;
+				case 0: datas[ 1 ] = ( byte )Config.DisplayVoltage_Ratio_1; break;
+				case 1: datas[ 1 ] = ( byte )Config.DisplayVoltage_Ratio_2; break;
+				case 2: datas[ 1 ] = ( byte )Config.DisplayVoltage_Ratio_3; break;
 				default: break;
 			}
 			byte[] value = BitConverter.GetBytes( Convert.ToUInt32( voltage * 1000 ) );
 			datas[ 2 ] = value[ 1 ];
 			datas[ 3 ] = value[ 0 ];
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 		/// <summary>
@@ -472,9 +475,11 @@ namespace Instrument_Control
 			datas[ 1 ] = ( byte )Config.MainpowerVoltageCalibrate;
 
 			byte[] value = BitConverter.GetBytes( Convert.ToUInt32( voltage ) );
-			datas[ 2 ] = value[ 1 ];
-			datas[ 3 ] = value[ 0 ];
+			datas[ 2 ] = value[ 0 ];
+			datas[ 3 ] = value[ 1 ];
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 
@@ -495,6 +500,8 @@ namespace Instrument_Control
 			datas[ 2 ] = value[ 1 ];
 			datas[ 3 ] = value[ 0 ];
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 		/// <summary>
@@ -509,6 +516,8 @@ namespace Instrument_Control
 			datas[ 0 ] = ( byte )Cmd.Cmd_Set;
 			datas[ 1 ] = ( byte )Config.Mcu_CannotChargeHighCountGet;
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 		/// <summary>
@@ -518,21 +527,23 @@ namespace Instrument_Control
 		/// <param name="ocp_value">目标OCP</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void McuCalibrate_vOCP(int channel_index, decimal ocp_value, SerialPort serialPort, out string error_information)
+		public void McuCalibrate_vOxpSet(int channel_index, decimal ocp_value, SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
 			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
 			datas[ 0 ] = ( byte )Cmd.Cmd_Set;
 			switch (channel_index) {
-				case 0: datas[ 1 ] = ( byte )Config.OverCurrentSet_1; break;
-				case 1: datas[ 1 ] = ( byte )Config.OverCurrentSet_2; break;
-				case 2: datas[ 1 ] = ( byte )Config.OverCurrentSet_3; break;
+				case 0: datas[ 1 ] = ( byte )Config.OxpSet_1; break;
+				case 1: datas[ 1 ] = ( byte )Config.OxpSet_2; break;
+				case 2: datas[ 1 ] = ( byte )Config.OxpSet_3; break;
 				default: break;
 			}
 			byte[] value = BitConverter.GetBytes( Convert.ToUInt32( ocp_value * 1000 ) );
 			datas[ 2 ] = value[ 1 ];
 			datas[ 3 ] = value[ 0 ];
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 		/// <summary>
@@ -549,9 +560,9 @@ namespace Instrument_Control
 			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
 			datas[ 0 ] = ( byte )Cmd.Cmd_Set;
 			switch (channel_index) {
-				case 0: datas[ 1 ] = ( byte )Config.DisplayVoltage_Ratio_1; break;
-				case 1: datas[ 1 ] = ( byte )Config.DisplayVoltage_Ratio_2; break;
-				case 2: datas[ 1 ] = ( byte )Config.DisplayVoltage_Ratio_3; break;
+				case 0: datas[ 1 ] = ( byte )Config.DisplayCurrent_Ratio_1; break;
+				case 1: datas[ 1 ] = ( byte )Config.DisplayCurrent_Ratio_2; break;
+				case 2: datas[ 1 ] = ( byte )Config.DisplayCurrent_Ratio_3; break;
 				default: break;
 			}
 			byte[] value = BitConverter.GetBytes( Convert.ToUInt32( voltage * 1000 ) );
@@ -561,6 +572,8 @@ namespace Instrument_Control
 			datas[ 4 ] = value[ 1 ];
 			datas[ 5 ] = value[ 0 ];
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 		/// <summary>
@@ -589,6 +602,8 @@ namespace Instrument_Control
 			datas[ 4 ] = value[ 1 ];
 			datas[ 5 ] = value[ 0 ];
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 		/// <summary>
@@ -603,10 +618,12 @@ namespace Instrument_Control
 			datas[ 0 ] = ( byte )Cmd.Cmd_Set;
 			datas[ 1 ] = ( byte )Config.BatsSingleWorkDisable;
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 		/// <summary>
-		/// 对待测产品MCU进行校准 - 擦除校准数据
+		/// 对待测产品MCU进行校准 - 擦除校准数据;为了保证可靠，写3次
 		/// </summary>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能存在的错误信息</param>
@@ -616,7 +633,16 @@ namespace Instrument_Control
 			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
 			datas[ 0 ] = ( byte )Cmd.Cmd_Set;
 			datas[ 1 ] = ( byte )Config.Mcu_ClearValidationCode;
+			datas[ 2 ] = 0x01;
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//单片机操作Flash时间较长，此处时间不可忽略；增加200ms延时
+			Thread.Sleep( 200 );
+			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//单片机操作Flash时间较长，此处时间不可忽略；增加200ms延时
+			Thread.Sleep( 200 );
+			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//单片机操作Flash时间较长，此处时间不可忽略；增加200ms延时
+			Thread.Sleep( 200 );
 		}
 
 		/// <summary>
@@ -630,7 +656,10 @@ namespace Instrument_Control
 			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
 			datas[ 0 ] = ( byte )Cmd.Cmd_Set;
 			datas[ 1 ] = ( byte )Config.ChangeBeepWorkingTime;
+			datas[ 2 ] = 0x01;
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 		/// <summary>
@@ -645,6 +674,8 @@ namespace Instrument_Control
 			datas[ 0 ] = ( byte )Cmd.Cmd_Set;
 			datas[ 1 ] = ( byte )Config.SetBeValidatedFlag;
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 		/// <summary>
@@ -674,10 +705,12 @@ namespace Instrument_Control
 			datas[ 1 ] = ( byte )Config.Mcu_MainpowerPeriodCountGet; 
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
 			if(error_information != string.Empty) { return; }
-
-			Thread.Sleep( 100 );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 			datas[ 1 ] = ( byte )Config.Mcu_MainpowerUnderVoltageCountGet;
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+			//操作Flash时需要时间，给25ms进行实际操作的等待
+			Thread.Sleep( 25 );
 		}
 
 		/// <summary>
@@ -691,6 +724,7 @@ namespace Instrument_Control
 			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
 			datas[ 0 ] = ( byte )Cmd.Cmd_Reset;
 			datas[ 1 ] = ( byte )Config.DisplayVoltage_Ratio_1;
+			datas[ 2 ] = 0x01;
 			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
 		}
 
@@ -774,6 +808,16 @@ namespace Instrument_Control
 		private void McuControl_vCommandSend(byte[] command_bytes, SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
+#if false
+			StringBuilder sb = new StringBuilder();
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "->";
+			for (int i = 0; i < command_bytes.Length; i++) {
+				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
+			}
+			sb.AppendLine( text_value );
+			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+#endif
+
 			/*以下执行串口数据传输指令*/
 			if (!serialPort.IsOpen) { serialPort.Open(); }
 			serialPort.Write( command_bytes, 0, command_bytes.Length );
@@ -803,6 +847,16 @@ namespace Instrument_Control
 		private void McuControl_vCheckRespond(byte[] command_bytes,  SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
+#if false
+			StringBuilder sb = new StringBuilder();
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			for (int i = 0; i < command_bytes.Length; i++) {
+				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
+			}
+			sb.AppendLine( text_value );
+			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+#endif
+
 			//先将之前发送出去的命令字节做一个备份，需要在查询指令时使用
 			byte address = command_bytes[ 1 ];
 			byte command_before = command_bytes[ 2 ];
@@ -847,8 +901,8 @@ namespace Instrument_Control
 			complete_cmd[ 0 ] = Header_Control;
 			complete_cmd[ 1 ] = address;
 			complete_cmd[ 2 ] = ( byte )cmd_MCUModel;
-			complete_cmd[ 3 ] = (byte)(0xFF- ( byte )cmd_MCUModel);
-			complete_cmd[ 4 ] = (byte)datas.Length;
+			complete_cmd[ 3 ] = ( byte )(0xFF - ( byte )cmd_MCUModel);
+			complete_cmd[ 4 ] = ( byte )datas.Length;
 			for (int index = 0; index < datas.Length; index++) {
 				complete_cmd[ 5 + index ] = datas[ index ];
 			}
@@ -865,9 +919,9 @@ namespace Instrument_Control
 			}
 		}
 
-        #endregion
+#endregion
 
-        #region -- 通用校准的相关函数
+#region -- 通用校准的相关函数
 
         /// <summary>
         /// 校验值为之前所有字节的和的低8位
@@ -877,7 +931,7 @@ namespace Instrument_Control
         private byte McuCalibrate_vCalculateVali(byte[] cmd)
         {
             UInt16 value = 0;
-            for (int i = 0; i < (cmd.Length - 2); i++) {
+            for (int i = 0; i < 7; i++) {
                 value += cmd[ i ];
             }
             byte[] vali = BitConverter.GetBytes( value );
@@ -887,25 +941,48 @@ namespace Instrument_Control
         /// <summary>
         /// 设备对用户发送指令的响应数据
         /// </summary>
+		/// <param name="retey_times">同一条命令反复发送的次数，为了防止电子负载错误响应时使用</param>
         /// <param name="command_bytes">发送到设备的命令</param>
         /// <param name="serialPort">设备连接的电脑串口</param>
         ///<param name="error_information">可能出现的错误信息</param>
-        private void McuCalibrate_vCheckRespond(byte[] command_bytes, SerialPort serialPort, out string error_information)
+		///<returns>是否需要再次发送的标志</returns>
+        private bool McuCalibrate_vCheckRespond(int retey_times ,byte[] command_bytes, SerialPort serialPort, out string error_information)
         {
             error_information = string.Empty;
+			bool need_retry = false;
 			//将串口受到的数据移到aByte数组中，并依据读取的数量进行判断0
 			byte[] received_data = new byte[ serialPort.BytesToRead ];
 			serialPort.Read( received_data, 0, serialPort.BytesToRead );
-			//先判断同步头字节和帧尾是否满足要求
-			if ((received_data[ 0 ] == Header_Vali) && (received_data[ 3 ] == 0x1F) &&  (received_data[ received_data.Length - 1 ] == Ender_Vali)) {
+#if false
+			StringBuilder sb = new StringBuilder();
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			for (int i = 0; i < received_data.Length; i++) {
+				text_value += (received_data[ i ].ToString( "x" ).ToUpper() + " ");
+			}
+			sb.AppendLine( text_value );
+			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+#endif
+
+			//先判断同步头字节是否满足要求;取消帧尾的判断（个别型号的电源重启时可能发送异常多个无意义字节）
+			if ((received_data[ 0 ] == Header_Vali) && (received_data[ 3 ] == 0x1F)) {
 				byte recevied_validatecode = McuCalibrate_vCalculateVali( received_data );
-				byte validatecode = received_data[ received_data.Length - 2 ];
+				byte validatecode = received_data[ 7 ];
 				if (recevied_validatecode != validatecode) {
 					error_information = "待测单片机返回的校验码不匹配 \r\n";
-				}
+				}				
 			} else {
-				error_information = "待测单片机回传数据格式错误 \r\n";
+				//由于电子负载也使用到了关键字0xAA作为同步头，个别负载在校准过程中发生错误返回代码的情况，此种问题需要特别注意
+				if (retey_times > 5) {
+					error_information = "待测单片机回传数据格式错误 \r\n";
+				} else {
+					need_retry = true;
+				}				
 			}
+
+			//个别型号的产品电源在上电下电时会错误的上传多余数据，此数据可能会对后续逻辑造成异常干扰；此处清除串口中的数据
+			serialPort.ReadExisting();
+
+			return need_retry;
 		}
 
 		/// <summary>
@@ -918,8 +995,18 @@ namespace Instrument_Control
 		{
 			error_information = string.Empty;
 			error_information = string.Empty;
+#if false
+			StringBuilder sb = new StringBuilder();
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "->";
+			for (int i = 0; i < command_bytes.Length; i++) {
+				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
+			}
+			sb.AppendLine( text_value );
+			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+#endif
 			/*以下执行串口数据传输指令*/
 			if (!serialPort.IsOpen) { serialPort.Open(); }
+			serialPort.ReadExisting();
 			serialPort.Write( command_bytes, 0, command_bytes.Length );
 			/*等待回码后解析回码*/
 			Int32 waittime = 0;
@@ -956,22 +1043,27 @@ namespace Instrument_Control
 			complete_cmd[ 7 ] = validate_code;
 			complete_cmd[ 8 ] = Ender_Vali;
 
-			McuCalibrate_vCommandSend( complete_cmd, serialPort, out error_information );
-			if (error_information == string.Empty) {
-				//接收代码查看信息
-				McuCalibrate_vCheckRespond( complete_cmd, serialPort, out error_information );
-			}
+			bool need_retry = false;
+			int retry_times = 0;
+			do {
+				McuCalibrate_vCommandSend( complete_cmd, serialPort, out error_information );
+				if (error_information == string.Empty) {
+					//接收代码查看信息
+					need_retry = McuCalibrate_vCheckRespond( retry_times, complete_cmd, serialPort, out error_information );
+					retry_times++;
+				}
+			} while (need_retry && (retry_times < 10));
 		}
 
-		#endregion
+#endregion
 
-		#endregion
+#endregion
 
-		#region -- 垃圾回收机制
+#region -- 垃圾回收机制
 
 		private bool disposed = false;   // 保证多次调用Dispose方式不会抛出异常
 
-		#region IDisposable 成员
+#region IDisposable 成员
 
 		/// <summary>
 		/// 本类资源释放
@@ -982,7 +1074,7 @@ namespace Instrument_Control
 			GC.SuppressFinalize( this ); // 告诉垃圾回收器从Finalization队列中清除自己,从而阻止垃圾回收器调用Finalize方法.
 		}
 
-		#endregion
+#endregion
 
 		/// <summary>
 		/// 无法直接调用的资源释放程序
@@ -1015,6 +1107,6 @@ namespace Instrument_Control
 			Dispose( false );    // MUST be false
 		}
 
-		#endregion
+#endregion
 	}
 }

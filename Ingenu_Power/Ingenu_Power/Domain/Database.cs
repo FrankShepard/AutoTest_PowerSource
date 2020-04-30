@@ -31,8 +31,8 @@ namespace Ingenu_Power.Domain
 		public void V_Initialize(string servername, string user_name, string password,out string error_information)
 		{
 			error_information = string.Empty;
-			//			objConnection = new SqlConnection( "Data Source=" + servername + ";Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
-			objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
+			objConnection = new SqlConnection( "Data Source=" + servername + ";Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
+			//objConnection = new SqlConnection( "Data Source=PC_瞿浩\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=" + user_name + ";Password=" + password );
 			//objConnection = new SqlConnection ( "Data Source=SC-201901112337\\SQLEXPRESS; Initial Catalog=盈帜电源;Persist Security Info=True;User ID=quhao;Password=admin123456" );
 			/*以下验证SQL用户名与密码是否能够和SQL数据库正常通讯*/
 			try {
@@ -145,7 +145,7 @@ namespace Ingenu_Power.Domain
         public DataTable V_McuCode_Get(int id_software,int ver_software,out string error_information)
         {
             error_information = string.Empty;
-			objConnection = new SqlConnection( "Data Source=192.168.1.99; Initial Catalog=盈帜产品程序;Persist Security Info=True;User ID=yanfa;Password=admin123456" );
+			objConnection = new SqlConnection( "Data Source=192.168.1.99; Initial Catalog=盈帜产品程序;Persist Security Info=True;User ID=test_0;Password=admin123456" );
 			DataTable dtTarget = new DataTable();
             dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜产品程序].[dbo].[盈帜产品程序信息] WHERE [文件编号ID] = '" + id_software.ToString() + "' AND [版本号] = '" + ver_software.ToString() + "' ORDER BY [归档日期] DESC", out error_information );
             return dtTarget;

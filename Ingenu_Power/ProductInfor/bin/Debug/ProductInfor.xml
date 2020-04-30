@@ -94,14 +94,14 @@
             主电电压值校准时的主电电压值（应急照明电源主电电压需要校准）
             </summary>
         </member>
-        <member name="F:ProductInfor.Base.Infor_Calibration.OutputPower_Mp">
+        <member name="F:ProductInfor.Base.Infor_Calibration.OutputCurrent_Mp">
             <summary>
-            主电工作校准时通道应当带载的功率值
+            主电工作校准时通道应当带载的电流值
             </summary>
         </member>
-        <member name="F:ProductInfor.Base.Infor_Calibration.OutputPower_Sp">
+        <member name="F:ProductInfor.Base.Infor_Calibration.OutputCurrent_Sp">
             <summary>
-            备电工作校准时通道应当带载的功率值
+            备电工作校准时通道应当带载的电流值
             </summary>
         </member>
         <member name="F:ProductInfor.Base.Infor_Calibration.OutputOXP">
@@ -119,6 +119,16 @@
             主电的相关信息
             </summary>
         </member>
+        <member name="F:ProductInfor.Base.Infor_Mp.MpChannelCount">
+            <summary>
+            主电通道的数量
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_Mp.UserNeedTestSourceEffect">
+            <summary>
+            标记用户是否强制需要源效应测试
+            </summary>
+        </member>
         <member name="F:ProductInfor.Base.Infor_Mp.MpVoltage">
             <summary>
             AC接入端电源常规测试的三个主电电压值：最低电压、正常电压、最高电压
@@ -134,9 +144,14 @@
             电池的备电相关信息
             </summary>
         </member>
+        <member name="F:ProductInfor.Base.Infor_Sp.SpChannelCount">
+            <summary>
+            备电通道的数量
+            </summary>
+        </member>
         <member name="F:ProductInfor.Base.Infor_Sp.UsedBatsCount">
             <summary>
-            使用的电池数量（按照默认单节电池电压为12V的标准值计，直接决定固定电平的备电电压值）
+            单个备电通道使用的电池数量（按照默认单节电池电压为12V的标准值计，直接决定固定电平的备电电压值）
             </summary>
         </member>
         <member name="F:ProductInfor.Base.Infor_Sp.Qualified_CutoffLevel">
@@ -470,6 +485,82 @@
             <param name="port_name">使用到的串口</param>
             <returns>可能存在的错误信息学</returns>
         </member>
+        <member name="M:ProductInfor.Base.Communicate_Admin(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的通讯 - 进入管理员通讯模式，不同产品的实际代码不同，需要被重写
+            </summary>
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor.Base.Communicate_User(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的通讯 - 常规通讯，不同产品的实际代码不同，需要被重写
+            </summary>
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor.Base.Communicate_User_QueryWorkingStatus(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的通讯(查询电源的工作状态) - 常规通讯，不同产品的实际代码不同，需要被重写
+            </summary>
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor.Base.Calibrate_vClearValidata(Instrument_Control.AN97002H,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            清除校准数据
+            </summary>
+            <param name="acpower">使用到的交流程控电源对象</param>
+            <param name="mCU_Control">使用到的校准集合对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能储存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.Base.Calibrate_vEmptyLoad_Mp(System.Int32[],Instrument_Control.Itech,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            主电供电时   输出空载的相关信息校准
+            </summary>
+            <param name="channel">电子负载对应的输出通道分配索引</param>
+            <param name="itech">使用到的电子负载的对象</param>
+            <param name="mCU_Control">使用到的校准集合对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能储存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.Base.Calibrate_vFullLoad_Mp(ProductInfor.MeasureDetails,System.Int32[],System.Decimal[],Instrument_Control.AN97002H,Instrument_Control.Itech,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            主电供电时   输出带载的相关信息校准
+            </summary>
+            <param name="measureDetails">实际测试的对象</param>
+            <param name="channel">电子负载对应的输出通道分配索引</param>
+            <param name="currents">对应负载的电流分配情况</param>
+            <param name="acpower">使用到的交流程控电源</param>
+            <param name="itech">使用到的电子负载的对象</param>
+            <param name="mCU_Control">使用到的校准集合对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能储存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.Base.Calibrate_vFullLoad_Sp(ProductInfor.MeasureDetails,System.Int32[],System.Decimal[],Instrument_Control.AN97002H,Instrument_Control.Itech,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            备电供电时   输出带载的相关信息校准
+            </summary>
+            <param name="measureDetails">实际测试的对象</param>
+            <param name="channel">电子负载对应的输出通道分配索引</param>
+            <param name="currents">对应负载的电流分配情况</param>
+            <param name="acpower">使用到的交流程控电源</param>
+            <param name="itech">使用到的电子负载的对象</param>
+            <param name="mCU_Control">使用到的校准集合对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能储存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.Base.Calibrate_vEmptyLoad_Sp(Instrument_Control.AN97002H,Instrument_Control.Itech,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            备电空载时的校准部分
+            </summary>
+            <param name="acpower">使用到的程控交流电源</param>
+            <param name="itech">使用到的电子负载</param>
+            <param name="mCU_Control">使用到的产品校准对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
         <member name="M:ProductInfor.Base.Measure_vCheckSingleSpStartupAbility(System.Int32,System.String)">
             <summary>
             测试备电单投功能
@@ -519,22 +610,14 @@
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vFixedDCPowerOutputSet(System.Int32,System.String,System.Boolean)">
+        <member name="M:ProductInfor.Base.Measure_vDCPowerOutputSet(System.Int32,System.String,System.Boolean,System.Boolean)">
             <summary>
-            固定电平备电输出的设置
+            直流备电电源输出的设置
             </summary>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
-            <param name="output_enable">备电输出与否</param>
-            <returns>包含多个信息的动态数组</returns>
-        </member>
-        <member name="M:ProductInfor.Base.Measure_vAdjustDCPowerOutputSet(System.Int32,System.String,System.Boolean)">
-            <summary>
-            可调直流电源输出的设置
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <param name="output_enable">备电输出与否</param>
+            <param name="adjust_power_output_enable">可调电压源的输出使能</param>
+            <param name="sp_output_enable">备电输出与否</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="M:ProductInfor.Base.Measure_vEfficiency(System.Int32,System.String)">
@@ -569,10 +652,17 @@
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vEffectSource(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vEffectLoad(System.Decimal[],System.Decimal[])">
+            <summary>
+            计算负载效益
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ProductInfor.Base.Measure_vEffectSource(System.Boolean,System.Int32,System.String)">
             <summary>
             计算源效应
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
@@ -654,6 +744,84 @@
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
+        <member name="M:ProductInfor.Base.Base_vAllcateChannel_FullLoad(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.Boolean,System.String@)">
+            <summary>
+            通道带载的自动分配 - 仅限常规满载情况
+            </summary>
+            <param name="measureDetails">具体操作测试细节对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="loads_on">各负载是否都需要带载</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>各负载的输出通道分配</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Base_vAllcateChannel_SpStartup(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            通道带载的自动分配 - 仅限备电单投情况
+            </summary>
+            <param name="measureDetails">具体操作测试细节对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>各负载的输出通道分配</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Base_vAllcateChannel_MpStartup(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            通道带载的自动分配 - 仅限主电单投情况
+            </summary>
+            <param name="measureDetails">具体操作测试细节对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>各负载的输出通道分配</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Base_vAllcateChannel_MandatoryStartup(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            通道带载的自动分配 - 仅限强制启动情况
+            </summary>
+            <param name="measureDetails">具体操作测试细节对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>各负载的输出通道分配</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Base_vAllcateChannel_SC(ProductInfor.MeasureDetails,System.Decimal[]@)">
+            <summary>
+            通道带载的自动分配 - 仅限主备电切换情况
+            </summary>
+            <param name="measureDetails">具体操作测试细节对象</param>
+            <param name="real_value">返回的具体电流分配值</param>
+            <returns>各负载的输出通道分配</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Base_vAllcateChannel_OXP(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.Decimal[],System.Boolean,System.String@)">
+            <summary>
+            通道带载的自动分配 - 仅限OXP测试情况
+            </summary>
+            <param name="measureDetails">具体操作测试细节对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="loads_value">目标带载值</param>
+            <param name="loads_on">各负载是否都需要带载</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>各负载的输出通道分配</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Measure_vProductReset(System.Int32,ProductInfor.MeasureDetails,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            等待待测产品复位
+            </summary>
+            <param name="delay_magnification">延时等级</param>
+            <param name="measureDetails">具体测试项的实例</param>
+            <param name="mCU_Control">单片机控制实例</param>
+            <param name="serialPort">使用串口对象</param>
+            <param name="error_information">可能存在的错误</param>
+        </member>
+        <member name="M:ProductInfor.Base.Measure_vProductOutputRebuild(System.Boolean,System.Int32,System.Int32[],ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            查看产品输出是否可以
+            </summary>
+            <param name="mp_status">为主电工作情况</param>
+            <param name="delay_magnification">延时等级</param>
+            <param name="allocate_channel">带载通道分配</param>
+            <param name="measureDetails">实际测试实例</param>
+            <param name="serialPort">串口实例</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>产品输出重启结果</returns>
+        </member>
         <member name="T:ProductInfor.Database">
             <summary>
             SQL数据库的操作，带返回可能存在异常信息的class
@@ -732,7 +900,7 @@
         </member>
         <member name="F:ProductInfor.MeasureDetails.SingleLoadMaxPower">
             <summary>
-            单个电子负载最大输入功率 - 270W
+            单个电子负载最大输入功率 - 280W
             </summary>
         </member>
         <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument">
@@ -750,44 +918,49 @@
             VISA中OSC的会话号
             </summary>
         </member>
-        <member name="M:ProductInfor.MeasureDetails.Measure_vInstrumentInitalize(System.String,System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:ProductInfor.MeasureDetails.Measure_vInstrumentInitalize(System.Decimal,System.String,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             仪表初始化
             </summary>
+            <param name="cv_target">充电电子负载的目标CV值</param>
             <param name="osc_ins">示波器INS</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor.MeasureDetails.Measure_vInstrumentPowerOff(System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:ProductInfor.MeasureDetails.Measure_vInstrumentPowerOff(System.Decimal,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             电源输出关闭
             </summary>
+            <param name="keep_current">第一个负载需要维持的带载值(CC模式),用于快速放电</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor.MeasureDetails.Measure_vPowerAllocate(System.Int32,System.Decimal[],System.Decimal[]@)">
+        <member name="M:ProductInfor.MeasureDetails.Measure_vPowerAllocate(System.Boolean,System.Int32,System.Decimal[],System.Decimal[]@)">
             <summary>
             功率的自动分配，根据预计带载值，将其分配到对应的电子负载上
             </summary>
+            <param name="is_emergencypower">是否为应急照明电源</param>
             <param name="output_count">输出通道数量</param>
             <param name="powers">按照输出通道的设计功率值</param>
             <param name="real_powers">分配到电子负载的对应功率值</param>
             <returns>输出使用的电子负载对应的硬件通道索引</returns>
         </member>
-        <member name="M:ProductInfor.MeasureDetails.Measure_vCurrentAllocate(System.Int32,System.Decimal[],System.Decimal[],System.Decimal[]@)">
+        <member name="M:ProductInfor.MeasureDetails.Measure_vCurrentAllocate(System.Boolean,System.Int32,System.Decimal[],System.Decimal[],System.Decimal[]@)">
             <summary>
             电流的自动分配，根据测试得到的电压，结合单个电子负载的最大限制功率，将对应电流分配到电子负载上
-            </summary>
+            </summary>.
+            <param name="is_emergencypower">是否为应急照明电源</param>
             <param name="output_count">输出通道</param>
             <param name="currents">按照电源输出通道设计的电流</param>
             <param name="real_voltages">电源输出通道实际空载电压</param>
             <param name="real_currents">所有输出电子负载对应的分配电流</param>
             <returns>输出使用的电子负载对应的硬件通道索引</returns>
         </member>
-        <member name="M:ProductInfor.MeasureDetails.Measure_vResistanceAllocate(System.Int32,System.Decimal[],System.Decimal[],System.Decimal[]@)">
+        <member name="M:ProductInfor.MeasureDetails.Measure_vResistanceAllocate(System.Boolean,System.Int32,System.Decimal[],System.Decimal[],System.Decimal[]@)">
             <summary>
             电阻的自动分配，根据测试得到的电压，结合单个电子负载的最大限制功率，将对应电阻分配到电子负载上
             </summary>
+            <param name="is_emergencypower">是否为应急照明电源</param>
             <param name="output_count">输出通道</param>
             <param name="resistances">按照电阻输出通道设计的电阻</param>
             <param name="real_voltages">电源输出通道实际空载电压</param>
@@ -895,6 +1068,12 @@
             <param name="error_information">可能存在的错误信息</param>
             <returns>测试得到的纹波值</returns>
         </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vPrepareForReadOutput(System.String@)">
+            <summary>
+            准备读取直流的输出值
+            </summary>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
         <member name="M:ProductInfor.MeasureDetails.Dispose">
             <summary>
             本类资源释放
@@ -911,49 +1090,1581 @@
             类释放资源析构函数
             </summary>
         </member>
-        <member name="T:ProductInfor._60010">
+        <member name="T:ProductInfor._60710">
             <summary>
-            继承自Base的 GST5000H 电源的相关信息
+            继承自Base的 J-EI8212 电源的相关信息
             </summary>
         </member>
-        <member name="T:ProductInfor._60010.Infor_Uart">
+        <member name="T:ProductInfor._60710.UserCmd">
             <summary>
-            专用于 ID 60010 的软件通讯协议具体值
+            用户通讯中的命令枚举
             </summary>
         </member>
-        <member name="F:ProductInfor._60010.Infor_Uart.Measured_MpErrorSignal">
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_GetInValidationMode">
+            <summary>
+            进入校准模式
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_QueryOvFlag">
+            <summary>
+            查询是否出现了过压状态标志
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_AnswerWorkingStatus">
+            <summary>
+            电源返回的应答电源状态命令
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_QueryWorkingStatus">
+            <summary>
+            查询电源工作状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_QuerySp">
+            <summary>
+            查询备电输入的电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_AnswerSp">
+            <summary>
+            电源返回的应答备电命令
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_SetMpWorkDisable">
+            <summary>
+            用户设置禁止主电工作
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_SetMpWorkEnable">
+            <summary>
+            用户设置允许主电工作
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_SetAllChannelClose">
+            <summary>
+            用户控制电源关闭全部输出
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_QueryOutput">
+            <summary>
+            查询输出通道的电流
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_AnswerOutput">
+            <summary>
+            电源返回的输出电流信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.UserCmd.UserCmd_RespondValiError">
+            <summary>
+            操作数据传输异常（校验和不正确）
+            </summary>
+        </member>
+        <member name="T:ProductInfor._60710.Communicate_Signal_Mp">
+            <summary>
+            交流主电相关的状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal_Mp.Measured_MpErrorSignal">
+            <summary>
+            主电故障信号 - 总的标志信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal_Mp.Measured_MpUndervoltageSignal">
+            <summary>
+            主电欠压信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal_Mp.Measured_MpOvervoltageSignal">
+            <summary>
+            主电过压信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor._60710.Communicate_Signal_Sp">
+            <summary>
+            电池备电相关的状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal_Sp.Measured_SpErrorSignal">
+            <summary>
+            备电故障信号 - 总的标志信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal_Sp.Measured_SpUndervoltageSignal">
+            <summary>
+            备电欠压信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor._60710.Communicate_Signal_Output">
+            <summary>
+            输出相关的状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal_Output.Measured_OutputErrorSignal">
+            <summary>
+            输出故障信号 - 总的标志信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor._60710.Communicate_Signal_Charge">
+            <summary>
+            充电相关状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal_Charge.Measured_IsChargingSignal">
+            <summary>
+            产品正在充电中
+            </summary>
+        </member>
+        <member name="T:ProductInfor._60710.Communicate_Signal_Other">
+            <summary>
+            其它状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal_Other.Measured_UserStopMpSignal">
+            <summary>
+            用户关闭主电信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor._60710.Communicate_Signal">
+            <summary>
+            串口通讯信号相关状态标记集合
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal.communicate_Signal_Mp">
+            <summary>
+            主电相关逻辑状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal.communicate_Signal_Sp">
+            <summary>
+            备电相关逻辑状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal.communicate_Signal_Output">
+            <summary>
+            输出相关逻辑状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal.communicate_Signal_Charge">
+            <summary>
+            充电相关逻辑状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Communicate_Signal.communicate_Signal_Other">
+            <summary>
+            其他状态信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor._60710.Infor_Uart">
+            <summary>
+            专用于 ID 64910 的软件通讯协议具体值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Infor_Uart.communicate_Signal">
+            <summary>
+            电源的状态信号集合
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Infor_Uart.Measured_SpVoltage">
+            <summary>
+            直流备电输入的电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.Infor_Uart.Measured_OutputCurrent">
+            <summary>
+            输出通道的电流
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.retry_time">
+            <summary>
+            控制命令出现通讯错误之后重新操作的次数
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60710.receive_data">
+            <summary>
+            产品返回的串口代码
+            </summary>
+        </member>
+        <member name="M:ProductInfor._60710.Initalize(System.String,System.String,System.String,System.String)">
+            <summary>
+            产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
+            </summary>
+            <param name="product_id">产品的厂内ID</param>
+            <param name="sql_name">sql数据库名</param>
+            <param name="sql_username">sql用户名</param>
+            <param name="sql_password">sql登录密码</param>
+            <returns>可能存在的错误信息和用户ID</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Communicate_User_QueryWorkingStatus(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的具体通讯环节（查询状态）
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常信息</param>
+            </summary>
+        </member>
+        <member name="M:ProductInfor._60710.Communicate_User(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的具体通讯环节 - 此处查询的指令为工作状态、输出电压电流、备电电压
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常信息</param>
+            </summary>
+        </member>
+        <member name="M:ProductInfor._60710.Communicate_Admin(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的通讯 - 进入管理员通讯模式
+            </summary>
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._60710.Product_vCmdQuery(ProductInfor._60710.UserCmd,System.String@)">
+            <summary>
+            对产品电源的查询命令
+            </summary>
+            <param name="userCmd">用户指令 - 具体的查询命令</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>需要向产品发送的用户指令数组</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Product_vCmdSet_Enable(ProductInfor._60710.UserCmd,System.Boolean,System.String@)">
+            <summary>
+            特殊使能标记（主电工作使能、备电工作使能、正常输出使能、正常充电使能）
+            </summary>
+            <param name="userCmd">可以设置使能的命令</param>
+            <param name="mp_working_status">主电使能状态</param>
+            <param name="error_information">可能存在的错误情况</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Product_vCmdSet_Admin">
+            <summary>
+            产品进入校准模式
+            </summary>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对产品串口发送的帧的实际过程
+            </summary>
+            <param name="command_bytes">待发送的命令帧</param>
+            <param name="sp_product">使用到的串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._60710.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
+            <summary>
+            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
+            </summary>
+            <param name="sp_product">使用到的串口</param>
+            <returns>可能存在的异常情况</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Product_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.Byte[]@)">
+            <summary>
+            待测产品对用户发送指令的响应数据
+            </summary>
+            <param name="sent_cmd">已经发送的命令字节</param>
+            <param name="sp_product">仪表连接的电脑串口</param>
+            <param name="received_cmd">串口接收数据</param>
+            <returns>仪表响应，正确与否的判定依据</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Product_vGetQueryedValue(System.Byte[],System.Byte[])">
+            <summary>
+            提取接收到的数据中的产品相关信息
+            </summary>
+            <param name="sent_data">发送给产品的数组信息</param>
+            <param name="SerialportData">接收到的数组信息</param>
+            <returns>可能存在的异常信息</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Product_vGetCalibrateCode(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            计算校验和
+            </summary>
+            <param name="command_bytes">通讯使用的数组</param>
+            <param name="start_index">数组中的起始字节索引</param>
+            <param name="count">需要计算的字节长度</param>
+            <returns>所需校验和</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Calibrate(System.String,System.String)">
+            <summary>
+            64910 的校准步骤重写
+            </summary>
+            <param name="osc_ins">示波器INS码</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Calibrate_vDoEvent(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            实际进行校准的操作过程，此过程需要根据不同产品的校准步骤进行调整
+            </summary>
+            <param name="measureDetails">测试部分的实例化对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor._60710.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+            <summary>
+            备电切断点检查 - 检查备电电压的采集误差
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Measure_vVoltageWithLoad(System.Int32,System.String)">
+            <summary>
+            满载电压测试 - 检查主电情况下输出电压和电流的采集误差
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="T:ProductInfor._67510">
+            <summary>
+            继承自Base的 IG-Z2102L 电源的相关信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_RespondOkey">
+            <summary>
+            电源应答中通讯正常的响应标志
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_RespondCmdError">
+            <summary>
+            电源应答中 命令字节无效标志
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_RespondValiError">
+            <summary>
+            电源应答中 校验不匹配
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_RespondBatsLeakageVoltage">
+            <summary>
+            电源应答中 表明备电因为电池电压而切断的状态
+            </summary>
+        </member>
+        <member name="T:ProductInfor._67510.UserCmd">
+            <summary>
+            用户通讯中的命令枚举
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_QueryCommon">
+            <summary>
+            查询最常用的电源相关参数
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetToBatMaintainMode">
+            <summary>
+            切换电源产品到电池维护模式
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetToAutoMode">
+            <summary>
+            切换电源产品到自动模式
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetSpCutoffVoltage">
+            <summary>
+            设置备电切断点对应的备电电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_QuerySpCutoffVoltage">
+            <summary>
+            查询备电切断点对应的备电电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetOutputOverpower">
+            <summary>
+            设置“输出过载”对应的功率值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_QueryOverpower">
+            <summary>
+            查询“输出过功率”对应功率值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetChargeCompletedVoltage">
+            <summary>
+            设置“充电完成”对应的备电电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_QueryChargeCompletedVoltage">
+            <summary>
+            查询“充电完成”标志对应的备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetOutputOpenCurrent">
+            <summary>
+            设置“输出开路”对应的电流值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_QueryOutputOpenCurrent">
+            <summary>
+            查询“输出开路”标志对应的电流值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetSpUnderVoltage">
+            <summary>
+            设置备电欠压点对应的电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_QuerySpUnderVoltage">
+            <summary>
+            查询备电欠压点对应的备电电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetBeepWorkingTime">
+            <summary>
+            设置备电关断之前的维持时间
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_QueryBeepWorkingTime">
+            <summary>
+            查询备电切断之后蜂鸣器工作的时间
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetSpWorkEnable">
+            <summary>
+            设置是否允许备电工作
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetChargeEnable">
+            <summary>
+            设置是否允许对备电进行充电
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetBaudrate">
+            <summary>
+            设置电源产品通讯波特率
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_SetAddress">
+            <summary>
+            设置电源的地址
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_ResetAddress">
+            <summary>
+            重置电源的地址
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.UserCmd.UserCmd_GetInValidationMode">
+            <summary>
+            进入校准模式
+            </summary>
+        </member>
+        <member name="T:ProductInfor._67510.Communicate_Signal">
+            <summary>
+            相关状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.WorkingMode_Mandatory">
+            <summary>
+            工作于强制模式
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.WorkingMode_BatsMaintain">
+            <summary>
+            工作于电池维护模式
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.WorkingMode_Auto">
+            <summary>
+            工作于自动模式
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_MpErrorSignal">
             <summary>
             主电故障信号
             </summary>
         </member>
-        <member name="F:ProductInfor._60010.Infor_Uart.Measured_SpErrorSignal">
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_OutputOpenSignal">
+            <summary>
+            输出通道开路信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_OutputOverpowerSignal">
+            <summary>
+            输出总功率过载信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_SpOpenSignal">
+            <summary>
+            备电口开路信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_SpShortSignal">
+            <summary>
+            备电口短路信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_SpVoltageDifferentialTooLarge">
+            <summary>
+            电池间的电压差距太大
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_SpUndervoltageSignal">
+            <summary>
+            备电欠压信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_SimpleLineShortOrOpen">
+            <summary>
+            电池采样线开路/短路
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_SimpleLineOrderError">
+            <summary>
+            电池采样线顺序错误
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_ChargeCompletedSignal">
+            <summary>
+            产品充电完成
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Communicate_Signal.Measured_IsChargingSignal">
+            <summary>
+            产品正在充电中
+            </summary>
+        </member>
+        <member name="T:ProductInfor._67510.Infor_Uart">
+            <summary>
+            专用于 ID 64910 的软件通讯协议具体值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.communicate_Signal">
+            <summary>
+            电源的状态信号集合
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.Measured_MpVoltage">
+            <summary>
+            交流主电输入的电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.Measured_SpVoltage">
+            <summary>
+            直流备电输入的电压 - 单节电压值采集
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.Measured_OutputVoltage">
+            <summary>
+            输出通道1的电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.Measured_OutputCurrent">
+            <summary>
+            输出通道1的电流
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.Measured_OutputOpenMaxCurrent">
+            <summary>
+            "输出1开路"的最大电流值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.Measured_OutputOverpowerValue">
+            <summary>
+            "输出1过载"的功率值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.Measured_ChargeCompletedVoltage">
+            <summary>
+            "充电完成"标志对应的备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.Measured_SpCutoffVoltage">
+            <summary>
+            "备电切断点"对应的备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.Measured_SpUnderVoltage">
+            <summary>
+            "备电欠压点"对应的备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.Infor_Uart.Measured_BeepWorkingTime">
+            <summary>
+            备电切断之后蜂鸣器工作的时间(s)
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.retry_time">
+            <summary>
+            控制命令出现通讯错误之后重新操作的次数
+            </summary>
+        </member>
+        <member name="F:ProductInfor._67510.receive_data">
+            <summary>
+            产品返回的串口代码
+            </summary>
+        </member>
+        <member name="M:ProductInfor._67510.Initalize(System.String,System.String,System.String,System.String)">
+            <summary>
+            产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
+            </summary>
+            <param name="product_id">产品的厂内ID</param>
+            <param name="sql_name">sql数据库名</param>
+            <param name="sql_username">sql用户名</param>
+            <param name="sql_password">sql登录密码</param>
+            <returns>可能存在的错误信息和用户ID</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Communicate_User_QueryWorkingStatus(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的具体通讯环节（查询状态）
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常信息</param>
+            </summary>
+        </member>
+        <member name="M:ProductInfor._67510.Communicate_User(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的具体通讯环节 - 此处查询的指令为工作状态、输出电压电流、备电电压
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常信息</param>
+            </summary>
+        </member>
+        <member name="M:ProductInfor._67510.Communicate_Admin(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的通讯 - 进入管理员通讯模式
+            </summary>
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCmdQueryCommon(System.String@)">
+            <summary>
+            对产品电源的查询命令 - 最常规使用的
+            </summary>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>需要向产品发送的用户指令数组</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCmdQuery(ProductInfor._67510.UserCmd,System.Int32,System.String@)">
+            <summary>
+            对产品电源的查询命令
+            </summary>
+            <param name="userCmd">用户指令 - 具体的查询命令</param>
+            <param name="channel_index">目标通道索引(总体状态：例如总功率、电源工作状态、蜂鸣器停响时间 是0，可能存在的具体通道从1开始)</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>需要向产品发送的用户指令数组</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCmdSet_OutputOpenCurrent(System.Decimal)">
+            <summary>
+            输出通道(从1开始)的开路最大电流设置
+            </summary>
+            <param name="target_current">目标电流</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCmdSet_OutputPower(System.Decimal)">
+            <summary>
+            输出通道(从1开始)的过载功率设置
+            </summary>
+            <param name="target_power">目标功率</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCmdSet_SpChargeCompletedVoltage(System.Decimal)">
+            <summary>
+            备电通道的"充电完成"标志的电压设置
+            </summary>
+            <param name="target_voltage">目标电压</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCmdSet_SpCutoffVoltage(System.Decimal)">
+            <summary>
+            备电通道的"切断保护"对应的电压设置
+            </summary>
+            <param name="target_voltage">目标电压</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCmdSet_SpUnderVoltage(System.Int32,System.Decimal)">
+            <summary>
+            备电通道的欠压对应的电压设置
+            </summary>
+            <param name="channel_index">备电通道</param>
+            <param name="target_voltage">目标电压</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCmdSet_BeepWorkingTime(System.Int32)">
+            <summary>
+            蜂鸣器工作时间长度设置
+            </summary>
+            <param name="target_time">目标时长(s)</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCmdSet_Enable(ProductInfor._67510.UserCmd,System.Int32,System.Boolean,System.String@)">
+            <summary>
+            特殊使能标记（主电工作使能、备电工作使能、正常输出使能、正常充电使能）
+            </summary>
+            <param name="userCmd">可以设置使能的命令</param>
+            <param name="channel_index">主电/备电/输出/充电通道索引 从1开始</param>
+            <param name="working_status">使能状态</param>
+            <param name="error_information">可能存在的错误情况</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCmdSet_Admin">
+            <summary>
+            产品进入校准模式
+            </summary>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对产品串口发送的帧的实际过程
+            </summary>
+            <param name="command_bytes">待发送的命令帧</param>
+            <param name="sp_product">使用到的串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
+            <summary>
+            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
+            </summary>
+            <param name="sp_product">使用到的串口</param>
+            <returns>可能存在的异常情况</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
+            <summary>
+            待测产品对用户发送指令的响应数据
+            </summary>
+            <param name="sp_product">仪表连接的电脑串口</param>
+            <param name="received_cmd">串口接收数据</param>
+            <returns>仪表响应，正确与否的判定依据</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vGetQueryedValue(System.Byte[],System.Byte[])">
+            <summary>
+            提取接收到的数据中的产品相关信息
+            </summary>
+            <param name="sent_data">发送给产品的数组信息</param>
+            <param name="SerialportData">接收到的数组信息</param>
+            <returns>可能存在的异常信息</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Product_vGetCalibrateCode(System.Byte[])">
+            <summary>
+            计算校验和
+            </summary>
+            <param name="command_bytes">通讯使用的数组</param>
+            <returns>所需校验和</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Calibrate(System.String,System.String)">
+            <summary>
+            64910 的校准步骤重写
+            </summary>
+            <param name="osc_ins">示波器INS码</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Calibrate_vDoEvent(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            实际进行校准的操作过程，此过程需要根据不同产品的校准步骤进行调整
+            </summary>
+            <param name="measureDetails">测试部分的实例化对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor._67510.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+            <summary>
+            备电切断点检查 - 检查备电电压的采集误差
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Measure_vVoltageWithLoad(System.Int32,System.String)">
+            <summary>
+            满载电压测试 - 检查主电情况下输出电压和电流的采集误差
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="T:ProductInfor._61710">
+            <summary>
+            继承自Base的 IG-M2131H 电源的相关信息
+            </summary>
+        </member>
+        <member name="T:ProductInfor._61710.Infor_Uart">
+            <summary>
+            专用于 ID 61710 的软件通讯协议具体值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._61710.Infor_Uart.Measured_MpErrorSignal">
+            <summary>
+            主电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._61710.Infor_Uart.Measured_SpErrorSignal">
             <summary>
             备电故障信号
             </summary>
         </member>
-        <member name="F:ProductInfor._60010.Infor_Uart.Measured_OutputErrorSignal">
+        <member name="F:ProductInfor._61710.Infor_Uart.Measured_OutputErrorSignal">
             <summary>
             输出故障信号
             </summary>
         </member>
-        <member name="F:ProductInfor._60010.Infor_Uart.Measured_SpValue">
+        <member name="F:ProductInfor._61710.Infor_Uart.Measured_OutputVoltageValue">
             <summary>
-            备电电压值
+            输出电压值 - 此处仅判断输出2
             </summary>
         </member>
-        <member name="F:ProductInfor._60010.Infor_Uart.Measured_OutputVoltageValue">
+        <member name="F:ProductInfor._61710.Infor_Uart.Measured_OutputCurrentValue">
             <summary>
-            输出电压值
+            输出电流值 - 此处仅判断输出2
             </summary>
         </member>
-        <member name="F:ProductInfor._60010.Infor_Uart.Measured_OutputCurrentValue">
+        <member name="F:ProductInfor._61710.infor_Uart">
             <summary>
-            输出电流值
+            用于海湾通讯系列电源的通讯协议结构体
             </summary>
         </member>
-        <member name="F:ProductInfor._60010.retry_time">
+        <member name="F:ProductInfor._61710.retry_time">
             <summary>
             控制命令出现通讯错误之后重新操作的次数
+            </summary>
+        </member>
+        <member name="M:ProductInfor._61710.Initalize(System.String,System.String,System.String,System.String)">
+            <summary>
+            产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
+            </summary>
+            <param name="product_id">产品的厂内ID</param>
+            <param name="sql_name">sql数据库名</param>
+            <param name="sql_username">sql用户名</param>
+            <param name="sql_password">sql登录密码</param>
+            <returns>可能存在的错误信息和用户ID</returns>
+        </member>
+        <member name="M:ProductInfor._61710.Communicate_User_QueryWorkingStatus(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            查询产品是否可以正常通讯时使用
+            </summary>
+            <param name="serialPort"></param>
+            <param name="error_information"></param>
+        </member>
+        <member name="M:ProductInfor._61710.Communicate_User(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的具体通讯环节
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常信息</param>
+            </summary>
+        </member>
+        <member name="M:ProductInfor._61710.Communicate_Admin(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的通讯 - 进入管理员通讯模式
+            </summary>
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._61710.Communicate_BeepWorking(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            蜂鸣器工作命令
+            </summary>
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._61710.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对产品串口发送的帧的实际过程
+            </summary>
+            <param name="command_bytes">待发送的命令帧</param>
+            <param name="sp_product">使用到的串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._61710.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
+            <summary>
+            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
+            </summary>
+            <param name="sp_product">使用到的串口</param>
+            <returns>可能存在的异常情况</returns>
+        </member>
+        <member name="M:ProductInfor._61710.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
+            <summary>
+            待测产品对用户发送指令的响应数据
+            </summary>
+            <param name="sp_product">仪表连接的电脑串口</param>
+            <param name="SerialportData">串口接收数据</param>
+            <returns>仪表响应，正确与否的判定依据</returns>
+        </member>
+        <member name="M:ProductInfor._61710.Product_vGetQueryedValue(System.Byte[])">
+            <summary>
+            提取接收到的数据中的产品相关信息
+            </summary>
+            <param name="SerialportData">接收到的数组信息</param>
+            <returns>可能存在的异常信息</returns>
+        </member>
+        <member name="M:ProductInfor._61710.Product_vGetCalibrateCode(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            计算校验和
+            </summary>
+            <param name="command_bytes">通讯使用的数组</param>
+            <param name="start_index">数组中的起始字节索引</param>
+            <param name="count">需要计算的字节长度</param>
+            <returns>所需校验和</returns>
+        </member>
+        <member name="M:ProductInfor._61710.Calibrate(System.String,System.String)">
+            <summary>
+            60510 的校准步骤重写
+            </summary>
+            <param name="osc_ins">示波器INS码</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._61710.Calibrate_vDoEvent(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            实际进行校准的操作过程，此过程需要根据不同产品的校准步骤进行调整
+            </summary>
+            <param name="measureDetails">测试部分的实例化对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor._61710.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+            <summary>
+            检查电源的备电切断点
+            </summary>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
+        <member name="M:ProductInfor._61710.Measure_vVoltageWithLoad(System.Int32,System.String)">
+            <summary>
+            满载电压测试 - 检查主电情况下输出电压和电流的采集误差
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="T:ProductInfor._60610">
+            <summary>
+            继承自_60510的 D06 电源的相关信息
+            </summary>
+        </member>
+        <member name="M:ProductInfor._60610.Initalize(System.String,System.String,System.String,System.String)">
+            <summary>
+            产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
+            </summary>
+            <param name="product_id">产品的厂内ID</param>
+            <param name="sql_name">sql数据库名</param>
+            <param name="sql_username">sql用户名</param>
+            <param name="sql_password">sql登录密码</param>
+            <returns>可能存在的错误信息和用户ID</returns>
+        </member>
+        <member name="M:ProductInfor._60610.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
+            <summary>
+            待测产品对用户发送指令的响应数据
+            </summary>
+            <param name="sp_product">仪表连接的电脑串口</param>
+            <param name="SerialportData">串口接收数据</param>
+            <returns>仪表响应，正确与否的判定依据</returns>
+        </member>
+        <member name="M:ProductInfor._60610.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+            <summary>
+            备电切断点检查 - 检查备电电压的采集误差
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._60610.Measure_vVoltageWithLoad(System.Int32,System.String)">
+            <summary>
+            满载电压测试 - 检查主电情况下输出电压和电流的采集误差
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="T:ProductInfor._67010">
+            <summary>
+            继承自_64910的 6200/10A 电源的相关信息
+            </summary>
+        </member>
+        <member name="T:ProductInfor._63910">
+            <summary>
+            继承自_64910的 6200/10A 电源的相关信息
+            </summary>
+        </member>
+        <member name="T:ProductInfor._64010">
+            <summary>
+            继承自_64910的 6200/20A 电源的相关信息
+            </summary>
+        </member>
+        <member name="T:ProductInfor._67110">
+            <summary>
+            继承自 _64910 的 IG-M1202F 电源的相关信息
+            </summary>
+        </member>
+        <member name="T:ProductInfor._67210">
+            <summary>
+            继承自_64910的 面板式IG-M1302F 电源的相关信息
+            </summary>
+        </member>
+        <member name="T:ProductInfor._64910">
+            <summary>
+            继承自Base的 6200/30A 电源的相关信息
+            </summary>
+        </member>
+        <member name="T:ProductInfor._64910.UserCmd">
+            <summary>
+            用户通讯中的命令枚举
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_QueryMp">
+            <summary>
+            查询交流主电输入的电压和电流
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_QuerySp">
+            <summary>
+            查询备电输入的电压和电流
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_QueryOutput">
+            <summary>
+            查询输出通道的电压和电流
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_QueryWorkingStatus">
+            <summary>
+            查询电源工作状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_QueryOutputOpenCurrent">
+            <summary>
+            查询“输出开路”标志对应的电流值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_QueryOverpower">
+            <summary>
+            查询“输出过功率”对应功率值；包含了总输出功率和指定单通道的功率值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_QueryChargeCompletedVoltage">
+            <summary>
+            查询“充电完成”标志对应的备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_QuerySpCutoffVoltage">
+            <summary>
+            查询备电切断点对应的备电电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_QuerySpUnderVoltage">
+            <summary>
+            查询备电欠压点对应的备电电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_QueryBeepWorkingTime">
+            <summary>
+            查询备电切断之后蜂鸣器工作的时间
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetOutputOpenCurrent">
+            <summary>
+            设置“输出开路”对应的电流值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetOutputOverpower">
+            <summary>
+            设置“输出过载”对应的功率值 - 包含对应通道的过载值和输出总过载值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetChargeCompletedVoltage">
+            <summary>
+            设置“充电完成”对应的备电电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetSpCutoffVoltage">
+            <summary>
+            设置备电切断点对应的备电电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetMpWorkEnable">
+            <summary>
+            设置主电工作与否
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetChargeEnable">
+            <summary>
+            设置是否允许对备电进行充电
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetOutputEnable">
+            <summary>
+            设置是否允许输出
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetSpWorkEnable">
+            <summary>
+            设置是否允许备电工作
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetAddress">
+            <summary>
+            设置电源的地址
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetBaudrate">
+            <summary>
+            设置电源产品通讯波特率
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_ResetAddress">
+            <summary>
+            重置电源的地址
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetSpUnderVoltage">
+            <summary>
+            设置备电欠压点对应的电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_SetBeepWorkingTime">
+            <summary>
+            设置备电关断之前的维持时间
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_RespondError">
+            <summary>
+            操作命令无效（操作指令错误或者指令码校验不正确）
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_RespondValiError">
+            <summary>
+            操作数据传输异常（校验和不正确）
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.UserCmd.UserCmd_GetInValidationMode">
+            <summary>
+            进入校准模式
+            </summary>
+        </member>
+        <member name="T:ProductInfor._64910.Communicate_Signal_Mp">
+            <summary>
+            交流主电相关的状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Mp.Measured_MpErrorSignal">
+            <summary>
+            主电故障信号 - 总的标志信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Mp.Measured_MpLostSignal">
+            <summary>
+            主电丢失信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Mp.Measured_MpUndervoltageSignal">
+            <summary>
+            主电欠压信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Mp.Measured_MpOvervoltageSignal">
+            <summary>
+            主电过压信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor._64910.Communicate_Signal_Sp">
+            <summary>
+            电池备电相关的状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Sp.Measured_SpErrorSignal">
+            <summary>
+            备电故障信号 - 总的标志信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Sp.Measured_SpShortSignal">
+            <summary>
+            备电口短路信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Sp.Measured_SpOpenSignal">
+            <summary>
+            备电口开路信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Sp.Measured_SpConnectErrorSignal">
+            <summary>
+            备电采样线连接异常信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Sp.Measured_SpUndervoltageSignal">
+            <summary>
+            备电欠压信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Sp.Measured_SpCutoffSignal">
+            <summary>
+            备电过放后切断信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Sp.Measured_SpBatsResistanceErrorSignal">
+            <summary>
+            备电电池内阻异常信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor._64910.Communicate_Signal_Output">
+            <summary>
+            输出相关的状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Output.Measured_OverpowerSignal">
+            <summary>
+            输出总功率过载信号 - 总状态标记信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Output.Measured_OutputErrorSignal">
+            <summary>
+            输出故障信号 - 总的标志信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Output.Measured_OutputOpenSignal">
+            <summary>
+            输出通道开路信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Output.Measured_OutputOverpowerSignal">
+            <summary>
+            输出通道过载信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Output.Measured_OutputInProtectingStatusSignal">
+            <summary>
+            输出通道处于保护状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Output.Measured_OutputUserCloseSignal">
+            <summary>
+            输出通道处于用于关闭输出状态信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor._64910.Communicate_Signal_Charge">
+            <summary>
+            充电相关状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Charge.Measured_IsChargingSignal">
+            <summary>
+            产品正在充电中
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Charge.Measured_ChargeCompletedSignal">
+            <summary>
+            产品充电完成
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Charge.Measured_ChargeHardwareErrorSignal">
+            <summary>
+            产品充电道故障
+            </summary>
+        </member>
+        <member name="T:ProductInfor._64910.Communicate_Signal_Other">
+            <summary>
+            其它状态信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Other.Measured_UserStopMpSignal">
+            <summary>
+            用户关闭主电信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Other.Measured_UserStopChargingSignal">
+            <summary>
+            用户停止充电信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal_Other.Measured_OutputFuseErrorSignal">
+            <summary>
+            输出保险丝故障
+            </summary>
+        </member>
+        <member name="T:ProductInfor._64910.Communicate_Signal">
+            <summary>
+            串口通讯信号相关状态标记集合
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal.communicate_Signal_Mp">
+            <summary>
+            主电相关逻辑状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal.communicate_Signal_Sp">
+            <summary>
+            备电相关逻辑状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal.communicate_Signal_Output">
+            <summary>
+            输出相关逻辑状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal.communicate_Signal_Charge">
+            <summary>
+            充电相关逻辑状态
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Communicate_Signal.communicate_Signal_Other">
+            <summary>
+            其他状态信号
+            </summary>
+        </member>
+        <member name="T:ProductInfor._64910.Infor_Uart">
+            <summary>
+            专用于 ID 64910 的软件通讯协议具体值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.communicate_Signal">
+            <summary>
+            电源的状态信号集合
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_MpVoltage">
+            <summary>
+            交流主电输入的电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_MpCurrent">
+            <summary>
+            交流主电输入的电流
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_SpVoltage">
+            <summary>
+            直流备电输入的电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_SpCurrent">
+            <summary>
+            直流备电输入的电流
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_OutputVoltage">
+            <summary>
+            输出通道的电压
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_OutputCurrent">
+            <summary>
+            输出通道的电流
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_OutputOpenMaxCurrent">
+            <summary>
+            "输出开路"的最大电流值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_OutputOverpowerValue">
+            <summary>
+            "输出过载"的功率值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_AllOutputOverpowerValue">
+            <summary>
+            "总输出过载"的功率值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_ChargeCompletedVoltage">
+            <summary>
+            "充电完成"标志对应的备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_SpCutoffVoltage">
+            <summary>
+            "备电切断点"对应的备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_SpUnderVoltage">
+            <summary>
+            "备电欠压点"对应的备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.Infor_Uart.Measured_BeepWorkingTime">
+            <summary>
+            备电切断之后蜂鸣器工作的时间(s)
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.retry_time">
+            <summary>
+            控制命令出现通讯错误之后重新操作的次数
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.receive_data">
+            <summary>
+            产品返回的串口代码
+            </summary>
+        </member>
+        <member name="M:ProductInfor._64910.Initalize(System.String,System.String,System.String,System.String)">
+            <summary>
+            产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
+            </summary>
+            <param name="product_id">产品的厂内ID</param>
+            <param name="sql_name">sql数据库名</param>
+            <param name="sql_username">sql用户名</param>
+            <param name="sql_password">sql登录密码</param>
+            <returns>可能存在的错误信息和用户ID</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Communicate_User_QueryWorkingStatus(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的具体通讯环节（查询状态）
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常信息</param>
+            </summary>
+        </member>
+        <member name="M:ProductInfor._64910.Communicate_User(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的具体通讯环节 - 此处查询的指令为工作状态、输出电压电流、备电电压
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常信息</param>
+            </summary>
+        </member>
+        <member name="M:ProductInfor._64910.Communicate_Admin(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的通讯 - 进入管理员通讯模式
+            </summary>
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCmdQuery(ProductInfor._64910.UserCmd,System.Int32,System.String@)">
+            <summary>
+            对产品电源的查询命令
+            </summary>
+            <param name="userCmd">用户指令 - 具体的查询命令</param>
+            <param name="channel_index">目标通道索引(总体状态：例如总功率、电源工作状态、蜂鸣器停响时间 是0，可能存在的具体通道从1开始)</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>需要向产品发送的用户指令数组</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCmdSet_OutputOpenCurrent(System.Int32,System.Decimal)">
+            <summary>
+            输出通道(从1开始)的开路最大电流设置
+            </summary>
+            <param name="channel_index">输出通道</param>
+            <param name="target_current">目标电流</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCmdSet_OutputPower(System.Int32,System.Decimal)">
+            <summary>
+            输出通道(从1开始)的过载功率设置；总功率设置时通道数为 0
+            </summary>
+            <param name="channel_index">输出通道</param>
+            <param name="target_power">目标功率</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCmdSet_SpChargeCompletedVoltage(System.Int32,System.Decimal)">
+            <summary>
+            备电通道(从1开始)的"充电完成"标志的电压设置
+            </summary>
+            <param name="channel_index">备电通道</param>
+            <param name="target_voltage">目标电压</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCmdSet_SpCutoffVoltage(System.Int32,System.Decimal)">
+            <summary>
+            备电通道(从1开始)的"切断保护"对应的电压设置
+            </summary>
+            <param name="channel_index">备电通道</param>
+            <param name="target_voltage">目标电压</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCmdSet_SpUnderVoltage(System.Int32,System.Decimal)">
+            <summary>
+            备电通道(从1开始)的欠压对应的电压设置
+            </summary>
+            <param name="channel_index">备电通道</param>
+            <param name="target_voltage">目标电压</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCmdSet_BeepWorkingTime(System.Int32)">
+            <summary>
+            蜂鸣器工作时间长度设置
+            </summary>
+            <param name="target_time">目标时长(s)</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCmdSet_Enable(ProductInfor._64910.UserCmd,System.Int32,System.Boolean,System.String@)">
+            <summary>
+            特殊使能标记（主电工作使能、备电工作使能、正常输出使能、正常充电使能）
+            </summary>
+            <param name="userCmd">可以设置使能的命令</param>
+            <param name="channel_index">主电/备电/输出/充电通道索引 从1开始</param>
+            <param name="working_status">使能状态</param>
+            <param name="error_information">可能存在的错误情况</param>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCmdSet_Admin">
+            <summary>
+            产品进入校准模式
+            </summary>
+            <returns>具体的命令字节</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对产品串口发送的帧的实际过程
+            </summary>
+            <param name="command_bytes">待发送的命令帧</param>
+            <param name="sp_product">使用到的串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
+            <summary>
+            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
+            </summary>
+            <param name="sp_product">使用到的串口</param>
+            <returns>可能存在的异常情况</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.Byte[]@)">
+            <summary>
+            待测产品对用户发送指令的响应数据
+            </summary>
+            <param name="sent_cmd">已经发送的命令字节</param>
+            <param name="sp_product">仪表连接的电脑串口</param>
+            <param name="received_cmd">串口接收数据</param>
+            <returns>仪表响应，正确与否的判定依据</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vGetQueryedValue(System.Byte[],System.Byte[])">
+            <summary>
+            提取接收到的数据中的产品相关信息
+            </summary>
+            <param name="sent_data">发送给产品的数组信息</param>
+            <param name="SerialportData">接收到的数组信息</param>
+            <returns>可能存在的异常信息</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Product_vGetCalibrateCode(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            计算校验和
+            </summary>
+            <param name="command_bytes">通讯使用的数组</param>
+            <param name="start_index">数组中的起始字节索引</param>
+            <param name="count">需要计算的字节长度</param>
+            <returns>所需校验和</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Calibrate(System.String,System.String)">
+            <summary>
+            64910 的校准步骤重写
+            </summary>
+            <param name="osc_ins">示波器INS码</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Calibrate_vDoEvent(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            实际进行校准的操作过程，此过程需要根据不同产品的校准步骤进行调整
+            </summary>
+            <param name="measureDetails">测试部分的实例化对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor._64910.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+            <summary>
+            备电切断点检查 - 检查备电电压的采集误差
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Measure_vVoltageWithLoad(System.Int32,System.String)">
+            <summary>
+            满载电压测试 - 检查主电情况下输出电压和电流的采集误差
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="T:ProductInfor._60010">
+            <summary>
+            继承自_60510的 GST5000H 电源的相关信息
             </summary>
         </member>
         <member name="M:ProductInfor._60010.Initalize(System.String,System.String,System.String,System.String)">
@@ -966,73 +2677,13 @@
             <param name="sql_password">sql登录密码</param>
             <returns>可能存在的错误信息和用户ID</returns>
         </member>
-        <member name="M:ProductInfor._60010.Communicate_User(System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            与产品的具体通讯环节
-            <param name="serialPort">使用到的实际串口</param>
-            <param name="error_information">可能存在的异常信息</param>
-            </summary>
-        </member>
-        <member name="M:ProductInfor._60010.Communicate_Admin(System.IO.Ports.SerialPort)">
-            <summary>
-            与产品的通讯 - 进入管理员通讯模式
-            </summary>
-            <param name="serialPort">使用到的实际串口</param>
-        </member>
-        <member name="M:ProductInfor._60010.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort)">
-            <summary>
-            对产品串口发送的帧的实际过程
-            </summary>
-            <param name="command_bytes">待发送的命令帧</param>
-            <param name="sp_product">使用到的串口</param>
-            <returns>可能存在的异常</returns>
-        </member>
-        <member name="M:ProductInfor._60010.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
-            <summary>
-            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
-            </summary>
-            <param name="sp_product">使用到的串口</param>
-            <returns>可能存在的异常情况</returns>
-        </member>
         <member name="M:ProductInfor._60010.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
             <summary>
-            仪表对用户发送指令的响应数据
+            待测产品对用户发送指令的响应数据
             </summary>
             <param name="sp_product">仪表连接的电脑串口</param>
             <param name="SerialportData">串口接收数据</param>
             <returns>仪表响应，正确与否的判定依据</returns>
-        </member>
-        <member name="M:ProductInfor._60010.Product_vGetQueryedValue(System.Byte[])">
-            <summary>
-            提取接收到的数据中的产品相关信息
-            </summary>
-            <param name="SerialportData">接收到的数组信息</param>
-            <returns>可能存在的异常信息</returns>
-        </member>
-        <member name="M:ProductInfor._60010.Product_vGetCalibrateCode(System.Byte[],System.Int32,System.Int32)">
-            <summary>
-            计算校验和
-            </summary>
-            <param name="command_bytes">通讯使用的数组</param>
-            <param name="start_index">数组中的起始字节索引</param>
-            <param name="count">需要计算的字节长度</param>
-            <returns>所需校验和</returns>
-        </member>
-        <member name="M:ProductInfor._60010.Calibrate(System.String,System.String)">
-            <summary>
-            60010 的校准步骤重写
-            </summary>
-            <param name="osc_ins">示波器INS码</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>可能存在的故障信息</returns>
-        </member>
-        <member name="M:ProductInfor._60010.Calibrate_vDoEvent(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            实际进行校准的操作过程，此过程需要根据不同产品的校准步骤进行调整
-            </summary>
-            <param name="measureDetails">测试部分的实例化对象</param>
-            <param name="serialPort">使用到的串口</param>
-            <param name="error_information">可能存在的错误信息</param>
         </member>
         <member name="M:ProductInfor._60010.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
             <summary>
@@ -1044,6 +2695,150 @@
             <returns>可能存在的故障信息</returns>
         </member>
         <member name="M:ProductInfor._60010.Measure_vVoltageWithLoad(System.Int32,System.String)">
+            <summary>
+            满载电压测试 - 检查主电情况下输出电压和电流的采集误差
+            </summary>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="T:ProductInfor._60510">
+            <summary>
+            继承自Base的 GST-LD-D02 电源的相关信息
+            </summary>
+        </member>
+        <member name="T:ProductInfor._60510.Infor_Uart">
+            <summary>
+            专用于 ID 60510 的软件通讯协议具体值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60510.Infor_Uart.Measured_MpErrorSignal">
+            <summary>
+            主电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60510.Infor_Uart.Measured_SpErrorSignal">
+            <summary>
+            备电故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60510.Infor_Uart.Measured_OutputErrorSignal">
+            <summary>
+            输出故障信号
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60510.Infor_Uart.Measured_SpValue">
+            <summary>
+            备电电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60510.Infor_Uart.Measured_OutputVoltageValue">
+            <summary>
+            输出电压值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60510.Infor_Uart.Measured_OutputCurrentValue">
+            <summary>
+            输出电流值
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60510.infor_Uart">
+            <summary>
+            用于海湾通讯系列电源的通讯协议结构体
+            </summary>
+        </member>
+        <member name="F:ProductInfor._60510.retry_time">
+            <summary>
+            控制命令出现通讯错误之后重新操作的次数
+            </summary>
+        </member>
+        <member name="M:ProductInfor._60510.Initalize(System.String,System.String,System.String,System.String)">
+            <summary>
+            产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
+            </summary>
+            <param name="product_id">产品的厂内ID</param>
+            <param name="sql_name">sql数据库名</param>
+            <param name="sql_username">sql用户名</param>
+            <param name="sql_password">sql登录密码</param>
+            <returns>可能存在的错误信息和用户ID</returns>
+        </member>
+        <member name="M:ProductInfor._60510.Communicate_User_QueryWorkingStatus(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            查询产品是否可以正常通讯时使用
+            </summary>
+            <param name="serialPort"></param>
+            <param name="error_information"></param>
+        </member>
+        <member name="M:ProductInfor._60510.Communicate_User(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的具体通讯环节
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常信息</param>
+            </summary>
+        </member>
+        <member name="M:ProductInfor._60510.Communicate_Admin(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            与产品的通讯 - 进入管理员通讯模式
+            </summary>
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._60510.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对产品串口发送的帧的实际过程
+            </summary>
+            <param name="command_bytes">待发送的命令帧</param>
+            <param name="sp_product">使用到的串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._60510.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
+            <summary>
+            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
+            </summary>
+            <param name="sp_product">使用到的串口</param>
+            <returns>可能存在的异常情况</returns>
+        </member>
+        <member name="M:ProductInfor._60510.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
+            <summary>
+            待测产品对用户发送指令的响应数据
+            </summary>
+            <param name="sp_product">仪表连接的电脑串口</param>
+            <param name="SerialportData">串口接收数据</param>
+            <returns>仪表响应，正确与否的判定依据</returns>
+        </member>
+        <member name="M:ProductInfor._60510.Product_vGetQueryedValue(System.Byte[])">
+            <summary>
+            提取接收到的数据中的产品相关信息
+            </summary>
+            <param name="SerialportData">接收到的数组信息</param>
+            <returns>可能存在的异常信息</returns>
+        </member>
+        <member name="M:ProductInfor._60510.Product_vGetCalibrateCode(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            计算校验和
+            </summary>
+            <param name="command_bytes">通讯使用的数组</param>
+            <param name="start_index">数组中的起始字节索引</param>
+            <param name="count">需要计算的字节长度</param>
+            <returns>所需校验和</returns>
+        </member>
+        <member name="M:ProductInfor._60510.Calibrate(System.String,System.String)">
+            <summary>
+            60510 的校准步骤重写
+            </summary>
+            <param name="osc_ins">示波器INS码</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._60510.Calibrate_vDoEvent(ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            实际进行校准的操作过程，此过程需要根据不同产品的校准步骤进行调整
+            </summary>
+            <param name="measureDetails">测试部分的实例化对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor._60510.Measure_vVoltageWithLoad(System.Int32,System.String)">
             <summary>
             满载电压测试 - 检查主电情况下输出电压和电流的采集误差
             </summary>

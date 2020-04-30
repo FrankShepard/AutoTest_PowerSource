@@ -7,6 +7,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Instrument_Control;
 using ISP;
@@ -125,6 +126,7 @@ namespace Ingenu_Power.Domain
 		public void ISP_vDoFlash( out string error_information )
 		{
 			error_information = string.Empty;
+			string error_information_temp = string.Empty;
 			string bin_filePath = string.Empty;
 			try {
 				using ( HC_ISP isp = new HC_ISP ( ) ) {
@@ -149,21 +151,32 @@ namespace Ingenu_Power.Domain
 						}
 
 						using ( SerialPort serialPort = new SerialPort ( Properties.Settings.Default.UsedSerialport, Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+							//2020.04.21 PCB绘制存在问题，在执行此步时先选择右侧通道
+							mcu.McuControl_vMeasureLocation( MCU_Control.Location.Location_Right, serialPort, out error_information );
+							//if (error_information != string.Empty) { return; }
+
 							//先将待测产品的ISP引脚接入
 							mcu.McuControl_vConnectISP ( true, serialPort, out error_information );
-							if ( error_information != string.Empty ) { return; }
+							//if ( error_information != string.Empty ) { return; }
 
 							for ( int index = 0 ; index < 2 ; index++ ) {
 								if ( index == 0 ) {
 									bin_filePath = Directory.GetCurrentDirectory ( ) + "\\Download\\master.bin";
-									if ( !File.Exists ( bin_filePath ) ) { continue; }
+									if ( !File.Exists ( bin_filePath ) ) {
+										error_information = "本地不存在待烧录文件"; //重新操作一次
+										Properties.Settings.Default.ISP_ID_Hardware = 0;
+										Properties.Settings.Default.ISP_Ver_Hardware = 0;
+										Properties.Settings.Default.Save();
+										continue;
+									}
 									mcu.McuControl_vISPMasterOrSlaver ( MCU_Control.MS_Choose.Master, serialPort, out error_information );
 								} else {
 									bin_filePath = Directory.GetCurrentDirectory ( ) + "\\Download\\slaver.bin";
 									if ( !File.Exists ( bin_filePath ) ) { continue; }
 									mcu.McuControl_vISPMasterOrSlaver ( MCU_Control.MS_Choose.Slaver, serialPort, out error_information );
 								}
-								if ( error_information != string.Empty ) { return; }
+								//if ( error_information != string.Empty ) { return; }
+								Thread.Sleep( 50 );
 
 								//以下执行程序的具体烧录过程
 								FileStream fileStream = new FileStream ( bin_filePath, FileMode.Open );
@@ -177,9 +190,10 @@ namespace Ingenu_Power.Domain
 								//控制程序烧录的单片机进行重新上电的操作
 								error_information = isp.ISP_vCheckCode ( buffer_hex );
 								if ( error_information != string.Empty ) { return; }
+								
 								//对应MCU需要重新上电的操作
 								mcu.McuControl_vISPRestartPower ( serialPort, out error_information );
-								if ( error_information != string.Empty ) { return; }
+								//if ( error_information != string.Empty ) { return; }
 								//执行ISP的具体操作
 								serialPort.BaudRate = 57600;
 								error_information = isp.ISP_vISPMode_In ( serialPort );
@@ -187,10 +201,14 @@ namespace Ingenu_Power.Domain
 								error_information = isp.ISP_vProgram ( buffer_hex, serialPort, true );
 								if ( error_information != string.Empty ) { return; }
 								serialPort.BaudRate = Baudrate_Instrument;
-							}
+							}			
 
 							//断开待测产品的ISP引脚接入							
-							mcu.McuControl_vConnectISP ( false, serialPort, out error_information );
+							mcu.McuControl_vConnectISP ( false, serialPort, out error_information_temp );
+							//2020.04.21 PCB绘制存在问题，恢复左边通道
+							mcu.McuControl_vMeasureLocation( MCU_Control.Location.Location_Left, serialPort, out error_information_temp );
+
+							error_information += error_information_temp;
 						}
 					}
 				}

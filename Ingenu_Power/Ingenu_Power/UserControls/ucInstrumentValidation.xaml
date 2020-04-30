@@ -52,9 +52,9 @@
 								<TextBlock FontStyle="Italic" Text="通讯地址"></TextBlock>
 							</WrapPanel>
 						</Grid>
-						
+
 						<TextBlock Margin="5,0,0,0" FontSize="11" Opacity=".68"
-                               TextWrapping="Wrap"><Run Text="Load-备电:0"/><Run Text=";"/><Run Text="&#xA;Load-Output1:1"/><Run Text="/"/><Run Text="2"/><Run Text=";"/><Run Text=" "/><Run Text="Load-Output2:3"/><Run Text="/"/><Run Text="4;"/><Run Text=" "/><Run Text="Load-Output3:5"/><Run Text="/"/><Run Text="6;"/><Run Text=" "/><Run Text="ACPower:12;"/><Run Text=" "/><Run Text="DCPower:13;"/><Run Text=" "/><Run Text="备电控制板:16;"/><Run Text=" "/><Run Text="通道分选板:17;"/></TextBlock>
+                               TextWrapping="Wrap"><Run Text="Load-备电:20"/><Run Text=";备电控制板:16;"/><Run Text=" "/><Run Text="通道分选板:17;&#xA;Load-Output1:21"/><Run Text="/"/><Run Text="22"/><Run Text=";"/><Run Text=" "/><Run Text="Load-Output2:"/><Run Text="2"/><Run Text="3"/><Run Text="/"/><Run Text="2"/><Run Text="4;"/><Run Text=" "/><Run Text="Load-Output3:"/><Run Text="2"/><Run Text="5"/><Run Text="/"/><Run Text="2"/><Run Text="6;"/><Run Text=" DCPower:27;"/><Run Text=" ACPower:12;"/><Run Text=" "/></TextBlock>
 					</StackPanel>
 				</Expander>
 				<Grid Margin="5">

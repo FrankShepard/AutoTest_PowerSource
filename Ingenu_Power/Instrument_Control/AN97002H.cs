@@ -367,11 +367,11 @@ namespace Instrument_Control
 					return error_information;
 				}
 			}
-			//! 等待传输结束，结束的标志为连续两个5ms之间的接收字节数量是相同的
+			//! 等待传输结束，结束的标志为连续两个25ms之间的接收字节数量是相同的
 			int last_byte_count = 0;
 			while ((sp_instrument.BytesToRead > last_byte_count) && (sp_instrument.BytesToRead != 0)) {
 				last_byte_count = sp_instrument.BytesToRead;
-				Thread.Sleep( 5 );
+				Thread.Sleep( 25 );
 			}
 			return error_information;
 		}
@@ -794,10 +794,14 @@ namespace Instrument_Control
 		{
 			error_information = string.Empty;
 			Parameters_Woring parameters_Woring = new Parameters_Woring();
-			object obj = ACPower_vQuery( address, 0x07, "RNT*",  sp_acpower, out error_information );
-			if (error_information == string.Empty) {
-				parameters_Woring = ( Parameters_Woring )obj;
-			}
+			object obj;
+			int retry_count = 0;
+			do {
+				obj = ACPower_vQuery( address, 0x07, "RNT*", sp_acpower, out error_information );
+				Thread.Sleep( 100 );
+			} while (((error_information != string.Empty) || (obj == null)) && (++retry_count < 3));
+			if (retry_count >= 3) { error_information += "\r\n查询程控交流电源工作时数据出现错误 "; return parameters_Woring; }
+			parameters_Woring = ( Parameters_Woring )obj;
 			return parameters_Woring;
         }
 

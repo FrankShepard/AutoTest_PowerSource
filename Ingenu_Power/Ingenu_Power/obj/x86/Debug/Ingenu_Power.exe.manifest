@@ -43,26 +43,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="807984">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="817200">
       <assemblyIdentity name="Ingenu_Power" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>2hHmmYZZPDvK6AOpf0fgsig+EzI0duYJi3JEypit+6g=</dsig:DigestValue>
+        <dsig:DigestValue>ZftPFrJSY8BzGQVD4yWpKKBwCuI9t2HsOVvbZCPp08s=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Instrument_Control.dll" size="99840">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Instrument_Control.dll" size="100864">
       <assemblyIdentity name="Instrument_Control" version="3.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>UKagTR01VCk7jq8FSywalTnM7kKJ2HfOg55KDM+gRlE=</dsig:DigestValue>
+        <dsig:DigestValue>LvJnmlk84EJz+5b0qDhiQa1Z3WfOKUSlPEP61MHdylI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -74,7 +74,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>0OqZQeoROi4zaCDb9Gc6fSauhf9ijbB8b8GPDgG6C0Q=</dsig:DigestValue>
+        <dsig:DigestValue>VkVpYe5x+Tn+8lB67Dmgbm2FEGGheTgehz485SNrgwY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -174,13 +174,13 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="Ingenu_Power.exe.config" size="1937">
+  <file name="Ingenu_Power.exe.config" size="2052">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>oyWmyi8nFoMAw4xXX0Vod56ShXhEG1mkI1kEx1yCtvQ=</dsig:DigestValue>
+      <dsig:DigestValue>FphBEEuMRPcAkoIoJYV1jxQxZFr6RQiLqWdCim5+5QY=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Resources\485转232.png" size="21018">
@@ -228,13 +228,13 @@
       <dsig:DigestValue>6fMYIF06LLgNFpo4of5jp4cDdG9NMBjnWVNJ0nDlOwM=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Resources\消防电源检验报告(标准定版）.xls" size="133120">
+  <file name="Resources\消防电源检验报告(标准定版）.xls" size="134656">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>RvAlXWGDMQABOdjj9+F9V6NOJwTRjLeDrAwppFzjM6M=</dsig:DigestValue>
+      <dsig:DigestValue>nPRPwDVBo+1+yVKd5pjR8ajVWMpRtfh65NyWPYECYGc=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

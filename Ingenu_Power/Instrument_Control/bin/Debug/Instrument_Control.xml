@@ -2961,54 +2961,54 @@
             Write : 输出通道2设定输出电压，用于后续扩展
             </summary>
         </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.OverCurrentSet_1OutputTargetSet_3">
+        <member name="F:Instrument_Control.MCU_Control.Config.OutputTargetSet_3">
             <summary>
             Write : 输出通道3设定输出电压，用于后续扩展
             </summary>
         </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.ZeroCalibrate_1">
-            <summary>
-            Write : 输出通道1的零点校准
-            </summary>
-        </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.ZeroCalibrate_2">
-            <summary>
-            Write : 输出通道2的零点校准
-            </summary>
-        </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.ZeroCalibrate_3">
-            <summary>
-            Write : 输出通道3的零点校准
-            </summary>
-        </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.OverCurrentSet_1">
-            <summary>
-            Write : 设置输出通道1的软件过流点
-            </summary>
-        </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.OverCurrentSet_2">
-            <summary>
-            Write : 设置输出通道2的软件过流点
-            </summary>
-        </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.OverCurrentSet_3">
-            <summary>
-            Write : 设置输出通道3的软件过流点
-            </summary>
-        </member>
         <member name="F:Instrument_Control.MCU_Control.Config.DisplayVoltage_Ratio_1">
             <summary>
-            Write : 输出通道1的电压与电流校准
+            Write : 输出通道1的空载电压的校准
             </summary>
         </member>
         <member name="F:Instrument_Control.MCU_Control.Config.DisplayVoltage_Ratio_2">
             <summary>
-            Write : 输出通道2的电压与电流校准
+            Write : 输出通道2的空载电压的校准
             </summary>
         </member>
         <member name="F:Instrument_Control.MCU_Control.Config.DisplayVoltage_Ratio_3">
             <summary>
-            Write : 输出通道3的电压与电流校准
+            Write : 输出通道3的空载电压的校准
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.OxpSet_1">
+            <summary>
+            Write : 设置输出通道1的软件过流/过功率点
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.OxpSet_2">
+            <summary>
+            Write : 设置输出通道2的软件过流/过功率点
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.OxpSet_3">
+            <summary>
+            Write : 设置输出通道3的软件过流/过功率点
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.DisplayCurrent_Ratio_1">
+            <summary>
+            Write : 输出通道1的电流校准
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.DisplayCurrent_Ratio_2">
+            <summary>
+            Write : 输出通道2的电流校准
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.DisplayCurrent_Ratio_3">
+            <summary>
+            Write : 输出通道3的电流校准
             </summary>
         </member>
         <member name="F:Instrument_Control.MCU_Control.Config.OutputVoltage_Adjust">
@@ -3048,12 +3048,17 @@
         </member>
         <member name="F:Instrument_Control.MCU_Control.Config.AlwaysCharging">
             <summary>
-            管理员指令，对特定的产品而言，使用本指令来保证始终处于充电的状态（应急照明电源）
+            管理员指令，对特定的产品而言，使用本指令来保证始终处于充电的状态
             </summary>
         </member>
         <member name="F:Instrument_Control.MCU_Control.Config.BatsSingleWorkDisable">
             <summary>
-            管理员指令，对特定产品，使用本指令之后会造成备电单投功能无效（应急照明电源）
+            管理员指令，对特定产品，使用本指令之后会造成备电单投功能无效
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.ChargePeriodSet">
+            <summary>
+            管理员指令，对特定产品，使用本指令之后会减少充电周期
             </summary>
         </member>
         <member name="F:Instrument_Control.MCU_Control.Config.Mcu_ClearValidationCode">
@@ -3089,11 +3094,6 @@
         <member name="F:Instrument_Control.MCU_Control.Config.FlashDataRead">
             <summary>
             读取单片机内指定地址的Flash数据
-            </summary>
-        </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.ChargePeriodSet">
-            <summary>
-            充电周期设置
             </summary>
         </member>
         <member name="F:Instrument_Control.MCU_Control.Config.ExitAdminMode">
@@ -3313,7 +3313,7 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vOCP(System.Int32,System.Decimal,System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vOxpSet(System.Int32,System.Decimal,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             对待测产品MCU进行校准 - 输出通道OCP设置
             </summary>
@@ -3351,7 +3351,7 @@
         </member>
         <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vClear(System.IO.Ports.SerialPort,System.String@)">
             <summary>
-            对待测产品MCU进行校准 - 擦除校准数据
+            对待测产品MCU进行校准 - 擦除校准数据;为了保证可靠，写3次
             </summary>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
@@ -3447,13 +3447,15 @@
             <param name="cmd">待计算校验和的数组对象</param>
             <returns>校验和</returns>
         </member>
-        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vCheckRespond(System.Int32,System.Byte[],System.IO.Ports.SerialPort,System.String@)">
              <summary>
              设备对用户发送指令的响应数据
              </summary>
+             <param name="retey_times">同一条命令反复发送的次数，为了防止电子负载错误响应时使用</param>
              <param name="command_bytes">发送到设备的命令</param>
              <param name="serialPort">设备连接的电脑串口</param>
             <param name="error_information">可能出现的错误信息</param>
+            <returns>是否需要再次发送的标志</returns>
         </member>
         <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
             <summary>
@@ -3968,18 +3970,20 @@
             功能关闭
             </summary>
         </member>
-        <member name="M:Instrument_Control.SiglentOSC.SiglentOSC_vOpenSessionRM">
+        <member name="M:Instrument_Control.SiglentOSC.SiglentOSC_vOpenSessionRM(System.String@)">
             <summary>
             创建DefalutRM
             </summary>
+            <param name="error_information">可能存在的错误信息</param>
             <returns>返回DefalutRM的会话值</returns>
         </member>
-        <member name="M:Instrument_Control.SiglentOSC.SiglentOSC_vOpenSession(System.Int32,System.String)">
+        <member name="M:Instrument_Control.SiglentOSC.SiglentOSC_vOpenSession(System.Int32,System.String,System.String@)">
             <summary>
             创建仪表会话session
             </summary>
             <param name="ResourceManager">DefalutRM</param>
             <param name="ResourceAddress">VISA地址</param>
+            <param name="error_information">可能存在的错误信息</param>
             <returns>仪表会话号</returns>
         </member>
         <member name="M:Instrument_Control.SiglentOSC.SiglentOSC_vCloseSession(System.Int32)">
@@ -4012,14 +4016,16 @@
             <param name="voltage_DIV">对应通道的电压DIV设置</param>
             <returns>OSC初始化可能存在的信息</returns>
         </member>
-        <member name="M:Instrument_Control.SiglentOSC.SiglentOSC_vQueryValue(System.Int32,System.Int32,System.Int32,Instrument_Control.SiglentOSC.Parameter_Type)">
+        <member name="M:Instrument_Control.SiglentOSC.SiglentOSC_vQueryValue(System.Int32,System.Int32,System.Int32,System.Boolean,Instrument_Control.SiglentOSC.Parameter_Type,System.String@)">
             <summary>
             示波器执行指定参数的读取操作
             </summary>
             <param name="ssionRM">Resouce Mannager的会话号</param>
             <param name="ssionOSC">使用VISA的示波器的会话号</param>
             <param name="channel">示波器使用的通道</param>
+            <param name="working_in_normalmode">示波器工作于"正常模式"与否，工作在此状态时示波器返回参数时间较长，且可能包含 **** </param>
             <param name="parameter_type">指定返回的参数的类型，(请不要选择All，该参数属于集合数据，提取容易出错)</param>
+            <param name="error_information">VISA执行中是否存在问题</param>
             <returns>返回示波器测量的指定参数</returns>
         </member>
         <member name="M:Instrument_Control.SiglentOSC.SiglentOSC_vSetCouplingMode(System.Int32,System.Int32,System.Int32,Instrument_Control.SiglentOSC.Coupling_Type,Instrument_Control.SiglentOSC.Impedance_Type)">

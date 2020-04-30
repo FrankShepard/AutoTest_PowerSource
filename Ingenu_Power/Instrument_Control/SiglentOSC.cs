@@ -428,16 +428,18 @@ namespace Instrument_Control
 		/// <summary>
 		/// 创建DefalutRM
 		/// </summary>
+		/// <param name="error_information">可能存在的错误信息</param>
 		/// <returns>返回DefalutRM的会话值</returns>
-		public Int32 SiglentOSC_vOpenSessionRM()
+		public Int32 SiglentOSC_vOpenSessionRM(out string error_information)
 		{
-            Int32 ViError;
+			error_information = string.Empty;
+			Int32 ViError;
             /*使用viOpenDefalutRM()函数时需要注意，若是Agilent相关服务没有打开的情况下，此程序会造成不响应*/
             ViError = visa32.viOpenDefaultRM( out int ResourceManager );
 			if ( ViError < visa32.VI_SUCCESS ) {
-				//Throw New ApplicationException("打开 Resource Manager 失败")
+				error_information = "打开 Resource Manager 失败";
 				//'存在程控致命错误，进行标记，并跳出函数，不进行
-				SiglentOSC_vCloseSession( ResourceManager );
+				//SiglentOSC_vCloseSession( ResourceManager );
 			}
 			return ResourceManager;
 		}
@@ -447,16 +449,19 @@ namespace Instrument_Control
 		/// </summary>
 		/// <param name="ResourceManager">DefalutRM</param>
 		/// <param name="ResourceAddress">VISA地址</param>
+		/// <param name="error_information">可能存在的错误信息</param>
 		/// <returns>仪表会话号</returns>
-		public Int32 SiglentOSC_vOpenSession( Int32 ResourceManager , string ResourceAddress )
+		public Int32 SiglentOSC_vOpenSession( Int32 ResourceManager , string ResourceAddress ,out string error_information)
 		{
+			error_information = string.Empty;
 			Int32 viError, session;
 			/*创建session*/
 			try {
 				viError = visa32.viOpen( ResourceManager , ResourceAddress , visa32.VI_NULL , visa32.VI_NULL , out session );
 				//viError = visa32.viOpen(ResourceManager, ResourceAddress, visa32.VI_NO_LOCK, visa32.VI_TMO_IMMEDIATE, out session);
 				if ( viError < visa32.VI_SUCCESS ) {
-					SiglentOSC_vCloseSession( session );
+					error_information = "打开仪表会话失败";
+					//SiglentOSC_vCloseSession( session );
 				}
 			} catch { session = -1; }
 			return session;
@@ -485,35 +490,39 @@ namespace Instrument_Control
 			if ( viError < visa32.VI_SUCCESS ) {
 				System.Text.StringBuilder err = new System.Text.StringBuilder( 256 );
 				visa32.viStatusDesc( ssionInstrument , viError , err );
-				SiglentOSC_vCloseSession( ssionInstrument );
+				//SiglentOSC_vCloseSession( ssionInstrument );
 				write_errorinformation = "给VISA仪表发送指令代码时出现异常 \r\n";         //给仪表发送指令代码时出现异常；此种情况下建议重新发送一遍指令（处理错误的过程在调用本函数的程序中）
 			}
+			Thread.Sleep( 10 );
 			return write_errorinformation;
 		}
 
 		/*使用示波器接受数据*/
-		private decimal SiglentOSC_vReadResult( Int32 ssionRM , Int32 ssionOSC )
+		private decimal SiglentOSC_vReadResult( Int32 ssionRM , Int32 ssionOSC, out string error_information)
 		{
-			decimal Value = 0m;
+			decimal value = 0m;
+			error_information = string.Empty;
 			Int32 viError = 0;
-            viError = visa32.viRead( ssionOSC, out string Result_String, 30 );
 
-            int retry_time = 10;
+			string Result_String = string.Empty;
+
+			int retry_time = 5;
 			do {
-				Thread.Sleep( 10 );
+				viError = visa32.viRead( ssionOSC, out Result_String, 256 ); //此处256为输出数据的最长限制，不可以设置的太短
 				if ( ( viError < visa32.VI_SUCCESS ) || ( Result_String == "" ) ) {
 					continue;
 				}
 
-				if ( Result_String.Contains( "*" ) ) {
-					return 0m; //single模式下未成功触发
+				if ( Result_String.Contains( "****" ) ) {
+					return value; //single/normal 模式下未成功触发
 				}
 			} while ( ( --retry_time > 0 ) && ( ( viError < visa32.VI_SUCCESS ) || ( Result_String == "" ) ) );
 
 			if ( ( viError < visa32.VI_SUCCESS ) || ( Result_String == "" ) ) {
-				System.Text.StringBuilder err = new System.Text.StringBuilder( 256 );
+				error_information = "SiglentOSC.SiglentOSC_vReadResult 函数执行读取示波器值出现错误 ( viError )";
+				StringBuilder err = new StringBuilder( 256 );
 				visa32.viStatusDesc( ssionOSC , viError , err );
-				return 0m;
+				return value;
 			}			
 
 			//通过以上的viRead指令得到的数据结构示例如下 ：           C1:PAVA PKPK,4.64E-02V\n ；需要将其中的数据提取出来          
@@ -526,11 +535,12 @@ namespace Instrument_Control
 				//将输出的4.64E-02转换为46.4mV的形式
 				decimal Value_1 = Convert.ToDecimal( Value_String.Substring( 0 , Value_String.Length - Value_String.IndexOf( "E" ) ) );
 				decimal Value_2 = Convert.ToDecimal( Value_String.Substring( Value_String.IndexOf( "E" ) + 1 ) );
-				Value = Value_1 * Convert.ToDecimal( Math.Pow( 10 , ( double ) Value_2 ) );
+				value = Value_1 * Convert.ToDecimal( Math.Pow( 10 , ( double ) Value_2 ) );
 			} catch {
-				Value = 0m;
+				error_information = "SiglentOSC.SiglentOSC_vReadResult 函数执行提取示波器值出现错误";
+				value = 0m;
 			}
-			return Value;
+			return value;
 		}
 
 		#endregion
@@ -612,11 +622,14 @@ namespace Instrument_Control
 		/// <param name="ssionRM">Resouce Mannager的会话号</param>
 		/// <param name="ssionOSC">使用VISA的示波器的会话号</param>
 		/// <param name="channel">示波器使用的通道</param>
+		/// <param name="working_in_normalmode">示波器工作于"正常模式"与否，工作在此状态时示波器返回参数时间较长，且可能包含 **** </param>
 		/// <param name="parameter_type">指定返回的参数的类型，(请不要选择All，该参数属于集合数据，提取容易出错)</param>
+		/// <param name="error_information">VISA执行中是否存在问题</param>
 		/// <returns>返回示波器测量的指定参数</returns>
-		public decimal SiglentOSC_vQueryValue( Int32 ssionRM , Int32 ssionOSC , Int32 channel , Parameter_Type parameter_type )
+		public decimal SiglentOSC_vQueryValue( Int32 ssionRM , Int32 ssionOSC , Int32 channel , bool working_in_normalmode,Parameter_Type parameter_type ,out string error_information)
 		{
 			string type = string.Empty;
+			error_information = string.Empty;
 
 			switch ( parameter_type ) {
 				case Parameter_Type.All:
@@ -696,8 +709,13 @@ namespace Instrument_Control
 			}
 
 			decimal value = 0;
-			SiglentOSC_vWriteCommand( ssionRM , ssionOSC , "C" + channel.ToString( ) + ":PAVA? " + type );       //设置需要读取的数据种类
-			value = SiglentOSC_vReadResult( ssionRM , ssionOSC );			
+			error_information = SiglentOSC_vWriteCommand( ssionRM , ssionOSC , "C" + channel.ToString( ) + ":PAVA? " + type );       //设置需要读取的数据种类
+			if (error_information == string.Empty) {
+				if (working_in_normalmode) {
+					Thread.Sleep( 350 ); //额外延长一段时间，防止传输数据时间不足造成的读取异常出现
+				}
+				value = SiglentOSC_vReadResult( ssionRM, ssionOSC, out error_information );
+			}
 			return value;
 		}
 
@@ -937,21 +955,17 @@ namespace Instrument_Control
 		{
 			string error_information = string.Empty;
 			if ( SiglentOSC_vSetTrigMode( ssionRM , ssionOSC , TrigMode_Type.normal_mode ) != string.Empty ) { error_information = InforError; return error_information; }
-			Thread.Sleep( 10 );
 			if ( SiglentOSC_vSetTrigMode( ssionRM , ssionOSC , TrigMode_Type.single_mode ) != string.Empty ) { error_information = InforError; return error_information; }
-			Thread.Sleep( 10 );
 
+			//设置为边沿触发，选择对应的通道
 			if ( SiglentOSC_vWriteCommand( ssionRM , ssionOSC , "TRSE EDGE,SR,C" + channel.ToString( ) + ",HT,TI,HV,100NS" ) != string.Empty ) { error_information = InforError; return error_information; }
-			Thread.Sleep( 10 ); //设置为边沿触发，选择对应的通道
+			//设置为下降沿触发
 			if ( SiglentOSC_vWriteCommand( ssionRM , ssionOSC , "C" + channel.ToString( ) + ":TRig_SLope NEG" ) != string.Empty ) { error_information = InforError; return error_information; }
-			Thread.Sleep( 10 ); //设置为下降沿触发
 
 			if ( trigCoupling_Type == TrigCoupling_Type.TrigCoupling_AC ) {
 				if ( SiglentOSC_vWriteCommand( ssionRM , ssionOSC , "C" + channel.ToString( ) + ":TRCP AC" ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 			} else if ( trigCoupling_Type == TrigCoupling_Type.TrigCoupling_DC ) {
 				if ( SiglentOSC_vWriteCommand( ssionRM , ssionOSC , "C" + channel.ToString( ) + ":TRCP DC" ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 			}
 
 			/*需要根据设定的触发电平调整电压的div 并将显示电压负向偏移3个div、设置触发电平*/
@@ -959,82 +973,57 @@ namespace Instrument_Control
 			decimal real_div = 0.002m; //实际电压DIV
 			if ( target_div < 0.002m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._2mV ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -0.006m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 0.002m;
 			} else if ( target_div < 0.005m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._5mV ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -0.015m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 0.005m;
 			} else if ( target_div < 0.01m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._10mV ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -0.03m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 0.01m;
 			} else if ( target_div < 0.02m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._20mV ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -0.06m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 0.02m;
 			} else if ( target_div < 0.05m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._50mV ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -0.15m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 0.05m;
 			} else if ( target_div < 0.1m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._100mV ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -0.3m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 0.1m;
 			} else if ( target_div < 0.2m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._200mV ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -0.6m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 0.2m;
 			} else if ( target_div < 0.5m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._500mV ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -1.5m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 0.5m;
 			} else if ( target_div < 1.0m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._1V ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -3m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 1.0m;
 			} else if ( target_div < 2.0m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._2V ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -6m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 2.0m;
 			} else if ( target_div < 5.0m ) {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._5V ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -15m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 5.0m;
 			} else {
 				if ( SiglentOSC_vSetVoltageDIV( ssionRM , ssionOSC , channel , Voltage_DIV._10V ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				if ( SiglentOSC_vVoltageOffsetSet( ssionRM , ssionOSC , channel , -30m ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 				real_div = 10.0m;
 			}
 
 			if ( trig_level < 6 * real_div ) //触发电平设置值必须为 真实电压div的6倍以内
 			{
 				if ( SiglentOSC_vChangeTrigLevel( ssionRM , ssionOSC , channel , trig_level ) != string.Empty ) { error_information = InforError; return error_information; }
-				Thread.Sleep( 10 );
 			}
 
 			return error_information;
@@ -1123,7 +1112,6 @@ namespace Instrument_Control
 
 			foreach ( string command in mode ) {
 				if ( SiglentOSC_vWriteCommand( ssionRM , ssionOSC , command ) != string.Empty ) { error_information = "示波器清除错误出现异常 \r\n"; }
-				Thread.Sleep( 3 );
 			}
 			return error_information;
 		}
