@@ -24,7 +24,7 @@ namespace Ingenu_Power.UserControls
 
 		Thread trdInstrumentValidation;
 
-		#region -- 路由事件
+		#region -- 控件事件
 
 		/// <summary>
 		/// 获取本机可以使用的串口

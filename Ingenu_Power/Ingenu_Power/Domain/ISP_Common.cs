@@ -176,7 +176,7 @@ namespace Ingenu_Power.Domain
 									mcu.McuControl_vISPMasterOrSlaver ( MCU_Control.MS_Choose.Slaver, serialPort, out error_information );
 								}
 								//if ( error_information != string.Empty ) { return; }
-								Thread.Sleep( 50 );
+								Thread.Sleep( 200 );
 
 								//以下执行程序的具体烧录过程
 								FileStream fileStream = new FileStream ( bin_filePath, FileMode.Open );

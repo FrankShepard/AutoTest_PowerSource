@@ -491,7 +491,7 @@ namespace ProductInfor
 							while (source_voltage > (infor_Sp.Qualified_CutoffLevel[ 1 ] + VoltageDrop + 0.5m)) {
 								measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, source_voltage, true, true, serialPort, out error_information );
 								if (error_information != string.Empty) { continue; }
-								Thread.Sleep( 50 * delay_magnification );
+								Thread.Sleep( 30 * delay_magnification );
 								source_voltage -= 0.5m;
 							}
 
@@ -526,7 +526,8 @@ namespace ProductInfor
 							//蜂鸣器响
 							Communicate_BeepWorking( serialPort, out error_information );
 							//关闭备电，等待测试人员确认蜂鸣器响
-							Thread.Sleep( delay_magnification * 500 ); //保证蜂鸣器能响
+							Thread.Sleep( 300 ); //保证蜂鸣器能响
+							Thread.Sleep( delay_magnification * 100 ); //保证蜂鸣器能响
 							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, source_voltage, true, false, serialPort, out error_information );
 						}
 					}

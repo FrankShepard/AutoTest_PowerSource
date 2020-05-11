@@ -137,7 +137,6 @@ F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Mater
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\NationalInstruments.Controls.xml
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\nationalinstruments.controls.booleans.xml
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\NationalInstruments.Common.xml
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csprojAssemblyReference.cache
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csproj.ResolveComReference.cache
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Domain\ResultMessageDialog.baml
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\MainWindow.baml
@@ -170,3 +169,6 @@ F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\I
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csproj.CopyComplete
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.exe
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.pdb
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Download\ProductInfor.dll
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Office.dll
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Microsoft.Office.Interop.Excel.dll

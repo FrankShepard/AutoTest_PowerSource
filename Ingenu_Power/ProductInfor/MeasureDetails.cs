@@ -72,21 +72,35 @@ namespace ProductInfor
 								if (SessionRM == 0) {
 									SessionRM = siglentOSC.SiglentOSC_vOpenSessionRM(out error_information_osc );									
 								}
-								if (error_information_osc == string.Empty) {
+								if ((error_information_osc == string.Empty) && (SessionRM > 0)) {
 									SessionOSC = siglentOSC.SiglentOSC_vOpenSession( SessionRM, "USB0::62700::60986::" + osc_ins + "::0::INSTR", out error_information_osc );
 								}
-								if (error_information_osc == string.Empty) {
+								if ((error_information_osc == string.Empty) && (SessionOSC > 0) && (SessionRM > 0)) {
 									error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC );
 									error_information += error_information_temp;
 									error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC, 1, SiglentOSC.Coupling_Type.AC, SiglentOSC.Voltage_DIV._100mV );
 									error_information += error_information_temp;
 									error_information = siglentOSC.SiglentOSC_vSetScanerDIV( SessionRM, SessionOSC, SiglentOSC.ScanerTime_DIV._10ms );
 									error_information += error_information_temp;
+								} else {
+									
+									if(SessionRM <= 0) {
+										error_information_osc += "VISA中的ResourceMangener未能正常打开会话，请检查Agilent相关服务是否启动";
+									} 
+									
+									if(SessionOSC <= 0) {
+										error_information_osc += "指定示波器未能正常打开会话，请检查USB线的连接";
+									}
+									error_information = error_information_osc;
 								}
-								if (error_information != string.Empty) {//关闭示波器的VISA会话端口,防止长期打开造成的通讯失败情况
-									siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
-									siglentOSC.SiglentOSC_vCloseSession( SessionRM );
-									SessionRM = 0;
+								if ((error_information != string.Empty) || (SessionOSC <= 0) || (SessionRM <= 0)) {//关闭示波器的VISA会话端口,防止长期打开造成的通讯失败情况
+									try {
+										siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
+										siglentOSC.SiglentOSC_vCloseSession( SessionRM );
+										SessionRM = 0;
+									} catch {
+										SessionRM = 0;
+									}
 								}
 
 								serialPort.BaudRate = Baudrate_Instrument;
@@ -116,9 +130,10 @@ namespace ProductInfor
 								error_information += error_information_temp;
 
 								//通道分选板设置为右侧，选择通道1进行完纹波测试
-								mcu.McuControl_vMeasureLocation( MCU_Control.Location.Location_Right, serialPort, out error_information );
+								mcu.McuControl_vMeasureLocation( MCU_Control.Location.Location_Right, serialPort, out error_information_temp );
 								error_information += error_information_temp;
-								mcu.McuControl_vRappleChannelChoose( 0, serialPort, out error_information );								
+								mcu.McuControl_vRappleChannelChoose( 0, serialPort, out error_information_temp );
+								error_information += error_information_temp;
 							}
 						}
 					}
@@ -259,6 +274,7 @@ namespace ProductInfor
 							real_powers[ index ] = 0m;
 						} else {
 							real_powers[ index ] = should_work_power_left;
+							should_work_power_left = 0m;
 						}
 					}
 				}
@@ -350,6 +366,7 @@ namespace ProductInfor
 							real_currents[ index ] = 0m;
 						} else {
 							real_currents[ index ] = should_work_current_left;
+							should_work_current_left = 0m;
 						}
 					}
 				}
@@ -430,7 +447,7 @@ namespace ProductInfor
 				for (int index = 0; index < 6; index++) {
 					AllocateChannel[ index ] = index / 4;
 					if (index == 4) {
-						real_resistances[ index ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ 1 ] ), 2.0 ) ) / real_voltages[1];
+						real_resistances[ index ] = resistances[ 1]; //5V输出  隔离通道的电阻直接使用设定值
 					} else if (index == 5) {
 						real_resistances[ index ] = 7500m; //使用最大的电阻，对输出电压影响放到最低
 					} else {
@@ -441,6 +458,7 @@ namespace ProductInfor
 							real_resistances[ index ] = 7500m; //使用最大的电阻，对输出电压影响放到最低
 						} else {
 							real_resistances[ index ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ 0 ] ), 2.0 ) ) / should_work_power_left ;
+							should_work_power_left = 0m;
 						}
 					}
 				}

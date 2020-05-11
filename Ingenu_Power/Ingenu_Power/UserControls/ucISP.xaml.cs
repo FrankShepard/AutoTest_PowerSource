@@ -25,7 +25,7 @@ namespace Ingenu_Power.UserControls
 
 		Thread trdFlash;
 
-		#region -- 路由事件
+		#region -- 控件事件
 
 		/// <summary>
 		/// 获取本机可以使用的串口
@@ -149,30 +149,33 @@ namespace Ingenu_Power.UserControls
 				int type_id = Convert.ToInt32 ( id.Substring ( 5, 3 ) );
 				int ver_id = Convert.ToInt32 ( id.Substring ( 8, 2 ) );
 				using ( ISP_Common iSP_Common = new ISP_Common ( ) ) {
-					ArrayList arrayList = iSP_Common.ISP_vCodeRefresh ( type_id, ver_id, out error_information );
-					if ( error_information == string.Empty ) {
-						if ( !( bool ) arrayList [ 0 ] ) {
-							error_information += "数据库中不存在指定型号产品的单片机程序 \r\n";
-						} else {
-							if ( !( bool ) arrayList [ 1 ] ) {
-								error_information += "当前电源无需使用ISP进行烧录 \r\n";
+					//每次更换产品之后需要更新待烧录代码
+					if((type_id !=Properties.Settings.Default.ISP_ID_Hardware) || (ver_id != Properties.Settings.Default.ISP_Ver_Hardware)) { 
+						ArrayList arrayList = iSP_Common.ISP_vCodeRefresh ( type_id, ver_id, out error_information );
+						if (error_information == string.Empty) {
+							if (!( bool )arrayList[ 0 ]) {
+								error_information += "数据库中不存在指定型号产品的单片机程序 \r\n";
 							} else {
-								switch ( ( int ) arrayList [ 2 ] ) {
-									case 1://显示含外部供电的485转TTL隔离模块
-										Dispatcher.Invoke ( new dlg_PromptShow ( PromptShow ), arrayList [ 3 ].ToString ( ), "485转TTL.png" ); break;
-									case 2://显示不含外部供电的485转TTL/232隔离模块
-										Dispatcher.Invoke ( new dlg_PromptShow ( PromptShow ), arrayList [ 3 ].ToString ( ), "485转232.png" ); break;
-									case 3://显示485转485隔离模块
-										Dispatcher.Invoke ( new dlg_PromptShow ( PromptShow ), arrayList [ 3 ].ToString ( ), "485转485.png" ); break;
-									default: //不使用串口通讯
-										Dispatcher.Invoke ( new dlg_PromptShow ( PromptShow ), "无需串口通讯", "null.png" ); break;
+								if (!( bool )arrayList[ 1 ]) {
+									error_information += "当前电源无需使用ISP进行烧录 \r\n";
+								} else {
+									switch (( int )arrayList[ 2 ]) {
+										case 1://显示含外部供电的485转TTL隔离模块
+											Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), arrayList[ 3 ].ToString(), "485转TTL.png" ); break;
+										case 2://显示不含外部供电的485转TTL/232隔离模块
+											Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), arrayList[ 3 ].ToString(), "485转232.png" ); break;
+										case 3://显示485转485隔离模块
+											Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), arrayList[ 3 ].ToString(), "485转485.png" ); break;
+										default: //不使用串口通讯
+											Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), "无需串口通讯", "null.png" ); break;
+									}
 								}
 							}
-						}
-						//执行真实的ISP动作
-						if ( error_information == string.Empty ) {
-							iSP_Common.ISP_vDoFlash ( out error_information );
-						}
+						}						
+					}
+					//执行真实的ISP动作
+					if (error_information == string.Empty) {
+						iSP_Common.ISP_vDoFlash( out error_information );
 					}
 				}
 			} catch ( Exception ex ) {

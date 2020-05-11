@@ -164,7 +164,8 @@ namespace ProductInfor
 								}
 							}
 
-							Thread.Sleep ( delay_magnification * 200 );
+							Thread.Sleep ( 100 );
+							Thread.Sleep ( delay_magnification * 50 );
 							//串口读取备电的电压，查看采集误差
 							serialPort.BaudRate = CommunicateBaudrate;
 							Communicate_User ( serialPort, out error_information );
@@ -178,7 +179,7 @@ namespace ProductInfor
 							while ( source_voltage > (infor_Sp.Qualified_CutoffLevel [ 1 ] + VoltageDrop +0.5m)) {
 								measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, source_voltage, true, true, serialPort, out error_information );
 								if ( error_information != string.Empty ) { continue; }
-								Thread.Sleep ( 50 * delay_magnification );
+								Thread.Sleep ( 30 * delay_magnification );
 								source_voltage -= 0.5m;
 							}
 
@@ -212,7 +213,8 @@ namespace ProductInfor
 								}
 							}
 							//关闭备电，等待测试人员确认蜂鸣器响
-							Thread.Sleep ( delay_magnification * 500 ); //保证蜂鸣器能响
+							Thread.Sleep ( 300 ); //保证蜂鸣器能响
+							Thread.Sleep ( delay_magnification * 50 ); //保证蜂鸣器能响
 							measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, source_voltage, true, false, serialPort, out error_information );
 						}
 					}

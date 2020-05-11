@@ -57,7 +57,7 @@ namespace Ingenu_Power
 
 		#endregion
 
-		#region -- 路由事件
+		#region -- 控件事件
 
 		/// <summary>
 		/// 窗体载入，需要将用户登录界面进行显示
@@ -79,6 +79,18 @@ namespace Ingenu_Power
             ucMeasure.Visibility = Visibility.Hidden;
             index_of_measure_in_grid = GrdMain.Children.Add( ucMeasure );
             GrdMain.Children.Add( ucLogin );
+		}
+
+		/// <summary>
+		/// 测试窗口关闭时，撤销ISP记录的硬件ID和Verion，保证每次窗口重新进行ISP时都首次读取ISP相关说明
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Window_Closed(object sender, EventArgs e)
+		{
+			Properties.Settings.Default.ISP_ID_Hardware = 0;
+			Properties.Settings.Default.ISP_Ver_Hardware = 0;
+			Properties.Settings.Default.Save();
 		}
 
 		/// <summary>
@@ -368,6 +380,6 @@ namespace Ingenu_Power
 
 
 		#endregion
-
+		
 	}
 }

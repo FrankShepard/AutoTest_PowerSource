@@ -19,4 +19,3 @@ F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\Produ
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csproj.CopyComplete
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.dll
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.pdb
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csprojAssemblyReference.cache

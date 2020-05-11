@@ -35,7 +35,7 @@ namespace Ingenu_Power.UserControls
 			BtnEndDate.Content = DateTime.Now.ToString ( "yyyy/MM/dd" );
 			Calendar_Start.SelectedDate = DateTime.Now;
 			Calendar_End.SelectedDate = DateTime.Now;
-			//绑定路由事件
+			//绑定控件事件
 			TgbChoose.Checked += new RoutedEventHandler ( TgbChoose_Checked );
 			TgbChoose.Unchecked += new RoutedEventHandler ( TgbChoose_Unchecked );
 
@@ -174,7 +174,7 @@ namespace Ingenu_Power.UserControls
 
 		#endregion
 
-		#region -- 路由事件
+		#region -- 控件事件
 
 		/// <summary>
 		/// 限定产品的硬件ID类型，只能输入数字
@@ -563,6 +563,10 @@ namespace Ingenu_Power.UserControls
 				objExcelWorkSheet.Range[ "N7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出空载电压1_Max" );
 				objExcelWorkSheet.Range[ "O5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压1_Min" );
 				objExcelWorkSheet.Range[ "O7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压1_Max" );
+				//应急照明电源系列需要调整过流保护点为过功率保护点
+				if (product_is_emergencypower) {
+					objExcelWorkSheet.Range[ "P2" ].Value2 = "过功率保护(W)";
+				}
 				objExcelWorkSheet.Range[ "P5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点1_Min" );
 				objExcelWorkSheet.Range[ "P7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点1_Max" );
 				objExcelWorkSheet.Range[ "Q7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出纹波1_Max" );
@@ -571,6 +575,10 @@ namespace Ingenu_Power.UserControls
 				objExcelWorkSheet.Range[ "S7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出空载电压2_Max" );
 				objExcelWorkSheet.Range[ "T5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压2_Min" );
 				objExcelWorkSheet.Range[ "T7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压2_Max" );
+				//应急照明电源系列需要调整过流保护点为过功率保护点
+				if (product_is_emergencypower) {
+					objExcelWorkSheet.Range[ "U2" ].Value2 = "过功率保护(W)";
+				}
 				objExcelWorkSheet.Range[ "U5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点2_Min" );
 				objExcelWorkSheet.Range[ "U7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点2_Max" );
 				objExcelWorkSheet.Range[ "V7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出纹波2_Max" );
@@ -579,6 +587,10 @@ namespace Ingenu_Power.UserControls
 				objExcelWorkSheet.Range[ "X7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出空载电压3_Max" );
 				objExcelWorkSheet.Range[ "Y5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压3_Min" );
 				objExcelWorkSheet.Range[ "Y7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压3_Max" );
+				//应急照明电源系列需要调整过流保护点为过功率保护点
+				if (product_is_emergencypower) {
+					objExcelWorkSheet.Range[ "Z2" ].Value2 = "过功率保护(W)";
+				}
 				objExcelWorkSheet.Range[ "Z5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点3_Min" );
 				objExcelWorkSheet.Range[ "Z7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点3_Max" );
 				objExcelWorkSheet.Range[ "AA7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出纹波3_Max" );
@@ -969,33 +981,37 @@ namespace Ingenu_Power.UserControls
 		private void DataQuery_vEditExcel(string target_filePath, DataTable dt_data,DataTable dt_qualified,out string error_information )
 		{
 			error_information = string.Empty;
-			
-			Excel.Application objExcelApp = new Excel.ApplicationClass ( ); //Excel进程
-			Excel.Workbooks objExcelWorkBooks = objExcelApp.Workbooks; //Excel工作表的集合
-			Excel.Workbook objExcelWorkbook = objExcelWorkBooks.Open ( target_filePath, 0, false, 5, "", "", true, Excel.XlPlatform.xlWindows, "", true, false, 0, true, false, false );
 
-			try {				
-				string target_excelsheet_name = "消防电源记录";
-				if (( bool )dt_qualified.Rows[ 0 ][ "UserNeedTestSourceEffect" ]) { //D02 D06试用的包含源效应数据的消防电源记录
-					target_excelsheet_name = "D02D06电源记录";
+			try {
+				Excel.Application objExcelApp = new Excel.ApplicationClass(); //Excel进程
+				Excel.Workbooks objExcelWorkBooks = objExcelApp.Workbooks; //Excel工作表的集合
+				Excel.Workbook objExcelWorkbook = objExcelWorkBooks.Open( target_filePath, 0, false, 5, "", "", true, Excel.XlPlatform.xlWindows, "", true, false, 0, true, false, false );
+
+				try {
+					string target_excelsheet_name = "消防电源记录";
+					if (( bool )dt_qualified.Rows[ 0 ][ "UserNeedTestSourceEffect" ]) { //D02 D06试用的包含源效应数据的消防电源记录
+						target_excelsheet_name = "D02D06电源记录";
+					}
+					foreach (Excel.Worksheet objExcelWorkSheet in objExcelWorkbook.Worksheets) {
+						objExcelWorkSheet.Select( Type.Missing );
+						if (objExcelWorkSheet.Name == target_excelsheet_name) {
+							DataQuery_vEditExcelDetails( objExcelWorkSheet, dt_data, dt_qualified, target_excelsheet_name, out error_information );
+							break;
+						}
+					}
+					//保存数据的自动填充结果，并退出 objExcelApp 这一进程；防止COM资源释放时存在问题
+					objExcelWorkbook.Save();
+					objExcelApp.Quit();
+					//自动打开之前修改过数据的Excel文件
+					System.Diagnostics.Process.Start( target_filePath ); //不使用ExcelApp，单独打开某一文件的默认方式				
+				} catch (Exception ex) {
+					error_information = ex.ToString();
+					error_information += "\r\n 一次仅可打印同一型号的产品数据";
+					objExcelWorkbook.Save();
+					objExcelApp.Quit(); //退出Excel文件的保存
 				}
-				foreach ( Excel.Worksheet objExcelWorkSheet in objExcelWorkbook.Worksheets ) {
-					objExcelWorkSheet.Select ( Type.Missing );					
-					if ( objExcelWorkSheet.Name == target_excelsheet_name) {
-						DataQuery_vEditExcelDetails( objExcelWorkSheet ,dt_data, dt_qualified, target_excelsheet_name, out error_information );
-						break;
-					}					
-				}
-				//保存数据的自动填充结果，并退出 objExcelApp 这一进程；防止COM资源释放时存在问题
-				objExcelWorkbook.Save ( );
-				objExcelApp.Quit ( );
-				//自动打开之前修改过数据的Excel文件
-				System.Diagnostics.Process.Start ( target_filePath ); //不使用ExcelApp，单独打开某一文件的默认方式				
-			} catch(Exception ex ) {
-				error_information = ex.ToString ( );
-				error_information += "\r\n 一次仅可打印同一型号的产品数据";
-				objExcelWorkbook.Save();
-				objExcelApp.Quit(); //退出Excel文件的保存
+			}catch(Exception ex) {
+				error_information = ex.ToString();
 			}
 		}
 
@@ -1004,24 +1020,29 @@ namespace Ingenu_Power.UserControls
 		/// </summary>
 		private void DataQuery_vExportData( DataTable dataTable )
 		{
-			string error_information = string.Empty;
-			DataTable dataTable_qualified = new DataTable();
-			for(int temp_index = 0 ;temp_index < 2 ;temp_index ++ ) {
-				if(temp_index == 0 ) {
-					//检查合格数据范围，若没有合格范围则不允许数据导出
-					dataTable_qualified = DataQuery_vQualifiedValueGet ( objDataTable.Rows [ 0 ] [ "硬件IDVerion" ].ToString ( ).Trim ( ), out error_information );
-					if ( error_information != string.Empty ) { continue; }
-					//生成用于数据导出的excel文件副本
-					string target_filePath = DataQuery_vCreatExcel( out error_information );
-					if ( error_information != string.Empty ) { continue; }
-					//对Excel文件进行数据填充的操作
-					DataQuery_vEditExcel ( target_filePath, dataTable, dataTable_qualified, out error_information );
-				} else {
-					//委托主线程中的等待进度条隐藏
-					Dispatcher.Invoke ( new DataQuery_dlgPrintImageShow ( DataQuery_vPrintImageShow ), false );
-					StaticInfor.Error_Message = error_information;
-					Dispatcher.Invoke ( new MainWindow.Dlg_MessageTips ( MainWindow.MessageTips ), error_information, false );					
+			try {
+				string error_information = string.Empty;
+				DataTable dataTable_qualified = new DataTable();
+				for (int temp_index = 0; temp_index < 2; temp_index++) {
+					if (temp_index == 0) {
+						//检查合格数据范围，若没有合格范围则不允许数据导出
+						dataTable_qualified = DataQuery_vQualifiedValueGet( objDataTable.Rows[ 0 ][ "硬件IDVerion" ].ToString().Trim(), out error_information );
+						if (error_information != string.Empty) { continue; }
+						//生成用于数据导出的excel文件副本
+						string target_filePath = DataQuery_vCreatExcel( out error_information );
+						if (error_information != string.Empty) { continue; }
+						//对Excel文件进行数据填充的操作
+						DataQuery_vEditExcel( target_filePath, dataTable, dataTable_qualified, out error_information );
+					} else {
+						//委托主线程中的等待进度条隐藏
+						Dispatcher.Invoke( new DataQuery_dlgPrintImageShow( DataQuery_vPrintImageShow ), false );
+						StaticInfor.Error_Message = error_information;
+						Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), error_information, false );
+					}
 				}
+			}catch(Exception ex) {
+				StaticInfor.Error_Message = ex.ToString();
+				Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), StaticInfor.Error_Message, false );
 			}
 		}
 		
