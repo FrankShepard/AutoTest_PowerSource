@@ -12,20 +12,19 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
 		Icon="Resources/owl.ico"
-        Title="盈帜电源测试系统" Height="494" MinHeight="494"  Width="734" MinWidth="734" HorizontalAlignment="Center" VerticalAlignment="Center" MaxHeight="711" MaxWidth="1100" 
-        WindowStartupLocation="CenterScreen" ToolTip="用于盈帜电源系列产品的自动测试" Topmost="False" VerticalContentAlignment="Center" Loaded="Window_Loaded" >
-	
+        Title="盈帜电源测试系统" Height="494" MinHeight="494"  Width="734" MinWidth="734" HorizontalAlignment="Center" VerticalAlignment="Center" WindowStartupLocation="CenterScreen" ToolTip="用于盈帜电源系列产品的自动测试" Topmost="False" VerticalContentAlignment="Center" Loaded="Window_Loaded" Closed="Window_Closed">
+
 	<materialDesign:DialogHost Identifier="RootDialog" >
 		<materialDesign:DrawerHost BorderBrush="{DynamicResource MaterialDesignDivider}" Height="Auto" Width="Auto">
 			<materialDesign:DrawerHost.LeftDrawerContent>
 				<StackPanel>
-						<TextBlock Margin="10" HorizontalAlignment="Left">功能选项</TextBlock>									
-						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Left}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Name="BtnMenu_ConnectDatabase" Click="BtnMenu_ConnectDatabase_Click">
-							<WrapPanel>
-								<materialDesign:PackIcon Kind="DatabasePlus" Margin="5" VerticalAlignment="Center"/>
-								<TextBlock TextWrapping="Wrap" Text="重连数据库" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
-							</WrapPanel>							
-						</Button>
+					<TextBlock Margin="10" HorizontalAlignment="Left">功能选项</TextBlock>
+					<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Left}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Name="BtnMenu_ConnectDatabase" Click="BtnMenu_ConnectDatabase_Click">
+						<WrapPanel>
+							<materialDesign:PackIcon Kind="DatabasePlus" Margin="5" VerticalAlignment="Center"/>
+							<TextBlock TextWrapping="Wrap" Text="重连数据库" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
+						</WrapPanel>
+					</Button>
 					<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Left}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Name="BtnMenu_Login" Click="BtnMenu_Login_Click">
 						<WrapPanel>
 							<materialDesign:PackIcon Kind="LoginVariant" Margin="5" VerticalAlignment="Center"/>
@@ -56,25 +55,19 @@
 							<TextBlock TextWrapping="Wrap" Text="数据查询" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
 						</WrapPanel>
 					</Button>
-					<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Left}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Name="BtnMenu_DataView" Click="BtnMenu_DataView_Click">
-						<WrapPanel>
-							<materialDesign:PackIcon Kind="Eye" Margin="5" VerticalAlignment="Center"/>
-							<TextBlock TextWrapping="Wrap" Text="打印预览" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
-						</WrapPanel>
-					</Button>
 				</StackPanel>
 			</materialDesign:DrawerHost.LeftDrawerContent>
-			
-			<Grid >
-			<Grid.RowDefinitions>
-				<RowDefinition Height="25"/>
-				<RowDefinition Height="*"/>
-			</Grid.RowDefinitions>
 
-			<Grid Grid.Row="0">
-				<materialDesign:ColorZone Padding="1" materialDesign:ShadowAssist.ShadowDepth="Depth2" Mode="PrimaryMid" DockPanel.Dock="Top">
-					<Grid Height="24">
-							<Grid HorizontalAlignment="Left">
+			<Grid >
+				<Grid.RowDefinitions>
+					<RowDefinition Height="25"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+
+				<Grid Grid.Row="0">
+					<materialDesign:ColorZone Padding="0" materialDesign:ShadowAssist.ShadowDepth="Depth2" Mode="PrimaryMid" DockPanel.Dock="Top">
+						<Grid Height="24">
+							<WrapPanel HorizontalAlignment="Left">
 								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMenuShow" Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" Click="BtnMenuShow_Click" >
 									<ToggleButton.Content>
 										<materialDesign:PackIcon Kind="Settings" Margin="0" />
@@ -82,8 +75,10 @@
 									<materialDesign:ToggleButtonAssist.OnContent>
 										<materialDesign:PackIcon Kind="Settings" Margin =" 0"/>
 									</materialDesign:ToggleButtonAssist.OnContent>
-								</ToggleButton>								
-							</Grid>
+								</ToggleButton>
+								<materialDesign:PackIcon Name="PkiSyncDll" Kind="CloudSync" Height="20" Width="20" Margin="2" MouseEnter="PkiSyncDll_MouseEnter" MouseDoubleClick="PkiSyncDll_MouseDoubleClick" />
+							</WrapPanel>
+							<TextBlock Text="盈帜电源自动测试系统" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFB0A5A5" FontFamily="YouYuan" FontStyle="Italic" FontSize="16" FontWeight="Normal" />
 							<WrapPanel HorizontalAlignment="Right">
 								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMessage" Click="BtnMessage_Click" ToolTip="最近一次出现的错误信息">
 									<ToggleButton.Content>
@@ -103,14 +98,14 @@
 								</ToggleButton>
 							</WrapPanel>
 						</Grid>
-				</materialDesign:ColorZone>
+					</materialDesign:ColorZone>
+				</Grid>
+				<Grid Grid.Row="1" Name="GrdMain">
+					<Grid.Background>
+						<ImageBrush ImageSource="Resources/BackGroundImage.png" Opacity="0.8"/>
+					</Grid.Background>
+				</Grid>
 			</Grid>
-			<Grid Grid.Row="1" Name="GrdMain">
-				<Grid.Background>
-					<ImageBrush ImageSource="Resources/BackGroundImage.png" Opacity="0.8"/>
-				</Grid.Background>
-			</Grid>
-		</Grid>
 		</materialDesign:DrawerHost>
 	</materialDesign:DialogHost>
 </Window>

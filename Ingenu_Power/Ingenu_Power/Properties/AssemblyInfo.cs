@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration ( "" )]
 [assembly: AssemblyCompany("北京盈帜新源科技有限公司")]
 [assembly: AssemblyProduct("Ingenu_Power")]
-[assembly: AssemblyCopyright("Copyright © 北京盈帜新源科技有限公司  2020")]
+[assembly: AssemblyCopyright( "©Ingenu 2020" )]
 [assembly: AssemblyTrademark("Ingenu")]
 [assembly: AssemblyCulture ( "" )]
 

@@ -1,0 +1,374 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ISP</name>
+    </assembly>
+    <members>
+        <member name="T:ISP.HC_ISP">
+            <summary>
+            定义芯圣HC89S003F4单片机的ISP操作通讯类
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_DefaultBaudrate">
+            <summary>
+            ISP模式使用的通讯波特率
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Header">
+            <summary>
+            ISP使用到的通讯帧的帧头数据
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Identifier_PC">
+            <summary>
+            ISP使用到的 PC-->MCU 的标识符
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Identifier_MCU">
+            <summary>
+            ISP使用到的 MCU-->PC 的标识符
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_HardwareSeries">
+            <summary>
+            ISP使用到的 MCU 的产品类型
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Ender">
+            <summary>
+            ISP使用到的通讯帧的帧尾数据
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Cmd_Induct">
+            <summary>
+            ISP使用到的特殊命令 - 使MCU进入ISP模式
+            </summary>
+        </member>
+        <member name="T:ISP.HC_ISP.ISP_Command">
+            <summary>
+            ISP操作使用到命令
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_LoadFlash">
+            <summary>
+            Flash数据更新下载 
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_StatusOkey">
+            <summary>
+            执行的ISP指令 状态  -  成功 MCU-->PC
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_StatusValiErr">
+            <summary>
+            执行的ISP指令 状态  -  校验和错误 MCU-->PC
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_StatusFlashEncrypted">
+            <summary>
+            执行的ISP指令 状态  -  Flash被加密 MCU-->PC
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_RespondInduct">
+            <summary>
+            特殊指令 - MCU进入ISP模式后返回的命令  MCU-->PC
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_Handshake">
+            <summary>
+            握手
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_Quit">
+            <summary>
+            退出ISP模式
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_StatusOtherErr">
+            <summary>
+            执行的ISP指令 状态  -  其它错误 MCU-->PC
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_EraseFlash">
+            <summary>
+            擦除Flash
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_ReadOption0">
+            <summary>
+            读取Option0的前64字节
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_ReadOption1">
+            <summary>
+            读取Option1的前64字节
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_ReadOption2">
+            <summary>
+            读取Option2的前64字节
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_SetOption">
+            <summary>
+            代码选项配置
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_ProtectOption">
+            <summary>
+            代码保护配置
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Command.ISP_Cmd_CustomerInfor">
+            <summary>
+            客户信息配置
+            </summary>
+        </member>
+        <member name="T:ISP.HC_ISP.ISP_Mode">
+            <summary>
+            MCU在进入 ISP 模式时返回的具体型号的代码
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Mode.ISP_Mode_HC89S003F4">
+            <summary>
+            HC89S003F4在进入ISP模式时返回的具体的MCU型号代码
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.ISP_Mode.ISP_Mode_HC89F0431">
+            <summary>
+            HC89F0431在进入ISP模式时返回的具体的MCU型号代码
+            </summary>
+        </member>
+        <member name="T:ISP.HC_ISP.Extern_Reset_EffectiveValue">
+            <summary>
+            MCU使用到外部复位功能时,触发外部复位的管脚有效电平
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.Extern_Reset_EffectiveValue.EffectiveValue_High">
+            <summary>
+            管脚高电平复位
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.Extern_Reset_EffectiveValue.EffectiveValue_Low">
+            <summary>
+            管脚低电平复位
+            </summary>
+        </member>
+        <member name="T:ISP.HC_ISP.BOR_Value">
+            <summary>
+            BOR检测电压点
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.BOR_Value.BOR_18V">
+            <summary>
+            BOR设置为1.8V
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.BOR_Value.BOR_20V">
+            <summary>
+            BOR设置为2.0V
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.BOR_Value.BOR_24V">
+            <summary>
+            BOR设置为2.4V
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.BOR_Value.BOR_26V">
+            <summary>
+            BOR设置为2.6V
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.BOR_Value.BOR_30V">
+            <summary>
+            BOR设置为3.0V
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.BOR_Value.BOR_36V">
+            <summary>
+            BOR设置为3.6V
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.BOR_Value.BOR_39V">
+            <summary>
+            BOR设置为3.9V
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.BOR_Value.BOR_42V">
+            <summary>
+            BOR设置为4.2V
+            </summary>
+        </member>
+        <member name="T:ISP.HC_ISP.WaitTimeAfterReset">
+            <summary>
+            复位等待时间枚举类型
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.WaitTimeAfterReset.WaitTime_8ms">
+            <summary>
+            复位等待时间 -8ms
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.WaitTimeAfterReset.WaitTime_4ms">
+            <summary>
+            复位等待时间 -4ms
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.WaitTimeAfterReset.WaitTime_1ms">
+            <summary>
+            复位等待时间 -1ms
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.WaitTimeAfterReset.WaitTime_16ms">
+            <summary>
+            复位等待时间 -16ms
+            </summary>
+        </member>
+        <member name="T:ISP.HC_ISP.FlashEraseType">
+            <summary>
+            Flash擦除的烈性
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.FlashEraseType.Erase_Part">
+            <summary>
+            局部擦除
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.FlashEraseType.Erase_Part_KeepDefaultData">
+            <summary>
+            局部擦除保留原始数据 - 慎用
+            </summary>
+        </member>
+        <member name="F:ISP.HC_ISP.FlashEraseType.Erase_All">
+            <summary>
+            全扇区擦除
+            </summary>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vValidationCodeGet(System.Byte[],System.Int32)">
+            <summary>
+            计算目标数组的校验和
+            </summary>
+            <param name="datas">目标byte数组</param>
+            <param name="length">需要计算的数组长度</param>
+            <returns>校验和</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vInductISPMode(System.IO.Ports.SerialPort)">
+            <summary>
+            向MCU发送指令，用于保证MCU能进入ISP模式 - 单次发送进入ISP模式
+            </summary>
+            <param name="sp_mcu">使用到的串口</param>
+            <returns>MCU是否进入ISP模式的标志</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vHandShake(System.IO.Ports.SerialPort)">
+            <summary>
+            向MCU发送指令，用于单次握手
+            </summary>
+            <param name="sp_mcu">使用到的串口</param>
+            <returns>MCU是否单次握手成功</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vEraseFlash(System.IO.Ports.SerialPort,ISP.HC_ISP.FlashEraseType,System.UInt16,System.UInt32)">
+            <summary>
+            向MCU发送指令，用于全扇区的擦除
+            </summary>
+            <param name="sp_mcu">使用到的串口</param>
+            <param name="flashEraseType">需要执行的片内擦除的类型</param>
+            <param name="start_address">起始地址</param>
+            <param name="end_address">停止地址</param>
+            <returns>擦除成功与否的状态</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vLoadFlash(System.IO.Ports.SerialPort,System.UInt16,System.Byte[])">
+            <summary>
+            向MCU发送指令，用于ROM区域程序的更新
+            </summary>
+            <param name="sp_mcu">使用到的串口</param>
+            <param name="flash_address">目标数据在MCU的ROM中的地址</param>
+            <param name="target_datas">目标数据数组</param>
+            <returns>Flash数据传输成功与否的标志</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vSetOption(System.IO.Ports.SerialPort,ISP.HC_ISP.WaitTimeAfterReset,ISP.HC_ISP.BOR_Value,ISP.HC_ISP.Extern_Reset_EffectiveValue,System.Boolean)">
+            <summary>
+            向MCU发送指令，用于代码选项配置
+            </summary>
+            <param name="sp_mcu">使用到的串口</param>
+            <param name="waitTimeAfterReset">复位等待时间  默认为8ms</param>
+            <param name="bOR_Value">BOR电平配置  默认为3V</param>
+            <param name="extern_Reset_EffectiveValue">外部复位管脚有效电平，默认低电平复位</param>
+            <param name="extern_reset_enable">外部复位管脚使能设置，默认外部复位无效</param>
+            <returns>代码选项配置是否成功</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vProtectOption(System.IO.Ports.SerialPort,System.Boolean)">
+            <summary>
+            向MCU发送指令，用于配置ICP及IAP保护功能；实际使用时需要禁用ICP和IAP保护，否则程序执行异常
+            </summary>
+            <param name="sp_mcu">使用到的串口</param>
+            <param name="need_iapwrite_protect">0~8K是否需要iap写保护</param>
+            <returns>IAP/ICP保护成功与否的状态</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vSetCustomerInfor(System.IO.Ports.SerialPort)">
+            <summary>
+            向MCU发送指令，用于设置客户信息
+            </summary>
+            <param name="sp_mcu">使用到的串口</param>
+            <returns>客户信息设置正常与否</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vQuit(System.IO.Ports.SerialPort)">
+            <summary>
+            向MCU发送指令，用于退出ISP模式
+            </summary>
+            <param name="sp_mcu">使用到的串口</param>
+            <returns>退出ISP模式成功与否</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vInitialize(System.IO.Ports.SerialPort)">
+            <summary>
+            ISP功能使用前的初始化设置 - 串口的初始化
+            </summary>
+            <param name="sp_mcu"></param>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vCheckCode(System.Byte[])">
+            <summary>
+            检查待烧录的文件是否满足要求
+            </summary>
+            <param name="file_data">待烧录的文件</param>
+            <returns>可能存在的错误信息</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vISPMode_In(System.IO.Ports.SerialPort)">
+            <summary>
+            ISP时单片机重启进入ISP模式的操作，限定最长的握手时间为1s以内，需要在单片机重置供电命令之后执行
+            </summary>
+            <param name="sp_mcu">使用到的串口对象</param>
+            <returns>可能存在的错误信息</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.ISP_vProgram(System.Byte[],System.IO.Ports.SerialPort,System.Boolean,ISP.HC_ISP.FlashEraseType,System.UInt16,System.UInt16,ISP.HC_ISP.WaitTimeAfterReset,ISP.HC_ISP.BOR_Value,ISP.HC_ISP.Extern_Reset_EffectiveValue,System.Boolean)">
+            <summary>
+            执行目标Flash数据的ISP更新
+            </summary>
+            <param name="file_data">程序文件数据</param>
+            <param name="sp_mcu">使用到的ISP通讯串口</param>
+            <param name="need_iapwrite_protect">0~8K的ROM是否需要设定为IAP写保护</param>
+            <param name="flashEraseType">擦除片内Flash的类型</param>
+            <param name="start_address">需要局部擦除片内flash的起始地址</param>
+            <param name="end_address">需要局部擦除片内flash的结束地址</param>
+            <param name="waitTimeAfterReset">复位等待时间，默认8ms</param>
+            <param name="bOR_Value">BOR电平值，默认3.0V</param>
+            <param name="extern_Reset_EffectiveValue">在允许外部复位前提下的复位有效电平，默认低电平</param>
+            <param name="extern_reset_enable">是否允许外部复位，默认不允许外部复位</param>
+            <returns>烧录成功与否的标志</returns>
+        </member>
+        <member name="M:ISP.HC_ISP.Dispose">
+            <summary>
+            本类资源释放
+            </summary>
+        </member>
+        <member name="M:ISP.HC_ISP.Dispose(System.Boolean)">
+            <summary>
+            无法直接调用的资源释放程序
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:ISP.HC_ISP.Finalize">
+            <summary>
+            类释放资源析构函数
+            </summary>
+        </member>
+    </members>
+</doc>

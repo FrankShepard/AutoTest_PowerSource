@@ -94,5 +94,65 @@ namespace Ingenu_Power.Properties {
                 this["PassWord"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ISP_ID_Hardware {
+            get {
+                return ((int)(this["ISP_ID_Hardware"]));
+            }
+            set {
+                this["ISP_ID_Hardware"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ISP_Ver_Hardware {
+            get {
+                return ((int)(this["ISP_Ver_Hardware"]));
+            }
+            set {
+                this["ISP_Ver_Hardware"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Instrment_OSC_INS {
+            get {
+                return ((string)(this["Instrment_OSC_INS"]));
+            }
+            set {
+                this["Instrment_OSC_INS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string UsedSerialport {
+            get {
+                return ((string)(this["UsedSerialport"]));
+            }
+            set {
+                this["UsedSerialport"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int MeasureDelayMagnification {
+            get {
+                return ((int)(this["MeasureDelayMagnification"]));
+            }
+            set {
+                this["MeasureDelayMagnification"] = value;
+            }
+        }
     }
 }

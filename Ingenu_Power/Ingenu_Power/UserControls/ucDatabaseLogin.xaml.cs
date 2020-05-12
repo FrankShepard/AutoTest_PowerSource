@@ -55,23 +55,21 @@ namespace Ingenu_Power.UserControls
 		/// 数据库的校验程序 -- 工作于后台工作线程中
 		/// </summary>
 		/// <param name="information">服务器信息的集合体</param>        
-		private string V_ValidateSQL(StaticInfor.SQL_Information information)
+		private void V_ValidateSQL(StaticInfor.SQL_Information information)
 		{
 			string error_information = string.Empty;
 			using (Database database = new Database()) {
 				database.V_Initialize( information.SQL_Name, information.SQL_User, information.SQL_Password, out error_information );
-				if (error_information != string.Empty) {
-					this.Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), error_information, false );
-				} else {
+				StaticInfor.Error_Message = error_information;
+				if (error_information == string.Empty) {
 					//更新SQL用户登信息
 					Properties.Settings.Default.SQL_Name = information.SQL_Name;
 					Properties.Settings.Default.SQL_User = information.SQL_User;
 					Properties.Settings.Default.SQL_Password = information.SQL_Password;
-					Properties.Settings.Default.Save();					
+					Properties.Settings.Default.Save();
 				}
-				StaticInfor.Error_Message = string.Empty;
+				this.Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), StaticInfor.Error_Message, false );
 			}
-			return error_information;
 		}
 
 		/// <summary>

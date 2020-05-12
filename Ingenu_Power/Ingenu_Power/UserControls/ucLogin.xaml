@@ -66,7 +66,7 @@
                             <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
                         <materialDesign:PackIcon Kind="ShieldKey" Style="{StaticResource InputIcon}" Height="40" Grid.ColumnSpan="2" Margin="19,0,0,0" Width="40"/>
-                        <PasswordBox Grid.Column="2" Padding="10 0" ToolTip="用户重置密码操作为 RESET(不区分大小写)"
+                        <PasswordBox Grid.Column="2" Padding="10 0" 
                                      x:Name="FloatingPasswordBox"
                                      MaxLength="20"
                                      materialDesign:HintAssist.Hint="密码"
