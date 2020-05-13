@@ -6,10 +6,10 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="SQL_Name" Type="System.String" Scope="User">
-      <Value Profile="(Default)">PC\\SQLEXPRESS</Value>
+      <Value Profile="(Default)">192.168.1.99</Value>
     </Setting>
     <Setting Name="SQL_User" Type="System.String" Scope="User">
-      <Value Profile="(Default)">quhao</Value>
+      <Value Profile="(Default)">test_0</Value>
     </Setting>
     <Setting Name="SQL_Password" Type="System.String" Scope="User">
       <Value Profile="(Default)">admin123456</Value>

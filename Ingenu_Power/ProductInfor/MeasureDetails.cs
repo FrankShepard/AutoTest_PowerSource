@@ -37,9 +37,17 @@ namespace ProductInfor
 		/// </summary>
 		const decimal SingleLoadMaxPower = 280m;
 		/// <summary>
-		/// 仪表通讯波特率
+		/// 仪表通讯波特率 - 艾德克斯产品
 		/// </summary>
-		public const int Baudrate_Instrument = 4800;
+		public const int Baudrate_Instrument_Itech = 4800;
+		/// <summary>
+		/// 仪表通讯波特率 - 程控交流电源
+		/// </summary>
+		private const int Baudrate_Instrument_ACPower = 4800;
+		/// <summary>
+		/// 仪表通讯波特率 - 自制控制板
+		/// </summary>
+		public const int Baudrate_Instrument_ControlBoard = 4800;
 		/// <summary>
 		/// VISA中RM的会话号
 		/// </summary>
@@ -53,91 +61,95 @@ namespace ProductInfor
 		/// <summary>
 		/// 仪表初始化
 		/// </summary>
+		/// <param name="whole_function_enable">全项测试与否，只有全项测试时需要先对示波器进行仪表程控</param>
 		/// <param name="cv_target">充电电子负载的目标CV值</param>
 		/// <param name="osc_ins">示波器INS</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void Measure_vInstrumentInitalize( decimal cv_target,string osc_ins, SerialPort serialPort, out string error_information )
+		public void Measure_vInstrumentInitalize( bool whole_function_enable, decimal cv_target, string osc_ins, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			string error_information_temp = string.Empty;
 			string error_information_osc = string.Empty;
 
 			try {
-				using (AN97002H acpower = new AN97002H()) {
-					using (Itech itech = new Itech()) {
-						using (MCU_Control mcu = new MCU_Control()) {
-							using (SiglentOSC siglentOSC = new SiglentOSC()) {
+				using ( AN97002H acpower = new AN97002H ( ) ) {
+					using ( Itech itech = new Itech ( ) ) {
+						using ( MCU_Control mcu = new MCU_Control ( ) ) {
+							using ( SiglentOSC siglentOSC = new SiglentOSC ( ) ) {
 								/* 示波器初始化 */
-								if (SessionRM == 0) {
-									SessionRM = siglentOSC.SiglentOSC_vOpenSessionRM(out error_information_osc );									
+								if ( SessionRM == 0 ) {
+									SessionRM = siglentOSC.SiglentOSC_vOpenSessionRM ( out error_information_osc );
 								}
-								if ((error_information_osc == string.Empty) && (SessionRM > 0)) {
-									SessionOSC = siglentOSC.SiglentOSC_vOpenSession( SessionRM, "USB0::62700::60986::" + osc_ins + "::0::INSTR", out error_information_osc );
+								if ( ( error_information_osc == string.Empty ) && ( SessionRM > 0 ) ) {
+									SessionOSC = siglentOSC.SiglentOSC_vOpenSession ( SessionRM, "USB0::62700::60986::" + osc_ins + "::0::INSTR", out error_information_osc );
 								}
-								if ((error_information_osc == string.Empty) && (SessionOSC > 0) && (SessionRM > 0)) {
-									error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC );
+								if ( ( error_information_osc == string.Empty ) && ( SessionOSC > 0 ) && ( SessionRM > 0 ) ) {
+									error_information_temp = siglentOSC.SiglentOSC_vInitializate ( SessionRM, SessionOSC );
 									error_information += error_information_temp;
-									error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC, 1, SiglentOSC.Coupling_Type.AC, SiglentOSC.Voltage_DIV._100mV );
+									error_information_temp = siglentOSC.SiglentOSC_vInitializate ( SessionRM, SessionOSC, 1, SiglentOSC.Coupling_Type.AC, SiglentOSC.Voltage_DIV._100mV );
 									error_information += error_information_temp;
-									error_information = siglentOSC.SiglentOSC_vSetScanerDIV( SessionRM, SessionOSC, SiglentOSC.ScanerTime_DIV._10ms );
+									error_information = siglentOSC.SiglentOSC_vSetScanerDIV ( SessionRM, SessionOSC, SiglentOSC.ScanerTime_DIV._10ms );
 									error_information += error_information_temp;
 								} else {
-									
-									if(SessionRM <= 0) {
+
+									if ( SessionRM <= 0 ) {
 										error_information_osc += "VISA中的ResourceMangener未能正常打开会话，请检查Agilent相关服务是否启动";
-									} 
-									
-									if(SessionOSC <= 0) {
+									}
+
+									if ( SessionOSC <= 0 ) {
 										error_information_osc += "指定示波器未能正常打开会话，请检查USB线的连接";
 									}
 									error_information = error_information_osc;
 								}
-								if ((error_information != string.Empty) || (SessionOSC <= 0) || (SessionRM <= 0)) {//关闭示波器的VISA会话端口,防止长期打开造成的通讯失败情况
+								if ( ( error_information != string.Empty ) || ( SessionOSC <= 0 ) || ( SessionRM <= 0 ) ) {//关闭示波器的VISA会话端口,防止长期打开造成的通讯失败情况
 									try {
-										siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
-										siglentOSC.SiglentOSC_vCloseSession( SessionRM );
+										siglentOSC.SiglentOSC_vCloseSession ( SessionOSC );
+										siglentOSC.SiglentOSC_vCloseSession ( SessionRM );
 										SessionRM = 0;
 									} catch {
 										SessionRM = 0;
 									}
 								}
 
-								serialPort.BaudRate = Baudrate_Instrument;
+								serialPort.BaudRate = Baudrate_Instrument_Itech;
 								/*电子负载的操作*/
-								for (int index_load = 0; index_load < Address_Load_Output.Length; index_load++) {
-									error_information_temp = itech.ElecLoad_vInitializate( Address_Load_Output[ index_load ], true, serialPort );
+								for ( int index_load = 0 ; index_load < Address_Load_Output.Length ; index_load++ ) {
+									error_information_temp = itech.ElecLoad_vInitializate ( Address_Load_Output [ index_load ], true, serialPort );
 									error_information += error_information_temp;
-									Thread.Sleep( 10 );
+									Thread.Sleep ( 10 );
 								}
-								error_information_temp = itech.ElecLoad_vInitializate( Address_Load_Bats, false, serialPort );
+								error_information_temp = itech.ElecLoad_vInitializate ( Address_Load_Bats, false, serialPort );
 								error_information += error_information_temp;
-								error_information_temp = itech.ElecLoad_vInputStatusSet( Address_Load_Bats, Itech.OperationMode.CV, cv_target, Itech.OnOffStatus.Off, serialPort );
-								error_information += error_information_temp;
-								/*备电控制继电器板和通道分选板软件复位*/
-								mcu.McuControl_vReset( MCU_Control.Address_BatsControl, serialPort, out error_information_temp );
-								error_information += error_information_temp;
-								mcu.McuControl_vReset( MCU_Control.Address_ChannelChoose, serialPort, out error_information_temp );
-								error_information += error_information_temp;
-								/*主备电关闭*/
-								error_information_temp = itech.Itech_vRemoteControl( Address_DCPower, Itech.RemoteControlMode.Remote, serialPort );
-								error_information += error_information_temp;
-								error_information_temp = itech.DCPower_vOutputStatusSet( Address_DCPower, 0m, false, serialPort );
-								error_information += error_information_temp;
-								error_information_temp = acpower.ACPower_vControlStop( Address_ACPower, serialPort );
-								error_information += error_information_temp;
-								error_information_temp = acpower.ACPower_vSetParameters( Address_ACPower, 220m, 50m, false, serialPort );
+								error_information_temp = itech.ElecLoad_vInputStatusSet ( Address_Load_Bats, Itech.OperationMode.CV, cv_target, Itech.OnOffStatus.Off, serialPort );
 								error_information += error_information_temp;
 
-								//通道分选板设置为右侧，选择通道1进行完纹波测试
-								mcu.McuControl_vMeasureLocation( MCU_Control.Location.Location_Right, serialPort, out error_information_temp );
+								/*主备电关闭*/
+								error_information_temp = itech.Itech_vRemoteControl ( Address_DCPower, Itech.RemoteControlMode.Remote, serialPort );
 								error_information += error_information_temp;
-								mcu.McuControl_vRappleChannelChoose( 0, serialPort, out error_information_temp );
+								error_information_temp = itech.DCPower_vOutputStatusSet ( Address_DCPower, 0m, false, serialPort );
+								error_information += error_information_temp;
+								serialPort.BaudRate = Baudrate_Instrument_ACPower;
+								error_information_temp = acpower.ACPower_vControlStop ( Address_ACPower, serialPort );
+								error_information += error_information_temp;
+								error_information_temp = acpower.ACPower_vSetParameters ( Address_ACPower, 220m, 50m, false, serialPort );
+								error_information += error_information_temp;
+
+								/*备电控制继电器板和通道分选板软件复位*/
+								serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+								mcu.McuControl_vReset ( MCU_Control.Address_BatsControl, serialPort, out error_information_temp );
+								error_information += error_information_temp;
+								mcu.McuControl_vReset ( MCU_Control.Address_ChannelChoose, serialPort, out error_information_temp );
+								error_information += error_information_temp;
+								//通道分选板设置为右侧，选择通道1进行完纹波测试
+								mcu.McuControl_vMeasureLocation ( MCU_Control.Location.Location_Right, serialPort, out error_information_temp );
+								error_information += error_information_temp;
+								mcu.McuControl_vRappleChannelChoose ( 0, serialPort, out error_information_temp );
 								error_information += error_information_temp;
 							}
 						}
 					}
-				}				
+				}
 
 			} catch ( Exception ex ) {
 				error_information += ex.ToString ( );
@@ -163,22 +175,24 @@ namespace ProductInfor
 								/* 释放示波器的连接 */
 								siglentOSC.SiglentOSC_vClearError( SessionRM, SessionOSC );
 								siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
-								serialPort.BaudRate = Baudrate_Instrument;
 								//关交流电源
+								serialPort.BaudRate = Baudrate_Instrument_ACPower;
 								int retry_index = 0;
 								do {
 									error_information = acpower.ACPower_vControlStop( Address_ACPower, serialPort );
 								} while ((++retry_index < 3) && (error_information != string.Empty));
 								//关直流电源
-								 retry_index = 0;
+								retry_index = 0;
 								do {
+									serialPort.BaudRate = Baudrate_Instrument_Itech;
 									error_information = itech.Itech_vInOutOnOffSet( Address_DCPower, Itech.OnOffStatus.Off, serialPort );
+									serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
 									mcu.McuControl_vBatsOutput( false, false, MCU_Control.FixedLevel.FixedLevel_24V, serialPort, out error_information );		
-								} while ((++retry_index < 3) && (error_information != string.Empty));								
-								
+								} while ((++retry_index < 3) && (error_information != string.Empty));
+
 								//防止个别产品电源在上电、下电时异常上报不受控的信号对总线的干扰，首个负载带载
+								serialPort.BaudRate = Baudrate_Instrument_Itech;
 								itech.ElecLoad_vInputStatusSet( Address_Load_Output[ 0 ], Itech.OperationMode.CC, keep_current, Itech.OnOffStatus.On, serialPort );
-								Thread.Sleep( 500 );
 							}
 						}
 					}
@@ -481,7 +495,7 @@ namespace ProductInfor
 			error_information = string.Empty;
 			Itech.GeneralData_DCPower generalData_DCPower = new Itech.GeneralData_DCPower();
 			using (Itech itech = new Itech()) {
-				serialPort.BaudRate = Baudrate_Instrument;
+				serialPort.BaudRate = Baudrate_Instrument_Itech;
 				int cmd_error_count = 0;
 				do {
 					generalData_DCPower = itech.DCPower_vReadParameter( Address_DCPower, serialPort, out error_information );
@@ -502,7 +516,7 @@ namespace ProductInfor
 			error_information = string.Empty;
 			AN97002H.Parameters_Woring parameters_Woring = new AN97002H.Parameters_Woring ( );
 			using (AN97002H aN97002H = new AN97002H()) {
-				serialPort.BaudRate = Baudrate_Instrument;
+				serialPort.BaudRate = Baudrate_Instrument_ACPower;
 				int cmd_error_count = 0;
 				do {
 					parameters_Woring = aN97002H.ACPower_vQueryResult( Address_ACPower, serialPort, out error_information );
@@ -525,7 +539,7 @@ namespace ProductInfor
 			ArrayList arrayList = new ArrayList ( );
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
 			using ( Itech itech = new Itech ( ) ) {
-				serialPort.BaudRate = Baudrate_Instrument;
+				serialPort.BaudRate = Baudrate_Instrument_Itech;
 				int cmd_error_count = 0;
 				do {
 					arrayList.Clear();
@@ -552,7 +566,7 @@ namespace ProductInfor
 			error_information = string.Empty;
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
 			using (Itech itech = new Itech()) {
-				serialPort.BaudRate = Baudrate_Instrument;
+				serialPort.BaudRate = Baudrate_Instrument_Itech;
 				int cmd_error_count = 0;
 				do {
 					generalData_Load = itech.ElecLoad_vReadMeasuredValue( Address_Load_Bats, serialPort, out error_information );
@@ -576,7 +590,7 @@ namespace ProductInfor
 		{
 			error_information = string.Empty;
 			using (Itech itech = new Itech()) {
-				serialPort.BaudRate = Baudrate_Instrument;
+				serialPort.BaudRate = Baudrate_Instrument_Itech;
 				int cmd_error_count = 0;
 				do {
 					for (int index = 0; index < Address_Load_Output.Length; index++) {
@@ -616,7 +630,7 @@ namespace ProductInfor
 					onOffStatus = Itech.OnOffStatus.On;
 				}
 
-				serialPort.BaudRate = Baudrate_Instrument;
+				serialPort.BaudRate = Baudrate_Instrument_Itech;
 				int cmd_error_count = 0;
 				do {
 					if (input_status) {
@@ -636,13 +650,41 @@ namespace ProductInfor
 		}
 
 		/// <summary>
+		/// 对输出通道上使用的电子负载进行统一的输入与否设置
+		/// </summary>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="input_status">目标输入状态</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vSetOutputLoadInputStatus( SerialPort serialPort, bool input_status, out string error_information )
+		{
+			error_information = string.Empty;
+			using ( Itech itech = new Itech ( ) ) {
+				Itech.OnOffStatus onOffStatus = Itech.OnOffStatus.Off;
+				if ( input_status != false ) {
+					onOffStatus = Itech.OnOffStatus.On;
+				}
+
+				serialPort.BaudRate = Baudrate_Instrument_Itech;
+				int cmd_error_count = 0;
+				do {
+					for ( int index = 0 ; index < Address_Load_Output.Length ; index++ ) {
+						error_information = itech.Itech_vInOutOnOffSet ( Address_Load_Output [ index ], onOffStatus, serialPort );
+						if ( error_information != string.Empty ) { break; }
+					}
+				} while ( ( error_information != string.Empty ) && ( ++cmd_error_count < 5 ) );
+				if ( cmd_error_count >= 5 ) { error_information = "MeasureDetails.Measure_vSetOutputLoadInputStatus 函数执行时仪表响应超时"; }
+			}
+		}
+
+		/// <summary>
 		/// 设置充电使用的电子负载的工作参数
 		/// </summary>
 		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="operationMode">电子负载接入的类型</param>
 		/// <param name="target_value">电子负载目标带载值</param>
 		/// <param name="input_status">目标输入状态</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void Measure_vSetChargeLoad( SerialPort serialPort, decimal target_value, bool input_status, out string error_information )
+		public void Measure_vSetChargeLoad( SerialPort serialPort, Itech.OperationMode operationMode, decimal target_value, bool input_status, out string error_information )
 		{
 			error_information = string.Empty;
 			Itech.OnOffStatus onOffStatus = Itech.OnOffStatus.Off;
@@ -650,10 +692,14 @@ namespace ProductInfor
 				onOffStatus = Itech.OnOffStatus.On;
 			}
 			using ( Itech itech = new Itech ( ) ) {
-				serialPort.BaudRate = Baudrate_Instrument;
+				serialPort.BaudRate = Baudrate_Instrument_Itech;
 				int cmd_error_count = 0;
 				do {
-					error_information = itech.ElecLoad_vInputStatusSet( Address_Load_Bats, Itech.OperationMode.CV, target_value, onOffStatus, serialPort );
+					if ( input_status ) {
+						error_information = itech.ElecLoad_vInputStatusSet ( Address_Load_Bats, operationMode, target_value, onOffStatus, serialPort );
+					} else {
+						error_information = itech.Itech_vInOutOnOffSet ( Address_Load_Bats, onOffStatus, serialPort );
+					}
 				} while ((error_information != string.Empty) && (++cmd_error_count < 5));
 				if (cmd_error_count >= 5) { error_information = "MeasureDetails.Measure_vSetChargeLoad 函数执行时仪表响应超时"; }
 			}
@@ -679,13 +725,14 @@ namespace ProductInfor
 					} else if ( used_bats_count == 1 ) {
 						fixedLevel = MCU_Control.FixedLevel.FixedLevel_12V;
 					}
-
-					serialPort.BaudRate = Baudrate_Instrument;
+					
 					int cmd_error_count = 0;
 					do {
+						serialPort.BaudRate = Baudrate_Instrument_Itech;
 						error_information = itech.DCPower_vOutputStatusSet( Address_DCPower, source_voltage, output_enable, serialPort );
 						if (error_information != string.Empty) { continue; }
 						Thread.Sleep( 50 );
+						serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
 						mCU_Control.McuControl_vBatsOutput( output_enable, used_adjust_power, fixedLevel, serialPort, out error_information );
 					} while ((error_information != string.Empty) && (++cmd_error_count < 5));
 					if (cmd_error_count >= 5) { error_information = "MeasureDetails.Measure_vSetDCPowerStatus 函数执行时仪表响应超时"; }
@@ -705,7 +752,7 @@ namespace ProductInfor
 		{
 			error_information = string.Empty;
 			using (AN97002H aN97002H = new AN97002H()) {
-				serialPort.BaudRate = Baudrate_Instrument;
+				serialPort.BaudRate = Baudrate_Instrument_ACPower;
 				int cmd_error_count = 0;
 				do {
 					if (output_enable) {
@@ -820,6 +867,70 @@ namespace ProductInfor
 				if (error_information != string.Empty) { return; }
 				error_information = siglentOSC.SiglentOSC_vVoltageOffsetSet( SessionRM, SessionOSC, 1, -10m );
 				if (error_information != string.Empty) { return; }
+			}
+		}
+
+		#endregion
+
+		#region -- 自制控制板相关动作
+
+		/// <summary>
+		/// 控制自制模块进行强制模式设置
+		/// </summary>
+		/// <param name="mandatory_status">是否设置为强制模式</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vMandatory(bool mandatory_status,SerialPort serialPort,out string error_information )
+		{
+			error_information = String.Empty;
+			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+			using(MCU_Control mCU_Control =  new MCU_Control ( ) ) {
+				mCU_Control.McuControl_vMandatory ( mandatory_status, serialPort, out error_information );
+			}
+		}
+
+		/// <summary>
+		/// 控制自制模块进行待测纹波通道切换
+		/// </summary>
+		/// <param name="channel_index">通道的索引，从0开始（通道对应输出1）</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vRappleChannelChoose( int channel_index, SerialPort serialPort, out string error_information )
+		{
+			error_information = String.Empty;
+			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+			using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
+				mCU_Control.McuControl_vRappleChannelChoose ( channel_index, serialPort, out error_information );
+			}
+		}
+
+		/// <summary>
+		/// 控制自制模块进行充电占比后门的设置
+		/// </summary>
+		/// <param name="target_status">目标充电100%后门状态</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vAlwaysCharging(bool target_status, SerialPort serialPort, out string error_information )
+		{
+			error_information = String.Empty;
+			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+			using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
+				mCU_Control.McuBackdoor_vAlwaysCharging ( target_status, serialPort, out error_information );
+			}
+		}
+
+		/// <summary>
+		/// 控制自制模块进行充电周期后门的设置
+		/// </summary>
+		/// <param name="target_status">目标充电100%后门状态</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vChargePeriodSet( bool target_status, SerialPort serialPort, out string error_information )
+		{
+			error_information = String.Empty;
+			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+			using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
+				mCU_Control.McuBackdoor_vChargePeriodSet ( target_status, serialPort, out error_information );
 			}
 		}
 

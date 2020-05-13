@@ -15,9 +15,9 @@ namespace ProductInfor
 	{
 #if false
 
-#region -- 产品通讯相关属性
+		#region -- 产品通讯相关属性
 
-#region -- 电源用户通讯命令相关
+		#region -- 电源用户通讯命令相关
 
 		/// <summary>
 		/// 用户通讯中的命令枚举
@@ -133,9 +133,9 @@ namespace ProductInfor
 			UserCmd_GetInValidationMode = 0xAB,			
 		}
 
-#endregion
+		#endregion
 
-#region -- 电源相关数据结构体
+		#region -- 电源相关数据结构体
 
 		/// <summary>
 		/// 交流主电相关的状态信号
@@ -355,11 +355,11 @@ namespace ProductInfor
 			public int Measured_BeepWorkingTime;
 		}
 
-#endregion
+		#endregion
 
 		Infor_Uart infor_Uart = new Infor_Uart ( );
 
-#endregion
+		#endregion
 
 		/// <summary>
 		/// 控制命令出现通讯错误之后重新操作的次数
@@ -457,7 +457,7 @@ namespace ProductInfor
 			return arrayList;
 		}
 
-#region -- 产品的具体通讯方式
+		#region -- 产品的具体通讯方式
 
 		/// <summary>
 		/// 与产品的具体通讯环节（查询状态）
@@ -564,9 +564,9 @@ namespace ProductInfor
 			Thread.Sleep( 200 );
 		}
 
-#endregion
+		#endregion
 
-#region -- 具体的与待测产品进行通讯的过程
+		#region -- 具体的与待测产品进行通讯的过程
 
 		/// <summary>
 		/// 对产品电源的查询命令
@@ -981,17 +981,18 @@ namespace ProductInfor
 			return aByte [ 0 ];
 		}
 
-#endregion
+		#endregion
 
-#region -- 执行的校准操作
+		#region -- 执行的校准操作
 
 		/// <summary>
 		/// 67210 的校准步骤重写
 		/// </summary>
+		/// <param name="whole_function_enable">是否全项测试</param>
 		/// <param name="osc_ins">示波器INS码</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public override string Calibrate( string osc_ins, string port_name )
+		public override string Calibrate(bool whole_function_enable, string osc_ins, string port_name )
 		{
 			string error_information = string.Empty; //整体校准环节可能存在的异常
 			if ( !exist.Calibration ) { return error_information; }
@@ -1070,9 +1071,9 @@ namespace ProductInfor
 		}
 	
 
-#endregion
+		#endregion
 
-#region -- 重写的测试函数部分，主要是为了保证后门程序方式及串口通讯功能、TTL电平检查功能是否正常
+		#region -- 重写的测试函数部分，主要是为了保证后门程序方式及串口通讯功能、TTL电平检查功能是否正常
 
 		/// <summary>
 		/// 备电切断点检查 - 检查备电电压的采集误差
@@ -1337,7 +1338,7 @@ namespace ProductInfor
 		}
 #endif
 
-#endregion
+		#endregion
 
 #endif
 	}

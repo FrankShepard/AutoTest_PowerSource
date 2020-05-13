@@ -337,17 +337,18 @@ namespace ProductInfor
 			return aByte [ 0 ];
 		}
 
-#endregion
+		#endregion
 
 		#region -- 执行的校准操作
 
 		/// <summary>
 		/// 60510 的校准步骤重写
 		/// </summary>
+		/// <param name="whole_function_enable">是否全项测试</param>
 		/// <param name="osc_ins">示波器INS码</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public override string Calibrate( string osc_ins, string port_name )
+		public override string Calibrate( bool whole_function_enable,string osc_ins, string port_name )
 		{
 			string error_information = string.Empty; //整体校准环节可能存在的异常
 			if ( !exist.Calibration ) { return error_information; }
@@ -356,9 +357,9 @@ namespace ProductInfor
 
 			//针对需要进行校准的产品而言，需要执行以下指令函数
 			using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-				using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+				using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 					//仪表初始化
-					measureDetails.Measure_vInstrumentInitalize( 12.5m * infor_Sp.UsedBatsCount, osc_ins, serialPort, out error_information );
+					measureDetails.Measure_vInstrumentInitalize( whole_function_enable,12.5m * infor_Sp.UsedBatsCount, osc_ins, serialPort, out error_information );
 					if ( error_information != string.Empty ) { return error_information; }
 #if false //以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
@@ -373,9 +374,10 @@ namespace ProductInfor
 					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "结束产品校准";
 					sb.AppendLine( temp );
 					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
-#endif
+#else
 					//真正开始进行待测产品的校准操作
 					Calibrate_vDoEvent( measureDetails, serialPort, out error_information_Calibrate );
+#endif
 					measureDetails.Measure_vInstrumentPowerOff( 2m, serialPort, out error_information );
 					error_information += error_information_Calibrate;
 				}
@@ -405,16 +407,16 @@ namespace ProductInfor
 						int[] allocate_channel = measureDetails.Measure_vCurrentAllocate( exist.MandatoryMode, infor_Output.OutputChannelCount, infor_Calibration.OutputCurrent_Mp, target_voltage, out calibrated_load_currents );
 
 						/*主电欠压点时启动，先擦除校准数据，后重启防止之前记录的校准数据对MCU采集的影响*/
-						Calibrate_vClearValidata( acpower, mCU_Control, serialPort, out error_information );
+						Calibrate_vClearValidata( measureDetails, mCU_Control, serialPort, out error_information );
 						if(error_information != string.Empty) { return; }
 						/*执行空载输出时电压的校准、主电周期及主电欠压点的校准*/
 						Calibrate_vEmptyLoad_Mp( allocate_channel, itech, mCU_Control, serialPort, out error_information );
 						if (error_information != string.Empty) { return; }
 						/*执行主电带载时的电流校准*/
-						Calibrate_vFullLoad_Mp( measureDetails,allocate_channel, calibrated_load_currents, acpower, itech, mCU_Control, serialPort, out error_information );
+						Calibrate_vFullLoad_Mp( measureDetails,allocate_channel, calibrated_load_currents, itech, mCU_Control, serialPort, out error_information );
 						if (error_information != string.Empty) { return; }
 						/*输出空载情况下，备电电压、OCP、蜂鸣器时长等其它相关的设置*/
-						Calibrate_vEmptyLoad_Sp( acpower, itech, mCU_Control, serialPort, out error_information );
+						Calibrate_vEmptyLoad_Sp( measureDetails, mCU_Control, serialPort, out error_information );
 						if (error_information != string.Empty) { return; }						
 					}
 				}
@@ -447,7 +449,7 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 							//按照标准满载进行带载 
 							decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
 							decimal [ ] max_voltages = new decimal [ infor_Output.OutputChannelCount ];

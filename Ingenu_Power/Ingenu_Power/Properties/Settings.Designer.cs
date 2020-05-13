@@ -37,7 +37,7 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("PC\\\\SQLEXPRESS")]
+        [global::System.Configuration.DefaultSettingValueAttribute("192.168.1.99")]
         public string SQL_Name {
             get {
                 return ((string)(this["SQL_Name"]));
@@ -49,7 +49,7 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("quhao")]
+        [global::System.Configuration.DefaultSettingValueAttribute("test_0")]
         public string SQL_User {
             get {
                 return ((string)(this["SQL_User"]));

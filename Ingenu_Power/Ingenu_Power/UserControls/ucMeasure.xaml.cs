@@ -328,7 +328,7 @@ namespace Ingenu_Power.UserControls
 						//measuredValue.exist_comOrTTL = ( bool )arrayList[ 2 ]; //元素2 - 声名产品是否存在通讯或者TTL电平信号功能
 						//进行校准操作
 						mi = id_verion.GetMethod( "Calibrate" );
-						parameters = new object[] { Properties.Settings.Default.Instrment_OSC_INS,Properties.Settings.Default.UsedSerialport };
+						parameters = new object[] {measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS,Properties.Settings.Default.UsedSerialport };
 						error_information += mi.Invoke( obj, parameters ).ToString();					
 
 						found_file = true;

@@ -391,16 +391,25 @@ namespace ProductInfor
 
 		#endregion
 
+		#region -- 常量
+
+		/// <summary>
+		/// 初始化串口时的默认波特率
+		/// </summary>
+		public int default_baudrate = 4800;
+
+		#endregion
+
 		#region -- 相关常量的获取
 
 		/// <summary>
-		/// 返回仪表通讯的波特率，用于不包含在本Dll中的ISP功能的实现
+		/// 返回自制控制板的波特率，用于不包含在本Dll中的ISP功能的实现
 		/// </summary>
 		/// <returns></returns>
-		public int BaudrateInstrumentGet()
+		public int BaudrateInstrument_ControlBoardGet( )
 		{
-			return MeasureDetails.Baudrate_Instrument;
-		}
+			return MeasureDetails.Baudrate_Instrument_ControlBoard;
+		}		
 
 		#endregion
 
@@ -808,10 +817,11 @@ namespace ProductInfor
 		/// <summary>
 		/// 校准的操作
 		/// </summary>
+		/// <param name="whole_function_enable">是否全项测试</param>
 		/// <param name="osc_ins">使用到的示波器INS</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public virtual string Calibrate( string osc_ins, string port_name )
+		public virtual string Calibrate( bool  whole_function_enable,string osc_ins, string port_name )
 		{
 			string error_information = string.Empty;
 			return error_information;
@@ -820,19 +830,20 @@ namespace ProductInfor
 		/// <summary>
 		/// 仪表的初始化
 		/// </summary>
+		/// <param name="whole_function_enable">全项测试与否</param>
 		/// <param name="osc_ins">示波器INS码</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的错误信息</returns>
-		public string Measure_vInstrumentInitalize( string osc_ins, string port_name )
+		public string Measure_vInstrumentInitalize( bool whole_function_enable,string osc_ins, string port_name )
 		{
 			string error_information = string.Empty;
 			using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-				using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+				using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 					decimal target_cv_value = 12.5m * infor_Sp.UsedBatsCount;
 					if(target_cv_value == 0m) {
 						target_cv_value = 25m;  //默认值
 					}
-					measureDetails.Measure_vInstrumentInitalize( target_cv_value, osc_ins, serialPort, out error_information );
+					measureDetails.Measure_vInstrumentInitalize( whole_function_enable,target_cv_value, osc_ins, serialPort, out error_information );
 				}
 			}
 			return error_information;
@@ -847,7 +858,7 @@ namespace ProductInfor
 		{
 			string error_information = string.Empty;
 			using (MeasureDetails measureDetails = new MeasureDetails()) {
-				using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+				using (SerialPort serialPort = new SerialPort( port_name, default_baudrate, Parity.None, 8, StopBits.One )) {
 					decimal keep_value = infor_Output.FullLoadValue[ 0 ];
 					if(keep_value > 5m) {
 						keep_value = 5m;
@@ -893,15 +904,17 @@ namespace ProductInfor
 		/// <summary>
 		/// 清除校准数据
 		/// </summary>
-		/// <param name="acpower">使用到的交流程控电源对象</param>
+		/// <param name="measureDetails">使用到的测试细节对象</param>
 		/// <param name="mCU_Control">使用到的校准集合对象</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能储存在的错误信息</param>
-		public void Calibrate_vClearValidata(AN97002H acpower, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
+		public void Calibrate_vClearValidata(MeasureDetails measureDetails, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
-			error_information = acpower.ACPower_vSetParameters( MeasureDetails.Address_ACPower, infor_Calibration.MpUnderVoltage, 50, true, serialPort ); Thread.Sleep( 30 );
-			error_information = acpower.ACPower_vControlStart( MeasureDetails.Address_ACPower, serialPort );
+
+			measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Calibration.MpUnderVoltage, infor_Mp.MpFrequncy [ 1 ] );
+			if(error_information != string.Empty ) { return; }
+
 			serialPort.BaudRate = CommunicateBaudrate;
 			int retry_count = 0;
 			do {
@@ -933,7 +946,7 @@ namespace ProductInfor
 			} while (error_information != string.Empty);
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
 			for (int index_of_calibration_channel = 0; index_of_calibration_channel < infor_Output.OutputChannelCount; index_of_calibration_channel++) {
-				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
+				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
 				for (int index_of_load = 0; index_of_load < MeasureDetails.Address_Load_Output.Length; index_of_load++) {
 					if (channel[ index_of_load ] == index_of_calibration_channel) {
 						//注意：本电源的输出在开机前一段时间被锁定，需要在输出电压超过标称电压的0.98倍之后才可以进行输出电压的校准;
@@ -973,25 +986,23 @@ namespace ProductInfor
 		/// <param name="measureDetails">实际测试的对象</param>
 		/// <param name="channel">电子负载对应的输出通道分配索引</param>
 		/// <param name="currents">对应负载的电流分配情况</param>
-		/// <param name="acpower">使用到的交流程控电源</param>
 		/// <param name="itech">使用到的电子负载的对象</param>
 		/// <param name="mCU_Control">使用到的校准集合对象</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能储存在的错误信息</param>
-		public void Calibrate_vFullLoad_Mp(MeasureDetails measureDetails,int[] channel, decimal[] currents, AN97002H acpower, Itech itech, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
+		public void Calibrate_vFullLoad_Mp(MeasureDetails measureDetails,int[] channel, decimal[] currents,  Itech itech, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
-			serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
 			if (!exist.MandatoryMode) {
-				error_information = acpower.ACPower_vSetParameters( MeasureDetails.Address_ACPower, infor_Mp.MpVoltage[ 1 ], infor_Mp.MpFrequncy[ 1 ], true, serialPort );
+				measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Mp.MpVoltage [ 1 ], infor_Mp.MpFrequncy [ 1 ] );
 			} else {
-				error_information = acpower.ACPower_vSetParameters( MeasureDetails.Address_ACPower, infor_Calibration.MpVoltage, infor_Mp.MpFrequncy[ 1 ], true, serialPort );
+				measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Calibration.MpVoltage, infor_Mp.MpFrequncy [ 1 ] );
 			}
 			Thread.Sleep( 200 ); //保证主电电压足够高，维持一段时间；防止电源在主电电压不够高时带载引发的输出保护
 			 //等电流采集准确,注意：从电子负载获取测试值时产品MCU依然在进行数据采集，不同产品的此处电流获取方式不同，需要根据实际情况决定
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
 			for (int index_of_calibration_channel = 0; index_of_calibration_channel < infor_Output.OutputChannelCount; index_of_calibration_channel++) {
-				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
+				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
 				decimal current = 0m;
 				for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
 					if ((channel[ index ] == index_of_calibration_channel) && (currents[ index ] != 0m)) {
@@ -1056,7 +1067,6 @@ namespace ProductInfor
 			}
 
 			//打开备电，在后续使用
-			serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
 			measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, 0m, false, true, serialPort, out error_information );
 			if (error_information != string.Empty) { return; }
 		}
@@ -1067,21 +1077,17 @@ namespace ProductInfor
 		/// <param name="measureDetails">实际测试的对象</param>
 		/// <param name="channel">电子负载对应的输出通道分配索引</param>
 		/// <param name="currents">对应负载的电流分配情况</param>
-		/// <param name="acpower">使用到的交流程控电源</param>
 		/// <param name="itech">使用到的电子负载的对象</param>
 		/// <param name="mCU_Control">使用到的校准集合对象</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能储存在的错误信息</param>
-		public void Calibrate_vFullLoad_Sp(MeasureDetails measureDetails, int[] channel, decimal[] currents, AN97002H acpower, Itech itech, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
+		public void Calibrate_vFullLoad_Sp(MeasureDetails measureDetails, int[] channel, decimal[] currents, Itech itech, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
 			/*备电时的电流为测试得到的主电电流*备电电流系数获取，故在进行此步之前需要将产品进行软件重启，否则备电采集会出现问题*/
-			serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
-			for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
-				error_information = itech.Itech_vInOutOnOffSet( MeasureDetails.Address_Load_Output[ index ], Itech.OnOffStatus.Off, serialPort );
-				if (error_information != string.Empty) { return; }
-			}
-			error_information = acpower.ACPower_vControlStop( MeasureDetails.Address_ACPower, serialPort );
+			measureDetails.Measure_vSetOutputLoadInputStatus ( serialPort, false, out error_information );
+			if (error_information != string.Empty) { return; }
+			measureDetails.Measure_vSetACPowerStatus ( false, serialPort, out error_information );
 			if (error_information != string.Empty) { return; }
 
 			serialPort.BaudRate = CommunicateBaudrate;
@@ -1094,13 +1100,13 @@ namespace ProductInfor
 			//在备电启动之后才可以正常带载
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
 			for (int index_of_calibration_channel = 0; index_of_calibration_channel < infor_Output.OutputChannelCount; index_of_calibration_channel++) {
-				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
+				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
 				decimal current = 0m;
 				for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
 					if ((channel[ index ] == index_of_calibration_channel) && (currents[ index ] != 0m)) {
 						for (int index_temp = 1; index_temp < 3; index_temp++) {//有些电源在从轻载到满载的变化时容易出现动态响应问题，而导致的硬件掉电情况，将通道带载分阶段进行，防止快速变化引发的跌落导致校准异常
 							error_information = itech.ElecLoad_vInputStatusSet( MeasureDetails.Address_Load_Output[ index ], Itech.OperationMode.CC, 0.5m * index_temp * currents[ index ], Itech.OnOffStatus.On, serialPort );
-							Thread.Sleep( 50 );
+							Thread.Sleep( 20 );
 						}
 					} else {
 						error_information = itech.Itech_vInOutOnOffSet( MeasureDetails.Address_Load_Output[ index ], Itech.OnOffStatus.Off, serialPort );
@@ -1160,34 +1166,32 @@ namespace ProductInfor
 		/// <summary>
 		/// 备电空载时的校准部分
 		/// </summary>
-		/// <param name="acpower">使用到的程控交流电源</param>
-		/// <param name="itech">使用到的电子负载</param>
+		/// <param name="measureDetails">测试细节的对象</param>
 		/// <param name="mCU_Control">使用到的产品校准对象</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public  void Calibrate_vEmptyLoad_Sp(AN97002H acpower, Itech itech, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
+		public  void Calibrate_vEmptyLoad_Sp(MeasureDetails measureDetails, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
-			//为了防止主备电切换时固定电平的动态响应影响，在关主电之前在充电电子负载上带超过均充电流2A的CC模式电流
-			serialPort.BaudRate = MeasureDetails.Baudrate_Instrument;
+			//为了防止主备电切换时固定电平的动态响应影响，在关主电之前在充电电子负载上带超过均充电流4A的CC模式电流
 			//备电使用CC模式带载值为  target_cc_value ,保证固定电平的备电可以带载)	
 			decimal target_cc_value = infor_Charge.Qualified_EqualizedCurrent[ 1 ] + 4m;
 			if (infor_Sp.UsedBatsCount < 3) {
 				target_cc_value += 1m;
 			}
-			error_information = itech.ElecLoad_vInputStatusSet( MeasureDetails.Address_Load_Bats, Itech.OperationMode.CC, target_cc_value, Itech.OnOffStatus.On, serialPort );
+			measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, target_cc_value, true, out error_information );
 			if (error_information != string.Empty) { return; }
-			error_information = acpower.ACPower_vControlStop( MeasureDetails.Address_ACPower, serialPort );
+			measureDetails.Measure_vSetACPowerStatus ( false, serialPort, out error_information );
 			if (error_information != string.Empty) { return; }
-			for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
-				error_information = itech.Itech_vInOutOnOffSet( MeasureDetails.Address_Load_Output[ index ], Itech.OnOffStatus.Off, serialPort );
-				if (error_information != string.Empty) { return; }
-			}
-			itech.Itech_vInOutOnOffSet( MeasureDetails.Address_Load_Bats, Itech.OnOffStatus.Off, serialPort );
+			measureDetails.Measure_vSetOutputLoadInputStatus ( serialPort, false, out error_information );
 			if (error_information != string.Empty) { return; }
+			measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, 0m, false, out error_information );
+			if ( error_information != string.Empty ) { return; }
+
 			Thread.Sleep( 600 );  //保证备电电压采集准确而进行的延时
-			Itech.GeneralData_Load generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Bats, serialPort, out error_information );
+			Itech.GeneralData_Load generalData_Load = measureDetails.Measure_vReadChargeLoadResult ( serialPort, out error_information );
 			if (error_information != string.Empty) { return; }
+
 			serialPort.BaudRate = CommunicateBaudrate;
 			mCU_Control.McuCalibrate_vSpVoltage( generalData_Load.ActrulyVoltage, serialPort, out error_information );
 			if (error_information != string.Empty) { return; }
@@ -1203,7 +1207,6 @@ namespace ProductInfor
 			if (error_information != string.Empty) { return; }
 			
 			//待测产品的软件复位
-			serialPort.BaudRate = CommunicateBaudrate;
 			mCU_Control.McuCalibrate_vReset( serialPort, out error_information );
 			if (error_information != string.Empty) { return; }
 		}
@@ -1228,7 +1231,7 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using (MeasureDetails measureDetails = new MeasureDetails()) {
-						using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+						using (SerialPort serialPort = new SerialPort( port_name, default_baudrate, Parity.None, 8, StopBits.One )) {
 							//备电启动前先将输出带载
 							int[] allocate_channel = Base_vAllcateChannel_SpStartup( measureDetails, serialPort, out error_information );
 							if (error_information != string.Empty) { continue; }
@@ -1284,38 +1287,36 @@ namespace ProductInfor
 				if ( temp_index == 0 ) {
 					if ( exist.MandatoryMode ) {
 						using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-							using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
-								using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {									
-									//检查备电的启动情况
-									int[] allocate_channel = Base_vAllcateChannel_MandatoryStartup( measureDetails, serialPort, out error_information );
-									if(error_information != string.Empty) { continue; }
+							using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
+								//检查备电的启动情况
+								int [ ] allocate_channel = Base_vAllcateChannel_MandatoryStartup ( measureDetails, serialPort, out error_information );
+								if ( error_information != string.Empty ) { continue; }
 
-									mCU_Control.McuControl_vMandatory( true, serialPort, out error_information );
-									if (error_information != string.Empty) { continue; }
+								measureDetails.Measure_vMandatory ( true, serialPort, out error_information );
+								if ( error_information != string.Empty ) { continue; }
 
-									//等待一段时间后查看待测电源是否成功启动；此处需要注意：个别产品电源在启动的一瞬间会造成通讯的异常，隔离也无法解决，只能依靠软件放宽的方式处理
-									int wait_index = 0;
-									while ( ( ++wait_index < 30 ) && ( error_information == string.Empty ) ) {
-										Thread.Sleep ( 30 * delay_magnification );
-										ArrayList array_list = measureDetails.Measure_vReadOutputLoadResult( serialPort, out error_information );
-										for ( int i = 0 ; i < infor_Output.OutputChannelCount ; i++ ) {
-											for ( int j = 0 ; j < allocate_channel.Length ; j++ ) {
-												if ( ( allocate_channel [ j ] == i ) && ( !infor_Output.Stabilivolt [ i ] ) ) { //对应通道并非稳压输出的情况
-													Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load ) array_list [ j ];
-													if ( generalData_Load.ActrulyVoltage > 0.85m * (12m * infor_Sp.UsedBatsCount)) {
-														check_okey = true;
-														break;
-													}
+								//等待一段时间后查看待测电源是否成功启动；此处需要注意：个别产品电源在启动的一瞬间会造成通讯的异常，隔离也无法解决，只能依靠软件放宽的方式处理
+								int wait_index = 0;
+								while ( ( ++wait_index < 30 ) && ( error_information == string.Empty ) ) {
+									Thread.Sleep ( 30 * delay_magnification );
+									ArrayList array_list = measureDetails.Measure_vReadOutputLoadResult ( serialPort, out error_information );
+									for ( int i = 0 ; i < infor_Output.OutputChannelCount ; i++ ) {
+										for ( int j = 0 ; j < allocate_channel.Length ; j++ ) {
+											if ( ( allocate_channel [ j ] == i ) && ( !infor_Output.Stabilivolt [ i ] ) ) { //对应通道并非稳压输出的情况
+												Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load ) array_list [ j ];
+												if ( generalData_Load.ActrulyVoltage > 0.85m * ( 12m * infor_Sp.UsedBatsCount ) ) {
+													check_okey = true;
+													break;
 												}
 											}
-											if ( check_okey ) { break; }
 										}
 										if ( check_okey ) { break; }
 									}
-									//断开强启开关
-									mCU_Control.McuControl_vMandatory ( false, serialPort, out error_information );
-									if ( error_information != string.Empty ) { continue; }
+									if ( check_okey ) { break; }
 								}
+								//断开强启开关
+								measureDetails.Measure_vMandatory ( false, serialPort, out error_information );
+								if ( error_information != string.Empty ) { continue; }
 							}
 						}
 					}
@@ -1348,7 +1349,7 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 							//输出负载变化，减为轻载8W，备电使用可调电源
 							decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
 							decimal [ ] target_power = new decimal [ ] { 8m, 0m, 0m };
@@ -1451,7 +1452,7 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 							//主电启动前先将输出带载
 							int[] allocate_channel = Base_vAllcateChannel_MpStartup( measureDetails, serialPort, out error_information );
 							if ( error_information != string.Empty ) { continue; }
@@ -1511,7 +1512,7 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 							//按照标准满载进行带载
 							int[] allocate_channel = Base_vAllcateChannel_FullLoad(measureDetails,serialPort,true,out error_information);
 							if ( error_information != string.Empty ) { continue; }
@@ -1560,7 +1561,7 @@ namespace ProductInfor
 		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>包含多个信息的动态数组</returns>
-		public virtual ArrayList Measure_vRapple(bool whole_function_enable, int delay_magnification, string port_name )
+		public virtual ArrayList Measure_vRapple( bool whole_function_enable, int delay_magnification, string port_name )
 		{
 			ArrayList arrayList = new ArrayList ( );//元素0 - 可能存在的错误信息 ； 元素1 - 输出通道数量 ； 元素2+index 为输出纹波的合格与否判断；元素 2+ index + arrayList[1] 为输出纹波具体值
 			string error_information = string.Empty;
@@ -1574,25 +1575,23 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
-							using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
-								//设置继电器的通道选择动作，切换待测通道到示波器通道1上
-								for ( int channel_index = 0 ; channel_index < infor_Output.OutputChannelCount ; channel_index++ ) {
-									mCU_Control.McuControl_vRappleChannelChoose( channel_index, serialPort, out error_information );
-									if (error_information != string.Empty) { continue; }
-									Thread.Sleep( 500 );
-									Thread.Sleep( 100 * delay_magnification );
-									specific_value [ channel_index ] = measureDetails.Measure_vReadRapple ( out error_information );
-									if ( error_information != string.Empty ) { continue; }
-									if (specific_value[ channel_index ] <= infor_Output.Qualified_OutputRipple_Max[ channel_index ]) {  //注意单位统一
-										check_okey[ channel_index ] = true;
-									}
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
+							//设置继电器的通道选择动作，切换待测通道到示波器通道1上
+							for ( int channel_index = 0 ; channel_index < infor_Output.OutputChannelCount ; channel_index++ ) {
+								measureDetails.Measure_vRappleChannelChoose ( channel_index, serialPort, out error_information );
+								if ( error_information != string.Empty ) { continue; }
+								Thread.Sleep ( 500 );
+								Thread.Sleep ( 100 * delay_magnification );
+								specific_value [ channel_index ] = measureDetails.Measure_vReadRapple ( out error_information );
+								if ( error_information != string.Empty ) { continue; }
+								if ( specific_value [ channel_index ] <= infor_Output.Qualified_OutputRipple_Max [ channel_index ] ) {  //注意单位统一
+									check_okey [ channel_index ] = true;
 								}
-
-								//设置示波器用于采集直流输出
-								measureDetails.Measure_vPrepareForReadOutput( out error_information );
-								if (error_information != string.Empty) { continue; }
 							}
+
+							//设置示波器用于采集直流输出
+							measureDetails.Measure_vPrepareForReadOutput ( out error_information );
+							if ( error_information != string.Empty ) { continue; }
 						}
 					}
 				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充
@@ -1626,7 +1625,7 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using (MeasureDetails measureDetails = new MeasureDetails()) {
-						using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+						using (SerialPort serialPort = new SerialPort( port_name,default_baudrate, Parity.None, 8, StopBits.One )) {
 
 							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, 12m * infor_Sp.UsedBatsCount, adjust_power_output_enable, sp_output_enable, serialPort, out error_information );
 							if (error_information != string.Empty) { continue; }
@@ -1659,7 +1658,7 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 							AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
 							if ( error_information != string.Empty ) { continue; }
 							ArrayList arrayList_1 = measureDetails.Measure_vReadOutputLoadResult ( serialPort, out error_information );
@@ -1707,7 +1706,7 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 							//输出设置为空载
 							int[] allocate_channel = Base_vAllcateChannel_FullLoad( measureDetails, serialPort, false, out error_information );
 
@@ -1747,7 +1746,7 @@ namespace ProductInfor
 		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>包含多个信息的动态数组</returns>
-		public virtual ArrayList Measure_vCurrentEqualizedCharge(bool whole_function_enable, int delay_magnification, string port_name )
+		public virtual ArrayList Measure_vCurrentEqualizedCharge( bool whole_function_enable, int delay_magnification, string port_name )
 		{
 			//元素0 - 可能存在的错误信息 ； 元素1 - 均充电流合格与否的判断 ； 元素2 - 具体的均充电流
 			ArrayList arrayList = new ArrayList ( );
@@ -1758,27 +1757,25 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
-							//对于特定电源，此处可能需要进入电源产品的程序后门，保证可以100%充电，此种情况下本函数需要重写；常用不需要改写
-							using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
-								//Communicate_Admin( serialPort );
-								//mCU_Control.McuBackdoor_vAlwaysCharging( true, serialPort, out error_information );
-								//if (error_information != string.Empty) { continue; }
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
+							////对于特定电源，此处可能需要进入电源产品的程序后门，保证可以100%充电，此种情况下本函数需要重写；常用不需要改写
+							//Communicate_Admin ( serialPort, out error_information );
+							//measureDetails.Measure_vAlwaysCharging ( true, serialPort, out error_information );
+							//if ( error_information != string.Empty ) { continue; }
 
-								measureDetails.Measure_vSetChargeLoad ( serialPort, infor_Charge.CV_Voltage, true, out error_information );
-								if ( error_information != string.Empty ) { continue; }
-								int retry_count = 0;
-								Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
-								do {
-									Thread.Sleep( 30 * delay_magnification );
-									generalData_Load = measureDetails.Measure_vReadChargeLoadResult( serialPort, out error_information );
-								} while ((++retry_count < 50) && (generalData_Load.ActrulyCurrent < infor_Charge.Qualified_EqualizedCurrent[ 0 ]));
+							measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CV, infor_Charge.CV_Voltage, true, out error_information );
+							if ( error_information != string.Empty ) { continue; }
+							int retry_count = 0;
+							Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
+							do {
+								Thread.Sleep ( 30 * delay_magnification );
+								generalData_Load = measureDetails.Measure_vReadChargeLoadResult ( serialPort, out error_information );
+							} while ( ( ++retry_count < 50 ) && ( generalData_Load.ActrulyCurrent < infor_Charge.Qualified_EqualizedCurrent [ 0 ] ) );
 
-								generalData_Load = measureDetails.Measure_vReadChargeLoadResult( serialPort, out error_information );
-								specific_value = generalData_Load.ActrulyCurrent;
-								if ( ( specific_value >= infor_Charge.Qualified_EqualizedCurrent [ 0 ] ) && ( specific_value <= infor_Charge.Qualified_EqualizedCurrent [ 1 ] ) ) {
-									check_okey = true;
-								}								
+							generalData_Load = measureDetails.Measure_vReadChargeLoadResult ( serialPort, out error_information );
+							specific_value = generalData_Load.ActrulyCurrent;
+							if ( ( specific_value >= infor_Charge.Qualified_EqualizedCurrent [ 0 ] ) && ( specific_value <= infor_Charge.Qualified_EqualizedCurrent [ 1 ] ) ) {
+								check_okey = true;
 							}
 						}
 					}
@@ -1809,40 +1806,39 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
-							using (MCU_Control mCU_Control = new MCU_Control()) {
-								Itech.GeneralData_Load generalData_Load = measureDetails.Measure_vReadChargeLoadResult( serialPort, out error_information );
-								decimal voltage = generalData_Load.ActrulyVoltage;
-								measureDetails.Measure_vSetChargeLoad( serialPort, infor_Charge.CV_Voltage, false, out error_information );
-								if (error_information != string.Empty) { continue; }
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
+							Itech.GeneralData_Load generalData_Load = measureDetails.Measure_vReadChargeLoadResult ( serialPort, out error_information );
+							decimal voltage = generalData_Load.ActrulyVoltage;
+							measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CV, infor_Charge.CV_Voltage, false, out error_information );
+							if ( error_information != string.Empty ) { continue; }
 
-								int same_count = 0;
-								int wait_count = 0;
-								do {
-									generalData_Load = measureDetails.Measure_vReadChargeLoadResult( serialPort, out error_information );
-									if (error_information != string.Empty) { break; }
-									if (generalData_Load.ActrulyVoltage > (voltage + 0.5m)) {//假定浮充电压比均充时高0.5V以上
-										if (++same_count >= 3) { break; }
-									} else { same_count = 0; }
-									Thread.Sleep( 30 * delay_magnification );
-								} while (++wait_count < 20);
+							int same_count = 0;
+							int wait_count = 0;
+							do {
+								generalData_Load = measureDetails.Measure_vReadChargeLoadResult ( serialPort, out error_information );
+								if ( error_information != string.Empty ) { break; }
+								if ( generalData_Load.ActrulyVoltage > ( voltage + 0.5m ) ) {//假定浮充电压比均充时高0.5V以上
+									if ( ++same_count >= 3 ) { break; }
+								} else { same_count = 0; }
+								Thread.Sleep ( 30 * delay_magnification );
+							} while ( ++wait_count < 20 );
 
-								specific_value = generalData_Load.ActrulyVoltage;
-								if ((specific_value >= infor_Charge.Qualified_FloatingVoltage[ 0 ]) && (specific_value <= infor_Charge.Qualified_FloatingVoltage[ 1 ])) {
-									check_okey = true;
-								}
-
-								//退出强制100%充电的情况
-								//mCU_Control.McuBackdoor_vAlwaysCharging( false, serialPort, out error_information );
-								//if (error_information != string.Empty) { continue; }
-								//对特定型号的电源，需要在此处开启后门，以减少充电周期，方便识别备电丢失的情况
-								//using (MCU_Control mCU_Control = new MCU_Control()) {
-								//	Communicate_Admin( serialPort );
-								//	mCU_Control.McuBackdoor_vChargePeriodSet( true, serialPort, out error_information );
-								//	if (error_information != string.Empty) { continue; }
-								//mCU_Control.McuCalibrate_vExitCalibration( serialPort, out error_information );
-								//if (error_information != string.Empty) { continue; }
+							specific_value = generalData_Load.ActrulyVoltage;
+							if ( ( specific_value >= infor_Charge.Qualified_FloatingVoltage [ 0 ] ) && ( specific_value <= infor_Charge.Qualified_FloatingVoltage [ 1 ] ) ) {
+								check_okey = true;
 							}
+
+							////退出强制100%充电的情况
+							//int retry_count = 0;
+							//do {
+							//	Communicate_Admin ( serialPort, out error_information );
+							//	measureDetails.Measure_vAlwaysCharging ( false, serialPort, out error_information );
+							//	if ( error_information != string.Empty ) { continue; }
+							//	//对特定型号的电源，需要在此处开启后门，以减少充电周期，方便识别备电丢失的情况
+							//	//	measureDetails.Measure_vChargePeriodSet( true, serialPort, out error_information );
+							//	//	if (error_information != string.Empty) { continue; }
+							//} while ( ( ++retry_count < 5 ) && ( error_information != string.Empty ) );
+							//if ( error_information != string.Empty ) { continue; }
 						}
 					}
 				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充
@@ -1917,58 +1913,56 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
-							using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 
-								//只有满足全项测试条件或者是用户强制要求进行源效应测试条件才可以真正进行源效应的测试
-								if((!whole_function_enable)  && (!infor_Mp.UserNeedTestSourceEffect)) { continue; }
+							//只有满足全项测试条件或者是用户强制要求进行源效应测试条件才可以真正进行源效应的测试
+							if ( ( !whole_function_enable ) && ( !infor_Mp.UserNeedTestSourceEffect ) ) { continue; }
 
-								//不同主电电压时的输出电压数组
-								decimal [ , , ] output_voltage = new decimal [ 2, infor_Mp.MpVoltage.Length, infor_Output.OutputChannelCount ];
+							//不同主电电压时的输出电压数组
+							decimal [ , , ] output_voltage = new decimal [ 2, infor_Mp.MpVoltage.Length, infor_Output.OutputChannelCount ];
 
-								for ( int index_loadtype = 0 ; index_loadtype < 2 ; index_loadtype++ ) {
-									int[] allocate_channel = new int[ MeasureDetails.Address_Load_Output.Length ];
-									if ( index_loadtype == 0 ) {//空载时
-										allocate_channel = Base_vAllcateChannel_FullLoad( measureDetails, serialPort, false, out error_information );
-									} else {
-										allocate_channel = Base_vAllcateChannel_FullLoad( measureDetails, serialPort, true, out error_information );
+							for ( int index_loadtype = 0 ; index_loadtype < 2 ; index_loadtype++ ) {
+								int [ ] allocate_channel = new int [ MeasureDetails.Address_Load_Output.Length ];
+								if ( index_loadtype == 0 ) {//空载时
+									allocate_channel = Base_vAllcateChannel_FullLoad ( measureDetails, serialPort, false, out error_information );
+								} else {
+									allocate_channel = Base_vAllcateChannel_FullLoad ( measureDetails, serialPort, true, out error_information );
+								}
+								for ( int index_acvalue = 0 ; index_acvalue < infor_Mp.MpVoltage.Length ; index_acvalue++ ) {
+									if ( index_loadtype == 0 ) {  //电压增加
+										measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Mp.MpVoltage [ index_acvalue ] );
+									} else { //电压减少
+										measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Mp.MpVoltage [ infor_Mp.MpVoltage.Length - index_acvalue - 1 ] );
 									}
-									for ( int index_acvalue = 0 ; index_acvalue < infor_Mp.MpVoltage.Length ; index_acvalue++ ) {
-										if (index_loadtype == 0) {  //电压增加
-											measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, infor_Mp.MpVoltage[ index_acvalue ] );
-										} else { //电压减少
-											measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, infor_Mp.MpVoltage[ infor_Mp.MpVoltage.Length  - index_acvalue - 1] );
-										}
-										if ( error_information != string.Empty ) { break; }
-										Thread.Sleep ( 30 * delay_magnification );
-										ArrayList list = measureDetails.Measure_vReadOutputLoadResult ( serialPort, out error_information );
-										if ( error_information != string.Empty ) { break; }
-										int last_channel_index = -1;
-										for ( int index_output_load = 0 ; index_output_load < allocate_channel.Length ; index_output_load++ ) {
-											if ( last_channel_index != allocate_channel [ index_output_load ] ) {
-												last_channel_index = allocate_channel [ index_output_load ];
-												Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load ) list [ index_output_load ];
-												output_voltage [ index_loadtype, index_acvalue, last_channel_index ] = generalData_Load.ActrulyVoltage;
-											}
+									if ( error_information != string.Empty ) { break; }
+									Thread.Sleep ( 30 * delay_magnification );
+									ArrayList list = measureDetails.Measure_vReadOutputLoadResult ( serialPort, out error_information );
+									if ( error_information != string.Empty ) { break; }
+									int last_channel_index = -1;
+									for ( int index_output_load = 0 ; index_output_load < allocate_channel.Length ; index_output_load++ ) {
+										if ( last_channel_index != allocate_channel [ index_output_load ] ) {
+											last_channel_index = allocate_channel [ index_output_load ];
+											Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load ) list [ index_output_load ];
+											output_voltage [ index_loadtype, index_acvalue, last_channel_index ] = generalData_Load.ActrulyVoltage;
 										}
 									}
 								}
-								//计算源效应
-								decimal [ , ] source_effect = new decimal [ 2, infor_Output.OutputChannelCount ];
-								for ( int index_channel = 0 ; index_channel < infor_Output.OutputChannelCount ; index_channel++ ) {
-									for ( int index_loadtype = 0 ; index_loadtype < 2 ; index_loadtype++ ) {
-										if ( output_voltage [ index_loadtype, 1, index_channel ] == 0m ) { break; }
-										source_effect [ index_loadtype, index_channel ] = Math.Max ( Math.Abs ( output_voltage [ index_loadtype, 2, index_channel ] - output_voltage [ index_loadtype, 1, index_channel ] ), Math.Abs ( output_voltage [ index_loadtype, 0, index_channel ] - output_voltage [ index_loadtype, 1, index_channel ] ) ) / output_voltage [ index_loadtype, 1, index_channel ];
-									}
-									specific_value [ index_channel ] = Math.Max ( source_effect [ 0, index_channel ], source_effect [ 1, index_channel ] );
-									if ( specific_value [ index_channel ] <= infor_Output.Qualified_SourceEffect_Max [ index_channel ] ) {
-										check_okey [ index_channel ] = true;
-									}
-								}
-
-								//测试完成之后，将主电电压恢复为欠压状态，保持满载
-								measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Mp.MpVoltage [ 0 ] );
 							}
+							//计算源效应
+							decimal [ , ] source_effect = new decimal [ 2, infor_Output.OutputChannelCount ];
+							for ( int index_channel = 0 ; index_channel < infor_Output.OutputChannelCount ; index_channel++ ) {
+								for ( int index_loadtype = 0 ; index_loadtype < 2 ; index_loadtype++ ) {
+									if ( output_voltage [ index_loadtype, 1, index_channel ] == 0m ) { break; }
+									source_effect [ index_loadtype, index_channel ] = Math.Max ( Math.Abs ( output_voltage [ index_loadtype, 2, index_channel ] - output_voltage [ index_loadtype, 1, index_channel ] ), Math.Abs ( output_voltage [ index_loadtype, 0, index_channel ] - output_voltage [ index_loadtype, 1, index_channel ] ) ) / output_voltage [ index_loadtype, 1, index_channel ];
+								}
+								specific_value [ index_channel ] = Math.Max ( source_effect [ 0, index_channel ], source_effect [ 1, index_channel ] );
+								if ( specific_value [ index_channel ] <= infor_Output.Qualified_SourceEffect_Max [ index_channel ] ) {
+									check_okey [ index_channel ] = true;
+								}
+							}
+
+							//测试完成之后，将主电电压恢复为欠压状态，保持满载
+							measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Mp.MpVoltage [ 0 ] );
 						}
 					}
 				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充
@@ -2004,7 +1998,7 @@ namespace ProductInfor
 				if ( temp_index == 0 ) {
 					if (whole_function_enable) {
 						using (MeasureDetails measureDetails = new MeasureDetails()) {
-							using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+							using (SerialPort serialPort = new SerialPort( port_name, default_baudrate, Parity.None, 8, StopBits.One )) {
 
 								int wait_count = 0;
 								Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
@@ -2052,73 +2046,73 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					//设置示波器的触发电平后关闭主电；检查是否捕获到输出跌落
-					using (MeasureDetails measureDetails = new MeasureDetails()) {
-						using (MCU_Control mCU_Control = new MCU_Control()) {
-							using (Itech itech = new Itech()) {
-								using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
-									//先保证切换前负载为满载
-									decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
-									int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
-									measureDetails.Measure_vSetOutputLoad( serialPort, infor_PowerSourceChange.OutputLoadType, real_value, true, out error_information );
-									if (error_information != string.Empty) { continue; }
+					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
+						using ( Itech itech = new Itech ( ) ) {
+							using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
+								//先保证切换前负载为满载
+								decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
+								int [ ] allocate_channel = Base_vAllcateChannel_SC ( measureDetails, out real_value );
+								measureDetails.Measure_vSetOutputLoad ( serialPort, infor_PowerSourceChange.OutputLoadType, real_value, true, out error_information );
+								if ( error_information != string.Empty ) { continue; }
 
-									//备电使用CC模式带载值为  target_cc_value ,保证固定电平的备电可以带载)	
-									decimal target_cc_value = infor_Charge.Qualified_EqualizedCurrent[ 1 ] + 4m;
-									if (infor_Sp.UsedBatsCount < 3) {
-										target_cc_value += 1m;
-									}
-									error_information = itech.ElecLoad_vInputStatusSet( MeasureDetails.Address_Load_Bats, Itech.OperationMode.CC, target_cc_value, Itech.OnOffStatus.On, serialPort );
-
-									//设置主电为欠压值
-									measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, infor_Mp.MpVoltage[ 0 ] );
-									if (error_information != string.Empty) { continue; }
-									//只使用示波器监测非稳压的第一路输出是否跌落
-									for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-										if (!infor_Output.Stabilivolt[ index_of_channel ]) {
-											measureDetails.Measure_vSetOscCapture( infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] * 0.75m, out error_information );
-											if (error_information != string.Empty) { break; }
-											mCU_Control.McuControl_vRappleChannelChoose( index_of_channel, serialPort, out error_information );
-											if (error_information != string.Empty) { break; }											
-
-											measureDetails.Measure_vSetACPowerStatus( false, serialPort, out error_information, infor_Mp.MpVoltage[ 0 ] );//关主电
-											if (error_information != string.Empty) { break; }
-											Thread.Sleep( 30 * delay_magnification ); //等待产品进行主备电切换
-											decimal value = measureDetails.Measure_vReadVpp( out error_information );
-											if (error_information != string.Empty) { break; }
-											if (value < infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] * 0.1m) { //说明没有被捕获
-												check_okey = true;
-											} else {
-												error_information = "主电丢失输出存在跌落"; break;
-											}
-											break;
-										}
-										if (error_information != string.Empty) { break; }
-									}
-									if (error_information != string.Empty) { continue; }
-
-									//其它通道使用电子负载查看输出,不可以低于0.85倍的标称固定电平的备电
-									Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
-									for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-										if (infor_Output.Stabilivolt[ index_of_channel ] == false) {
-											for (int index_of_load = 0; index_of_load < MeasureDetails.Address_Load_Output.Length; index_of_load++) {
-												if(allocate_channel[index_of_load] == index_of_channel) {
-													generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_of_load ], serialPort, out error_information );
-													if(generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount) {
-														check_okey = false;
-														error_information += "主电丢失输出通道 "+(index_of_channel + 1).ToString() +" 存在跌落";
-														continue;
-													}
-													break;
-												}												
-											}
-										}
-									}
-
-									//停止备电使用的电子负载带载	
-									error_information = itech.Itech_vInOutOnOffSet( MeasureDetails.Address_Load_Bats, Itech.OnOffStatus.Off, serialPort );
-									if (error_information != string.Empty) { continue; }
-
+								//备电使用CC模式带载值为  target_cc_value ,保证固定电平的备电可以带载)	
+								decimal target_cc_value = infor_Charge.Qualified_EqualizedCurrent [ 1 ] + 4m;
+								if ( infor_Sp.UsedBatsCount < 3 ) {
+									target_cc_value += 1m;
 								}
+								measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, target_cc_value, true, out error_information );
+								if ( error_information != string.Empty ) { continue; }
+
+								//设置主电为欠压值
+								measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Mp.MpVoltage [ 0 ] );
+								if ( error_information != string.Empty ) { continue; }
+								//只使用示波器监测非稳压的第一路输出是否跌落
+								for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+									if ( !infor_Output.Stabilivolt [ index_of_channel ] ) {
+										measureDetails.Measure_vSetOscCapture ( infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] * 0.75m, out error_information );
+										if ( error_information != string.Empty ) { break; }
+										measureDetails.Measure_vRappleChannelChoose ( index_of_channel, serialPort, out error_information );
+										if ( error_information != string.Empty ) { break; }
+
+										measureDetails.Measure_vSetACPowerStatus ( false, serialPort, out error_information, infor_Mp.MpVoltage [ 0 ] );//关主电
+										if ( error_information != string.Empty ) { break; }
+										Thread.Sleep ( 30 * delay_magnification ); //等待产品进行主备电切换
+										decimal value = measureDetails.Measure_vReadVpp ( out error_information );
+										if ( error_information != string.Empty ) { break; }
+										if ( value < infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] * 0.1m ) { //说明没有被捕获
+											check_okey = true;
+										} else {
+											error_information = "主电丢失输出存在跌落"; break;
+										}
+										break;
+									}
+									if ( error_information != string.Empty ) { break; }
+								}
+								if ( error_information != string.Empty ) { continue; }
+
+								//其它通道使用电子负载查看输出,不可以低于0.85倍的标称固定电平的备电
+								Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
+								for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+									if ( infor_Output.Stabilivolt [ index_of_channel ] == false ) {
+										for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
+											if ( allocate_channel [ index_of_load ] == index_of_channel ) {
+												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+												generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
+												if ( generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount ) {
+													check_okey = false;
+													error_information += "主电丢失输出通道 " + ( index_of_channel + 1 ).ToString ( ) + " 存在跌落";
+													continue;
+												}
+												break;
+											}
+										}
+									}
+								}
+
+								//停止备电使用的电子负载带载	
+								measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, 0m, false, out error_information );
+								if ( error_information != string.Empty ) { continue; }
+
 							}
 						}
 					}
@@ -2137,7 +2131,7 @@ namespace ProductInfor
 		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>包含多个信息的动态数组</returns>
-		public virtual ArrayList Measure_vCheckSourceChangeMpRestart(bool whole_function_enable, int delay_magnification, string port_name )
+		public virtual ArrayList Measure_vCheckSourceChangeMpRestart( bool whole_function_enable, int delay_magnification, string port_name )
 		{
 			//元素0 - 可能存在的错误信息 ； 元素1 - 检查主电恢复主备电切换功能正常与否的判断
 			ArrayList arrayList = new ArrayList ( );
@@ -2146,47 +2140,46 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using (MCU_Control mCU_Control = new MCU_Control()) {
-							using (Itech itech = new Itech()) {
-								using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+						using ( Itech itech = new Itech ( ) ) {
+							using ( SerialPort serialPort = new SerialPort ( port_name, delay_magnification, Parity.None, 8, StopBits.One ) ) {
 
-									decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
-									int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
-									if (error_information != string.Empty) { continue; }
+								decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
+								int [ ] allocate_channel = Base_vAllcateChannel_SC ( measureDetails, out real_value );
+								if ( error_information != string.Empty ) { continue; }
 
-									for (int index = 0; index < infor_Output.OutputChannelCount; index++) {
-										if (infor_Output.Stabilivolt[ index ] == false) {
-											mCU_Control.McuControl_vRappleChannelChoose( index, serialPort, out error_information );
-											if (error_information != string.Empty) { continue; }
+								for ( int index = 0 ; index < infor_Output.OutputChannelCount ; index++ ) {
+									if ( infor_Output.Stabilivolt [ index ] == false ) {
+										measureDetails.Measure_vRappleChannelChoose ( index, serialPort, out error_information );
+										if ( error_information != string.Empty ) { continue; }
 
-											//恢复主电的欠压输出
-											measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, infor_Mp.MpVoltage[ 0 ] );
-											if (error_information != string.Empty) { continue; }
-											Thread.Sleep( infor_PowerSourceChange.Delay_WaitForUnderVoltageRecovery ); //等待产品进行主备电切换
-											decimal value = measureDetails.Measure_vReadVpp( out error_information );
-											if (error_information != string.Empty) { continue; }
+										//恢复主电的欠压输出
+										measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Mp.MpVoltage [ 0 ] );
+										if ( error_information != string.Empty ) { continue; }
+										Thread.Sleep ( infor_PowerSourceChange.Delay_WaitForUnderVoltageRecovery ); //等待产品进行主备电切换
+										decimal value = measureDetails.Measure_vReadVpp ( out error_information );
+										if ( error_information != string.Empty ) { continue; }
 
-											if (value < infor_Output.Qualified_OutputVoltageWithLoad[ index, 0 ] * 0.1m) { //说明没有被捕获
-												check_okey = true;
-											} else {
-												error_information = "主电丢失后重新上电输出存在跌落";
+										if ( value < infor_Output.Qualified_OutputVoltageWithLoad [ index, 0 ] * 0.1m ) { //说明没有被捕获
+											check_okey = true;
+										} else {
+											error_information = "主电丢失后重新上电输出存在跌落";
+										}
+										break;
+									}
+								}
+								//所有通道使用电子负载查看输出,不可以低于0.95倍合格最低电压
+								Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
+								for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+									for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
+										if ( allocate_channel [ index_of_load ] == index_of_channel ) {
+											serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+											generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
+											if ( generalData_Load.ActrulyVoltage < 0.95m * infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) {
+												check_okey = false;
+												error_information += "主电欠压输出通道 " + ( index_of_channel + 1 ).ToString ( ) + " 存在跌落";
+												continue;
 											}
 											break;
-										}
-									}
-									//所有通道使用电子负载查看输出,不可以低于0.95倍合格最低电压
-									Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
-									for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-										for (int index_of_load = 0; index_of_load < MeasureDetails.Address_Load_Output.Length; index_of_load++) {
-											if (allocate_channel[ index_of_load ] == index_of_channel) {
-												generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_of_load ], serialPort, out error_information );
-												if (generalData_Load.ActrulyVoltage < 0.95m * infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ]) {
-													check_okey = false;
-													error_information += "主电欠压输出通道 " + (index_of_channel + 1).ToString() + " 存在跌落";
-													continue;
-												}
-												break;
-											}
 										}
 									}
 								}
@@ -2208,20 +2201,19 @@ namespace ProductInfor
 		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>包含多个信息的动态数组</returns>
-		public virtual ArrayList Measure_vCheckSourceChangeMpUnderVoltage(bool whole_function_enable, int delay_magnification, string port_name)
+		public virtual ArrayList Measure_vCheckSourceChangeMpUnderVoltage( bool whole_function_enable, int delay_magnification, string port_name )
 		{
 			//元素0 - 可能存在的错误信息 ； 元素1 - 检查主电欠压点主备电切换功能正常与否的判断 ； 元素2 - 具体的主电欠压点
-			ArrayList arrayList = new ArrayList();
+			ArrayList arrayList = new ArrayList ( );
 			string error_information = string.Empty;
 			bool check_okey = false;
 			decimal specific_value = 0m;
-			for (int temp_index = 0; temp_index < 2; temp_index++) {
-				if (temp_index == 0) {
-					if (whole_function_enable) {
-						using (MeasureDetails measureDetails = new MeasureDetails()) {
-							using (MCU_Control mCU_Control = new MCU_Control()) {
-								using (Itech itech = new Itech()) {
-									using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
+				if ( temp_index == 0 ) {
+					if ( whole_function_enable ) {
+						using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
+							using ( Itech itech = new Itech ( ) ) {
+								using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 #if false
 										decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
 										int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
@@ -2293,88 +2285,89 @@ namespace ProductInfor
 											}
 										}
 #else
-										decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
-										int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
-										if (error_information != string.Empty) { continue; }
+									decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
+									int [ ] allocate_channel = Base_vAllcateChannel_SC ( measureDetails, out real_value );
+									if ( error_information != string.Empty ) { continue; }
 
-										//备电使用CC模式带载值为  target_cc_value ,保证固定电平的备电可以带载)	
-										decimal target_cc_value = infor_Charge.Qualified_EqualizedCurrent[ 1 ] + 4m;
-										if (infor_Sp.UsedBatsCount < 3) {
-											target_cc_value += 1m;
-										}
-										error_information = itech.ElecLoad_vInputStatusSet( MeasureDetails.Address_Load_Bats, Itech.OperationMode.CC, target_cc_value, Itech.OnOffStatus.On, serialPort );
+									//备电使用CC模式带载值为  target_cc_value ,保证固定电平的备电可以带载)	
+									decimal target_cc_value = infor_Charge.Qualified_EqualizedCurrent [ 1 ] + 4m;
+									if ( infor_Sp.UsedBatsCount < 3 ) {
+										target_cc_value += 1m;
+									}
+									measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, target_cc_value, true, out error_information );
+									if ( error_information != string.Empty ) { continue; }
 
-										//只使用示波器监测非稳压的第一路输出是否跌落
-										for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-											if (!infor_Output.Stabilivolt[ index_of_channel ]) {
-												mCU_Control.McuControl_vRappleChannelChoose( index_of_channel, serialPort, out error_information );
-												if (error_information != string.Empty) { break; }
-												measureDetails.Measure_vSetOscCapture( infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] * 0.8m, out error_information );
-												if (error_information != string.Empty) { break; }
+									//只使用示波器监测非稳压的第一路输出是否跌落
+									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+										if ( !infor_Output.Stabilivolt [ index_of_channel ] ) {
+											measureDetails.Measure_vRappleChannelChoose ( index_of_channel, serialPort, out error_information );
+											if ( error_information != string.Empty ) { continue; }
+											measureDetails.Measure_vSetOscCapture ( infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] * 0.8m, out error_information );
+											if ( error_information != string.Empty ) { break; }
 
 
-												decimal target_value = 0m;
-												for (target_value = infor_PowerSourceChange.Qualified_MpUnderVoltage[ 1 ]; target_value >= (infor_PowerSourceChange.Qualified_MpUnderVoltage[ 0 ] - 3m); target_value -= 3.0m) {
-													measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, target_value );
-													if (error_information != string.Empty) { break; }
-													Thread.Sleep( 20 * delay_magnification );
-													//检查输出是否跌落
-													decimal value = measureDetails.Measure_vReadVpp( out error_information );
-													if (error_information != string.Empty) { continue; }
-													if (value > infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] * 0.5m) { //说明被捕获
-														error_information = "主电欠压输出存在跌落"; break;
-													}
-													//检查是否从主电切换到备电
-													AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
-													if (error_information != string.Empty) { break; }
-													if ((parameters_Woring.ActrulyPower < 20m) && (parameters_Woring.ActrulyCurrent < 1.5m)) { //增加输入电流的限定条件，防止采集时交流电源时出现功率返回值的错误
-														specific_value = target_value + 1m;
-														break;
-													}
+											decimal target_value = 0m;
+											for ( target_value = infor_PowerSourceChange.Qualified_MpUnderVoltage [ 1 ] ; target_value >= ( infor_PowerSourceChange.Qualified_MpUnderVoltage [ 0 ] - 3m ) ; target_value -= 3.0m ) {
+												measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, target_value );
+												if ( error_information != string.Empty ) { break; }
+												Thread.Sleep ( 20 * delay_magnification );
+												//检查输出是否跌落
+												decimal value = measureDetails.Measure_vReadVpp ( out error_information );
+												if ( error_information != string.Empty ) { continue; }
+												if ( value > infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] * 0.5m ) { //说明被捕获
+													error_information = "主电欠压输出存在跌落"; break;
 												}
-												if ((error_information == string.Empty) && ((target_value >= infor_PowerSourceChange.Qualified_MpUnderVoltage[ 0 ]) && (target_value <= infor_PowerSourceChange.Qualified_MpUnderVoltage[ 1 ]))) {
-													check_okey = true;
+												//检查是否从主电切换到备电
+												AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
+												if ( error_information != string.Empty ) { break; }
+												if ( ( parameters_Woring.ActrulyPower < 20m ) && ( parameters_Woring.ActrulyCurrent < 1.5m ) ) { //增加输入电流的限定条件，防止采集时交流电源时出现功率返回值的错误
+													specific_value = target_value + 1m;
+													break;
 												}
-												break;
 											}
+											if ( ( error_information == string.Empty ) && ( ( target_value >= infor_PowerSourceChange.Qualified_MpUnderVoltage [ 0 ] ) && ( target_value <= infor_PowerSourceChange.Qualified_MpUnderVoltage [ 1 ] ) ) ) {
+												check_okey = true;
+											}
+											break;
 										}
+									}
 
 #endif
-										if (error_information != string.Empty) { continue; }
-										//所有通道使用电子负载查看输出,不可以低于0.85倍的标称固定电平的备电
-										Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
-										for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-											if (infor_Output.Stabilivolt[ index_of_channel ] == false) {
-												for (int index_of_load = 0; index_of_load < MeasureDetails.Address_Load_Output.Length; index_of_load++) {
-													if (allocate_channel[ index_of_load ] == index_of_channel) {
-														generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_of_load ], serialPort, out error_information );
-														if (generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount) {
-															check_okey = false;
-															error_information += "主电欠压输出通道 " + (index_of_channel + 1).ToString() + " 存在跌落";
-															continue;
-														}
-														break;
+									if ( error_information != string.Empty ) { continue; }
+									//所有通道使用电子负载查看输出,不可以低于0.85倍的标称固定电平的备电
+									Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
+									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+										if ( infor_Output.Stabilivolt [ index_of_channel ] == false ) {
+											for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
+												if ( allocate_channel [ index_of_load ] == index_of_channel ) {
+													serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+													generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
+													if ( generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount ) {
+														check_okey = false;
+														error_information += "主电欠压输出通道 " + ( index_of_channel + 1 ).ToString ( ) + " 存在跌落";
+														continue;
 													}
+													break;
 												}
 											}
 										}
-
-										//停止备电使用的电子负载带载	
-										error_information = itech.Itech_vInOutOnOffSet( MeasureDetails.Address_Load_Bats, Itech.OnOffStatus.Off, serialPort );
-										if (error_information != string.Empty) { break; }
 									}
+
+									//停止备电使用的电子负载带载	
+									measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, 0m, false, out error_information );
+									if ( error_information != string.Empty ) { continue; }
 								}
 							}
 						}
 					} else { //简化时无需进行欠压点的测试
 						check_okey = true;
-						Random random = new Random();
-						specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltage[ 0 ] ), Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltage[ 1 ] ) ) );
+						Random random = new Random ( );
+						specific_value = Convert.ToDecimal ( random.Next ( Convert.ToInt32 ( infor_PowerSourceChange.Qualified_MpUnderVoltage [ 0 ] ), Convert.ToInt32 ( infor_PowerSourceChange.Qualified_MpUnderVoltage [ 1 ] ) ) );
 					}
 				} else {
-					arrayList.Add( error_information );
-					arrayList.Add( check_okey );
-					arrayList.Add( specific_value );
+					arrayList.Add ( error_information );
+					arrayList.Add ( check_okey );
+					arrayList.Add ( specific_value );
 				}
 			}
 			return arrayList;
@@ -2387,20 +2380,19 @@ namespace ProductInfor
 		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>包含多个信息的动态数组</returns>
-		public virtual ArrayList Measure_vCheckSourceChangeMpUnderVoltageRecovery(bool whole_function_enable, int delay_magnification, string port_name)
+		public virtual ArrayList Measure_vCheckSourceChangeMpUnderVoltageRecovery( bool whole_function_enable, int delay_magnification, string port_name )
 		{
 			//元素0 - 可能存在的错误信息 ； 元素1 - 检查主电欠压恢复点主备电切换功能正常与否的判断 ； 元素2 - 具体的主电欠压恢复点
-			ArrayList arrayList = new ArrayList();
+			ArrayList arrayList = new ArrayList ( );
 			string error_information = string.Empty;
 			bool check_okey = false;
 			decimal specific_value = 0m;
-			for (int temp_index = 0; temp_index < 2; temp_index++) {
-				if (temp_index == 0) {
-					if (whole_function_enable) {
-						using (MeasureDetails measureDetails = new MeasureDetails()) {
-							using (MCU_Control mCU_Control = new MCU_Control()) {
-								using (Itech itech = new Itech()) {
-									using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
+				if ( temp_index == 0 ) {
+					if ( whole_function_enable ) {
+						using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
+							using ( Itech itech = new Itech ( ) ) {
+								using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 #if false
 									decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
 									int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
@@ -2463,59 +2455,59 @@ namespace ProductInfor
 										}
 									}
 #else
-										decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
-										int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
-										if (error_information != string.Empty) { continue; }
+									decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
+									int [ ] allocate_channel = Base_vAllcateChannel_SC ( measureDetails, out real_value );
+									if ( error_information != string.Empty ) { continue; }
 
-										//只使用示波器监测非稳压的第一路输出是否跌落
-										for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-											if (!infor_Output.Stabilivolt[ index_of_channel ]) {
-												//检查是否从备电切换到主电
-												AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
-												if (error_information != string.Empty) { continue; }
-												decimal first_value = parameters_Woring.ActrulyVoltage;
-												decimal target_value = 0m;
-												for (target_value = first_value; target_value <= (infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery[ 1 ] + 2m); target_value += 2.0m) {
-													measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, target_value );
-													if (error_information != string.Empty) { break; }
-													Thread.Sleep( 30 * delay_magnification );
-													//检查输出是否跌落
-													decimal value = measureDetails.Measure_vReadVpp( out error_information );
-													if (error_information != string.Empty) { continue; }
-													if (value > infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] * 0.5m) { //说明被捕获
-														error_information = "主电欠压恢复输出存在跌落";
-														break;
-													}
-													//检查是否从备电切换到主电
-													parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
-													if (error_information != string.Empty) { continue; }
-													if (parameters_Woring.ActrulyPower > 25m) {//主电输出功率超过25W则认为恢复主电工作
-														specific_value = target_value - 1m;
-														break;
-													}
-												}
-												if ((error_information == string.Empty) && ((target_value > first_value) && (target_value <= infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery[ 1 ]))) {
-													check_okey = true;
-												}
-											}
-											break;
-										}
-#endif
-										if (error_information != string.Empty) { continue; }
-
-										//所有通道使用电子负载查看输出,不可以低于0.95倍合格最低电压
-										Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
-										for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-											for (int index_of_load = 0; index_of_load < MeasureDetails.Address_Load_Output.Length; index_of_load++) {
-												if (allocate_channel[ index_of_load ] == index_of_channel) {
-													generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_of_load ], serialPort, out error_information );
-													if (generalData_Load.ActrulyVoltage < 0.95m * infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ]) {
-														check_okey = false;
-														error_information += "主电欠压恢复输出通道 " + (index_of_channel + 1).ToString() + " 存在跌落";
-														continue;
-													}
+									//只使用示波器监测非稳压的第一路输出是否跌落
+									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+										if ( !infor_Output.Stabilivolt [ index_of_channel ] ) {
+											//检查是否从备电切换到主电
+											AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
+											if ( error_information != string.Empty ) { continue; }
+											decimal first_value = parameters_Woring.ActrulyVoltage;
+											decimal target_value = 0m;
+											for ( target_value = first_value ; target_value <= ( infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery [ 1 ] + 2m ) ; target_value += 2.0m ) {
+												measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, target_value );
+												if ( error_information != string.Empty ) { break; }
+												Thread.Sleep ( 30 * delay_magnification );
+												//检查输出是否跌落
+												decimal value = measureDetails.Measure_vReadVpp ( out error_information );
+												if ( error_information != string.Empty ) { continue; }
+												if ( value > infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] * 0.5m ) { //说明被捕获
+													error_information = "主电欠压恢复输出存在跌落";
 													break;
 												}
+												//检查是否从备电切换到主电
+												parameters_Woring = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
+												if ( error_information != string.Empty ) { continue; }
+												if ( parameters_Woring.ActrulyPower > 25m ) {//主电输出功率超过25W则认为恢复主电工作
+													specific_value = target_value - 1m;
+													break;
+												}
+											}
+											if ( ( error_information == string.Empty ) && ( ( target_value > first_value ) && ( target_value <= infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery [ 1 ] ) ) ) {
+												check_okey = true;
+											}
+										}
+										break;
+									}
+#endif
+									if ( error_information != string.Empty ) { continue; }
+
+									//所有通道使用电子负载查看输出,不可以低于0.95倍合格最低电压
+									Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
+									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+										for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
+											if ( allocate_channel [ index_of_load ] == index_of_channel ) {
+												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+												generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
+												if ( generalData_Load.ActrulyVoltage < 0.95m * infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) {
+													check_okey = false;
+													error_information += "主电欠压恢复输出通道 " + ( index_of_channel + 1 ).ToString ( ) + " 存在跌落";
+													continue;
+												}
+												break;
 											}
 										}
 									}
@@ -2524,13 +2516,13 @@ namespace ProductInfor
 						}
 					} else { //简化时无需进行欠压恢复点的测试
 						check_okey = true;
-						Random random = new Random();
-						specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery[ 0 ] + 5 ), Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery[ 1 ] ) ) );
+						Random random = new Random ( );
+						specific_value = Convert.ToDecimal ( random.Next ( Convert.ToInt32 ( infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery [ 0 ] + 5 ), Convert.ToInt32 ( infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery [ 1 ] ) ) );
 					}
 				} else {
-					arrayList.Add( error_information );
-					arrayList.Add( check_okey );
-					arrayList.Add( specific_value );
+					arrayList.Add ( error_information );
+					arrayList.Add ( check_okey );
+					arrayList.Add ( specific_value );
 				}
 			}
 			return arrayList;
@@ -2550,13 +2542,12 @@ namespace ProductInfor
 			string error_information = string.Empty;
 			bool check_okey = false;
 			decimal specific_value = 0m;
-			for (int temp_index = 0; temp_index < 2; temp_index++) {
-				if (temp_index == 0) {
-					if (whole_function_enable) {
-						using (MeasureDetails measureDetails = new MeasureDetails()) {
-							using (MCU_Control mCU_Control = new MCU_Control()) {
-								using (Itech itech = new Itech()) {
-									using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
+				if ( temp_index == 0 ) {
+					if ( whole_function_enable ) {
+						using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
+							using ( Itech itech = new Itech ( ) ) {
+								using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 #if false
 									decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
 									int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
@@ -2626,85 +2617,86 @@ namespace ProductInfor
 										}
 									}
 #else
-										decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
-										int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
-										if (error_information != string.Empty) { continue; }
+									decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
+									int [ ] allocate_channel = Base_vAllcateChannel_SC ( measureDetails, out real_value );
+									if ( error_information != string.Empty ) { continue; }
 
-										//备电使用CC模式带载值为  target_cc_value ,保证固定电平的备电可以带载)	
-										decimal target_cc_value = infor_Charge.Qualified_EqualizedCurrent[ 1 ] + 4m;
-										if (infor_Sp.UsedBatsCount < 3) {
-											target_cc_value += 1m;
-										}
-										error_information = itech.ElecLoad_vInputStatusSet( MeasureDetails.Address_Load_Bats, Itech.OperationMode.CC, target_cc_value, Itech.OnOffStatus.On, serialPort );
-										if (error_information != string.Empty) { break; }
-										//只使用示波器监测非稳压的第一路输出是否跌落
-										for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-											if (!infor_Output.Stabilivolt[ index_of_channel ]) {
-												mCU_Control.McuControl_vRappleChannelChoose( index_of_channel, serialPort, out error_information );
-												if (error_information != string.Empty) { break; }
-												measureDetails.Measure_vSetOscCapture( infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] * 0.8m, out error_information );
-												if (error_information != string.Empty) { break; }
-												decimal target_value = 0m;
-												for (target_value = infor_PowerSourceChange.Qualified_MpOverVoltage[ 0 ]; target_value <= (infor_PowerSourceChange.Qualified_MpOverVoltage[ 1 ] + 2m); target_value += 2.0m) {
-													measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, target_value );
-													if (error_information != string.Empty) { break; }
-													Thread.Sleep( 30 * delay_magnification );
-													//检查输出是否跌落
-													decimal value = measureDetails.Measure_vReadVpp( out error_information );
-													if (error_information != string.Empty) { continue; }
-													if (value > infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] * 0.5m) { //说明被捕获
-														error_information = "主电过压输出存在跌落"; break;
-													}
-													//检查是否从主电切换到备电
-													AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
-													if (error_information != string.Empty) { break; }
-													if ((parameters_Woring.ActrulyPower < 20m) && (parameters_Woring.ActrulyCurrent < 1.5m)) { //增加输入电流的限定条件，防止采集时交流电源时出现功率返回值的错误
-														specific_value = target_value - 1m;
-														break;
-													}
+									//备电使用CC模式带载值为  target_cc_value ,保证固定电平的备电可以带载)	
+									decimal target_cc_value = infor_Charge.Qualified_EqualizedCurrent [ 1 ] + 4m;
+									if ( infor_Sp.UsedBatsCount < 3 ) {
+										target_cc_value += 1m;
+									}								
+									measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, target_cc_value, true, out error_information );
+									if ( error_information != string.Empty ) { continue; }
+
+									//只使用示波器监测非稳压的第一路输出是否跌落
+									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+										if ( !infor_Output.Stabilivolt [ index_of_channel ] ) {
+											measureDetails.Measure_vRappleChannelChoose ( index_of_channel, serialPort, out error_information );
+											if ( error_information != string.Empty ) { break; }
+											measureDetails.Measure_vSetOscCapture ( infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] * 0.8m, out error_information );
+											if ( error_information != string.Empty ) { break; }
+											decimal target_value = 0m;
+											for ( target_value = infor_PowerSourceChange.Qualified_MpOverVoltage [ 0 ] ; target_value <= ( infor_PowerSourceChange.Qualified_MpOverVoltage [ 1 ] + 2m ) ; target_value += 2.0m ) {
+												measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, target_value );
+												if ( error_information != string.Empty ) { break; }
+												Thread.Sleep ( 30 * delay_magnification );
+												//检查输出是否跌落
+												decimal value = measureDetails.Measure_vReadVpp ( out error_information );
+												if ( error_information != string.Empty ) { continue; }
+												if ( value > infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] * 0.5m ) { //说明被捕获
+													error_information = "主电过压输出存在跌落"; break;
 												}
-												if ((error_information == string.Empty) && ((target_value >= infor_PowerSourceChange.Qualified_MpOverVoltage[ 0 ]) && (target_value <= infor_PowerSourceChange.Qualified_MpOverVoltage[ 1 ]))) {
-													check_okey = true;
-												}
-												break;
-											}
-										}
-#endif
-										if (error_information != string.Empty) { continue; }
-										//所有通道使用电子负载查看输出,不可以低于0.85倍的标称固定电平的备电
-										Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
-										for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-											if (infor_Output.Stabilivolt[ index_of_channel ] == false) {
-												for (int index_of_load = 0; index_of_load < MeasureDetails.Address_Load_Output.Length; index_of_load++) {
-													if (allocate_channel[ index_of_load ] == index_of_channel) {
-														generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_of_load ], serialPort, out error_information );
-														if (generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount) {
-															check_okey = false;
-															error_information += "主电过压输出通道 " + (index_of_channel + 1).ToString() + " 存在跌落";
-															continue;
-														}
-														break;
-													}
+												//检查是否从主电切换到备电
+												AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
+												if ( error_information != string.Empty ) { break; }
+												if ( ( parameters_Woring.ActrulyPower < 20m ) && ( parameters_Woring.ActrulyCurrent < 1.5m ) ) { //增加输入电流的限定条件，防止采集时交流电源时出现功率返回值的错误
+													specific_value = target_value - 1m;
+													break;
 												}
 											}
+											if ( ( error_information == string.Empty ) && ( ( target_value >= infor_PowerSourceChange.Qualified_MpOverVoltage [ 0 ] ) && ( target_value <= infor_PowerSourceChange.Qualified_MpOverVoltage [ 1 ] ) ) ) {
+												check_okey = true;
+											}
+											break;
 										}
-
-										//停止备电使用的电子负载带载	
-										error_information = itech.Itech_vInOutOnOffSet( MeasureDetails.Address_Load_Bats, Itech.OnOffStatus.Off, serialPort );
-										if (error_information != string.Empty) { break; }
 									}
+#endif
+									if ( error_information != string.Empty ) { continue; }
+									//所有通道使用电子负载查看输出,不可以低于0.85倍的标称固定电平的备电
+									Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
+									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+										if ( infor_Output.Stabilivolt [ index_of_channel ] == false ) {
+											for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
+												if ( allocate_channel [ index_of_load ] == index_of_channel ) {
+													serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+													generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
+													if ( generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount ) {
+														check_okey = false;
+														error_information += "主电过压输出通道 " + ( index_of_channel + 1 ).ToString ( ) + " 存在跌落";
+														continue;
+													}
+													break;
+												}
+											}
+										}
+									}
+
+									//停止备电使用的电子负载带载	
+									measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, 0m, false, out error_information );
+									if ( error_information != string.Empty ) { continue; }
 								}
 							}
 						}
 					} else { //简化时无需进行过压点的测试
 						check_okey = true;
-						Random random = new Random();
-						specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_PowerSourceChange.Qualified_MpOverVoltage[ 0 ] + 5 ), Convert.ToInt32( infor_PowerSourceChange.Qualified_MpOverVoltage[ 1 ] ) ) );
+						Random random = new Random ( );
+						specific_value = Convert.ToDecimal ( random.Next ( Convert.ToInt32 ( infor_PowerSourceChange.Qualified_MpOverVoltage [ 0 ] + 5 ), Convert.ToInt32 ( infor_PowerSourceChange.Qualified_MpOverVoltage [ 1 ] ) ) );
 					}
 				} else {
-					arrayList.Add( error_information );
-					arrayList.Add( check_okey );
-					arrayList.Add( specific_value );
+					arrayList.Add ( error_information );
+					arrayList.Add ( check_okey );
+					arrayList.Add ( specific_value );
 				}
 			}
 			return arrayList;
@@ -2724,13 +2716,12 @@ namespace ProductInfor
 			string error_information = string.Empty;
 			bool check_okey = false;
 			decimal specific_value = 0m;
-			for (int temp_index = 0; temp_index < 2; temp_index++) {
-				if (temp_index == 0) {
-					if (whole_function_enable) {
-						using (MeasureDetails measureDetails = new MeasureDetails()) {
-							using (MCU_Control mCU_Control = new MCU_Control()) {
-								using (Itech itech = new Itech()) {
-									using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
+				if ( temp_index == 0 ) {
+					if ( whole_function_enable ) {
+						using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
+							using ( Itech itech = new Itech ( ) ) {
+								using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 #if false
 									decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
 									int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
@@ -2794,77 +2785,77 @@ namespace ProductInfor
 									}
 
 #else
-										decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
-										int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
-										if (error_information != string.Empty) { continue; }
+									decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
+									int [ ] allocate_channel = Base_vAllcateChannel_SC ( measureDetails, out real_value );
+									if ( error_information != string.Empty ) { continue; }
 
-										//只使用示波器监测非稳压的第一路输出是否跌落
-										for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-											if (!infor_Output.Stabilivolt[ index_of_channel ]) {
+									//只使用示波器监测非稳压的第一路输出是否跌落
+									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+										if ( !infor_Output.Stabilivolt [ index_of_channel ] ) {
+											//检查是否从备电切换到主电
+											AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
+											if ( error_information != string.Empty ) { continue; }
+											decimal first_value = parameters_Woring.ActrulyVoltage;
+											decimal target_value = 0m;
+											for ( target_value = first_value ; target_value >= ( infor_PowerSourceChange.Qualified_MpOverVoltageRecovery [ 0 ] - 3m ) ; target_value -= 2.0m ) {
+												measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, target_value );
+												if ( error_information != string.Empty ) { break; }
+												Thread.Sleep ( 20 * delay_magnification );
+												//检查输出是否跌落
+												decimal value = measureDetails.Measure_vReadVpp ( out error_information );
+												if ( error_information != string.Empty ) { continue; }
+												if ( value > infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] * 0.5m ) { //说明被捕获
+													error_information = "主电过压恢复输出存在跌落";
+													break;
+												}
 												//检查是否从备电切换到主电
-												AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
-												if (error_information != string.Empty) { continue; }
-												decimal first_value = parameters_Woring.ActrulyVoltage;
-												decimal target_value = 0m;
-												for (target_value = first_value; target_value >= (infor_PowerSourceChange.Qualified_MpOverVoltageRecovery[ 0 ] - 3m); target_value -= 2.0m) {
-													measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, target_value );
-													if (error_information != string.Empty) { break; }
-													Thread.Sleep( 20 * delay_magnification );
-													//检查输出是否跌落
-													decimal value = measureDetails.Measure_vReadVpp( out error_information );
-													if (error_information != string.Empty) { continue; }
-													if (value > infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] * 0.5m) { //说明被捕获
-														error_information = "主电过压恢复输出存在跌落";
-														break;
-													}
-													//检查是否从备电切换到主电
-													parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
-													if (error_information != string.Empty) { continue; }
-													if (parameters_Woring.ActrulyPower > 25m) {//主电输出功率超过25W则认为恢复主电工作
-														specific_value = target_value + 1m;
-														break;
-													}
-												}
-												if ((error_information == string.Empty) && ((specific_value < first_value) && (specific_value >= infor_PowerSourceChange.Qualified_MpOverVoltageRecovery[ 0 ]))) {
-													check_okey = true;
-												}
-											}
-											break;
-										}
-#endif
-										if (error_information != string.Empty) { continue; }
-										//所有通道使用电子负载查看输出,不可以低于0.95倍合格最低电压
-										Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
-										for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
-											for (int index_of_load = 0; index_of_load < MeasureDetails.Address_Load_Output.Length; index_of_load++) {
-												if (allocate_channel[ index_of_load ] == index_of_channel) {
-													generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_of_load ], serialPort, out error_information );
-													if (generalData_Load.ActrulyVoltage < 0.95m * infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ]) {
-														check_okey = false;
-														error_information += "主电过压恢复输出通道 " + (index_of_channel + 1).ToString() + " 存在跌落";
-														continue;
-													}
+												parameters_Woring = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
+												if ( error_information != string.Empty ) { continue; }
+												if ( parameters_Woring.ActrulyPower > 25m ) {//主电输出功率超过25W则认为恢复主电工作
+													specific_value = target_value + 1m;
 													break;
 												}
 											}
+											if ( ( error_information == string.Empty ) && ( ( specific_value < first_value ) && ( specific_value >= infor_PowerSourceChange.Qualified_MpOverVoltageRecovery [ 0 ] ) ) ) {
+												check_okey = true;
+											}
 										}
-
-										//恢复标准主电电压状态
-										measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information );
-										if (error_information != string.Empty) { continue; }
+										break;
 									}
+#endif
+									if ( error_information != string.Empty ) { continue; }
+									//所有通道使用电子负载查看输出,不可以低于0.95倍合格最低电压
+									Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
+									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
+										for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
+											if ( allocate_channel [ index_of_load ] == index_of_channel ) {
+												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+												generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
+												if ( generalData_Load.ActrulyVoltage < 0.95m * infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) {
+													check_okey = false;
+													error_information += "主电过压恢复输出通道 " + ( index_of_channel + 1 ).ToString ( ) + " 存在跌落";
+													continue;
+												}
+												break;
+											}
+										}
+									}
+
+									//恢复标准主电电压状态
+									measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information );
+									if ( error_information != string.Empty ) { continue; }
 								}
 							}
 						}
 					} else { //简化时无需进行过压点的测试
 						check_okey = true;
-						Random random = new Random();
-						specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_PowerSourceChange.Qualified_MpOverVoltageRecovery[ 0 ] ), Convert.ToInt32( infor_PowerSourceChange.Qualified_MpOverVoltageRecovery[ 1 ] - 5 ) ) );
+						Random random = new Random ( );
+						specific_value = Convert.ToDecimal ( random.Next ( Convert.ToInt32 ( infor_PowerSourceChange.Qualified_MpOverVoltageRecovery [ 0 ] ), Convert.ToInt32 ( infor_PowerSourceChange.Qualified_MpOverVoltageRecovery [ 1 ] - 5 ) ) );
 					}
 				} else {
-					arrayList.Add( error_information );
-					arrayList.Add( check_okey );
-					arrayList.Add( specific_value );
+					arrayList.Add ( error_information );
+					arrayList.Add ( check_okey );
+					arrayList.Add ( specific_value );
 				}
 			}
 			return arrayList;
@@ -2894,7 +2885,7 @@ namespace ProductInfor
 				if ( temp_index == 0 ) {
 					using (MeasureDetails measureDetails = new MeasureDetails()) {
 						using (Itech itech = new Itech()) {
-							using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+							using (SerialPort serialPort = new SerialPort( port_name, default_baudrate, Parity.None, 8, StopBits.One )) {
 								//将示波器模式换成自动模式，换之前查看Vpp是否因为跌落而被捕获 - 原因是示波器捕获的反应速度较慢，只能在所有过程结束之后再查看是否又跌落情况
 								decimal value = measureDetails.Measure_vReadVpp( out error_information );
 								if (error_information != string.Empty) { continue; }
@@ -2969,6 +2960,7 @@ namespace ProductInfor
 											bool effect_others = false;
 											for (int index_allocate = 0; index_allocate < MeasureDetails.Address_Load_Output.Length; index_allocate++) {
 												if ((order[allocate_channel[ index_allocate ]] == order_index ) && (!oxp_work)) {
+													serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
 													Itech.GeneralData_Load generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_allocate ], serialPort, out error_information );
 													if (generalData_Load.ActrulyVoltage < infor_Output.Qualified_OutputVoltageWithLoad[ order[ order_index ], 0 ] * 0.5m) { //指定输出通道电压过低认为过流保护已经生效	
 														specific_value[ order[ order_index ] ] = target_value - 0.1m;
@@ -3016,6 +3008,7 @@ namespace ProductInfor
 														Thread.Sleep( infor_Output.Delay_WaitForOXP );
 													} else {
 														int retry_count = 0;
+														serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
 														do {															
 															generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_allocate ], serialPort, out error_information );
 															Thread.Sleep( 200 );
@@ -3083,7 +3076,7 @@ namespace ProductInfor
 		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>包含多个信息的动态数组</returns>
-		public virtual ArrayList Measure_vOutputShortProtect(bool whole_function_enable, int delay_magnification, string port_name )
+		public virtual ArrayList Measure_vOutputShortProtect( bool whole_function_enable, int delay_magnification, string port_name )
 		{
 			//元素0 - 可能存在的错误信息 ； 元素1 - 输出通道数量 ； 元素(2~(1+count)) - 测试通道是否需要短路保护；
 			//元素(2+count  ~ 1+2*count ) -  测试通道的短路保护合格与否判断
@@ -3097,127 +3090,125 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using(MCU_Control mCU_Control = new MCU_Control()) {
-							using (SerialPort serialPort = new SerialPort( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
-								//只有允许短路的产品通道才可以进行后续的测试，否则退出本函数
-								bool should_test_short = false;
-								for (int index = 0; index < infor_Output.OutputChannelCount; index++) {
-									if (infor_Output.NeedShort[ index ]) {
-										should_test_short = true; break;
-									}
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
+							//只有允许短路的产品通道才可以进行后续的测试，否则退出本函数
+							bool should_test_short = false;
+							for ( int index = 0 ; index < infor_Output.OutputChannelCount ; index++ ) {
+								if ( infor_Output.NeedShort [ index ] ) {
+									should_test_short = true; break;
 								}
-								if (!should_test_short) { continue; }
-
-								//通道的带载分配计算，用于获取电子负载的通道分配情况；然后恢复满载带载情况
-								decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
-								int[] allocate_channel = Base_vAllcateChannel_FullLoad( measureDetails, serialPort, true, out error_information );
-								if (error_information != string.Empty) { continue; }
-
-								//之前进行OCP/OWP保护时输出可能跌落，主电重新上电一次；个别电源软件重启效果更好
-								Measure_vProductReset( delay_magnification, measureDetails, mCU_Control, serialPort, out error_information );
-								if(error_information != string.Empty) { continue; }
-
-								//等待一段时间后查看待测电源是否成功启动
-								bool output_rebuild = Measure_vProductOutputRebuild( true, delay_magnification, allocate_channel, measureDetails, serialPort, out error_information );
-								if( !output_rebuild) { continue; }								
-
-								//按照需要执行短路的顺序，获取通道的索引数组
-								int[] order = new int[ infor_Output.OutputChannelCount ];
-								for (int index = 0; index < order.Length; index++) {
-									order[ index ] = -1; //初始值设置为-1，方便后续进行通道索引的填充
-								}
-								int location = -1;
-								int min_value = infor_Output.OutputChannelCount;
-
-								for (int j = 0; j < infor_Output.OutputChannelCount; j++) {
-									for (int i = 0; i < infor_Output.OutputChannelCount; i++) {
-										if (order.Contains( i ) == false) {
-											if (min_value > infor_Output.Short_OrderIndex[ i ]) {
-												min_value = infor_Output.Short_OrderIndex[ i ];
-												location = i;
-											}
-										}
-									}
-									order[ j ] = location;
-									min_value = infor_Output.OutputChannelCount;
-								}
-
-								//按顺序进行短路，需要保证短路后不要对尚未短路的通道输出造成影响
-								ArrayList arlResult = new ArrayList();
-								bool effect_others = false;
-								bool[] short_status = new bool[ MeasureDetails.Address_Load_Output.Length ];
-								for (int order_index = 0; order_index < infor_Output.OutputChannelCount; order_index++) {
-									if (infor_Output.NeedShort[ order[ order_index ] ]) {
-										for (int allocate_index = 0; allocate_index < MeasureDetails.Address_Load_Output.Length; allocate_index++) {
-											if ( order_index == order[allocate_channel[ allocate_index ]]) {
-												short_status[ allocate_index ] = true;
-											} else {
-												short_status[ allocate_index ] = false;
-											}
-										}
-										//执行短路与否的执行逻辑
-										measureDetails.Measure_vSetOutputLoadShort( serialPort, short_status, out error_information );
-										if (error_information != string.Empty) { break; }
-										//防止短路时对后续通道的电压造成影响
-										arlResult  = measureDetails.Measure_vReadOutputLoadResult( serialPort, out error_information );
-										for(int check_index = 0;check_index < MeasureDetails.Address_Load_Output.Length; check_index++) {
-											if (order[allocate_channel[ check_index ]] > order_index ) {
-												Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load )arlResult[ check_index ];
-												if(generalData_Load.ActrulyVoltage < infor_Output.Qualified_OutputVoltageWithLoad[ order[ order_index ], 0 ]) {
-													error_information =  "第 " + (order[ order_index ] + 1).ToString() + " 通道短路对尚未开始短路的通道造成影响";
-													effect_others = true;break;
-												}
-											}
-										}
-										if (!effect_others) { check_okey[ order[ order_index ] ] = true;  }
-										
-										//撤销所有的输出负载短路情况;软件保护的通道输出在此处应该被锁定，此处需要检查负载电压
-										for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
-											short_status[ index ] = false;
-										}
-										measureDetails.Measure_vSetOutputLoadShort( serialPort, short_status, out error_information );
-										if (error_information != string.Empty) { break; }
-
-										Thread.Sleep( 200 );
-										Thread.Sleep( 50 * delay_magnification );
-										arlResult = measureDetails.Measure_vReadOutputLoadResult( serialPort, out error_information );
-										for (int check_index = 0; check_index < MeasureDetails.Address_Load_Output.Length; check_index++) {
-											if (order[ allocate_channel[ check_index ] ] == order_index) {
-												Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load )arlResult[ check_index ];
-												if (generalData_Load.ActrulyVoltage < 0.2m * infor_Output.Qualified_OutputVoltageWithLoad[ order[ order_index ], 0 ]) {
-													error_information = "第 " + (order[ order_index ] + 1).ToString() + " 通道短路后软件保护未能正常启动";
-													break;
-												}
-											}
-										}
-
-									}
-								}								
-
-								//撤销所有的输出负载短路情况
-								for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
-									short_status[ index ] = false;
-								}
-								measureDetails.Measure_vSetOutputLoadShort( serialPort, short_status, out error_information );
-								if (error_information != string.Empty) { break; }
-
-								//之前进行OCP/OWP保护时输出可能跌落，主电重新上电一次；个别电源软件重启效果更好
-								Measure_vProductReset( delay_magnification, measureDetails, mCU_Control, serialPort, out error_information );
-								if (error_information != string.Empty) { continue; }
-
-								//等待一段时间后查看待测电源是否成功启动
-								output_rebuild = Measure_vProductOutputRebuild( true, delay_magnification, allocate_channel, measureDetails, serialPort, out error_information );
-								if (!output_rebuild) { continue; }
 							}
+							if ( !should_test_short ) { continue; }
+
+							//通道的带载分配计算，用于获取电子负载的通道分配情况；然后恢复满载带载情况
+							decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
+							int [ ] allocate_channel = Base_vAllcateChannel_FullLoad ( measureDetails, serialPort, true, out error_information );
+							if ( error_information != string.Empty ) { continue; }
+
+							//之前进行OCP/OWP保护时输出可能跌落，主电重新上电一次；个别电源软件重启效果更好
+							Measure_vProductReset ( delay_magnification, measureDetails, serialPort, out error_information );
+							if ( error_information != string.Empty ) { continue; }
+
+							//等待一段时间后查看待测电源是否成功启动
+							bool output_rebuild = Measure_vProductOutputRebuild ( true, delay_magnification, allocate_channel, measureDetails, serialPort, out error_information );
+							if ( !output_rebuild ) { continue; }
+
+							//按照需要执行短路的顺序，获取通道的索引数组
+							int [ ] order = new int [ infor_Output.OutputChannelCount ];
+							for ( int index = 0 ; index < order.Length ; index++ ) {
+								order [ index ] = -1; //初始值设置为-1，方便后续进行通道索引的填充
+							}
+							int location = -1;
+							int min_value = infor_Output.OutputChannelCount;
+
+							for ( int j = 0 ; j < infor_Output.OutputChannelCount ; j++ ) {
+								for ( int i = 0 ; i < infor_Output.OutputChannelCount ; i++ ) {
+									if ( order.Contains ( i ) == false ) {
+										if ( min_value > infor_Output.Short_OrderIndex [ i ] ) {
+											min_value = infor_Output.Short_OrderIndex [ i ];
+											location = i;
+										}
+									}
+								}
+								order [ j ] = location;
+								min_value = infor_Output.OutputChannelCount;
+							}
+
+							//按顺序进行短路，需要保证短路后不要对尚未短路的通道输出造成影响
+							ArrayList arlResult = new ArrayList ( );
+							bool effect_others = false;
+							bool [ ] short_status = new bool [ MeasureDetails.Address_Load_Output.Length ];
+							for ( int order_index = 0 ; order_index < infor_Output.OutputChannelCount ; order_index++ ) {
+								if ( infor_Output.NeedShort [ order [ order_index ] ] ) {
+									for ( int allocate_index = 0 ; allocate_index < MeasureDetails.Address_Load_Output.Length ; allocate_index++ ) {
+										if ( order_index == order [ allocate_channel [ allocate_index ] ] ) {
+											short_status [ allocate_index ] = true;
+										} else {
+											short_status [ allocate_index ] = false;
+										}
+									}
+									//执行短路与否的执行逻辑
+									measureDetails.Measure_vSetOutputLoadShort ( serialPort, short_status, out error_information );
+									if ( error_information != string.Empty ) { break; }
+									//防止短路时对后续通道的电压造成影响
+									arlResult = measureDetails.Measure_vReadOutputLoadResult ( serialPort, out error_information );
+									for ( int check_index = 0 ; check_index < MeasureDetails.Address_Load_Output.Length ; check_index++ ) {
+										if ( order [ allocate_channel [ check_index ] ] > order_index ) {
+											Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load ) arlResult [ check_index ];
+											if ( generalData_Load.ActrulyVoltage < infor_Output.Qualified_OutputVoltageWithLoad [ order [ order_index ], 0 ] ) {
+												error_information = "第 " + ( order [ order_index ] + 1 ).ToString ( ) + " 通道短路对尚未开始短路的通道造成影响";
+												effect_others = true; break;
+											}
+										}
+									}
+									if ( !effect_others ) { check_okey [ order [ order_index ] ] = true; }
+
+									//撤销所有的输出负载短路情况;软件保护的通道输出在此处应该被锁定，此处需要检查负载电压
+									for ( int index = 0 ; index < MeasureDetails.Address_Load_Output.Length ; index++ ) {
+										short_status [ index ] = false;
+									}
+									measureDetails.Measure_vSetOutputLoadShort ( serialPort, short_status, out error_information );
+									if ( error_information != string.Empty ) { break; }
+
+									Thread.Sleep ( 200 );
+									Thread.Sleep ( 50 * delay_magnification );
+									arlResult = measureDetails.Measure_vReadOutputLoadResult ( serialPort, out error_information );
+									for ( int check_index = 0 ; check_index < MeasureDetails.Address_Load_Output.Length ; check_index++ ) {
+										if ( order [ allocate_channel [ check_index ] ] == order_index ) {
+											Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load ) arlResult [ check_index ];
+											if ( generalData_Load.ActrulyVoltage < 0.2m * infor_Output.Qualified_OutputVoltageWithLoad [ order [ order_index ], 0 ] ) {
+												error_information = "第 " + ( order [ order_index ] + 1 ).ToString ( ) + " 通道短路后软件保护未能正常启动";
+												break;
+											}
+										}
+									}
+
+								}
+							}
+
+							//撤销所有的输出负载短路情况
+							for ( int index = 0 ; index < MeasureDetails.Address_Load_Output.Length ; index++ ) {
+								short_status [ index ] = false;
+							}
+							measureDetails.Measure_vSetOutputLoadShort ( serialPort, short_status, out error_information );
+							if ( error_information != string.Empty ) { break; }
+
+							//之前进行OCP/OWP保护时输出可能跌落，主电重新上电一次；个别电源软件重启效果更好
+							Measure_vProductReset ( delay_magnification, measureDetails, serialPort, out error_information );
+							if ( error_information != string.Empty ) { continue; }
+
+							//等待一段时间后查看待测电源是否成功启动
+							output_rebuild = Measure_vProductOutputRebuild ( true, delay_magnification, allocate_channel, measureDetails, serialPort, out error_information );
+							if ( !output_rebuild ) { continue; }
 						}
 					}
 				} else {
 					arrayList.Add ( error_information );
-					arrayList.Add( infor_Output.OutputChannelCount );
-					for ( int index = 0 ; index < infor_Output.OutputChannelCount; index++ ) {
-						arrayList.Add ( infor_Output.NeedShort[ index ] );
+					arrayList.Add ( infor_Output.OutputChannelCount );
+					for ( int index = 0 ; index < infor_Output.OutputChannelCount ; index++ ) {
+						arrayList.Add ( infor_Output.NeedShort [ index ] );
 					}
-					for ( int index = 0 ; index < infor_Output.OutputChannelCount; index++ ) {
+					for ( int index = 0 ; index < infor_Output.OutputChannelCount ; index++ ) {
 						arrayList.Add ( check_okey [ index ] );
 					}
 				}
@@ -3228,7 +3219,7 @@ namespace ProductInfor
 
 #endregion
 
-#region -- 其它函数
+		#region -- 其它函数
 
 		/// <summary>
 		/// 通道带载的自动分配 - 仅限常规满载情况
@@ -3437,30 +3428,32 @@ namespace ProductInfor
 		/// </summary>
 		/// <param name="delay_magnification">延时等级</param>
 		/// <param name="measureDetails">具体测试项的实例</param>
-		/// <param name="mCU_Control">单片机控制实例</param>
 		/// <param name="serialPort">使用串口对象</param>
 		/// <param name="error_information">可能存在的错误</param>
-		private void Measure_vProductReset(int delay_magnification, MeasureDetails measureDetails, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
+		private void Measure_vProductReset( int delay_magnification, MeasureDetails measureDetails, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
-			if (exist.CommunicationProtocol) { //软件重启更快
-				int retry_index = 0;
-				do {
-					Communicate_User_QueryWorkingStatus( serialPort, out error_information );
-					Thread.Sleep( delay_magnification * 30 );
-				} while ((error_information != string.Empty) && (++retry_index < 30));
-				if (retry_index >= 30) { error_information = "待测产品通讯异常"; return; }
-				Communicate_Admin( serialPort, out error_information );
-				if (error_information != string.Empty) { return; }
-				mCU_Control.McuCalibrate_vReset( serialPort, out error_information );
-				if (error_information != string.Empty) { return; }
+			if ( exist.CommunicationProtocol ) { //软件重启更快
+				using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
+					int retry_index = 0;
+					do {
+						Communicate_User_QueryWorkingStatus ( serialPort, out error_information );
+						Thread.Sleep ( delay_magnification * 30 );
+					} while ( ( error_information != string.Empty ) && ( ++retry_index < 30 ) );
+					if ( retry_index >= 30 ) { error_information = "待测产品通讯异常"; return; }
+					Communicate_Admin ( serialPort, out error_information );
+					if ( error_information != string.Empty ) { return; }
+
+					mCU_Control.McuCalibrate_vReset ( serialPort, out error_information );
+					if ( error_information != string.Empty ) { return; }
+				}
 			} else { //对于没有软件通讯功能的电源，只能重新上主电
-				measureDetails.Measure_vSetACPowerStatus( false, serialPort, out error_information );
-				Thread.Sleep( 800 );
-				Thread.Sleep( 100 * delay_magnification );
+				measureDetails.Measure_vSetACPowerStatus ( false, serialPort, out error_information );
+				Thread.Sleep ( 800 );
+				Thread.Sleep ( 100 * delay_magnification );
 				//开启主电进行带载
-				measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, infor_Mp.MpVoltage[ 1 ], infor_Mp.MpFrequncy[ 1 ] );
-				if (error_information != string.Empty) { return; }
+				measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Mp.MpVoltage [ 1 ], infor_Mp.MpFrequncy [ 1 ] );
+				if ( error_information != string.Empty ) { return; }
 			}
 		}
 
@@ -3510,8 +3503,8 @@ namespace ProductInfor
 			return output_rebuild;
 		}
 
-#endregion
+		#endregion
 
-#endregion
+		#endregion
 	}
 }

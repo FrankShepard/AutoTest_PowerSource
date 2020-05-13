@@ -712,7 +712,8 @@ namespace Instrument_Control
 			error_information = SiglentOSC_vWriteCommand( ssionRM , ssionOSC , "C" + channel.ToString( ) + ":PAVA? " + type );       //设置需要读取的数据种类
 			if (error_information == string.Empty) {
 				if (working_in_normalmode) {
-					Thread.Sleep( 350 ); //额外延长一段时间，防止传输数据时间不足造成的读取异常出现
+//					Thread.Sleep( 350 ); //额外延长一段时间，防止传输数据时间不足造成的读取异常出现
+					Thread.Sleep( 100 ); //额外延长一段时间，防止传输数据时间不足造成的读取异常出现
 				}
 				value = SiglentOSC_vReadResult( ssionRM, ssionOSC, out error_information );
 			}

@@ -141,7 +141,7 @@ namespace Ingenu_Power.Domain
 								if ( id_verion.Name == "Base" ) {
 									Object obj = Activator.CreateInstance ( id_verion );
 
-									MethodInfo mi = id_verion.GetMethod ( "BaudrateInstrumentGet" );
+									MethodInfo mi = id_verion.GetMethod ( "BaudrateInstrument_ControlBoardGet" );
 									Baudrate_Instrument = ( int ) mi.Invoke ( obj, null );
 									break;
 								}

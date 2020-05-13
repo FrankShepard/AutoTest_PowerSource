@@ -444,9 +444,14 @@
             输出相关参数的结构体实例化对象
             </summary>
         </member>
-        <member name="M:ProductInfor.Base.BaudrateInstrumentGet">
+        <member name="F:ProductInfor.Base.default_baudrate">
             <summary>
-            返回仪表通讯的波特率，用于不包含在本Dll中的ISP功能的实现
+            初始化串口时的默认波特率
+            </summary>
+        </member>
+        <member name="M:ProductInfor.Base.BaudrateInstrument_ControlBoardGet">
+            <summary>
+            返回自制控制板的波特率，用于不包含在本Dll中的ISP功能的实现
             </summary>
             <returns></returns>
         </member>
@@ -467,18 +472,20 @@
             <param name="sql_password">sql登录密码</param>
             <returns>可能存在的错误信息和用户ID</returns>
         </member>
-        <member name="M:ProductInfor.Base.Calibrate(System.String,System.String)">
+        <member name="M:ProductInfor.Base.Calibrate(System.Boolean,System.String,System.String)">
             <summary>
             校准的操作
             </summary>
+            <param name="whole_function_enable">是否全项测试</param>
             <param name="osc_ins">使用到的示波器INS</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vInstrumentInitalize(System.String,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vInstrumentInitalize(System.Boolean,System.String,System.String)">
             <summary>
             仪表的初始化
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="osc_ins">示波器INS码</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的错误信息</returns>
@@ -511,11 +518,11 @@
             <param name="serialPort">使用到的实际串口</param>
             <param name="error_information">可能存在的异常</param>
         </member>
-        <member name="M:ProductInfor.Base.Calibrate_vClearValidata(Instrument_Control.AN97002H,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:ProductInfor.Base.Calibrate_vClearValidata(ProductInfor.MeasureDetails,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             清除校准数据
             </summary>
-            <param name="acpower">使用到的交流程控电源对象</param>
+            <param name="measureDetails">使用到的测试细节对象</param>
             <param name="mCU_Control">使用到的校准集合对象</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能储存在的错误信息</param>
@@ -530,38 +537,35 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能储存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor.Base.Calibrate_vFullLoad_Mp(ProductInfor.MeasureDetails,System.Int32[],System.Decimal[],Instrument_Control.AN97002H,Instrument_Control.Itech,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:ProductInfor.Base.Calibrate_vFullLoad_Mp(ProductInfor.MeasureDetails,System.Int32[],System.Decimal[],Instrument_Control.Itech,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             主电供电时   输出带载的相关信息校准
             </summary>
             <param name="measureDetails">实际测试的对象</param>
             <param name="channel">电子负载对应的输出通道分配索引</param>
             <param name="currents">对应负载的电流分配情况</param>
-            <param name="acpower">使用到的交流程控电源</param>
             <param name="itech">使用到的电子负载的对象</param>
             <param name="mCU_Control">使用到的校准集合对象</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能储存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor.Base.Calibrate_vFullLoad_Sp(ProductInfor.MeasureDetails,System.Int32[],System.Decimal[],Instrument_Control.AN97002H,Instrument_Control.Itech,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:ProductInfor.Base.Calibrate_vFullLoad_Sp(ProductInfor.MeasureDetails,System.Int32[],System.Decimal[],Instrument_Control.Itech,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             备电供电时   输出带载的相关信息校准
             </summary>
             <param name="measureDetails">实际测试的对象</param>
             <param name="channel">电子负载对应的输出通道分配索引</param>
             <param name="currents">对应负载的电流分配情况</param>
-            <param name="acpower">使用到的交流程控电源</param>
             <param name="itech">使用到的电子负载的对象</param>
             <param name="mCU_Control">使用到的校准集合对象</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能储存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor.Base.Calibrate_vEmptyLoad_Sp(Instrument_Control.AN97002H,Instrument_Control.Itech,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:ProductInfor.Base.Calibrate_vEmptyLoad_Sp(ProductInfor.MeasureDetails,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             备电空载时的校准部分
             </summary>
-            <param name="acpower">使用到的程控交流电源</param>
-            <param name="itech">使用到的电子负载</param>
+            <param name="measureDetails">测试细节的对象</param>
             <param name="mCU_Control">使用到的产品校准对象</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
@@ -827,13 +831,12 @@
             <param name="error_information">可能存在的错误信息</param>
             <returns>各负载的输出通道分配</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vProductReset(System.Int32,ProductInfor.MeasureDetails,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:ProductInfor.Base.Measure_vProductReset(System.Int32,ProductInfor.MeasureDetails,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             等待待测产品复位
             </summary>
             <param name="delay_magnification">延时等级</param>
             <param name="measureDetails">具体测试项的实例</param>
-            <param name="mCU_Control">单片机控制实例</param>
             <param name="serialPort">使用串口对象</param>
             <param name="error_information">可能存在的错误</param>
         </member>
@@ -930,9 +933,19 @@
             单个电子负载最大输入功率 - 280W
             </summary>
         </member>
-        <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument">
+        <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument_Itech">
             <summary>
-            仪表通讯波特率
+            仪表通讯波特率 - 艾德克斯产品
+            </summary>
+        </member>
+        <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument_ACPower">
+            <summary>
+            仪表通讯波特率 - 程控交流电源
+            </summary>
+        </member>
+        <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument_ControlBoard">
+            <summary>
+            仪表通讯波特率 - 自制控制板
             </summary>
         </member>
         <member name="F:ProductInfor.MeasureDetails.SessionRM">
@@ -945,10 +958,11 @@
             VISA中OSC的会话号
             </summary>
         </member>
-        <member name="M:ProductInfor.MeasureDetails.Measure_vInstrumentInitalize(System.Decimal,System.String,System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:ProductInfor.MeasureDetails.Measure_vInstrumentInitalize(System.Boolean,System.Decimal,System.String,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             仪表初始化
             </summary>
+            <param name="whole_function_enable">全项测试与否，只有全项测试时需要先对示波器进行仪表程控</param>
             <param name="cv_target">充电电子负载的目标CV值</param>
             <param name="osc_ins">示波器INS</param>
             <param name="serialPort">使用到的串口</param>
@@ -1044,11 +1058,20 @@
             <param name="input_status">目标输入状态</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor.MeasureDetails.Measure_vSetChargeLoad(System.IO.Ports.SerialPort,System.Decimal,System.Boolean,System.String@)">
+        <member name="M:ProductInfor.MeasureDetails.Measure_vSetOutputLoadInputStatus(System.IO.Ports.SerialPort,System.Boolean,System.String@)">
+            <summary>
+            对输出通道上使用的电子负载进行统一的输入与否设置
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="input_status">目标输入状态</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vSetChargeLoad(System.IO.Ports.SerialPort,Instrument_Control.Itech.OperationMode,System.Decimal,System.Boolean,System.String@)">
             <summary>
             设置充电使用的电子负载的工作参数
             </summary>
             <param name="serialPort">使用到的串口</param>
+            <param name="operationMode">电子负载接入的类型</param>
             <param name="target_value">电子负载目标带载值</param>
             <param name="input_status">目标输入状态</param>
             <param name="error_information">可能存在的错误信息</param>
@@ -1099,6 +1122,38 @@
             <summary>
             准备读取直流的输出值
             </summary>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vMandatory(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            控制自制模块进行强制模式设置
+            </summary>
+            <param name="mandatory_status">是否设置为强制模式</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vRappleChannelChoose(System.Int32,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            控制自制模块进行待测纹波通道切换
+            </summary>
+            <param name="channel_index">通道的索引，从0开始（通道对应输出1）</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vAlwaysCharging(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            控制自制模块进行充电占比后门的设置
+            </summary>
+            <param name="target_status">目标充电100%后门状态</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vChargePeriodSet(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            控制自制模块进行充电周期后门的设置
+            </summary>
+            <param name="target_status">目标充电100%后门状态</param>
+            <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
         <member name="M:ProductInfor.MeasureDetails.Dispose">
@@ -1407,10 +1462,11 @@
             <param name="count">需要计算的字节长度</param>
             <returns>所需校验和</returns>
         </member>
-        <member name="M:ProductInfor._60710.Calibrate(System.String,System.String)">
+        <member name="M:ProductInfor._60710.Calibrate(System.Boolean,System.String,System.String)">
             <summary>
             64910 的校准步骤重写
             </summary>
+            <param name="whole_function_enable">是否全项测试</param>
             <param name="osc_ins">示波器INS码</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
@@ -1910,10 +1966,11 @@
             <param name="command_bytes">通讯使用的数组</param>
             <returns>所需校验和</returns>
         </member>
-        <member name="M:ProductInfor._67510.Calibrate(System.String,System.String)">
+        <member name="M:ProductInfor._67510.Calibrate(System.Boolean,System.String,System.String)">
             <summary>
             64910 的校准步骤重写
             </summary>
+            <param name="whole_function_enable">是否全项测试</param>
             <param name="osc_ins">示波器INS码</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
@@ -2291,10 +2348,11 @@
             <param name="count">需要计算的字节长度</param>
             <returns>所需校验和</returns>
         </member>
-        <member name="M:ProductInfor._61710.Calibrate(System.String,System.String)">
+        <member name="M:ProductInfor._61710.Calibrate(System.Boolean,System.String,System.String)">
             <summary>
             60510 的校准步骤重写
             </summary>
+            <param name="whole_function_enable">是否全项测试</param>
             <param name="osc_ins">示波器INS码</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
@@ -2930,10 +2988,11 @@
             <param name="count">需要计算的字节长度</param>
             <returns>所需校验和</returns>
         </member>
-        <member name="M:ProductInfor._64910.Calibrate(System.String,System.String)">
+        <member name="M:ProductInfor._64910.Calibrate(System.Boolean,System.String,System.String)">
             <summary>
             64910 的校准步骤重写
             </summary>
+            <param name="whole_function_enable">是否全项测试</param>
             <param name="osc_ins">示波器INS码</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
@@ -3125,10 +3184,11 @@
             <param name="count">需要计算的字节长度</param>
             <returns>所需校验和</returns>
         </member>
-        <member name="M:ProductInfor._60510.Calibrate(System.String,System.String)">
+        <member name="M:ProductInfor._60510.Calibrate(System.Boolean,System.String,System.String)">
             <summary>
             60510 的校准步骤重写
             </summary>
+            <param name="whole_function_enable">是否全项测试</param>
             <param name="osc_ins">示波器INS码</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>

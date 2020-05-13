@@ -16,8 +16,6 @@ E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\A
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\obj\Debug\Instrument_Control.csproj.CoreCompileInputs.cache
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\obj\Debug\Instrument_Control.dll
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\obj\Debug\Instrument_Control.pdb
-E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\bin\Debug\Instrument_Control.dll.CodeAnalysisLog.xml
-E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\bin\Debug\Instrument_Control.dll.lastcodeanalysissucceeded
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\bin\Debug\Instrument_Control.xml
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\bin\Debug\Instrument_Control.dll
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\bin\Debug\Instrument_Control.pdb

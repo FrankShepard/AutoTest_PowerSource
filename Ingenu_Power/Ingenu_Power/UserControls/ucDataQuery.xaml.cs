@@ -39,7 +39,7 @@ namespace Ingenu_Power.UserControls
 			TgbChoose.Checked += new RoutedEventHandler ( TgbChoose_Checked );
 			TgbChoose.Unchecked += new RoutedEventHandler ( TgbChoose_Unchecked );
 
-			if(StaticInfor.UserRightLevel >= 3) { //经理权限才可以修改DataGrid中的数据
+			if((StaticInfor.UserRightLevel >= 3) && (StaticInfor.UserRightLevel < 5)) { //经理权限才可以修改DataGrid中的数据；超级管理员权限(权限5)仅用于数据统计，无法进行数据修改
 				DtgData.IsReadOnly = false;
 			}
 
@@ -241,6 +241,12 @@ namespace Ingenu_Power.UserControls
 		{
 			string error_information = string.Empty;
 			using (Database database = new Database()) {
+				//超级管理员权限与否
+				bool super_administrator_right = false;
+				if ( StaticInfor.UserRightLevel == 5 ) {
+					super_administrator_right = true;
+				}
+
 				if (( bool )TgbChoose.IsChecked == false) { //单支产品数据查询
 					if (TxtSingleID.Text == string.Empty) {
 						StaticInfor.Error_Message = "请输入需要查询的单支产品ID";
@@ -249,9 +255,10 @@ namespace Ingenu_Power.UserControls
 					}
 					string product_id = TxtSingleID.Text;
 					bool use_custmer_id = ( bool )TgbIDType.IsChecked;
+					
 					//在新线程中执行数据查询
 					if (trdQueryData == null) {
-						trdQueryData = new Thread( () => DataQuery_vQuerySingleData( product_id, use_custmer_id ) ) {
+						trdQueryData = new Thread( () => DataQuery_vQuerySingleData( product_id, super_administrator_right, use_custmer_id ) ) {
 							Name = "数据查询线程",
 							Priority = ThreadPriority.Lowest,
 							IsBackground = false,
@@ -260,7 +267,7 @@ namespace Ingenu_Power.UserControls
 						trdQueryData.Start();
 					} else {
 						if (trdQueryData.ThreadState != ThreadState.Stopped) { return; }
-						trdQueryData = new Thread( () => DataQuery_vQuerySingleData( product_id, use_custmer_id ) );
+						trdQueryData = new Thread( () => DataQuery_vQuerySingleData( product_id, super_administrator_right, use_custmer_id ) );
 						trdQueryData.Start();
 					}
 				} else { //多支产品数据查询
@@ -292,7 +299,7 @@ namespace Ingenu_Power.UserControls
 					}
 					//在新线程中执行数据查询
 					if (trdQueryData == null) {
-						trdQueryData = new Thread( () => DataQuery_vQueryMultiData( limit, product_type, start_date, end_date ) ) {
+						trdQueryData = new Thread( () => DataQuery_vQueryMultiData( limit, product_type, start_date, end_date ,super_administrator_right) ) {
 							Name = "数据查询线程",
 							Priority = ThreadPriority.Lowest,
 							IsBackground = false,
@@ -301,7 +308,7 @@ namespace Ingenu_Power.UserControls
 						trdQueryData.Start();
 					} else {
 						if (trdQueryData.ThreadState != ThreadState.Stopped) { return; }
-						trdQueryData = new Thread( () => DataQuery_vQueryMultiData( limit, product_type, start_date, end_date ) );
+						trdQueryData = new Thread ( ( ) => DataQuery_vQueryMultiData ( limit, product_type, start_date, end_date, super_administrator_right ) );
 						trdQueryData.Start();
 					}
 				}				
@@ -349,7 +356,7 @@ namespace Ingenu_Power.UserControls
 			using (Database database = new Database()) {
 				database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
 				if (error_information != string.Empty) { StaticInfor.Error_Message = error_information; return; }
-				database.V_QueryedValue_Update( objDataTable, ShouldChange_RowIndex, out error_information );
+				database.V_QueryedValue_Update ( objDataTable, ShouldChange_RowIndex, out error_information );
 				if (error_information != string.Empty) { //更新数据库中的数据失败，需要将之前的数据还原
 				}
 			}
@@ -377,7 +384,7 @@ namespace Ingenu_Power.UserControls
 		/// <summary>
 		/// 多线程中具体执行数据库中数据查询的函数
 		/// </summary>
-		private void DataQuery_vQuerySingleData(string product_id, bool use_custmer_id = false)
+		private void DataQuery_vQuerySingleData(string product_id, bool super_administrator_right = false, bool use_custmer_id = false)
 		{
 			string error_information = string.Empty;
 			using (Database database = new Database()) {
@@ -388,7 +395,7 @@ namespace Ingenu_Power.UserControls
 					return;
 				}
 
-				objDataTable = database.V_QueryedValue_Get( product_id, out error_information, use_custmer_id );
+				objDataTable = database.V_QueryedValue_Get ( product_id, out error_information, super_administrator_right, use_custmer_id );
 				if (error_information != string.Empty) {
 					StaticInfor.Error_Message = error_information;
 					Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), error_information, false );
@@ -410,7 +417,7 @@ namespace Ingenu_Power.UserControls
 		/// <summary>
 		/// 多线程中具体执行数据库中数据查询的函数
 		/// </summary>
-		private void DataQuery_vQueryMultiData(bool[] limit, string product_type, DateTime start_date, DateTime end_date)
+		private void DataQuery_vQueryMultiData(bool[] limit, string product_type, DateTime start_date, DateTime end_date,bool super_administrator_right = false )
 		{
 			string error_information = string.Empty;
 			using (Database database = new Database()) {
@@ -421,7 +428,7 @@ namespace Ingenu_Power.UserControls
 					return;
 				}
 
-				objDataTable = database.V_QueryedValue_Get( limit, product_type, start_date, end_date, out error_information );
+				objDataTable = database.V_QueryedValue_Get( limit, product_type, start_date, end_date, out error_information ,super_administrator_right);
 				if (error_information != string.Empty) {
 					StaticInfor.Error_Message = error_information;
 					Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), error_information, false );

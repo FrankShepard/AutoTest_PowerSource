@@ -14,6 +14,15 @@ namespace Ingenu_Power.Domain
 		#region -- 数据库操作部分需要使用到的全局变量 
 
 		/// <summary>
+		/// 记录最终测试数据的数据表名称，记录的产品ID是唯一的
+		/// </summary>
+		const string DBO_TableName_Finnal = "[电源产品测试数据]";
+		/// <summary>
+		/// 记录临时测试数据的数据表名称，记录的产品ID可以重复，为了后续的批次数据分析
+		/// </summary>
+		const string DBO_TableName_Temp = "[电源产品测试数据_All]";
+
+		/// <summary>
 		/// 执行连接数据库操作连接的全局变量声名；
 		/// </summary>
 		private SqlConnection objConnection;
@@ -160,16 +169,25 @@ namespace Ingenu_Power.Domain
 		/// </summary>
 		/// <param name="product_id">产品ID</param>
 		/// <param name="error_information"> 可能存在的错误信息</param>
+		/// <param name="super_administrator_right">是否使用超级管理员权限进行数据的查询</param>
 		/// <param name="use_custmer_id">是否使用客户ID</param>
 		/// <returns>单片机程序相关信息</returns>
-		public DataTable V_QueryedValue_Get(string product_id ,out string error_information,bool use_custmer_id = false)
+		public DataTable V_QueryedValue_Get(string product_id ,out string error_information,bool super_administrator_right = false,bool use_custmer_id = false)
 		{
 			error_information = string.Empty;
 			DataTable dtTarget = new DataTable();
-			if (!use_custmer_id) {
-				dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE [产品ID] = '" + product_id.ToString() + "' ORDER BY [测试日期] DESC", out error_information );
+			if ( !super_administrator_right ) {
+				if ( !use_custmer_id ) {
+					dtTarget = V_QueryInfor ( "SELECT *  FROM [盈帜电源].[dbo]." + DBO_TableName_Finnal + " WHERE [产品ID] = '" + product_id.ToString ( ) + "' ORDER BY [测试日期] DESC", out error_information );
+				} else {
+					dtTarget = V_QueryInfor ( "SELECT *  FROM [盈帜电源].[dbo]." + DBO_TableName_Finnal + " WHERE [客户ID] = '" + product_id.ToString ( ) + "' ORDER BY [测试日期] DESC", out error_information );
+				}
 			} else {
-				dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE [客户ID] = '" + product_id.ToString() + "' ORDER BY [测试日期] DESC", out error_information );
+				if ( !use_custmer_id ) {
+					dtTarget = V_QueryInfor ( "SELECT *  FROM [盈帜电源].[dbo]." + DBO_TableName_Temp + " WHERE [产品ID] = '" + product_id.ToString ( ) + "' ORDER BY [测试日期] DESC", out error_information );
+				} else {
+					dtTarget = V_QueryInfor ( "SELECT *  FROM [盈帜电源].[dbo]." + DBO_TableName_Temp + " WHERE [客户ID] = '" + product_id.ToString ( ) + "' ORDER BY [测试日期] DESC", out error_information );
+				}
 			}
 			return dtTarget;
 		}
@@ -182,13 +200,18 @@ namespace Ingenu_Power.Domain
 		/// <param name="start_date">测试日期</param>
 		/// <param name="end_date">截止日期</param>
 		/// <param name="error_information"> 可能存在的错误信息</param>
+		/// <param name="super_administrator_right">是否使用超级管理员权限进行查询</param>
 		/// <returns>单片机程序相关信息</returns>
-		public DataTable V_QueryedValue_Get(bool[] limit,string product_type, DateTime start_date, DateTime end_date, out string error_information )
+		public DataTable V_QueryedValue_Get(bool[] limit,string product_type, DateTime start_date, DateTime end_date, out string error_information ,bool super_administrator_right = false)
 		{
 			error_information = string.Empty;			
 			DataTable dtTarget = new DataTable();
 
-			string SQL_SELECT_TEXT = "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE ";
+			string dbo_table_name = DBO_TableName_Finnal;
+			if(super_administrator_right ) {
+				dbo_table_name = DBO_TableName_Temp;
+			}
+			string SQL_SELECT_TEXT = "SELECT *  FROM [盈帜电源].[dbo]." + dbo_table_name + " WHERE ";
 			if (limit[ 0 ]) {
 				SQL_SELECT_TEXT += (SQL_MeasureItems[ 1 ] + " = '" + product_type + "'");
 				if ( !limit [ 2 ] ) {
@@ -226,7 +249,7 @@ namespace Ingenu_Power.Domain
 		static string [ ] SQL_MeasureItems = new string [ ] { "产品ID", "硬件IDVerion", "客户ID", "通讯或信号检查", "备电单投功能检查", "备电切断点", "备电切断点检查", "备电欠压点", "备电欠压点检查", "主电单投功能检查", "产品识别备电丢失检查", "ACDC效率", "输出空载电压1", "输出满载电压1", "输出纹波1", "负载效应1", "源效应1", "输出OCP保护点1", "输出OCP保护检查1", "输出短路保护检查1", "输出空载电压2", "输出满载电压2", "输出纹波2", "负载效应2", "源效应2", "输出OCP保护点2", "输出OCP保护检查2", "输出短路保护检查2", "输出空载电压3", "输出满载电压3", "输出纹波3", "负载效应3", "源效应3", "输出OCP保护点3", "输出OCP保护检查3", "输出短路保护检查3", "浮充电压", "均充电流", "主备电切换跌落检查", "备主电切换跌落检查", "主电欠压点", "主电欠压点检查", "主电欠压恢复点", "主电欠压恢复点检查", "主电过压点", "主电过压点检查", "主电过压恢复点", "主电过压恢复点检查", "测试日期", "合格判断" };
 
 		/// <summary>
-		///   测试数据的整体重新插入；若数据库中已经存储了数据，则需要先将数据库中的对应数据清除，再重新上传数据
+		///   测试数据的整体重新插入；在最终测试数据库中上传时若数据库中已经存储了数据，则需要先将数据库中的对应数据清除，再重新上传数据；在测试过程数据库中直接上传数据即可
 		/// </summary>
 		/// <param name="measuredValue">测试数据结构体的实例化对象</param>
 		/// <param name="error_information">可能存在的错误信息</param>
@@ -234,20 +257,21 @@ namespace Ingenu_Power.Domain
 		{
 			error_information = string.Empty;
 			try {
-				DataTable dtTarget = V_QueryInfor ( "SELECT *  FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE [产品ID] = '" + measuredValue.ProudctID + "'", out error_information );
+				DataTable dtTarget = V_QueryInfor ( "SELECT *  FROM [盈帜电源].[dbo]."+ DBO_TableName_Finnal+" WHERE [产品ID] = '" + measuredValue.ProudctID + "'", out error_information );
 				if ( dtTarget.Rows.Count > 0 ) {
 
 					using ( SqlCommand objCommand = objConnection.CreateCommand ( ) ) {
 						objCommand.Connection = objConnection;
 						objCommand.CommandType = CommandType.Text;
 						//删除数据
-						objCommand.CommandText = "DELETE FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE 产品ID = '" + measuredValue.ProudctID + "'";
+						objCommand.CommandText = "DELETE FROM [盈帜电源].[dbo]."+ DBO_TableName_Finnal + " WHERE 产品ID = '" + measuredValue.ProudctID + "'";
 						V_UpdateInfor ( objCommand, out error_information );
 						if ( error_information != string.Empty ) { return; }
 					}
 				}
 				//重新插入整条数据
-				V_MeasuredValue_Insert ( measuredValue, out error_information );
+				V_MeasuredValue_Insert ( measuredValue, DBO_TableName_Finnal,out error_information ); //仅唯一ID
+				V_MeasuredValue_Insert ( measuredValue, DBO_TableName_Temp,out error_information ); //可以多个相同ID
 			} catch {
 				error_information = "Database.V_MeasuredValue_Update 数据库操作异常  \r\n";
 			}
@@ -257,15 +281,16 @@ namespace Ingenu_Power.Domain
 		/// 测试数据的整体重新插入；
 		/// </summary>
 		/// <param name="measuredValue">测试数据结构体的实例化对象</param>
+		/// <param name="dbo_table_name">待上传的数据库的表格名称</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void V_MeasuredValue_Insert(StaticInfor.MeasuredValue measuredValue, out string error_information)
+		public void V_MeasuredValue_Insert(StaticInfor.MeasuredValue measuredValue, string dbo_table_name,out string error_information)
 		{
 			error_information = string.Empty;
 			try {
 				using (SqlCommand objCommand = objConnection.CreateCommand()) {
 					objCommand.Connection = objConnection;
 					objCommand.CommandType = CommandType.Text;
-					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[电源产品测试数据] (";
+					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo]." + dbo_table_name +" (";
 					for(int index = 0;index < SQL_MeasureItems.Length; index++) {
 						objCommand.CommandText += SQL_MeasureItems [ index ].Trim ( ); ;
 						if(index == SQL_MeasureItems.Length - 1) {
@@ -440,7 +465,7 @@ namespace Ingenu_Power.Domain
 				using (SqlCommand objCommand = objConnection.CreateCommand()) {
 					objCommand.Connection = objConnection;
 					objCommand.CommandType = CommandType.Text;
-					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[电源产品测试数据] (";
+					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo]."+ DBO_TableName_Finnal +" (";
 					for (int index = 0; index < SQL_MeasureItems.Length; index++) {
 						objCommand.CommandText += SQL_MeasureItems[ index ].Trim();
 						if (index == SQL_MeasureItems.Length - 1) {
@@ -486,7 +511,7 @@ namespace Ingenu_Power.Domain
 					objCommand.Connection = objConnection;
 					objCommand.CommandType = CommandType.Text;
 					//删除数据
-					objCommand.CommandText = "DELETE FROM [盈帜电源].[dbo].[电源产品测试数据] WHERE " + SQL_MeasureItems[ 0 ].Trim() + " = '" + dataTable.Rows[ row_index ][ SQL_MeasureItems[ 0 ] ].ToString().Trim() + "'";
+					objCommand.CommandText = "DELETE FROM [盈帜电源].[dbo]."+ DBO_TableName_Finnal +" WHERE " + SQL_MeasureItems[ 0 ].Trim() + " = '" + dataTable.Rows[ row_index ][ SQL_MeasureItems[ 0 ] ].ToString().Trim() + "'";
 					V_UpdateInfor( objCommand, out error_information );
 					if( error_information != string.Empty) { return; }
 					//重新插入整条数据

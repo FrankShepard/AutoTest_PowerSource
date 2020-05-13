@@ -118,7 +118,7 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 							//先检查备电带载情况下的状态识别
 							int wait_count = 0;
 							do {
@@ -260,7 +260,7 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, MeasureDetails.Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 							//按照标准满载进行带载 
 							decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
 							decimal [ ] max_voltages = new decimal [ infor_Output.OutputChannelCount ];
