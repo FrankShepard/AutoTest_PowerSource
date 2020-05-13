@@ -413,7 +413,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 3://备电单投启动功能检查
 									mi = id_verion.GetMethod( "Measure_vCheckSingleSpStartupAbility" );
-									parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
 									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "备电单投功能检查";
@@ -427,7 +427,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 4://强制模式启动功能检查	
 									mi = id_verion.GetMethod( "Measure_vCheckMandtoryStartupAbility" );
-									parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
 									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
 									if (( bool )arrayList[ 1 ] != false) { //元素1 - 是否存在强制模式
@@ -443,7 +443,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 5://备电切断点检查
 									mi = id_verion.GetMethod( "Measure_vCutoffVoltageCheck" );				
-									parameters = new object[] { measureCondition.Magnification,measureCondition.WholeFunction_Enable,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
 									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "备电切断点合格检查";
@@ -468,7 +468,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 6://主电单投启动功能检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSingleMpStartupAbility" );
-									parameters = new object[] { measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "主电单投功能检查";
@@ -482,7 +482,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 7://满载电压测试
 									mi = id_verion.GetMethod ( "Measure_vVoltageWithLoad" );
-									parameters = new object[] { measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "输出满载电压测试";
@@ -506,7 +506,7 @@ namespace Ingenu_Power.UserControls
 									break;								
 								case 8://测试输出纹波
 									mi = id_verion.GetMethod ( "Measure_vRapple" );
-									parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "输出纹波测试";
@@ -543,7 +543,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 10://计算AC/DC部分效率
 									mi = id_verion.GetMethod ( "Measure_vEfficiency" );
-									parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "AC/DC部分效率";
@@ -557,7 +557,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 11://测试空载电压
 									mi = id_verion.GetMethod ( "Measure_vVoltageWithoutLoad" );
-									parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "输出空载电压测试";
@@ -583,7 +583,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 12://测试均充电流
 									mi = id_verion.GetMethod ( "Measure_vCurrentEqualizedCharge" );
-									parameters = new object[] {measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "均充电流测试";
@@ -597,7 +597,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 13://测试浮充电压（此处可能需要进入电源产品的程序后门，减少充电时间）
 									mi = id_verion.GetMethod ( "Measure_vVoltageFloatingCharge" );
-									parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "浮充电压测试";
@@ -625,7 +625,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 15://计算负载效应
 									mi = id_verion.GetMethod( "Measure_vEffectLoad" );
-									parameters = new object[] { measuredValue.Voltage_WithLoad, measuredValue.Voltage_WithoutLoad };
+									parameters = new object[] { measureCondition.WholeFunction_Enable,measuredValue.Voltage_WithLoad, measuredValue.Voltage_WithoutLoad };
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
 									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "输出负载效应测试";
@@ -675,7 +675,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 17://识别备电丢失
 									mi = id_verion.GetMethod ( "Measure_vCheckDistinguishSpOpen" );
-									parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查备电丢失识别功能";
@@ -704,7 +704,7 @@ namespace Ingenu_Power.UserControls
 								case 19://主电丢失切换检查
 									Thread.Sleep ( 500 );
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpLost" );
-									parameters = new object[] {measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电丢失主备电切换功能";
@@ -718,7 +718,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 20://主电恢复存在切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpRestart" );
-									parameters = new object[] {measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电恢复主备电切换功能";
@@ -732,7 +732,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 21://主电欠压切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpUnderVoltage" );
-									parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电欠压点主备电切换功能";
@@ -751,7 +751,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 22://主电欠压恢复切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpUnderVoltageRecovery" );
-									parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable, Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电欠压恢复点主备电切换功能";
@@ -770,7 +770,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 23://主电过压切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpOverVoltage" );
-									parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable, Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电过压点主备电切换功能";
@@ -789,7 +789,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 24://主电过压恢复切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpOverVoltageRecovery" );
-									parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable, Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查主电过压恢复点主备电切换功能";
@@ -808,7 +808,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 25://测试OXP
 									mi = id_verion.GetMethod ( "Measure_vOXP" );
-									parameters = new object[] {measureCondition.Magnification,measureCondition.WholeFunction_Enable, Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "检查输出OCP/OWP功能";
@@ -833,7 +833,7 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 26://短路保护检查
 									mi = id_verion.GetMethod ( "Measure_vOutputShortProtect" );
-									parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
 									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "输出短路保护";

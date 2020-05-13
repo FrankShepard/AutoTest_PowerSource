@@ -95,17 +95,17 @@ namespace ProductInfor
 		}
 
 		#endregion
-		
+
 		#region -- 重写的测试函数部分，主要是为了保证后门程序方式及串口通讯功能、TTL电平检查功能是否正常
 
 		/// <summary>
 		/// 备电切断点检查 - 检查备电电压的采集误差
 		/// </summary>
+		/// <param name="whole_function_enable">全项测试与否</param>
 		/// <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
-		/// <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public override ArrayList Measure_vCutoffVoltageCheck( int delay_magnification, bool whole_function_enable, string port_name )
+		public override ArrayList Measure_vCutoffVoltageCheck( bool whole_function_enable,int delay_magnification, string port_name )
 		{
 			//元素0 - 可能存在的错误信息；元素1 - 备电切断点的合格检查 ；元素2 - 具体的备电切断点值；元素3 - 是否需要测试备电欠压点；元素4 - 具体的备电欠压点
 			ArrayList arrayList = new ArrayList ( );
@@ -183,13 +183,14 @@ namespace ProductInfor
 								source_voltage -= 0.5m;
 							}
 
+							Itech.GeneralData_DCPower generalData_DCPower = new Itech.GeneralData_DCPower();
 							if ( whole_function_enable == false ) { //上下限检测即可
 								int index = 0;
 								for ( index = 0 ; index < 2 ; index++ ) {
 									measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, ( infor_Sp.Qualified_CutoffLevel [ 1 - index ] + VoltageDrop ), true, true, serialPort, out error_information );
 									if ( error_information != string.Empty ) { break; }
 									Thread.Sleep ( infor_Sp.Delay_WaitForCutoff );
-									Itech.GeneralData_DCPower generalData_DCPower = measureDetails.Measure_vReadDCPowerResult ( serialPort, out error_information );
+									generalData_DCPower = measureDetails.Measure_vReadDCPowerResult ( serialPort, out error_information );
 									if ( generalData_DCPower.ActrulyCurrent < 0.05m ) {
 										break;
 									}
@@ -198,13 +199,13 @@ namespace ProductInfor
 									check_okey = true;
 								}
 							} else { //需要获取具体的数据
-								for ( decimal target_value = infor_Sp.Qualified_CutoffLevel [ 1 ] ; target_value >= infor_Sp.Qualified_CutoffLevel [ 0 ] ; target_value -= 0.1m ) {
+								for ( decimal target_value = infor_Sp.Qualified_CutoffLevel [ 1 ] ; target_value >= infor_Sp.Qualified_CutoffLevel [ 0 ] - 0.3m ; target_value -= 0.1m ) {
 									measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, ( target_value + VoltageDrop ), true, true, serialPort, out error_information );
 									Thread.Sleep ( 75 * delay_magnification );
-									Itech.GeneralData_DCPower generalData_DCPower = measureDetails.Measure_vReadDCPowerResult ( serialPort, out error_information );
+									generalData_DCPower = measureDetails.Measure_vReadDCPowerResult ( serialPort, out error_information );
 									if ( generalData_DCPower.ActrulyCurrent < 0.05m ) {
 										check_okey = true;
-										specific_value = target_value + 0.2m; //快速下降实际上需要延迟等待才可以关闭
+										specific_value = target_value + 0.3m; //快速下降实际上需要延迟等待才可以关闭
 										decimal distance = specific_value - infor_Sp.Target_CutoffVoltageLevel; //实际电压与目标电压的设计差值
 										undervoltage_value = infor_Sp.Target_UnderVoltageLevel + distance; //根据实际的计算偏差得到的备电欠压点
 										Thread.Sleep( 500 );
@@ -215,6 +216,15 @@ namespace ProductInfor
 							//关闭备电，等待测试人员确认蜂鸣器响
 							Thread.Sleep( 3300 ); //非面板式电源的蜂鸣器只在关断输出一段时间之后才会响，所以此处的延时时间不可忽略
 							Thread.Sleep ( delay_magnification * 100 ); //保证蜂鸣器能响
+							//将备电电压设置到19V以下，验证备电自杀功能
+							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, 19m, true, true, serialPort, out error_information );
+							if(error_information != string.Empty) { continue; }
+							Thread.Sleep( 100 );
+							Thread.Sleep( delay_magnification * 50 );
+							generalData_DCPower = measureDetails.Measure_vReadDCPowerResult( serialPort, out error_information );
+							if (generalData_DCPower.ActrulyCurrent > 0.08m) { //需要注意：程控直流电源采集输出电流存在偏差，此处设置为80mA防止错误判断
+								error_information = "待测电源的自杀功能失败，请注意此异常"; continue;
+							}
 							measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, source_voltage, true, false, serialPort, out error_information );
 						}
 					}
@@ -232,10 +242,11 @@ namespace ProductInfor
 		/// <summary>
 		/// 满载电压测试 - 检查主电情况下输出电压和电流的采集误差
 		/// </summary>
+		/// <param name="whole_function_enable">全项测试与否</param>
 		/// <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public override ArrayList Measure_vVoltageWithLoad( int delay_magnification, string port_name )
+		public override ArrayList Measure_vVoltageWithLoad(bool whole_function_enable,int delay_magnification, string port_name )
 		{
 			ArrayList arrayList = new ArrayList ( );//元素0 - 可能存在的错误信息 ； 元素1 - 输出通道数量 ； 元素2+index 为输出满载电压的合格与否判断；元素 2+ index + arrayList[1] 为满载输出电压具体值
 			string error_information = string.Empty;

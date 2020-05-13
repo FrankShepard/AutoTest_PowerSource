@@ -436,11 +436,11 @@ namespace ProductInfor
 		/// <summary>
 		/// 检查电源的备电切断点
 		/// </summary>
-		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
 		/// <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>包含多个信息的动态数组</returns>
-		public override ArrayList Measure_vCutoffVoltageCheck(int delay_magnification, bool whole_function_enable, string port_name)
+		public override ArrayList Measure_vCutoffVoltageCheck(bool whole_function_enable, int delay_magnification,string port_name)
 		{
 			//元素0 - 可能存在的错误信息；元素1 - 备电切断点的合格检查 ；元素2 - 具体的备电切断点值；元素3 - 是否需要测试备电欠压点；元素4 - 具体的备电欠压点
 			ArrayList arrayList = new ArrayList();
@@ -510,13 +510,13 @@ namespace ProductInfor
 									check_okey = true;
 								}
 							} else { //需要获取具体的数据
-								for (decimal target_value = infor_Sp.Qualified_CutoffLevel[ 1 ]; target_value >= infor_Sp.Qualified_CutoffLevel[ 0 ]; target_value -= 0.1m) {
+								for (decimal target_value = infor_Sp.Qualified_CutoffLevel[ 1 ]; target_value >= infor_Sp.Qualified_CutoffLevel[ 0 ] - 0.3m; target_value -= 0.1m) {
 									measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, (target_value + VoltageDrop), true, true, serialPort, out error_information );
 									Thread.Sleep( 75 * delay_magnification );
 									Itech.GeneralData_DCPower generalData_DCPower = measureDetails.Measure_vReadDCPowerResult( serialPort, out error_information );
 									if (generalData_DCPower.ActrulyCurrent < 0.05m) {
 										check_okey = true;
-										specific_value = target_value + 0.2m; //快速下降实际上需要延迟等待才可以关闭
+										specific_value = target_value + 0.3m; //快速下降实际上需要延迟等待才可以关闭
 										decimal distance = specific_value - infor_Sp.Target_CutoffVoltageLevel; //实际电压与目标电压的设计差值
 										undervoltage_value = infor_Sp.Target_UnderVoltageLevel + distance; //根据实际的计算偏差得到的备电欠压点
 										break;
@@ -545,10 +545,11 @@ namespace ProductInfor
 		/// <summary>
 		/// 满载电压测试 - 检查主电情况下输出电压和电流的采集误差
 		/// </summary>
+		/// <param name="whole_function_enable">全项测试与否</param>
 		/// <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public override ArrayList Measure_vVoltageWithLoad(int delay_magnification, string port_name)
+		public override ArrayList Measure_vVoltageWithLoad(bool whole_function_enable,int delay_magnification, string port_name)
 		{
 			ArrayList arrayList = new ArrayList();//元素0 - 可能存在的错误信息 ； 元素1 - 输出通道数量 ； 元素2+index 为输出满载电压的合格与否判断；元素 2+ index + arrayList[1] 为满载输出电压具体值
 			string error_information = string.Empty;

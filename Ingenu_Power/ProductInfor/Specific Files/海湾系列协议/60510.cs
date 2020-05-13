@@ -420,19 +420,20 @@ namespace ProductInfor
 				}
 			}
 		}
-	
 
-#endregion
+
+		#endregion
 
 		#region -- 重写的测试函数部分，主要是为了保证后门程序方式及串口通讯功能、TTL电平检查功能是否正常
-		
+
 		/// <summary>
 		/// 满载电压测试 - 检查主电情况下输出电压和电流的采集误差
 		/// </summary>
+		/// <param name="whole_function_enable">全项测试与否</param>
 		/// <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
 		/// <param name="port_name">使用到的串口名</param>
 		/// <returns>可能存在的故障信息</returns>
-		public override ArrayList Measure_vVoltageWithLoad( int delay_magnification, string port_name )
+		public override ArrayList Measure_vVoltageWithLoad( bool whole_function_enable,int delay_magnification, string port_name )
 		{
 			ArrayList arrayList = new ArrayList ( );//元素0 - 可能存在的错误信息 ； 元素1 - 输出通道数量 ； 元素2+index 为输出满载电压的合格与否判断；元素 2+ index + arrayList[1] 为满载输出电压具体值
 			string error_information = string.Empty;

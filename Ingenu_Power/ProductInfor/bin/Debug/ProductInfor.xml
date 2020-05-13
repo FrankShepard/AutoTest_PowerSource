@@ -566,51 +566,56 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCheckSingleSpStartupAbility(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCheckSingleSpStartupAbility(System.Boolean,System.Int32,System.String)">
             <summary>
             测试备电单投功能
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCheckMandtoryStartupAbility(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCheckMandtoryStartupAbility(System.Boolean,System.Int32,System.String)">
             <summary>
             检查电源的强制启动功能是否正常
             </summary>
+            <param name="whole_function_enable">全项测试与否</param> 
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
             <summary>
             检查电源的备电切断点
             </summary>
+            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>		
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCheckSingleMpStartupAbility(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCheckSingleMpStartupAbility(System.Boolean,System.Int32,System.String)">
             <summary>
             测试主电单投功能
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vVoltageWithLoad(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             测试满载输出电压
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vRapple(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vRapple(System.Boolean,System.Int32,System.String)">
             <summary>
             测试输出纹波
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
@@ -625,39 +630,43 @@
             <param name="sp_output_enable">备电输出与否</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vEfficiency(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vEfficiency(System.Boolean,System.Int32,System.String)">
             <summary>
             计算AC/DC部分效率
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vVoltageWithoutLoad(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vVoltageWithoutLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             测试空载电压
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCurrentEqualizedCharge(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCurrentEqualizedCharge(System.Boolean,System.Int32,System.String)">
             <summary>
             测试均充电流
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vVoltageFloatingCharge(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vVoltageFloatingCharge(System.Boolean,System.Int32,System.String)">
             <summary>
             测试浮充电压
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vEffectLoad(System.Decimal[],System.Decimal[])">
+        <member name="M:ProductInfor.Base.Measure_vEffectLoad(System.Boolean,System.Decimal[],System.Decimal[])">
             <summary>
             计算负载效益
             </summary>
@@ -672,67 +681,70 @@
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCheckDistinguishSpOpen(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCheckDistinguishSpOpen(System.Boolean,System.Int32,System.String)">
             <summary>
             识别备电丢失
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpLost(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpLost(System.Boolean,System.Int32,System.String)">
             <summary>
             主电丢失切换检查
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpRestart(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpRestart(System.Boolean,System.Int32,System.String)">
             <summary>
             主电恢复存在切换检查
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpUnderVoltage(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpUnderVoltage(System.Boolean,System.Int32,System.String)">
             <summary>
             主电欠压切换检查
             </summary>
+            /// <param name="whole_function_enable">全项测试，为true时需要获取具体的主电欠压点</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="whole_function_enable">全项测试，为true时需要获取具体的主电欠压点</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpUnderVoltageRecovery(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpUnderVoltageRecovery(System.Boolean,System.Int32,System.String)">
             <summary>
             主电欠压恢复切换检查
             </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="whole_function_enable">全项测试，为true时需要获取具体的主电欠压恢复点</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpOverVoltage(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpOverVoltage(System.Boolean,System.Int32,System.String)">
             <summary>
             主电过压切换检查
             </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="whole_function_enable">全项测试，为true时需要获取具体的主电过压点</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpOverVoltageRecovery(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vCheckSourceChangeMpOverVoltageRecovery(System.Boolean,System.Int32,System.String)">
             <summary>
             主电过压恢复切换检查
             </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="whole_function_enable">全项测试，为true时需要获取具体的主电过压恢复点</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vOXP(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vOXP(System.Boolean,System.Int32,System.String)">
             <summary>
             测试OXP
             </summary>
@@ -741,10 +753,11 @@
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vOutputShortProtect(System.Int32,System.String)">
+        <member name="M:ProductInfor.Base.Measure_vOutputShortProtect(System.Boolean,System.Int32,System.String)">
             <summary>
             短路保护检查
             </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
@@ -1410,19 +1423,20 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor._60710.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor._60710.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
             <summary>
             备电切断点检查 - 检查备电电压的采集误差
             </summary>
-            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
-        <member name="M:ProductInfor._60710.Measure_vVoltageWithLoad(System.Int32,System.String)">
+        <member name="M:ProductInfor._60710.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             满载电压测试 - 检查主电情况下输出电压和电流的采集误差
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
@@ -1921,23 +1935,25 @@
             <param name="serialPort">使用到的串口对象</param>
             <param name="error_information">可能存在的异常</param>
         </member>
-        <member name="M:ProductInfor._67510.Measure_vCheckSingleSpStartupAbility(System.Int32,System.String)">
+        <member name="M:ProductInfor._67510.Measure_vCheckSingleSpStartupAbility(System.Boolean,System.Int32,System.String)">
             <summary>
             测试备电单投功能
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor._67510.Measure_vCheckMandtoryStartupAbility(System.Int32,System.String)">
+        <member name="M:ProductInfor._67510.Measure_vCheckMandtoryStartupAbility(System.Boolean,System.Int32,System.String)">
             <summary>
             检查电源的强制启动功能是否正常
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor._67510.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor._67510.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
             <summary>
             备电切断点检查 - 检查备电电压的采集误差
             </summary>
@@ -1946,39 +1962,61 @@
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
-        <member name="M:ProductInfor._67510.Measure_vVoltageWithLoad(System.Int32,System.String)">
+        <member name="M:ProductInfor._67510.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             满载电压测试 - 检查主电情况下输出电压和电流的采集误差
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
-        <member name="M:ProductInfor._67510.Measure_vRapple(System.Int32,System.String)">
+        <member name="M:ProductInfor._67510.Measure_vRapple(System.Boolean,System.Int32,System.String)">
             <summary>
             测试输出纹波
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor._67510.Measure_vCurrentEqualizedCharge(System.Int32,System.String)">
+        <member name="M:ProductInfor._67510.Measure_vCurrentEqualizedCharge(System.Boolean,System.Int32,System.String)">
             <summary>
             测试均充电流
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor._67510.Measure_vVoltageFloatingCharge(System.Int32,System.String)">
+        <member name="M:ProductInfor._67510.Measure_vVoltageFloatingCharge(System.Boolean,System.Int32,System.String)">
             <summary>
             测试浮充电压
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor._67510.Measure_vOXP(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor._67510.Measure_vCheckSourceChangeMpLost(System.Boolean,System.Int32,System.String)">
+            <summary>
+            主电丢失切换检查
+            </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Measure_vCheckSourceChangeMpRestart(System.Boolean,System.Int32,System.String)">
+            <summary>
+            主电恢复存在切换检查
+            </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
+        <member name="M:ProductInfor._67510.Measure_vOXP(System.Boolean,System.Int32,System.String)">
             <summary>
             测试OXP
             </summary>
@@ -1987,10 +2025,11 @@
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor._67510.Measure_vOutputShortProtect(System.Int32,System.String)">
+        <member name="M:ProductInfor._67510.Measure_vOutputShortProtect(System.Boolean,System.Int32,System.String)">
             <summary>
             短路保护检查 - 应急照明系列电源仅需对输出2进行短路
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
@@ -2000,26 +2039,10 @@
             继承自 _67510 的 IG-Z2182F 电源的相关信息
             </summary>
         </member>
-        <member name="M:ProductInfor._69611.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
-        </member>
         <member name="T:ProductInfor._69511">
             <summary>
             继承自 _67510 的 IG-Z2121F 电源的相关信息
             </summary>
-        </member>
-        <member name="M:ProductInfor._69511.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._69411">
             <summary>
@@ -2031,14 +2054,6 @@
             继承自 _67510 的 IG-Z2121K 电源的相关信息
             </summary>
         </member>
-        <member name="M:ProductInfor._69311.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
-        </member>
         <member name="T:ProductInfor._68910">
             <summary>
             继承自 _67510 的 IG-Z2071K 电源的相关信息
@@ -2048,14 +2063,6 @@
             <summary>
             继承自 _67510 的 IG-Z2181F 电源的相关信息
             </summary>
-        </member>
-        <member name="M:ProductInfor._68811.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._68710">
             <summary>
@@ -2067,26 +2074,10 @@
             继承自 _67510 的 IG-Z2272K 电源的相关信息
             </summary>
         </member>
-        <member name="M:ProductInfor._66210.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
-        </member>
         <member name="T:ProductInfor._66110">
             <summary>
             继承自 _67510 的 IG-Z2182K 电源的相关信息
             </summary>
-        </member>
-        <member name="M:ProductInfor._66110.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._66010">
             <summary>
@@ -2098,26 +2089,10 @@
             继承自 _67510 的 IG-Z2181K 电源的相关信息
             </summary>
         </member>
-        <member name="M:ProductInfor._65910.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
-        </member>
         <member name="T:ProductInfor._65810">
             <summary>
             继承自 _67510 的 IG-Z2121K 电源的相关信息
             </summary>
-        </member>
-        <member name="M:ProductInfor._65810.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._65710">
             <summary>
@@ -2129,26 +2104,10 @@
             继承自 _67510 的 IG-Z2272H 电源的相关信息
             </summary>
         </member>
-        <member name="M:ProductInfor._65610.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
-        </member>
         <member name="T:ProductInfor._65510">
             <summary>
             继承自 _67510 的 IG-Z2182H 电源的相关信息
             </summary>
-        </member>
-        <member name="M:ProductInfor._65510.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._65410">
             <summary>
@@ -2165,26 +2124,10 @@
             继承自 _67510 的 IG-Z2272F 电源的相关信息
             </summary>
         </member>
-        <member name="M:ProductInfor._63310.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
-        </member>
         <member name="T:ProductInfor._63210">
             <summary>
             继承自 _67510 的 IG-Z2182F 电源的相关信息
             </summary>
-        </member>
-        <member name="M:ProductInfor._63210.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._63110">
             <summary>
@@ -2201,78 +2144,30 @@
             继承自 _67510 的 IG-Z2121F 电源的相关信息
             </summary>
         </member>
-        <member name="M:ProductInfor._62710.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
-        </member>
         <member name="T:ProductInfor._62810">
             <summary>
             继承自 _67510 的 IG-Z2181F 电源的相关信息
             </summary>
-        </member>
-        <member name="M:ProductInfor._62810.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._65310">
             <summary>
             继承自 _67510 的 IG-Z2181H 电源的相关信息
             </summary>
         </member>
-        <member name="M:ProductInfor._65310.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
-        </member>
         <member name="T:ProductInfor._65210">
             <summary>
             继承自 _67510 的 IG-Z2121H 电源的相关信息
             </summary>
-        </member>
-        <member name="M:ProductInfor._65210.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._67710">
             <summary>
             继承自 _67510 的 IG-Z2272L 电源的相关信息
             </summary>
         </member>
-        <member name="M:ProductInfor._67710.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
-        </member>
         <member name="T:ProductInfor._67610">
             <summary>
             继承自 _67510 的 IG-Z2182L 电源的相关信息
             </summary>
-        </member>
-        <member name="M:ProductInfor._67610.Measure_vRapple(System.Int32,System.String)">
-            <summary>
-            测试输出纹波
-            </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._61710">
             <summary>
@@ -2412,19 +2307,20 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor._61710.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor._61710.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
             <summary>
             检查电源的备电切断点
             </summary>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
-        <member name="M:ProductInfor._61710.Measure_vVoltageWithLoad(System.Int32,System.String)">
+        <member name="M:ProductInfor._61710.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             满载电压测试 - 检查主电情况下输出电压和电流的采集误差
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
@@ -2452,19 +2348,20 @@
             <param name="SerialportData">串口接收数据</param>
             <returns>仪表响应，正确与否的判定依据</returns>
         </member>
-        <member name="M:ProductInfor._60610.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor._60610.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
             <summary>
             备电切断点检查 - 检查备电电压的采集误差
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
-            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
-        <member name="M:ProductInfor._60610.Measure_vVoltageWithLoad(System.Int32,System.String)">
+        <member name="M:ProductInfor._60610.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             满载电压测试 - 检查主电情况下输出电压和电流的采集误差
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
@@ -3049,19 +2946,20 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor._64910.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor._64910.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
             <summary>
             备电切断点检查 - 检查备电电压的采集误差
             </summary>
-            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
-        <member name="M:ProductInfor._64910.Measure_vVoltageWithLoad(System.Int32,System.String)">
+        <member name="M:ProductInfor._64910.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             满载电压测试 - 检查主电情况下输出电压和电流的采集误差
             </summary>
+            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
@@ -3089,19 +2987,20 @@
             <param name="SerialportData">串口接收数据</param>
             <returns>仪表响应，正确与否的判定依据</returns>
         </member>
-        <member name="M:ProductInfor._60010.Measure_vCutoffVoltageCheck(System.Int32,System.Boolean,System.String)">
+        <member name="M:ProductInfor._60010.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
             <summary>
             备电切断点检查 - 检查备电电压的采集误差
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
-            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
-        <member name="M:ProductInfor._60010.Measure_vVoltageWithLoad(System.Int32,System.String)">
+        <member name="M:ProductInfor._60010.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             满载电压测试 - 检查主电情况下输出电压和电流的采集误差
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
@@ -3242,10 +3141,11 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor._60510.Measure_vVoltageWithLoad(System.Int32,System.String)">
+        <member name="M:ProductInfor._60510.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             满载电压测试 - 检查主电情况下输出电压和电流的采集误差
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>

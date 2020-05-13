@@ -1049,9 +1049,9 @@ namespace Instrument_Control
 				McuCalibrate_vCommandSend( complete_cmd, serialPort, out error_information );
 				if (error_information == string.Empty) {
 					//接收代码查看信息
-					need_retry = McuCalibrate_vCheckRespond( retry_times, complete_cmd, serialPort, out error_information );
-					retry_times++;
+					need_retry = McuCalibrate_vCheckRespond( retry_times, complete_cmd, serialPort, out error_information );					
 				}
+				retry_times++;
 			} while (need_retry && (retry_times < 10));
 		}
 
