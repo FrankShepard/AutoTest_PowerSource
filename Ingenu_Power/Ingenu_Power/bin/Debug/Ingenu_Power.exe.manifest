@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="819216">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="821296">
       <assemblyIdentity name="Ingenu_Power" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>DILH0yKnIgK1Bty9H/nqemrWybzuk6Nfopk/aSY3rjc=</dsig:DigestValue>
+        <dsig:DigestValue>OiolOMgjITOq/lyLvQp7Q9w5KnUagdJKF9SyKC7yvTA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -103,14 +103,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Microsoft.Office.Interop.Excel.dll" size="1628856">
-      <assemblyIdentity name="Microsoft.Office.Interop.Excel" version="15.0.0.0" publicKeyToken="71E9BCE111E9429C" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Microsoft.Office.Interop.Excel.dll" size="1550200">
+      <assemblyIdentity name="Microsoft.Office.Interop.Excel" version="14.0.0.0" publicKeyToken="71E9BCE111E9429C" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>byYruoLu2KjWn6xE5JG5nMotTNRIFmKRziGGgz5zCoU=</dsig:DigestValue>
+        <dsig:DigestValue>OmebSJAJVndSOiHRUyBW9535p4yZUzMh/ZfL65aSDbs=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -175,14 +175,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Office.dll" size="457384">
-      <assemblyIdentity name="office" version="15.0.0.0" publicKeyToken="71E9BCE111E9429C" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Office.dll" size="448360">
+      <assemblyIdentity name="office" version="14.0.0.0" publicKeyToken="71E9BCE111E9429C" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>VRLKvVe24fvSuWwpjYBKN5XNMX9h4VSu2zNfbBGer2I=</dsig:DigestValue>
+        <dsig:DigestValue>gI0MYsrsHnstHrxHDjHquo8CqXJxDis/pbkvEt1f3wk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -204,7 +204,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>N3XHNpQJtFPHpFRygJM/4JMacjhvyRD0M8A/rx/Qvsc=</dsig:DigestValue>
+      <dsig:DigestValue>rEdPnLhjstTZfEhrZjN+DRtDwMZtSvgN+b7lHM+xFm8=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Ingenu_Power.exe.config" size="2055">

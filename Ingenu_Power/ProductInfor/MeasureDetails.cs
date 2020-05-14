@@ -19,11 +19,11 @@ namespace ProductInfor
 		/// <summary>
 		/// 交流电源地址
 		/// </summary>
-		public const byte Address_ACPower = 12;
+		private const byte Address_ACPower = 12;
 		/// <summary>
 		/// 可调直流电源地址
 		/// </summary>
-		public const byte Address_DCPower = 27;
+		private const byte Address_DCPower = 27;
 		/// <summary>
 		/// 输出通道电子负载地址
 		/// </summary>
@@ -31,15 +31,19 @@ namespace ProductInfor
 		/// <summary>
 		/// 检测均充电流电子负载地址
 		/// </summary>
-		public const byte Address_Load_Bats = 20;
+		private const byte Address_Load_Bats = 20;
 		/// <summary>
 		/// 单个电子负载最大输入功率 - 280W
 		/// </summary>
 		const decimal SingleLoadMaxPower = 280m;
 		/// <summary>
-		/// 仪表通讯波特率 - 艾德克斯产品
+		/// 仪表通讯波特率 - 艾德克斯电子负载
 		/// </summary>
-		public const int Baudrate_Instrument_Itech = 4800;
+		public const int Baudrate_Instrument_Load = 4800;
+		/// <summary>
+		/// 仪表通讯波特率 - 艾德克斯直流电源
+		/// </summary>
+		private const int Baudrate_Instrument_DCPower = 4800;
 		/// <summary>
 		/// 仪表通讯波特率 - 程控交流电源
 		/// </summary>
@@ -51,11 +55,11 @@ namespace ProductInfor
 		/// <summary>
 		/// VISA中RM的会话号
 		/// </summary>
-		public static int SessionRM = 0;
+		private static int SessionRM = 0;
 		/// <summary>
 		/// VISA中OSC的会话号
 		/// </summary>
-		public static int SessionOSC = 0;
+		private static int SessionOSC = 0;
 		#endregion
 
 		/// <summary>
@@ -112,7 +116,7 @@ namespace ProductInfor
 									}
 								}
 
-								serialPort.BaudRate = Baudrate_Instrument_Itech;
+								serialPort.BaudRate = Baudrate_Instrument_Load;
 								/*电子负载的操作*/
 								for ( int index_load = 0 ; index_load < Address_Load_Output.Length ; index_load++ ) {
 									error_information_temp = itech.ElecLoad_vInitializate ( Address_Load_Output [ index_load ], true, serialPort );
@@ -125,6 +129,7 @@ namespace ProductInfor
 								error_information += error_information_temp;
 
 								/*主备电关闭*/
+								serialPort.BaudRate = Baudrate_Instrument_DCPower;
 								error_information_temp = itech.Itech_vRemoteControl ( Address_DCPower, Itech.RemoteControlMode.Remote, serialPort );
 								error_information += error_information_temp;
 								error_information_temp = itech.DCPower_vOutputStatusSet ( Address_DCPower, 0m, false, serialPort );
@@ -184,14 +189,14 @@ namespace ProductInfor
 								//关直流电源
 								retry_index = 0;
 								do {
-									serialPort.BaudRate = Baudrate_Instrument_Itech;
+									serialPort.BaudRate = Baudrate_Instrument_DCPower;
 									error_information = itech.Itech_vInOutOnOffSet( Address_DCPower, Itech.OnOffStatus.Off, serialPort );
 									serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
 									mcu.McuControl_vBatsOutput( false, false, MCU_Control.FixedLevel.FixedLevel_24V, serialPort, out error_information );		
 								} while ((++retry_index < 3) && (error_information != string.Empty));
 
 								//防止个别产品电源在上电、下电时异常上报不受控的信号对总线的干扰，首个负载带载
-								serialPort.BaudRate = Baudrate_Instrument_Itech;
+								serialPort.BaudRate = Baudrate_Instrument_Load;
 								itech.ElecLoad_vInputStatusSet( Address_Load_Output[ 0 ], Itech.OperationMode.CC, keep_current, Itech.OnOffStatus.On, serialPort );
 							}
 						}
@@ -495,7 +500,7 @@ namespace ProductInfor
 			error_information = string.Empty;
 			Itech.GeneralData_DCPower generalData_DCPower = new Itech.GeneralData_DCPower();
 			using (Itech itech = new Itech()) {
-				serialPort.BaudRate = Baudrate_Instrument_Itech;
+				serialPort.BaudRate = Baudrate_Instrument_DCPower;
 				int cmd_error_count = 0;
 				do {
 					generalData_DCPower = itech.DCPower_vReadParameter( Address_DCPower, serialPort, out error_information );
@@ -539,7 +544,7 @@ namespace ProductInfor
 			ArrayList arrayList = new ArrayList ( );
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
 			using ( Itech itech = new Itech ( ) ) {
-				serialPort.BaudRate = Baudrate_Instrument_Itech;
+				serialPort.BaudRate = Baudrate_Instrument_Load;
 				int cmd_error_count = 0;
 				do {
 					arrayList.Clear();
@@ -566,7 +571,7 @@ namespace ProductInfor
 			error_information = string.Empty;
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
 			using (Itech itech = new Itech()) {
-				serialPort.BaudRate = Baudrate_Instrument_Itech;
+				serialPort.BaudRate = Baudrate_Instrument_Load;
 				int cmd_error_count = 0;
 				do {
 					generalData_Load = itech.ElecLoad_vReadMeasuredValue( Address_Load_Bats, serialPort, out error_information );
@@ -590,7 +595,7 @@ namespace ProductInfor
 		{
 			error_information = string.Empty;
 			using (Itech itech = new Itech()) {
-				serialPort.BaudRate = Baudrate_Instrument_Itech;
+				serialPort.BaudRate = Baudrate_Instrument_Load;
 				int cmd_error_count = 0;
 				do {
 					for (int index = 0; index < Address_Load_Output.Length; index++) {
@@ -630,7 +635,7 @@ namespace ProductInfor
 					onOffStatus = Itech.OnOffStatus.On;
 				}
 
-				serialPort.BaudRate = Baudrate_Instrument_Itech;
+				serialPort.BaudRate = Baudrate_Instrument_Load;
 				int cmd_error_count = 0;
 				do {
 					if (input_status) {
@@ -664,7 +669,7 @@ namespace ProductInfor
 					onOffStatus = Itech.OnOffStatus.On;
 				}
 
-				serialPort.BaudRate = Baudrate_Instrument_Itech;
+				serialPort.BaudRate = Baudrate_Instrument_Load;
 				int cmd_error_count = 0;
 				do {
 					for ( int index = 0 ; index < Address_Load_Output.Length ; index++ ) {
@@ -692,7 +697,7 @@ namespace ProductInfor
 				onOffStatus = Itech.OnOffStatus.On;
 			}
 			using ( Itech itech = new Itech ( ) ) {
-				serialPort.BaudRate = Baudrate_Instrument_Itech;
+				serialPort.BaudRate = Baudrate_Instrument_Load;
 				int cmd_error_count = 0;
 				do {
 					if ( input_status ) {
@@ -728,7 +733,7 @@ namespace ProductInfor
 					
 					int cmd_error_count = 0;
 					do {
-						serialPort.BaudRate = Baudrate_Instrument_Itech;
+						serialPort.BaudRate = Baudrate_Instrument_DCPower;
 						error_information = itech.DCPower_vOutputStatusSet( Address_DCPower, source_voltage, output_enable, serialPort );
 						if (error_information != string.Empty) { continue; }
 						Thread.Sleep( 50 );

@@ -162,6 +162,55 @@ namespace Ingenu_Power.Domain
 
 		#endregion
 
+		#region -- 更新dll文件相关信息
+
+		/// <summary>
+		/// 上传数据
+		/// </summary>
+		/// <param name="file_bin">待上传的文件</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void V_UpdateFile(byte[] file_bin,out string error_information)
+		{
+			error_information = string.Empty;
+			try {
+				using (SqlCommand objCommand = objConnection.CreateCommand()) {
+					objCommand.Connection = objConnection;
+					objCommand.CommandType = CommandType.Text;
+					//先删除现存的数据，再更新
+					objCommand.CommandText = "DELETE FROM [盈帜电源].[dbo].[dll文件保存表]";
+					V_UpdateInfor( objCommand, out error_information );
+					if(error_information != string.Empty) { return; }
+
+
+					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[dll文件保存表] (ProductInfor文件,修改时间) VALUES (@ProductInfor文件,@修改时间)";
+					//插入数据的填充
+					objCommand.Parameters.Clear();
+					objCommand.Parameters.AddWithValue( "@ProductInfor文件", file_bin );
+					objCommand.Parameters.AddWithValue( "@修改时间", DateTime.Now );
+
+					V_UpdateInfor( objCommand, out error_information );
+				}
+			} catch (Exception ex) {
+				error_information += ex.ToString();
+				error_information += "Database.V_UpdateFile 数据库操作异常  \r\n";
+			}
+		}
+
+		/// <summary>
+		/// 下载数据
+		/// </summary>
+		/// <param name="error_information"></param>
+		/// <returns></returns>
+		public DataTable V_DownloadFile(out string error_information)
+		{
+			error_information = string.Empty;
+			DataTable dtTarget = new DataTable();
+			dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[dll文件保存表] ORDER BY [修改时间] DESC", out error_information );
+			return dtTarget;
+		}
+
+		#endregion
+
 		#region -- 产品测试数据的获取与更新
 
 		/// <summary>
@@ -623,9 +672,7 @@ namespace Ingenu_Power.Domain
 			}
 		}
 		
-		#endregion
-
-		
+		#endregion		
 
 		#region -- 垃圾回收机制 
 

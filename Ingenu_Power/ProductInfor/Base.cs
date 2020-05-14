@@ -946,7 +946,7 @@ namespace ProductInfor
 			} while (error_information != string.Empty);
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
 			for (int index_of_calibration_channel = 0; index_of_calibration_channel < infor_Output.OutputChannelCount; index_of_calibration_channel++) {
-				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 				for (int index_of_load = 0; index_of_load < MeasureDetails.Address_Load_Output.Length; index_of_load++) {
 					if (channel[ index_of_load ] == index_of_calibration_channel) {
 						//注意：本电源的输出在开机前一段时间被锁定，需要在输出电压超过标称电压的0.98倍之后才可以进行输出电压的校准;
@@ -1002,7 +1002,7 @@ namespace ProductInfor
 			 //等电流采集准确,注意：从电子负载获取测试值时产品MCU依然在进行数据采集，不同产品的此处电流获取方式不同，需要根据实际情况决定
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
 			for (int index_of_calibration_channel = 0; index_of_calibration_channel < infor_Output.OutputChannelCount; index_of_calibration_channel++) {
-				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 				decimal current = 0m;
 				for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
 					if ((channel[ index ] == index_of_calibration_channel) && (currents[ index ] != 0m)) {
@@ -1100,7 +1100,7 @@ namespace ProductInfor
 			//在备电启动之后才可以正常带载
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
 			for (int index_of_calibration_channel = 0; index_of_calibration_channel < infor_Output.OutputChannelCount; index_of_calibration_channel++) {
-				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 				decimal current = 0m;
 				for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++) {
 					if ((channel[ index ] == index_of_calibration_channel) && (currents[ index ] != 0m)) {
@@ -2096,7 +2096,7 @@ namespace ProductInfor
 									if ( infor_Output.Stabilivolt [ index_of_channel ] == false ) {
 										for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
 											if ( allocate_channel [ index_of_load ] == index_of_channel ) {
-												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 												generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
 												if ( generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount ) {
 													check_okey = false;
@@ -2172,7 +2172,7 @@ namespace ProductInfor
 								for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
 									for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
 										if ( allocate_channel [ index_of_load ] == index_of_channel ) {
-											serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+											serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 											generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
 											if ( generalData_Load.ActrulyVoltage < 0.95m * infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) {
 												check_okey = false;
@@ -2340,7 +2340,7 @@ namespace ProductInfor
 										if ( infor_Output.Stabilivolt [ index_of_channel ] == false ) {
 											for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
 												if ( allocate_channel [ index_of_load ] == index_of_channel ) {
-													serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+													serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 													generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
 													if ( generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount ) {
 														check_okey = false;
@@ -2500,7 +2500,7 @@ namespace ProductInfor
 									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
 										for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
 											if ( allocate_channel [ index_of_load ] == index_of_channel ) {
-												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 												generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
 												if ( generalData_Load.ActrulyVoltage < 0.95m * infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) {
 													check_okey = false;
@@ -2669,7 +2669,7 @@ namespace ProductInfor
 										if ( infor_Output.Stabilivolt [ index_of_channel ] == false ) {
 											for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
 												if ( allocate_channel [ index_of_load ] == index_of_channel ) {
-													serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+													serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 													generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
 													if ( generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount ) {
 														check_okey = false;
@@ -2829,7 +2829,7 @@ namespace ProductInfor
 									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
 										for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
 											if ( allocate_channel [ index_of_load ] == index_of_channel ) {
-												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 												generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
 												if ( generalData_Load.ActrulyVoltage < 0.95m * infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) {
 													check_okey = false;
@@ -2960,7 +2960,7 @@ namespace ProductInfor
 											bool effect_others = false;
 											for (int index_allocate = 0; index_allocate < MeasureDetails.Address_Load_Output.Length; index_allocate++) {
 												if ((order[allocate_channel[ index_allocate ]] == order_index ) && (!oxp_work)) {
-													serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+													serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 													Itech.GeneralData_Load generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_allocate ], serialPort, out error_information );
 													if (generalData_Load.ActrulyVoltage < infor_Output.Qualified_OutputVoltageWithLoad[ order[ order_index ], 0 ] * 0.5m) { //指定输出通道电压过低认为过流保护已经生效	
 														specific_value[ order[ order_index ] ] = target_value - 0.1m;
@@ -3008,7 +3008,7 @@ namespace ProductInfor
 														Thread.Sleep( infor_Output.Delay_WaitForOXP );
 													} else {
 														int retry_count = 0;
-														serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+														serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 														do {															
 															generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_allocate ], serialPort, out error_information );
 															Thread.Sleep( 200 );

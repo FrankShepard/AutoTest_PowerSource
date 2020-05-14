@@ -933,9 +933,14 @@
             单个电子负载最大输入功率 - 280W
             </summary>
         </member>
-        <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument_Itech">
+        <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument_Load">
             <summary>
-            仪表通讯波特率 - 艾德克斯产品
+            仪表通讯波特率 - 艾德克斯电子负载
+            </summary>
+        </member>
+        <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument_DCPower">
+            <summary>
+            仪表通讯波特率 - 艾德克斯直流电源
             </summary>
         </member>
         <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument_ACPower">

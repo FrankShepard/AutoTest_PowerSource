@@ -1913,7 +1913,7 @@ namespace ProductInfor
 									if ( infor_Output.Stabilivolt [ index_of_channel ] == false ) {
 										for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
 											if ( allocate_channel [ index_of_load ] == index_of_channel ) {
-												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 												generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
 												if ( generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount ) {
 													check_okey = false;
@@ -1990,7 +1990,7 @@ namespace ProductInfor
 									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
 										for ( int index_of_load = 0 ; index_of_load < MeasureDetails.Address_Load_Output.Length ; index_of_load++ ) {
 											if ( allocate_channel [ index_of_load ] == index_of_channel ) {
-												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Itech;
+												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
 												generalData_Load = itech.ElecLoad_vReadMeasuredValue ( MeasureDetails.Address_Load_Output [ index_of_load ], serialPort, out error_information );
 												if ( generalData_Load.ActrulyVoltage < 0.95m * infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) {
 													check_okey = false;

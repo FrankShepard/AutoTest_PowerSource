@@ -1,10 +1,13 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Ingenu_Power.Domain;
 using Microsoft.Office.Interop.Excel;
+using Microsoft.Win32;
 
 namespace Ingenu_Power
 {
@@ -48,7 +51,7 @@ namespace Ingenu_Power
 		/// <summary>
 		/// 内存回收周期（单位ms）
 		/// </summary>
-		public const double TIM_MemoryClearTime = ( double ) 30000;
+		public const double TIM_MemoryClearTime = ( double ) 30000;		
 
 		#endregion
 
@@ -289,6 +292,7 @@ namespace Ingenu_Power
 
 		#region -- 线程间委托及函数
 
+		private delegate void Dlg_PkiKindChange(MaterialDesignThemes.Wpf.PackIconKind packIconKind);
 		public delegate void Dlg_MessageTips(string message, bool cancel_showed = false);
 
 		/// <summary>
@@ -304,6 +308,11 @@ namespace Ingenu_Power
 			}
 		}
 
+		private void PkiKindChange(MaterialDesignThemes.Wpf.PackIconKind packIconKind)
+		{
+			PkiSyncDll.Kind = packIconKind;
+		}
+
 		#endregion
 
 		/// <summary>
@@ -313,12 +322,24 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void PkiSyncDll_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
+			bool can_refresh_dll_data = false;
+			
 			if(ucMeasure.trdMeasure == null) { //测试线程不存在，可以更新dll
-
+				can_refresh_dll_data = true;
 			} else {
 				if (!ucMeasure.trdMeasure.IsAlive) {//测试线程没有激活，可以更新dll
-
+					can_refresh_dll_data = true;
 				}
+			}
+
+			if (can_refresh_dll_data) {
+				Thread trdFileRefresh = new Thread(() => Main_vRefreshDllFile( StaticInfor.UserRightLevel ) ) {
+						Name = "DLL文件更新线程",
+						Priority = ThreadPriority.AboveNormal,
+						IsBackground = true
+					};
+				trdFileRefresh.SetApartmentState( ApartmentState.STA );
+				trdFileRefresh.Start();
 			}
 		}
 
@@ -335,6 +356,79 @@ namespace Ingenu_Power
 				PkiSyncDll.ToolTip = "测试使用的 dll文件，更新完成";
 			}
 		}
+
+		#region -- 最重要的dll文件更新与下载功能
+
+		/// <summary>
+		/// 将任意对象转为数组的形式
+		/// </summary>
+		/// <param name="obj">任意对象</param>
+		/// <returns>内存中的数组形式</returns>
+		public static byte[] ObjectToBytes(object obj)
+		{
+			/*数据库中保存的本来就是二进制数组，此处强制转换为byte[]即可，不要进行其他的处理*/
+			return ( byte[] )obj;
+		}
+
+		/// <summary>
+		/// 上传Dll文件的函数
+		/// </summary>
+		/// <param name="right_level">操作权限级别</param>
+		private void Main_vRefreshDllFile(int right_level)
+		{
+			string error_information = string.Empty;
+			string error_information_temp = string.Empty;
+			for (int index_temp = 0; index_temp < 2; index_temp++) {
+				if (index_temp == 0) {
+					if (right_level >= 5) { //超级管理员权限双击此处的实际功能是上传新dll
+						OpenFileDialog openFileDialog = new OpenFileDialog {
+							Filter = "dll文件(*.dll)|*.dll",
+							RestoreDirectory = true //保护对话框记忆的上次打开的目录
+						};
+						if (( bool )openFileDialog.ShowDialog() == true) {
+							//将选中的文件转成数据流填充到结构体对象的待上传数据中
+							FileStream fs = new FileStream( openFileDialog.FileName, FileMode.Open );
+							byte[] binfile = new byte[ fs.Length ];
+							fs.Read( binfile, 0, binfile.Length );
+							fs.Close();
+
+							//实际上传
+							using (Database database = new Database()) {
+								database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information_temp );
+								if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
+								database.V_UpdateFile( binfile, out error_information_temp );
+								if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
+							}
+
+							//图标变化
+							Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
+						}
+					} else { //其它权限双击此处执行的是下载dll
+						using (Database database = new Database()) {
+							database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information_temp );
+							if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
+							System.Data.DataTable dataTable = database.V_DownloadFile( out error_information_temp );
+							if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
+							if (dataTable.Rows.Count > 0) {
+								string bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
+								FileStream fs = new FileStream( bin_filePath, FileMode.Create, FileAccess.Write );
+								byte[] file_data = ObjectToBytes( dataTable.Rows[ 0 ][ "ProductInfor文件" ] );
+								fs.Write( file_data, 0, file_data.Length );
+								fs.Close();
+							}
+
+							//图标变化
+							Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
+						}
+					}
+				} else {
+					//显示操作过程中的异常
+					Dispatcher.Invoke( new Dlg_MessageTips( MainWindow.MessageTips ), error_information );
+				}
+			}
+		}
+
+		#endregion
 
 		#region -- 内存回收 
 
