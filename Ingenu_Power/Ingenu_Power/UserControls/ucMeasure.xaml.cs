@@ -310,7 +310,8 @@ namespace Ingenu_Power.UserControls
 				if (!Directory.Exists( bin_filePath )) {//如果不存在就创建文件夹
 					Directory.CreateDirectory( bin_filePath );
 				}
-				bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
+				//bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
+				bin_filePath = Properties.Settings.Default.Dll文件保存路径;
 				//bin_filePath = @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 				Assembly assembly = Assembly.LoadFrom( bin_filePath );
 				Type[] tys = assembly.GetTypes();
@@ -340,7 +341,7 @@ namespace Ingenu_Power.UserControls
 					error_information = "没有找到对应ID和版本号的产品的测试方法"; return;
 				}
 			} catch {
-				error_information = "没有能正常加载 ProductInfor.dll";
+				error_information = "没有能正常加载用户指定的dll文件";
 			}
 
 		}
@@ -364,7 +365,8 @@ namespace Ingenu_Power.UserControls
 				if (!Directory.Exists( bin_filePath )) {//如果不存在就创建文件夹
 					Directory.CreateDirectory( bin_filePath );
 				}
-				bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
+				//bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
+				bin_filePath = Properties.Settings.Default.Dll文件保存路径;
 				//bin_filePath = @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 				Assembly assembly = Assembly.LoadFrom( bin_filePath );
 				Type [ ] tys = assembly.GetTypes();
@@ -408,12 +410,12 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 2://仪表初始化操作
 									mi = id_verion.GetMethod( "Measure_vInstrumentInitalize" );
-									parameters = new object[] { Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
 									error_information_step = mi.Invoke( obj, parameters ).ToString();									
 									break;
 								case 3://备电单投启动功能检查
 									mi = id_verion.GetMethod( "Measure_vCheckSingleSpStartupAbility" );
-									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
 									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "备电单投功能检查";
@@ -902,7 +904,7 @@ namespace Ingenu_Power.UserControls
 
 			
 			} catch(Exception ex) {				
-				error_information = "没有能正常加载 ProductInfor.dll";
+				error_information = "没有能正常加载用户指定的dll文件";
 				error_information += ex.ToString();
 			}
 

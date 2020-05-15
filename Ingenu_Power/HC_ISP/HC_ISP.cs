@@ -875,7 +875,6 @@ namespace ISP
 			int index = 0;
 			do {
 				flash_temp = ISP_vInductISPMode( sp_mcu ); //注意：一次ISP进入的等待时间最长为5ms
-				Thread.Sleep( 3 );
 			} while ((++index < 500) && (!flash_temp));
 			if (!flash_temp) {
 				error_information = "MCU进入ISP模式超时";

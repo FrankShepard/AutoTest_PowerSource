@@ -8,7 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("download/productinfor.dll")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/%e6%b6%88%e9%98%b2%e7%94%b5%e6%ba%90%e6%a3%80%e9%aa%8c%e6%8a%a5%e5%91%8" +
     "a(%e6%a0%87%e5%87%86%e5%ae%9a%e7%89%88%ef%bc%89.xls")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/485%e8%bd%ac232.png")]

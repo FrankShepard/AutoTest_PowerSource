@@ -37,30 +37,6 @@ namespace Ingenu_Power.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("192.168.1.99")]
-        public string SQL_Name {
-            get {
-                return ((string)(this["SQL_Name"]));
-            }
-            set {
-                this["SQL_Name"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("test_0")]
-        public string SQL_User {
-            get {
-                return ((string)(this["SQL_User"]));
-            }
-            set {
-                this["SQL_User"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("admin123456")]
         public string SQL_Password {
             get {
@@ -152,6 +128,42 @@ namespace Ingenu_Power.Properties {
             }
             set {
                 this["MeasureDelayMagnification"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("192.168.1.99")]
+        public string SQL_Name {
+            get {
+                return ((string)(this["SQL_Name"]));
+            }
+            set {
+                this["SQL_Name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("test_0")]
+        public string SQL_User {
+            get {
+                return ((string)(this["SQL_User"]));
+            }
+            set {
+                this["SQL_User"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Dll文件保存路径 {
+            get {
+                return ((string)(this["Dll文件保存路径"]));
+            }
+            set {
+                this["Dll文件保存路径"] = value;
             }
         }
     }

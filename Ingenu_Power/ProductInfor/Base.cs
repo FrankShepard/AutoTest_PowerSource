@@ -1045,7 +1045,7 @@ namespace ProductInfor
 					}
 				}
 				if (error_information != string.Empty) { return; }
-				Thread.Sleep( 300 ); //等待产品电源采集完成
+				Thread.Sleep( 400 ); //等待产品电源采集完成
 
 				serialPort.BaudRate = CommunicateBaudrate;
 				Communicate_Admin( serialPort, out error_information );
@@ -1758,25 +1758,27 @@ namespace ProductInfor
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
 						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
-							////对于特定电源，此处可能需要进入电源产品的程序后门，保证可以100%充电，此种情况下本函数需要重写；常用不需要改写
-							//Communicate_Admin ( serialPort, out error_information );
-							//measureDetails.Measure_vAlwaysCharging ( true, serialPort, out error_information );
-							//if ( error_information != string.Empty ) { continue; }
+							//对于特定电源，此处可能需要进入电源产品的程序后门，保证可以100%充电，此种情况下本函数需要重写；常用不需要改写
+							//using (MCU_Control mCU_Control = new MCU_Control()) {
+							//	Communicate_Admin( serialPort, out error_information );
+							//	mCU_Control.McuBackdoor_vAlwaysCharging( true, serialPort, out error_information );
+							//	if (error_information != string.Empty) { continue; }
 
-							measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CV, infor_Charge.CV_Voltage, true, out error_information );
-							if ( error_information != string.Empty ) { continue; }
-							int retry_count = 0;
-							Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
-							do {
-								Thread.Sleep ( 30 * delay_magnification );
-								generalData_Load = measureDetails.Measure_vReadChargeLoadResult ( serialPort, out error_information );
-							} while ( ( ++retry_count < 50 ) && ( generalData_Load.ActrulyCurrent < infor_Charge.Qualified_EqualizedCurrent [ 0 ] ) );
+								measureDetails.Measure_vSetChargeLoad( serialPort, Itech.OperationMode.CV, infor_Charge.CV_Voltage, true, out error_information );
+								if (error_information != string.Empty) { continue; }
+								int retry_count = 0;
+								Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
+								do {
+									Thread.Sleep( 30 * delay_magnification );
+									generalData_Load = measureDetails.Measure_vReadChargeLoadResult( serialPort, out error_information );
+								} while ((++retry_count < 50) && (generalData_Load.ActrulyCurrent < infor_Charge.Qualified_EqualizedCurrent[ 0 ]));
 
-							generalData_Load = measureDetails.Measure_vReadChargeLoadResult ( serialPort, out error_information );
-							specific_value = generalData_Load.ActrulyCurrent;
-							if ( ( specific_value >= infor_Charge.Qualified_EqualizedCurrent [ 0 ] ) && ( specific_value <= infor_Charge.Qualified_EqualizedCurrent [ 1 ] ) ) {
-								check_okey = true;
-							}
+								generalData_Load = measureDetails.Measure_vReadChargeLoadResult( serialPort, out error_information );
+								specific_value = generalData_Load.ActrulyCurrent;
+								if ((specific_value >= infor_Charge.Qualified_EqualizedCurrent[ 0 ]) && (specific_value <= infor_Charge.Qualified_EqualizedCurrent[ 1 ])) {
+									check_okey = true;
+								}
+							//}
 						}
 					}
 				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充
@@ -1806,39 +1808,41 @@ namespace ProductInfor
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
-						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
-							Itech.GeneralData_Load generalData_Load = measureDetails.Measure_vReadChargeLoadResult ( serialPort, out error_information );
-							decimal voltage = generalData_Load.ActrulyVoltage;
-							measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CV, infor_Charge.CV_Voltage, false, out error_information );
-							if ( error_information != string.Empty ) { continue; }
+						using (MCU_Control mCU_Control = new MCU_Control()) {
+							using (SerialPort serialPort = new SerialPort( port_name, default_baudrate, Parity.None, 8, StopBits.One )) {
+								Itech.GeneralData_Load generalData_Load = measureDetails.Measure_vReadChargeLoadResult( serialPort, out error_information );
+								decimal voltage = generalData_Load.ActrulyVoltage;
+								measureDetails.Measure_vSetChargeLoad( serialPort, Itech.OperationMode.CV, infor_Charge.CV_Voltage, false, out error_information );
+								if (error_information != string.Empty) { continue; }
 
-							int same_count = 0;
-							int wait_count = 0;
-							do {
-								generalData_Load = measureDetails.Measure_vReadChargeLoadResult ( serialPort, out error_information );
-								if ( error_information != string.Empty ) { break; }
-								if ( generalData_Load.ActrulyVoltage > ( voltage + 0.5m ) ) {//假定浮充电压比均充时高0.5V以上
-									if ( ++same_count >= 3 ) { break; }
-								} else { same_count = 0; }
-								Thread.Sleep ( 30 * delay_magnification );
-							} while ( ++wait_count < 20 );
+								int same_count = 0;
+								int wait_count = 0;
+								do {
+									generalData_Load = measureDetails.Measure_vReadChargeLoadResult( serialPort, out error_information );
+									if (error_information != string.Empty) { break; }
+									if (generalData_Load.ActrulyVoltage > (voltage + 0.5m)) {//假定浮充电压比均充时高0.5V以上
+										if (++same_count >= 3) { break; }
+									} else { same_count = 0; }
+									Thread.Sleep( 30 * delay_magnification );
+								} while (++wait_count < 20);
 
-							specific_value = generalData_Load.ActrulyVoltage;
-							if ( ( specific_value >= infor_Charge.Qualified_FloatingVoltage [ 0 ] ) && ( specific_value <= infor_Charge.Qualified_FloatingVoltage [ 1 ] ) ) {
-								check_okey = true;
+								specific_value = generalData_Load.ActrulyVoltage;
+								if ((specific_value >= infor_Charge.Qualified_FloatingVoltage[ 0 ]) && (specific_value <= infor_Charge.Qualified_FloatingVoltage[ 1 ])) {
+									check_okey = true;
+								}
+
+								////退出强制100%充电的情况
+								//int retry_count = 0;
+								//do {
+								//	Communicate_Admin( serialPort, out error_information );
+								//	mCU_Control.McuBackdoor_vAlwaysCharging( false, serialPort, out error_information );
+								//	if (error_information != string.Empty) { continue; }
+								//	//对特定型号的电源，需要在此处开启后门，以减少充电周期，方便识别备电丢失的情况
+								//	//	mCU_Control.McuBackdoor_vChargePeriodSet ( true, serialPort, out error_information );
+								//	//	if (error_information != string.Empty) { continue; }
+								//} while ((++retry_count < 5) && (error_information != string.Empty));
+								//if (error_information != string.Empty) { continue; }
 							}
-
-							////退出强制100%充电的情况
-							//int retry_count = 0;
-							//do {
-							//	Communicate_Admin ( serialPort, out error_information );
-							//	measureDetails.Measure_vAlwaysCharging ( false, serialPort, out error_information );
-							//	if ( error_information != string.Empty ) { continue; }
-							//	//对特定型号的电源，需要在此处开启后门，以减少充电周期，方便识别备电丢失的情况
-							//	//	measureDetails.Measure_vChargePeriodSet( true, serialPort, out error_information );
-							//	//	if (error_information != string.Empty) { continue; }
-							//} while ( ( ++retry_count < 5 ) && ( error_information != string.Empty ) );
-							//if ( error_information != string.Empty ) { continue; }
 						}
 					}
 				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充

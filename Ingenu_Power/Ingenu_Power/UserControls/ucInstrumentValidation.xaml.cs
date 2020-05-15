@@ -131,7 +131,9 @@ namespace Ingenu_Power.UserControls
 		{
 			//反射进行动态调用
 			try {
-				string bin_filePath = Directory.GetCurrentDirectory ( ) + "\\Download\\ProductInfor.dll";
+				//string bin_filePath = Directory.GetCurrentDirectory ( ) + "\\Download\\ProductInfor.dll";
+				string bin_filePath = Properties.Settings.Default.Dll文件保存路径;
+				//string bin_filePath = @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 				Assembly assembly = Assembly.LoadFrom ( bin_filePath );
 				Type [ ] tys = assembly.GetTypes ( );
 				foreach ( Type id_verion in tys ) {
@@ -141,7 +143,7 @@ namespace Ingenu_Power.UserControls
 						Dispatcher.Invoke ( new dlg_ProgressBarWorkingSet ( ProgressBarWorkingSet ), true );
 						//仪表初始化
 						MethodInfo mi = id_verion.GetMethod ( "Measure_vInstrumentInitalize" );
-						object [ ] parameters = new object [ ] { ins, sp_name };
+						object [ ] parameters = new object [ ] {false, ins, sp_name };
 						string error_information = mi.Invoke ( obj, parameters ).ToString ( );
 
 						StaticInfor.Error_Message = error_information;

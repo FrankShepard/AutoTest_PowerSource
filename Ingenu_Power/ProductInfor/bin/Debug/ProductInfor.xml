@@ -1145,22 +1145,6 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor.MeasureDetails.Measure_vAlwaysCharging(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            控制自制模块进行充电占比后门的设置
-            </summary>
-            <param name="target_status">目标充电100%后门状态</param>
-            <param name="serialPort">使用到的串口</param>
-            <param name="error_information">可能存在的错误信息</param>
-        </member>
-        <member name="M:ProductInfor.MeasureDetails.Measure_vChargePeriodSet(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            控制自制模块进行充电周期后门的设置
-            </summary>
-            <param name="target_status">目标充电100%后门状态</param>
-            <param name="serialPort">使用到的串口</param>
-            <param name="error_information">可能存在的错误信息</param>
-        </member>
         <member name="M:ProductInfor.MeasureDetails.Dispose">
             <summary>
             本类资源释放

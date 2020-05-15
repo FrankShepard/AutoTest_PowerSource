@@ -39,15 +39,15 @@ namespace ProductInfor
 		/// <summary>
 		/// 仪表通讯波特率 - 艾德克斯电子负载
 		/// </summary>
-		public const int Baudrate_Instrument_Load = 4800;
+		public const int Baudrate_Instrument_Load = 19200;
 		/// <summary>
 		/// 仪表通讯波特率 - 艾德克斯直流电源
 		/// </summary>
-		private const int Baudrate_Instrument_DCPower = 4800;
+		private const int Baudrate_Instrument_DCPower = 9600;
 		/// <summary>
 		/// 仪表通讯波特率 - 程控交流电源
 		/// </summary>
-		private const int Baudrate_Instrument_ACPower = 4800;
+		private const int Baudrate_Instrument_ACPower = 9600;
 		/// <summary>
 		/// 仪表通讯波特率 - 自制控制板
 		/// </summary>
@@ -906,36 +906,6 @@ namespace ProductInfor
 			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
 			using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
 				mCU_Control.McuControl_vRappleChannelChoose ( channel_index, serialPort, out error_information );
-			}
-		}
-
-		/// <summary>
-		/// 控制自制模块进行充电占比后门的设置
-		/// </summary>
-		/// <param name="target_status">目标充电100%后门状态</param>
-		/// <param name="serialPort">使用到的串口</param>
-		/// <param name="error_information">可能存在的错误信息</param>
-		public void Measure_vAlwaysCharging(bool target_status, SerialPort serialPort, out string error_information )
-		{
-			error_information = String.Empty;
-			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
-			using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
-				mCU_Control.McuBackdoor_vAlwaysCharging ( target_status, serialPort, out error_information );
-			}
-		}
-
-		/// <summary>
-		/// 控制自制模块进行充电周期后门的设置
-		/// </summary>
-		/// <param name="target_status">目标充电100%后门状态</param>
-		/// <param name="serialPort">使用到的串口</param>
-		/// <param name="error_information">可能存在的错误信息</param>
-		public void Measure_vChargePeriodSet( bool target_status, SerialPort serialPort, out string error_information )
-		{
-			error_information = String.Empty;
-			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
-			using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
-				mCU_Control.McuBackdoor_vChargePeriodSet ( target_status, serialPort, out error_information );
 			}
 		}
 

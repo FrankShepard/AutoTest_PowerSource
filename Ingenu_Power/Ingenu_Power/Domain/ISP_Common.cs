@@ -123,97 +123,101 @@ namespace Ingenu_Power.Domain
 		/// 执行实际的ISP程序更新操作，若是对应的程序文件不存在，则到下一个程序检查
 		/// </summary>
 		/// <param name="error_information">可能存在的错误情况</param>
-		public void ISP_vDoFlash( out string error_information )
+		public void ISP_vDoFlash(out string error_information)
 		{
 			error_information = string.Empty;
 			string error_information_temp = string.Empty;
 			string bin_filePath = string.Empty;
 			try {
-				using ( HC_ISP isp = new HC_ISP ( ) ) {
-					using ( MCU_Control mcu = new MCU_Control ( ) ) {
+				using (HC_ISP isp = new HC_ISP()) {
+					using (MCU_Control mcu = new MCU_Control()) {
 						//使用ProductInfor中的波特率信息进行波特率数据的确定
 						int Baudrate_Instrument = 0;
 						try {
-							bin_filePath = Directory.GetCurrentDirectory ( ) + "\\Download\\ProductInfor.dll";
-							Assembly assembly = Assembly.LoadFrom ( bin_filePath );
-							Type [ ] tys = assembly.GetTypes ( );
-							foreach ( Type id_verion in tys ) {
-								if ( id_verion.Name == "Base" ) {
-									Object obj = Activator.CreateInstance ( id_verion );
+							//bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
+							bin_filePath = Properties.Settings.Default.Dll文件保存路径;
+							Assembly assembly = Assembly.LoadFrom( bin_filePath );
+							Type[] tys = assembly.GetTypes();
+							foreach (Type id_verion in tys) {
+								if (id_verion.Name == "Base") {
+									Object obj = Activator.CreateInstance( id_verion );
 
-									MethodInfo mi = id_verion.GetMethod ( "BaudrateInstrument_ControlBoardGet" );
-									Baudrate_Instrument = ( int ) mi.Invoke ( obj, null );
+									MethodInfo mi = id_verion.GetMethod( "BaudrateInstrumentGet" );
+									Baudrate_Instrument = ( int )mi.Invoke( obj, null );
 									break;
 								}
 							}
-						} catch ( Exception ex ) {
-							error_information = ex.ToString ( ); return;
+						} catch (Exception ex) {
+							error_information = ex.ToString(); return;
 						}
 
-						using ( SerialPort serialPort = new SerialPort ( Properties.Settings.Default.UsedSerialport, Baudrate_Instrument, Parity.None, 8, StopBits.One ) ) {
+						using (SerialPort serialPort = new SerialPort( Properties.Settings.Default.UsedSerialport, Baudrate_Instrument, Parity.None, 8, StopBits.One )) {
+							//复位通道控制单片机
+							mcu.McuControl_vReset( MCU_Control.Address_ChannelChoose, serialPort, out error_information_temp );
+
 							//2020.04.21 PCB绘制存在问题，在执行此步时先选择右侧通道
 							mcu.McuControl_vMeasureLocation( MCU_Control.Location.Location_Right, serialPort, out error_information );
-							//if (error_information != string.Empty) { return; }
+							//if (error_information != string.Empty) { return; }							
 
-							//先将待测产品的ISP引脚接入
-							mcu.McuControl_vConnectISP ( true, serialPort, out error_information );
-							//if ( error_information != string.Empty ) { return; }
-
-							for ( int index = 0 ; index < 2 ; index++ ) {
-								if ( index == 0 ) {
-									bin_filePath = Directory.GetCurrentDirectory ( ) + "\\Download\\master.bin";
-									if ( !File.Exists ( bin_filePath ) ) {
+							for (int index = 0; index < 2; index++) {
+								if (index == 0) {
+									bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\master.bin";
+									if (!File.Exists( bin_filePath )) {
 										error_information = "本地不存在待烧录文件"; //重新操作一次
 										Properties.Settings.Default.ISP_ID_Hardware = 0;
 										Properties.Settings.Default.ISP_Ver_Hardware = 0;
 										Properties.Settings.Default.Save();
 										continue;
 									}
-									mcu.McuControl_vISPMasterOrSlaver ( MCU_Control.MS_Choose.Master, serialPort, out error_information );
+									mcu.McuControl_vISPMasterOrSlaver( MCU_Control.MS_Choose.Master, serialPort, out error_information );
 								} else {
-									bin_filePath = Directory.GetCurrentDirectory ( ) + "\\Download\\slaver.bin";
-									if ( !File.Exists ( bin_filePath ) ) { continue; }
-									mcu.McuControl_vISPMasterOrSlaver ( MCU_Control.MS_Choose.Slaver, serialPort, out error_information );
+									bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\slaver.bin";
+									if (!File.Exists( bin_filePath )) { continue; }
+									mcu.McuControl_vISPMasterOrSlaver( MCU_Control.MS_Choose.Slaver, serialPort, out error_information );
 								}
 								//if ( error_information != string.Empty ) { return; }
-								Thread.Sleep( 200 );
+
+								//对应MCU需要重新上电的操作
+								mcu.McuControl_vISPRestartPower( serialPort, out error_information );
+								//if ( error_information != string.Empty ) { return; }
 
 								//以下执行程序的具体烧录过程
-								FileStream fileStream = new FileStream ( bin_filePath, FileMode.Open );
-								if ( fileStream.Length == 0 ) {
+								FileStream fileStream = new FileStream( bin_filePath, FileMode.Open );
+								if (fileStream.Length == 0) {
 									error_information += "读取单片机程序异常，退出烧录程序过程 \r\n"; return;
 								}
-								byte [ ] buffer_hex = new byte [ fileStream.Length ];
-								fileStream.Read ( buffer_hex, 0, buffer_hex.Length );
-								fileStream.Close ( );
+								byte[] buffer_hex = new byte[ fileStream.Length ];
+								fileStream.Read( buffer_hex, 0, buffer_hex.Length );
+								fileStream.Close();
 
 								//控制程序烧录的单片机进行重新上电的操作
-								error_information = isp.ISP_vCheckCode ( buffer_hex );
-								if ( error_information != string.Empty ) { return; }
-								
-								//对应MCU需要重新上电的操作
-								mcu.McuControl_vISPRestartPower ( serialPort, out error_information );
+								error_information = isp.ISP_vCheckCode( buffer_hex );
+								if (error_information != string.Empty) { return; }
+
+								//待测产品的ISP引脚接入
+								mcu.McuControl_vConnectISP( true, serialPort, out error_information );
 								//if ( error_information != string.Empty ) { return; }
+
 								//执行ISP的具体操作
 								serialPort.BaudRate = 57600;
-								error_information = isp.ISP_vISPMode_In ( serialPort );
-								if ( error_information != string.Empty ) { return; }
-								error_information = isp.ISP_vProgram ( buffer_hex, serialPort, true );
-								if ( error_information != string.Empty ) { return; }
+								error_information = isp.ISP_vISPMode_In( serialPort );
+								if (error_information != string.Empty) { return; }
+								error_information = isp.ISP_vProgram( buffer_hex, serialPort, true );
+								if (error_information != string.Empty) { return; }
 								serialPort.BaudRate = Baudrate_Instrument;
-							}			
 
-							//断开待测产品的ISP引脚接入							
-							mcu.McuControl_vConnectISP ( false, serialPort, out error_information_temp );
-							//2020.04.21 PCB绘制存在问题，恢复左边通道
-							mcu.McuControl_vMeasureLocation( MCU_Control.Location.Location_Left, serialPort, out error_information_temp );
+								//断开待测产品的ISP引脚接入							
+								mcu.McuControl_vConnectISP( false, serialPort, out error_information_temp );
+							}
 
+							//复位通道控制单片机
+							mcu.McuControl_vReset( MCU_Control.Address_ChannelChoose, serialPort, out error_information_temp );
 							error_information += error_information_temp;
 						}
 					}
 				}
-			} catch ( Exception ex ) {
-				error_information += ex.ToString ( );
+			} catch (Exception ex) {
+				error_information += ex.ToString();
 			}
 		}
 

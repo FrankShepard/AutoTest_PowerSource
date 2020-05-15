@@ -5,12 +5,6 @@
     <Setting Name="RememberPassWord" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="SQL_Name" Type="System.String" Scope="User">
-      <Value Profile="(Default)">192.168.1.99</Value>
-    </Setting>
-    <Setting Name="SQL_User" Type="System.String" Scope="User">
-      <Value Profile="(Default)">test_0</Value>
-    </Setting>
     <Setting Name="SQL_Password" Type="System.String" Scope="User">
       <Value Profile="(Default)">admin123456</Value>
     </Setting>
@@ -34,6 +28,15 @@
     </Setting>
     <Setting Name="MeasureDelayMagnification" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="SQL_Name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">192.168.1.99</Value>
+    </Setting>
+    <Setting Name="SQL_User" Type="System.String" Scope="User">
+      <Value Profile="(Default)">test_0</Value>
+    </Setting>
+    <Setting Name="Dll文件保存路径" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

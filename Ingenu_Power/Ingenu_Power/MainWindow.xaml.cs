@@ -51,7 +51,11 @@ namespace Ingenu_Power
 		/// <summary>
 		/// 内存回收周期（单位ms）
 		/// </summary>
-		public const double TIM_MemoryClearTime = ( double ) 30000;		
+		public const double TIM_MemoryClearTime = ( double ) 30000;
+		/// <summary>
+		/// 更新文件所用线程
+		/// </summary>
+		Thread trdFileRefresh;
 
 		#endregion
 
@@ -333,13 +337,19 @@ namespace Ingenu_Power
 			}
 
 			if (can_refresh_dll_data) {
-				Thread trdFileRefresh = new Thread(() => Main_vRefreshDllFile( StaticInfor.UserRightLevel ) ) {
+				if (trdFileRefresh == null) {
+					trdFileRefresh = new Thread( () => Main_vRefreshDllFile( StaticInfor.UserRightLevel ) ) {
 						Name = "DLL文件更新线程",
 						Priority = ThreadPriority.AboveNormal,
 						IsBackground = true
 					};
-				trdFileRefresh.SetApartmentState( ApartmentState.STA );
-				trdFileRefresh.Start();
+					trdFileRefresh.SetApartmentState( ApartmentState.STA );
+					trdFileRefresh.Start();
+				} else {
+					if (trdFileRefresh.ThreadState != ThreadState.Stopped) { return; }
+					trdFileRefresh = new Thread( () => Main_vRefreshDllFile( StaticInfor.UserRightLevel ) );
+					trdFileRefresh.Start();
+				}
 			}
 		}
 
@@ -378,53 +388,69 @@ namespace Ingenu_Power
 		{
 			string error_information = string.Empty;
 			string error_information_temp = string.Empty;
-			for (int index_temp = 0; index_temp < 2; index_temp++) {
-				if (index_temp == 0) {
-					if (right_level >= 5) { //超级管理员权限双击此处的实际功能是上传新dll
-						OpenFileDialog openFileDialog = new OpenFileDialog {
-							Filter = "dll文件(*.dll)|*.dll",
-							RestoreDirectory = true //保护对话框记忆的上次打开的目录
-						};
-						if (( bool )openFileDialog.ShowDialog() == true) {
-							//将选中的文件转成数据流填充到结构体对象的待上传数据中
-							FileStream fs = new FileStream( openFileDialog.FileName, FileMode.Open );
-							byte[] binfile = new byte[ fs.Length ];
-							fs.Read( binfile, 0, binfile.Length );
-							fs.Close();
+			try {
+				for (int index_temp = 0; index_temp < 2; index_temp++) {
+					if (index_temp == 0) {
+						if (right_level >= 5) { //超级管理员权限双击此处的实际功能是上传新dll
+							OpenFileDialog openFileDialog = new OpenFileDialog {
+								Filter = "dll文件(*.dll)|*.dll",
+								RestoreDirectory = true //保护对话框记忆的上次打开的目录
+							};
+							if (( bool )openFileDialog.ShowDialog() == true) {
+								//将选中的文件转成数据流填充到结构体对象的待上传数据中
+								FileStream fs = new FileStream( openFileDialog.FileName, FileMode.Open );
+								byte[] binfile = new byte[ fs.Length ];
+								fs.Read( binfile, 0, binfile.Length );
+								fs.Close();
 
-							//实际上传
+								//实际上传
+								using (Database database = new Database()) {
+									database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information_temp );
+									if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
+									database.V_UpdateFile( binfile, out error_information_temp );
+									if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
+								}
+
+								//图标变化
+								Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
+							}
+						} else { //其它权限双击此处执行的是下载dll
 							using (Database database = new Database()) {
 								database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information_temp );
 								if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
-								database.V_UpdateFile( binfile, out error_information_temp );
+								System.Data.DataTable dataTable = database.V_DownloadFile( out error_information_temp );
 								if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
-							}
+								if (dataTable.Rows.Count > 0) {
+									//保存到用户指定地址上
+									SaveFileDialog saveFileDialog = new SaveFileDialog {
+										RestoreDirectory = true, //保护对话框记忆的上次打开的目录
+									};
 
-							//图标变化
-							Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
-						}
-					} else { //其它权限双击此处执行的是下载dll
-						using (Database database = new Database()) {
-							database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information_temp );
-							if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
-							System.Data.DataTable dataTable = database.V_DownloadFile( out error_information_temp );
-							if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
-							if (dataTable.Rows.Count > 0) {
-								string bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
-								FileStream fs = new FileStream( bin_filePath, FileMode.Create, FileAccess.Write );
-								byte[] file_data = ObjectToBytes( dataTable.Rows[ 0 ][ "ProductInfor文件" ] );
-								fs.Write( file_data, 0, file_data.Length );
-								fs.Close();
+									saveFileDialog.Filter = "动态库文件(*.dll)|*.dll";
+									if (( bool )saveFileDialog.ShowDialog() == true) {
+										string filePath = saveFileDialog.FileName;
+										FileStream fs = new FileStream( saveFileDialog.FileName, FileMode.Create, FileAccess.Write );
+										byte[] file_data = ObjectToBytes( dataTable.Rows[ 0 ][ "ProductInfor文件" ] );
+										fs.Write( file_data, 0, file_data.Length );
+										fs.Close();
+										//图标变化
+										Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
+										Properties.Settings.Default.Dll文件保存路径 = filePath;
+										Properties.Settings.Default.Save();
+									}
+								} else {
+									error_information = "数据库中缺少对应的DLL文件";
+								}
 							}
-
-							//图标变化
-							Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
 						}
+					} else {
+						//显示操作过程中的异常
+						Dispatcher.Invoke( new Dlg_MessageTips( MessageTips ), error_information, false );
 					}
-				} else {
-					//显示操作过程中的异常
-					Dispatcher.Invoke( new Dlg_MessageTips( MainWindow.MessageTips ), error_information );
 				}
+			}catch(Exception ex) {
+				//显示操作过程中的异常
+				Dispatcher.Invoke( new Dlg_MessageTips( MessageTips ), ex.ToString(), false );
 			}
 		}
 

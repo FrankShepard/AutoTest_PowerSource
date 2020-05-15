@@ -17,7 +17,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
+    <PublishUrl>ftp://192.168.1.99/盈帜测试程序安装包/IngenuPower/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -27,12 +27,12 @@
     <UpdatePeriodically>true</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>http://192.168.1.98:81/盈帜测试程序安装包/IngenuPower/</InstallUrl>
+    <InstallUrl>http://192.168.1.99:82/盈帜测试程序安装包/IngenuPower/</InstallUrl>
     <ProductName>电源自动测试系统</ProductName>
     <PublisherName>北京盈帜新源科技有限公司</PublisherName>
     <SuiteName>IngenuPower_AutoTest</SuiteName>
-    <ApplicationRevision>5</ApplicationRevision>
-    <ApplicationVersion>2.1.0.%2a</ApplicationVersion>
+    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationVersion>2.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>false</BootstrapperEnabled>
@@ -198,9 +198,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Content Include="Download\ProductInfor.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\消防电源检验报告%28标准定版）.xls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
