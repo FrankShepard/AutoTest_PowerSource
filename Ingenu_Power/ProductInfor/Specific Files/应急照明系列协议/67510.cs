@@ -1146,7 +1146,7 @@ namespace ProductInfor
 					Calibrate_vDoEvent ( measureDetails, serialPort, out error_information_Calibrate );
 #endif
 					//关电源输出
-					measureDetails.Measure_vInstrumentPowerOff ( 5m, serialPort, out error_information );
+					measureDetails.Measure_vInstrumentPowerOff ( whole_function_enable, 5m, serialPort, out error_information );
 					error_information += error_information_Calibrate;
 
 				}
@@ -1553,7 +1553,7 @@ namespace ProductInfor
 								}
 							}
 							//关闭备电，查看是否可以在2s时间内自杀（方法为查看程控直流电源的输出电流是否低于60mA）
-							Thread.Sleep ( 2500 );
+							Thread.Sleep ( 2800 );
 							if ( infor_Sp.UsedBatsCount > 2 ) {
 								Thread.Sleep ( 1000 );
 							}
@@ -1875,11 +1875,13 @@ namespace ProductInfor
 						using ( Itech itech = new Itech ( ) ) {
 							using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 
-								//此型号电源只检测5V输出是否跌落
-								measureDetails.Measure_vSetOscCapture( infor_Output.Qualified_OutputVoltageWithLoad[ 1, 0 ] * 0.75m, out error_information );
-								if (error_information != string.Empty) { continue; }
-								measureDetails.Measure_vRappleChannelChoose( 2, serialPort, out error_information );
-								if (error_information != string.Empty) { continue; }
+								if (whole_function_enable) {
+									//此型号电源只检测5V输出是否跌落
+									measureDetails.Measure_vSetOscCapture( infor_Output.Qualified_OutputVoltageWithLoad[ 1, 0 ] * 0.75m, out error_information );
+									if (error_information != string.Empty) { continue; }
+									measureDetails.Measure_vRappleChannelChoose( 2, serialPort, out error_information );
+									if (error_information != string.Empty) { continue; }
+								}
 
 								//设置主电为欠压值
 								measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, infor_Mp.MpVoltage[ 0 ] );
@@ -1902,12 +1904,16 @@ namespace ProductInfor
 								measureDetails.Measure_vSetACPowerStatus ( false, serialPort, out error_information, infor_Mp.MpVoltage [ 0 ] );//关主电
 								if ( error_information != string.Empty ) { continue; }
 								Thread.Sleep ( 30 * delay_magnification ); //等待产品进行主备电切换
-								decimal value = measureDetails.Measure_vReadVpp ( out error_information );
-								if ( error_information != string.Empty ) { continue; }
-								if ( value < infor_Output.Qualified_OutputVoltageWithLoad [ 1, 0 ] * 0.3m ) { //说明没有被捕获
-									check_okey = true;
+								if (whole_function_enable) {
+									decimal value = measureDetails.Measure_vReadVpp( out error_information );
+									if (error_information != string.Empty) { continue; }
+									if (value < infor_Output.Qualified_OutputVoltageWithLoad[ 1, 0 ] * 0.3m) { //说明没有被捕获
+										check_okey = true;
+									} else {
+										error_information = "主电丢失时5V输出存在跌落"; continue;
+									}
 								} else {
-									error_information = "主电丢失时5V输出存在跌落"; continue;
+									check_okey = true; //简化测试时默认为合格状态
 								}
 
 								//其它通道使用电子负载查看输出,不可以低于0.85倍的标称固定电平的备电
@@ -2058,16 +2064,18 @@ namespace ProductInfor
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
 						using ( Itech itech = new Itech ( ) ) {
-							using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
-								//将示波器模式换成自动模式，换之前查看Vpp是否因为跌落而被捕获 - 原因是示波器捕获的反应速度较慢，只能在所有过程结束之后再查看是否又跌落情况
-								decimal value = measureDetails.Measure_vReadVpp ( out error_information );
-								if ( error_information != string.Empty ) { continue; }
-								if ( value > infor_Output.Qualified_OutputVoltageWithLoad [ 0, 0 ] * 0.5m ) { //说明被捕获
-									error_information = "待测电源在主备电切换过程中存在跌落情况";
-									continue;
+							using (SerialPort serialPort = new SerialPort( port_name, default_baudrate, Parity.None, 8, StopBits.One )) {
+								if (whole_function_enable) {
+									//将示波器模式换成自动模式，换之前查看Vpp是否因为跌落而被捕获 - 原因是示波器捕获的反应速度较慢，只能在所有过程结束之后再查看是否又跌落情况
+									decimal value = measureDetails.Measure_vReadVpp( out error_information );
+									if (error_information != string.Empty) { continue; }
+									if (value > infor_Output.Qualified_OutputVoltageWithLoad[ 0, 0 ] * 0.5m) { //说明被捕获
+										error_information = "待测电源在主备电切换过程中存在跌落情况";
+										continue;
+									}
+									measureDetails.Measure_vPrepareForReadOutput( out error_information );
+									if (error_information != string.Empty) { continue; }
 								}
-								measureDetails.Measure_vPrepareForReadOutput ( out error_information );
-								if ( error_information != string.Empty ) { continue; }
 
 								//应急照明电源系列电源的OXP只需要对输出2进行OXP验证即可；  输出1仅使用转 电池维护模式命令来判断是否生效
 								Communicate_vUserSetWorkingMode ( false, serialPort, out error_information );

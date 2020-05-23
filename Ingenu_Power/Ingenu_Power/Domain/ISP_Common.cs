@@ -135,6 +135,7 @@ namespace Ingenu_Power.Domain
 						int Baudrate_Instrument = 0;
 						try {
 							//bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
+							//bin_filePath = @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 							bin_filePath = Properties.Settings.Default.Dll文件保存路径;
 							Assembly assembly = Assembly.LoadFrom( bin_filePath );
 							Type[] tys = assembly.GetTypes();
@@ -142,7 +143,7 @@ namespace Ingenu_Power.Domain
 								if (id_verion.Name == "Base") {
 									Object obj = Activator.CreateInstance( id_verion );
 
-									MethodInfo mi = id_verion.GetMethod( "BaudrateInstrumentGet" );
+									MethodInfo mi = id_verion.GetMethod( "BaudrateInstrument_ControlBoardGet" );
 									Baudrate_Instrument = ( int )mi.Invoke( obj, null );
 									break;
 								}

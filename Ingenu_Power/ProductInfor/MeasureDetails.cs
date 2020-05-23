@@ -39,7 +39,7 @@ namespace ProductInfor
 		/// <summary>
 		/// 仪表通讯波特率 - 艾德克斯电子负载
 		/// </summary>
-		public const int Baudrate_Instrument_Load = 19200;
+		public const int Baudrate_Instrument_Load = 9600;
 		/// <summary>
 		/// 仪表通讯波特率 - 艾德克斯直流电源
 		/// </summary>
@@ -81,38 +81,40 @@ namespace ProductInfor
 					using ( Itech itech = new Itech ( ) ) {
 						using ( MCU_Control mcu = new MCU_Control ( ) ) {
 							using ( SiglentOSC siglentOSC = new SiglentOSC ( ) ) {
-								/* 示波器初始化 */
-								if ( SessionRM == 0 ) {
-									SessionRM = siglentOSC.SiglentOSC_vOpenSessionRM ( out error_information_osc );
-								}
-								if ( ( error_information_osc == string.Empty ) && ( SessionRM > 0 ) ) {
-									SessionOSC = siglentOSC.SiglentOSC_vOpenSession ( SessionRM, "USB0::62700::60986::" + osc_ins + "::0::INSTR", out error_information_osc );
-								}
-								if ( ( error_information_osc == string.Empty ) && ( SessionOSC > 0 ) && ( SessionRM > 0 ) ) {
-									error_information_temp = siglentOSC.SiglentOSC_vInitializate ( SessionRM, SessionOSC );
-									error_information += error_information_temp;
-									error_information_temp = siglentOSC.SiglentOSC_vInitializate ( SessionRM, SessionOSC, 1, SiglentOSC.Coupling_Type.AC, SiglentOSC.Voltage_DIV._100mV );
-									error_information += error_information_temp;
-									error_information = siglentOSC.SiglentOSC_vSetScanerDIV ( SessionRM, SessionOSC, SiglentOSC.ScanerTime_DIV._10ms );
-									error_information += error_information_temp;
-								} else {
-
-									if ( SessionRM <= 0 ) {
-										error_information_osc += "VISA中的ResourceMangener未能正常打开会话，请检查Agilent相关服务是否启动";
+								/* 示波器初始化 - 简化测试时无需使用示波器 */
+								if (whole_function_enable) {
+									if (SessionRM == 0) {
+										SessionRM = siglentOSC.SiglentOSC_vOpenSessionRM( out error_information_osc );
 									}
-
-									if ( SessionOSC <= 0 ) {
-										error_information_osc += "指定示波器未能正常打开会话，请检查USB线的连接";
+									if ((error_information_osc == string.Empty) && (SessionRM > 0)) {
+										SessionOSC = siglentOSC.SiglentOSC_vOpenSession( SessionRM, "USB0::62700::60986::" + osc_ins + "::0::INSTR", out error_information_osc );
 									}
-									error_information = error_information_osc;
-								}
-								if ( ( error_information != string.Empty ) || ( SessionOSC <= 0 ) || ( SessionRM <= 0 ) ) {//关闭示波器的VISA会话端口,防止长期打开造成的通讯失败情况
-									try {
-										siglentOSC.SiglentOSC_vCloseSession ( SessionOSC );
-										siglentOSC.SiglentOSC_vCloseSession ( SessionRM );
-										SessionRM = 0;
-									} catch {
-										SessionRM = 0;
+									if ((error_information_osc == string.Empty) && (SessionOSC > 0) && (SessionRM > 0)) {
+										error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC );
+										error_information += error_information_temp;
+										error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC, 1, SiglentOSC.Coupling_Type.AC, SiglentOSC.Voltage_DIV._100mV );
+										error_information += error_information_temp;
+										error_information = siglentOSC.SiglentOSC_vSetScanerDIV( SessionRM, SessionOSC, SiglentOSC.ScanerTime_DIV._10ms );
+										error_information += error_information_temp;
+									} else {
+
+										if (SessionRM <= 0) {
+											error_information_osc += "VISA中的ResourceMangener未能正常打开会话，请检查Agilent相关服务是否启动";
+										}
+
+										if (SessionOSC <= 0) {
+											error_information_osc += "指定示波器未能正常打开会话，请检查USB线的连接";
+										}
+										error_information = error_information_osc;
+									}
+									if ((error_information != string.Empty) || (SessionOSC <= 0) || (SessionRM <= 0)) {//关闭示波器的VISA会话端口,防止长期打开造成的通讯失败情况
+										try {
+											siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
+											siglentOSC.SiglentOSC_vCloseSession( SessionRM );
+											SessionRM = 0;
+										} catch {
+											SessionRM = 0;
+										}
 									}
 								}
 
@@ -164,10 +166,11 @@ namespace ProductInfor
 		/// <summary>
 		/// 电源输出关闭
 		/// </summary>
+		/// <param name="whole_function_enable">全项测试与否</param>
 		/// <param name="keep_current">第一个负载需要维持的带载值(CC模式),用于快速放电</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void Measure_vInstrumentPowerOff(decimal keep_current,SerialPort serialPort, out string error_information)
+		public void Measure_vInstrumentPowerOff(bool whole_function_enable,decimal keep_current,SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
 			string error_information_temp = string.Empty;
@@ -177,9 +180,11 @@ namespace ProductInfor
 					using (Itech itech = new Itech()) {
 						using (MCU_Control mcu = new MCU_Control()) {
 							using (SiglentOSC siglentOSC = new SiglentOSC()) {
-								/* 释放示波器的连接 */
-								siglentOSC.SiglentOSC_vClearError( SessionRM, SessionOSC );
-								siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
+								if (whole_function_enable) {
+									/* 释放示波器的连接 */
+									siglentOSC.SiglentOSC_vClearError( SessionRM, SessionOSC );
+									siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
+								}
 								//关交流电源
 								serialPort.BaudRate = Baudrate_Instrument_ACPower;
 								int retry_index = 0;

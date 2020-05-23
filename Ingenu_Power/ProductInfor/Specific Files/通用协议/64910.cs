@@ -1059,7 +1059,7 @@ namespace ProductInfor
 					Calibrate_vDoEvent( measureDetails, serialPort, out error_information_Calibrate );
 #endif
 					//关电源输出
-					measureDetails.Measure_vInstrumentPowerOff( 5m, serialPort, out error_information );
+					measureDetails.Measure_vInstrumentPowerOff( whole_function_enable, 5m, serialPort, out error_information );
 					error_information += error_information_Calibrate;
 
 				}

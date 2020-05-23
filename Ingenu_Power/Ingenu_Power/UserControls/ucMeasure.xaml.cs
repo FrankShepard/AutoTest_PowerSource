@@ -885,7 +885,7 @@ namespace Ingenu_Power.UserControls
 
 						//仪表状态重置，防止更换产品时带电
 						mi = id_verion.GetMethod ( "Measure_vInstrumentOff" );
-						parameters = new object[] { Properties.Settings.Default.UsedSerialport };
+						parameters = new object[] { measureCondition.WholeFunction_Enable, Properties.Settings.Default.UsedSerialport };
 						mi.Invoke ( obj, parameters );
 
 						//产品测试数据上传

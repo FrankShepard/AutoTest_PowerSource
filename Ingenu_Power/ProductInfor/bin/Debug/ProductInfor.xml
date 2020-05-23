@@ -490,10 +490,11 @@
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的错误信息</returns>
         </member>
-        <member name="M:ProductInfor.Base.Measure_vInstrumentOff(System.String)">
+        <member name="M:ProductInfor.Base.Measure_vInstrumentOff(System.Boolean,System.String)">
             <summary>
             测试结束时使用，为了增加测试速度，只将交流电源和直流电源的输出关闭
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="port_name">使用到的串口</param>
             <returns>可能存在的错误信息学</returns>
         </member>
@@ -973,10 +974,11 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:ProductInfor.MeasureDetails.Measure_vInstrumentPowerOff(System.Decimal,System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:ProductInfor.MeasureDetails.Measure_vInstrumentPowerOff(System.Boolean,System.Decimal,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             电源输出关闭
             </summary>
+            <param name="whole_function_enable">全项测试与否</param>
             <param name="keep_current">第一个负载需要维持的带载值(CC模式),用于快速放电</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>

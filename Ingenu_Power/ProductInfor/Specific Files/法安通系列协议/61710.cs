@@ -385,7 +385,7 @@ namespace ProductInfor
 					//真正开始进行待测产品的校准操作
 					Calibrate_vDoEvent( measureDetails, serialPort, out error_information_Calibrate );
 #endif
-					measureDetails.Measure_vInstrumentPowerOff( 5m, serialPort, out error_information );
+					measureDetails.Measure_vInstrumentPowerOff( whole_function_enable, 5m, serialPort, out error_information );
 					error_information += error_information_Calibrate;
 				}
 				return error_information;
