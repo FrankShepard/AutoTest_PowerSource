@@ -171,8 +171,8 @@ namespace Ingenu_Power.UserControls
 		/// <param name="solidColorBrush">开启时的颜色填充值  Brushes </param>
 		private void LedValueSet(SolidColorBrush solidColorBrush)
 		{
-			Led.Value = true; //保证每次调用之后都是在开启的状态
-			Led.TrueBrush = solidColorBrush;
+//			Led.Value = true; //保证每次调用之后都是在开启的状态
+			Led.Fill = solidColorBrush;
 		}
 
 		/// <summary>

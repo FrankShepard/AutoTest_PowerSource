@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Ingenu_Power.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:domain="clr-namespace:Ingenu_Power.Domain"
-             xmlns:ni="http://schemas.ni.com/controls/2009/xaml/presentation" 
+             xmlns:domain="clr-namespace:Ingenu_Power.Domain"             
 			 x:Class="Ingenu_Power.UserControls.UcMeasure"
              mc:Ignorable="d" 
              d:DesignHeight="443" d:DesignWidth="726" >
@@ -103,7 +102,7 @@
 									<TextBlock Text="" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Padding="25,5" x:Name="TxtMeasuredResult"/>
 								</WrapPanel>
 							</StackPanel>
-							<ni:LED x:Name="Led" Height="110" Width="110" Margin="197,247,36,16" Value="False" IsReadOnly="True" />
+							<Ellipse x:Name="Led" Height="110" Width="110" Margin="197,247,36,16" StrokeThickness="3" Stroke="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}" Fill="DarkGreen"/>
 						</Grid>
 					</Grid>
 					<Grid Grid.Row="1">

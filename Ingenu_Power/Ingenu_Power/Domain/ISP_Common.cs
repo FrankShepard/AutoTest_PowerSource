@@ -145,6 +145,7 @@ namespace Ingenu_Power.Domain
 
 									MethodInfo mi = id_verion.GetMethod( "BaudrateInstrument_ControlBoardGet" );
 									Baudrate_Instrument = ( int )mi.Invoke( obj, null );
+
 									break;
 								}
 							}

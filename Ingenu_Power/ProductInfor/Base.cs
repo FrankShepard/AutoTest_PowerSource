@@ -403,13 +403,22 @@ namespace ProductInfor
 		#region -- 相关常量的获取
 
 		/// <summary>
-		/// 返回自制控制板的波特率，用于不包含在本Dll中的ISP功能的实现
+		/// 返回自制控制板(备电控制)的波特率，用于不包含在本Dll中的ISP功能的实现
 		/// </summary>
 		/// <returns></returns>
-		public int BaudrateInstrument_ControlBoardGet( )
+		public int BaudrateInstrument_BatsControlBoardGet( )
+		{
+			return MeasureDetails.Baudrate_Instrument_BatsControlBoard;
+		}
+
+		/// <summary>
+		/// 返回自制控制板(MCU控制)的波特率，用于不包含在本Dll中的ISP功能的实现
+		/// </summary>
+		/// <returns></returns>
+		public int BaudrateInstrument_ControlBoardGet()
 		{
 			return MeasureDetails.Baudrate_Instrument_ControlBoard;
-		}		
+		}
 
 		#endregion
 

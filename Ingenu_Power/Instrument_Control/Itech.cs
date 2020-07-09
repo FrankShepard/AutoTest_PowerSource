@@ -1624,7 +1624,14 @@ namespace Instrument_Control
 				}
 			}
 			if(index_of_header < 0) { error_information = address.ToString() + "数据传输受到干扰，请重试";return error_information; }
-			Buffer.BlockCopy( received_data, index_of_header, SerialportData, 0, (received_data.Length - index_of_header) );
+			int max_count = 0;
+			if ((received_data.Length - index_of_header) >= SerialportData.Length) {
+				max_count = SerialportData.Length;
+			} else {
+				max_count = (received_data.Length - index_of_header);
+			}
+
+			Buffer.BlockCopy( received_data, index_of_header, SerialportData, 0, max_count );
 
 			//防止串口异常出现的接收数据与发送数据相同的情况
 			index = 0;

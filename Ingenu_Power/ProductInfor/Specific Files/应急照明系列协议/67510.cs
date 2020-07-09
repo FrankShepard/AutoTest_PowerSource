@@ -1402,8 +1402,8 @@ namespace ProductInfor
 										Communicate_User ( serialPort, out error_information );
 										if ( error_information != string.Empty ) { continue; }
 										if ( ( Math.Abs ( infor_Uart.Measured_OutputCurrent - currents [ 0 ] ) > 0.5m ) || ( Math.Abs ( infor_Uart.Measured_OutputVoltage - voltages [ 0 ] ) > 0.5m ) ) {
+											Thread.Sleep( 100 );
 											error_information = "强制启动模式下，产品串口采集到的数据与真实电压/电流的输出超过了限定的最大范围0.5V \r\n" + infor_Uart.Measured_OutputCurrent.ToString() + " " + currents[ 0 ].ToString() + "\r\n" + infor_Uart.Measured_OutputVoltage.ToString() + " " + voltages[ 0 ].ToString();
-											Thread.Sleep ( 100 );
 										}
 									} while ( ( error_information != string.Empty ) && ( ++retry_count < 10 ) );
 								}

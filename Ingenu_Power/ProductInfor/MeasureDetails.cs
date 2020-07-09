@@ -49,9 +49,13 @@ namespace ProductInfor
 		/// </summary>
 		private const int Baudrate_Instrument_ACPower = 9600;
 		/// <summary>
-		/// 仪表通讯波特率 - 自制控制板
+		/// 仪表通讯波特率 - 自制控制板_MCU控制
 		/// </summary>
 		public const int Baudrate_Instrument_ControlBoard = 4800;
+		/// <summary>
+		/// 仪表通讯波特率 - 自制控制板_备电控制
+		/// </summary>
+		public const int Baudrate_Instrument_BatsControlBoard = 4800;
 		/// <summary>
 		/// VISA中RM的会话号
 		/// </summary>
@@ -143,9 +147,10 @@ namespace ProductInfor
 								error_information += error_information_temp;
 
 								/*备电控制继电器板和通道分选板软件复位*/
-								serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+								serialPort.BaudRate = Baudrate_Instrument_BatsControlBoard;
 								mcu.McuControl_vReset ( MCU_Control.Address_BatsControl, serialPort, out error_information_temp );
 								error_information += error_information_temp;
+								serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
 								mcu.McuControl_vReset ( MCU_Control.Address_ChannelChoose, serialPort, out error_information_temp );
 								error_information += error_information_temp;
 								//通道分选板设置为右侧，选择通道1进行完纹波测试
@@ -196,7 +201,7 @@ namespace ProductInfor
 								do {
 									serialPort.BaudRate = Baudrate_Instrument_DCPower;
 									error_information = itech.Itech_vInOutOnOffSet( Address_DCPower, Itech.OnOffStatus.Off, serialPort );
-									serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+									serialPort.BaudRate = Baudrate_Instrument_BatsControlBoard;
 									mcu.McuControl_vBatsOutput( false, false, MCU_Control.FixedLevel.FixedLevel_24V, serialPort, out error_information );		
 								} while ((++retry_index < 3) && (error_information != string.Empty));
 
@@ -742,7 +747,7 @@ namespace ProductInfor
 						error_information = itech.DCPower_vOutputStatusSet( Address_DCPower, source_voltage, output_enable, serialPort );
 						if (error_information != string.Empty) { continue; }
 						Thread.Sleep( 50 );
-						serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+						serialPort.BaudRate = Baudrate_Instrument_BatsControlBoard;
 						mCU_Control.McuControl_vBatsOutput( output_enable, used_adjust_power, fixedLevel, serialPort, out error_information );
 					} while ((error_information != string.Empty) && (++cmd_error_count < 5));
 					if (cmd_error_count >= 5) { error_information = "MeasureDetails.Measure_vSetDCPowerStatus 函数执行时仪表响应超时"; }

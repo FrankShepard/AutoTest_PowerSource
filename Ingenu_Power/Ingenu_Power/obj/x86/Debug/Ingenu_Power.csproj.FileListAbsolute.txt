@@ -121,12 +121,7 @@ F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Instr
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\ISP.dll
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\MaterialDesignColors.dll
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\MaterialDesignThemes.Wpf.dll
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\nationalinstruments.controls.booleans.dll
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\NationalInstruments.Controls.dll
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\ShowMeTheXAML.dll
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\NationalInstruments.Common.dll
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\NationalInstruments.NiLmClientDLL.dll
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\NationalInstruments.MStudioCLM.dll
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Instrument_Control.pdb
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Instrument_Control.xml
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\ISP.pdb
@@ -134,9 +129,6 @@ F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\ISP.x
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\MaterialDesignColors.pdb
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\MaterialDesignThemes.Wpf.pdb
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\MaterialDesignThemes.Wpf.xml
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\NationalInstruments.Controls.xml
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\nationalinstruments.controls.booleans.xml
-F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\NationalInstruments.Common.xml
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csproj.ResolveComReference.cache
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Domain\ResultMessageDialog.baml
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\MainWindow.baml
@@ -174,3 +166,4 @@ F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Micro
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Download\ProductInfor.dll
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Office.dll
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Microsoft.Office.Interop.Excel.dll
+F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csprojAssemblyReference.cache

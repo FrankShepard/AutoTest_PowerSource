@@ -449,9 +449,15 @@
             初始化串口时的默认波特率
             </summary>
         </member>
+        <member name="M:ProductInfor.Base.BaudrateInstrument_BatsControlBoardGet">
+            <summary>
+            返回自制控制板(备电控制)的波特率，用于不包含在本Dll中的ISP功能的实现
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:ProductInfor.Base.BaudrateInstrument_ControlBoardGet">
             <summary>
-            返回自制控制板的波特率，用于不包含在本Dll中的ISP功能的实现
+            返回自制控制板(MCU控制)的波特率，用于不包含在本Dll中的ISP功能的实现
             </summary>
             <returns></returns>
         </member>
@@ -951,7 +957,12 @@
         </member>
         <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument_ControlBoard">
             <summary>
-            仪表通讯波特率 - 自制控制板
+            仪表通讯波特率 - 自制控制板_MCU控制
+            </summary>
+        </member>
+        <member name="F:ProductInfor.MeasureDetails.Baudrate_Instrument_BatsControlBoard">
+            <summary>
+            仪表通讯波特率 - 自制控制板_备电控制
             </summary>
         </member>
         <member name="F:ProductInfor.MeasureDetails.SessionRM">
