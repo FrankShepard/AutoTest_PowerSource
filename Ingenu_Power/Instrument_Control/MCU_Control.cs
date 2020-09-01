@@ -10,6 +10,15 @@ namespace Instrument_Control
 	/// </summary>
 	public class MCU_Control : IDisposable
 	{
+		#region -- 全局变量
+
+		/// <summary>
+		/// 单片机接收到的有效数据的数组，用于接收单片机返回值
+		/// </summary>
+		byte[] McuControl_uReceivedData = new byte[20];
+
+		#endregion
+
 		#region -- 常量设置
 
 		/// <summary>
@@ -37,6 +46,10 @@ namespace Instrument_Control
 		/// 通用校准协议中使用的通讯同步 帧尾
 		/// </summary>
 		private const byte Ender_Vali = 0x33;
+		/// <summary>
+		/// 单片机通讯板的波特率
+		/// </summary>
+		private const int Baudrate_McuControlBoard = 38400;
 
 		#endregion
 
@@ -247,6 +260,43 @@ namespace Instrument_Control
 			Slaver = 1,
 		}
 
+		/// <summary>
+		/// 与待测产品通讯的串口方式
+		/// </summary>
+		public enum Comm_Type:byte
+		{
+			/// <summary>
+			/// 无通讯功能
+			/// </summary>
+			Comm_None = 0,
+			/// <summary>
+			/// 通讯使用TTL电平的Uart
+			/// </summary>
+			Comm_TTL = 1,
+			/// <summary>
+			/// 通讯使用RS232
+			/// </summary>
+			Comm_RS232 = 2,
+			/// <summary>
+			/// 通讯使用RS485
+			/// </summary>
+			Comm_RS485 = 3,
+		}
+
+		/// <summary>
+		/// PC与待测产品的通讯方向
+		/// </summary>
+		public enum Comm_Direction:byte
+		{
+			/// <summary>
+			/// PC->ProductMcu
+			/// </summary>
+			CommDir_PCToProduct = 0,
+			/// <summary>
+			/// ProductMcu->PC
+			/// </summary>
+			CommDir_ProductToPC = 1,
+		}
 
 		/// <summary>
 		/// 对备电控制继电器模块和双通道分选继电器模块的通讯命令
@@ -282,6 +332,26 @@ namespace Instrument_Control
 			/// </summary>
 			Set_Location = 0x20,
 			/// <summary>
+			/// 设置待测产品的GND
+			/// </summary>
+			Set_GndConnection = 0x30,
+			/// <summary>
+			/// 设置需要进行ADC测试的管脚状态
+			/// </summary>
+			Set_PinsNeedADTest = 0x31,
+			/// <summary>
+			/// 获取产品SG端子的AD合格状态及高低电平
+			/// </summary>
+			Read_PinsADValue = 0x32,
+			/// <summary>
+			/// 设置待测产品的通讯方式及TXD/RXD的电平反向与否状态(485总线时后面置为0)
+			/// </summary>
+			Set_CommunicationParameter = 0x40,
+			/// <summary>
+			/// 设置PC与待测产品通讯的数据流方向（此命令是由于IS3082的电路缺陷引发）
+			/// </summary>
+			Set_CommunicationDirection = 0x41,
+			/// <summary>
 			/// MCU返回代码 - busy
 			/// </summary>
 			Respond_Busy = 0xA0,
@@ -293,6 +363,10 @@ namespace Instrument_Control
 			/// MCU返回代码 - 校验和错误
 			/// </summary>
 			Respond_ValiError = 0xA2,
+			/// <summary>
+			/// MCU的定时查询操作-类似看门狗操作，防止待测产品通讯异常造成总线抢占
+			/// </summary>
+			WatchDogCheck = 0xFE,
 			/// <summary>
 			/// 软件复位特定地址的单片机
 			/// </summary>
@@ -429,6 +503,118 @@ namespace Instrument_Control
 			Byte [ ] datas = new byte [ ] { 0 };
 
 			McuControl_vSendCmd ( address, Cmd_MCUModel.Reset_Model, datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 选择产品GND对应的数据管脚
+		/// </summary>
+		/// <param name="gnd_pin">产品端子上的GND的管脚索引，1~10表示对应的GND管脚，0表示无需连接GND到产品端子上</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuControl_vProductGndChoose(byte gnd_pin,SerialPort serialPort,out string error_information)
+		{
+			error_information = string.Empty;
+
+			byte[] datas = new byte[] { gnd_pin };
+			McuControl_vSendCmd( Address_ChannelChoose, Cmd_MCUModel.Set_GndConnection, datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 设置需要使用AD进行测试信号端子高低电平的管脚的状态
+		/// </summary>
+		/// <param name="need_ad_pins_status">需要使用AD进行测试的信号端子的状态；对应bit上为1表示需要使用AD功能进行测试</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuControl_vPinsNeedADMeasureSetting(UInt16 need_ad_pins_status,SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+
+			byte[] datas = BitConverter.GetBytes( need_ad_pins_status );
+			McuControl_vSendCmd( Address_ChannelChoose, Cmd_MCUModel.Set_PinsNeedADTest, datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 获取AD测试的管脚的状态
+		/// </summary>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		/// <returns>AD采集到的高低电平及逻辑电平合格状态</returns>
+		public UInt16[] McuControl_vGetPinsADValue(SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			UInt16[] result = new UInt16[] { 0, 0 };
+
+			byte[] datas = BitConverter.GetBytes( 0 );
+			McuControl_vSendCmd( Address_ChannelChoose, Cmd_MCUModel.Read_PinsADValue, datas, serialPort, out error_information );
+			if(error_information == string.Empty) {
+				result[ 0 ] = BitConverter.ToUInt16( McuControl_uReceivedData, 0 );
+				result[ 1 ] = BitConverter.ToUInt16( McuControl_uReceivedData, 2 );
+			}
+			return result;
+		}
+
+		/// <summary>
+		/// 设置与产品的通讯相关参数
+		/// </summary>
+		/// <param name="comm_Type">通讯类型</param>
+		/// <param name="txd_pin">TXD对应的端子管脚（485时为0）</param>
+		/// <param name="rxd_pin">RXD对应的端子管脚（485时为0）</param>
+		/// <param name="txd_level_reverse">TXD电平是否反向（485时为0）</param>
+		/// <param name="rxd_level_reverse">RXD电平是否反向（485时为0）</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuControl_vSetCommParameter(Comm_Type comm_Type, byte txd_pin,byte rxd_pin,bool txd_level_reverse,bool rxd_level_reverse, SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			byte[] datas = new byte[] { 0, 0, 0, 0, 0 };
+			byte txd_rev = 0,rxd_rev = 0;
+			if (txd_level_reverse) { txd_rev = 1; }
+			if (rxd_level_reverse) { rxd_rev = 1; }
+
+			if (comm_Type ==  Comm_Type.Comm_TTL) {
+				datas[ 0 ] = (byte)Comm_Type.Comm_TTL;
+				datas[ 1 ] = txd_pin;
+				datas[ 2 ] = rxd_pin;
+				datas[ 3 ] = txd_rev;
+				datas[ 4 ] = rxd_rev;
+			}else if (comm_Type == Comm_Type.Comm_RS232) {
+				datas[ 0 ] = ( byte ) Comm_Type.Comm_RS232;
+				datas[ 1 ] = txd_pin;
+				datas[ 2 ] = rxd_pin;
+				datas[ 3 ] = txd_rev;
+				datas[ 4 ] = rxd_rev;
+			}else if (comm_Type == Comm_Type.Comm_RS485) {
+				datas[ 0 ] = ( byte ) Comm_Type.Comm_RS485;				
+			}
+			McuControl_vSendCmd( Address_ChannelChoose, Cmd_MCUModel.Set_CommunicationParameter, datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 设置PC与产品单片机之间的应答方向
+		/// </summary>
+		/// <param name="comm_Direction">通讯方向</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuControl_vSetCommDirection(Comm_Direction comm_Direction,SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+
+			byte[] datas = new byte[] { 0 };
+			datas[ 0 ] = ( byte ) comm_Direction;
+			McuControl_vSendCmd( Address_ChannelChoose, Cmd_MCUModel.Set_CommunicationDirection, datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 类似看门狗操作，周期性（3s内）发送给控制板，防止待测产品通讯异常导致485总线被抢占
+		/// </summary>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuControl_vWatchDogCheck( SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+
+			byte[] datas = new byte[] { 0 };
+			McuControl_vSendCmd( Address_ChannelChoose, Cmd_MCUModel.WatchDogCheck, datas, serialPort, out error_information );
 		}
 
 		#endregion
@@ -635,11 +821,8 @@ namespace Instrument_Control
 			datas [ 1 ] = ( byte ) Config.Mcu_ClearValidationCode;
 			datas [ 2 ] = 0x01;
 			McuCalibrate_vSendCmd ( datas, serialPort, out error_information );
-			//单片机操作Flash时间较长，此处时间不可忽略；增加200ms延时
-			Thread.Sleep ( 200 );
-			McuCalibrate_vSendCmd ( datas, serialPort, out error_information );
-			//单片机操作Flash时间较长，此处时间不可忽略；增加200ms延时
-			Thread.Sleep ( 200 );
+			//单片机操作Flash时间较长，此处时间不可忽略；增加100ms延时
+			Thread.Sleep ( 100 );
 		}
 
 		/// <summary>
@@ -813,7 +996,11 @@ namespace Instrument_Control
 				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
 			}
 			sb.AppendLine( text_value );
-			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			if(!System.IO.File.Exists( file_name )) {
+				System.IO.File.Create( file_name );
+			}
+			System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 
 			/*以下执行串口数据传输指令*/
@@ -828,7 +1015,7 @@ namespace Instrument_Control
 					return;
 				}
 			}
-			//! 等待传输结束，结束的标志为连续两个5ms之间的接收字节数量是相同的
+			//! 等待传输结束，结束的标志为连续两个2ms之间的接收字节数量是相同的
 			int last_byte_count = 0;
 			while ( ( serialPort.BytesToRead > last_byte_count ) && ( serialPort.BytesToRead != 0 ) ) {
 				last_byte_count = serialPort.BytesToRead;
@@ -852,7 +1039,11 @@ namespace Instrument_Control
 				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
 			}
 			sb.AppendLine( text_value );
-			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			if(!System.IO.File.Exists( file_name )) {
+				System.IO.File.Create( file_name );
+			}
+			System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 
 			//先将之前发送出去的命令字节做一个备份，需要在查询指令时使用
@@ -877,6 +1068,9 @@ namespace Instrument_Control
 					UInt16 validatecode = BitConverter.ToUInt16 ( received_data, received_data.Length - 3 );
 					if ( recevied_validatecode != validatecode ) {
 						error_information = "地址为 " + address.ToString ( ) + " 的设备返回的校验码不匹配 \r\n";
+					} else {
+						//正常命令，将返回数据填充到全局变量的数组中
+						Buffer.BlockCopy( received_data, 4, McuControl_uReceivedData, 0, received_data[ 4 ] );
 					}
 				} else { error_information = "地址为 " + address.ToString ( ) + " 的设备不能正确执行命令 \r\n"; }
 			} else {
@@ -958,7 +1152,11 @@ namespace Instrument_Control
 				text_value += (received_data[ i ].ToString( "x" ).ToUpper() + " ");
 			}
 			sb.AppendLine( text_value );
-			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			if(!System.IO.File.Exists( file_name )) {
+				System.IO.File.Create( file_name );
+			}
+			System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 
 			//先判断同步头字节是否满足要求;取消帧尾的判断（个别型号的电源重启时可能发送异常多个无意义字节）
@@ -980,6 +1178,10 @@ namespace Instrument_Control
 			//个别型号的产品电源在上电下电时会错误的上传多余数据，此数据可能会对后续逻辑造成异常干扰；此处清除串口中的数据
 			serialPort.ReadExisting ( );
 
+			//将McuControl控制板流向设置为产品接收PC数据使用
+			int baudrate_product = serialPort.BaudRate;
+			serialPort.BaudRate = Baudrate_McuControlBoard;
+			McuControl_vSetCommDirection( Comm_Direction.CommDir_PCToProduct, serialPort, out error_information );
 			return need_retry;
 		}
 
@@ -1000,12 +1202,24 @@ namespace Instrument_Control
 				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
 			}
 			sb.AppendLine( text_value );
-			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			if(!System.IO.File.Exists( file_name )) {
+				System.IO.File.Create( file_name );
+			}
+			System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 			/*以下执行串口数据传输指令*/
 			if ( !serialPort.IsOpen ) { serialPort.Open ( ); }
 			serialPort.ReadExisting ( );
 			serialPort.Write ( command_bytes, 0, command_bytes.Length );
+			//由于本次使用的IS3082问题，在发送后等待待测产品回码时必须将方向信息设定
+			int baudrate_product = serialPort.BaudRate;
+			serialPort.BaudRate = Baudrate_McuControlBoard;
+			McuControl_vSetCommDirection( Comm_Direction.CommDir_ProductToPC, serialPort, out error_information );
+			if(error_information != string.Empty) {
+				return;
+			}
+			serialPort.BaudRate = baudrate_product;
 			/*等待回码后解析回码*/
 			Int32 waittime = 0;
 			while ( serialPort.BytesToRead == 0 ) {

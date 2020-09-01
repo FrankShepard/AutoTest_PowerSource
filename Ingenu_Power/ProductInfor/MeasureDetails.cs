@@ -39,11 +39,11 @@ namespace ProductInfor
 		/// <summary>
 		/// 仪表通讯波特率 - 艾德克斯电子负载
 		/// </summary>
-		public const int Baudrate_Instrument_Load = 9600;
+		public const int Baudrate_Instrument_Load = 115200;
 		/// <summary>
 		/// 仪表通讯波特率 - 艾德克斯直流电源
 		/// </summary>
-		private const int Baudrate_Instrument_DCPower = 9600;
+		private const int Baudrate_Instrument_DCPower = 115200;
 		/// <summary>
 		/// 仪表通讯波特率 - 程控交流电源
 		/// </summary>
@@ -51,7 +51,7 @@ namespace ProductInfor
 		/// <summary>
 		/// 仪表通讯波特率 - 自制控制板_MCU控制
 		/// </summary>
-		public const int Baudrate_Instrument_ControlBoard = 4800;
+		public const int Baudrate_Instrument_ControlBoard = 38400;
 		/// <summary>
 		/// 仪表通讯波特率 - 自制控制板_备电控制
 		/// </summary>
@@ -190,6 +190,10 @@ namespace ProductInfor
 									siglentOSC.SiglentOSC_vClearError( SessionRM, SessionOSC );
 									siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
 								}
+								//断开与产品间的通讯，防止产品掉电而导致的总线占用
+								serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+								mcu.McuControl_vReset( MCU_Control.Address_ChannelChoose, serialPort, out error_information );
+
 								//关交流电源
 								serialPort.BaudRate = Baudrate_Instrument_ACPower;
 								int retry_index = 0;
@@ -526,20 +530,20 @@ namespace ProductInfor
 		/// <param name="serialPort">使用到的串口对象</param>
 		/// <param name="error_information">可能存在的错误信息</param>
 		/// <returns>交流电源输出参数</returns>
-		public AN97002H.Parameters_Woring Measure_vReadACPowerResult( SerialPort serialPort, out string error_information )
+		public AN97002H.Parameters_Working Measure_vReadACPowerResult( SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
-			AN97002H.Parameters_Woring parameters_Woring = new AN97002H.Parameters_Woring ( );
+			AN97002H.Parameters_Working parameters_Working = new AN97002H.Parameters_Working ( );
 			using (AN97002H aN97002H = new AN97002H()) {
 				serialPort.BaudRate = Baudrate_Instrument_ACPower;
 				int cmd_error_count = 0;
 				do {
-					parameters_Woring = aN97002H.ACPower_vQueryResult( Address_ACPower, serialPort, out error_information );
+					parameters_Working = aN97002H.ACPower_vQueryResult( Address_ACPower, serialPort, out error_information );
 				} while ((error_information != string.Empty) && (++cmd_error_count < 5));
 				if (cmd_error_count >= 5) { error_information = "MeasureDetails.Measure_vReadACPowerResult 函数执行时仪表响应超时"; }
 			}
 
-			return parameters_Woring;
+			return parameters_Working;
 		}
 
 		/// <summary>
@@ -888,6 +892,23 @@ namespace ProductInfor
 		#endregion
 
 		#region -- 自制控制板相关动作
+
+		/// <summary>
+		/// 控制与待测单片机之间的通讯方向
+		/// </summary>
+		/// <param name="comm_Direction">PC与产品通讯的方向</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vCommDirectionSet(MCU_Control.Comm_Direction comm_Direction,SerialPort serialPort,out string error_information)
+		{
+			error_information = string.Empty;
+			int baudrate_product = serialPort.BaudRate;
+			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+			using (MCU_Control mCU_Control = new MCU_Control()) {
+				mCU_Control.McuControl_vSetCommDirection( comm_Direction, serialPort, out error_information );
+			}
+			serialPort.BaudRate = baudrate_product;
+		}
 
 		/// <summary>
 		/// 控制自制模块进行强制模式设置

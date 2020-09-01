@@ -1681,18 +1681,18 @@ namespace ProductInfor
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
 						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
-							AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
+							AN97002H.Parameters_Working parameters_Working = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
 							if ( error_information != string.Empty ) { continue; }
 							ArrayList arrayList_1 = measureDetails.Measure_vReadOutputLoadResult ( serialPort, out error_information );
 							if ( error_information != string.Empty ) { continue; }
-							if ( parameters_Woring.ActrulyPower == 0m ) { continue; }
+							if ( parameters_Working.ActrulyPower == 0m ) { continue; }
 							Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
 							decimal output_power = 0m;
 							for ( int index = 0 ; index < arrayList_1.Count ; index++ ) {
 								generalData_Load = ( Itech.GeneralData_Load ) arrayList_1 [ index ];
 								output_power += generalData_Load.ActrulyPower;
 							}
-							specific_value = output_power / parameters_Woring.ActrulyPower;
+							specific_value = output_power / parameters_Working.ActrulyPower;
 							if ( specific_value >= infor_Output.Qualified_Efficiency_Min ) {
 								check_okey = true;
 							}
@@ -2349,9 +2349,9 @@ namespace ProductInfor
 													error_information = "主电欠压输出存在跌落"; break;
 												}
 												//检查是否从主电切换到备电
-												AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
+												AN97002H.Parameters_Working parameters_Working = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
 												if (error_information != string.Empty) { break; }
-												if ((parameters_Woring.ActrulyPower < 20m) && (parameters_Woring.ActrulyCurrent < 1.5m)) { //增加输入电流的限定条件，防止采集时交流电源时出现功率返回值的错误
+												if ((parameters_Working.ActrulyPower < 20m) && (parameters_Working.ActrulyCurrent < 1.5m)) { //增加输入电流的限定条件，防止采集时交流电源时出现功率返回值的错误
 													specific_value = target_value + 1m;
 													break;
 												}
@@ -2493,9 +2493,9 @@ namespace ProductInfor
 									for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
 										if (!infor_Output.Stabilivolt[ index_of_channel ]) {
 											//检查是否从备电切换到主电
-											AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
+											AN97002H.Parameters_Working parameters_Working = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
 											if (error_information != string.Empty) { continue; }
-											decimal first_value = parameters_Woring.ActrulyVoltage;
+											decimal first_value = parameters_Working.ActrulyVoltage;
 											decimal target_value = 0m;
 											for (target_value = first_value; target_value <= (infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery[ 1 ] + 2m); target_value += 2.0m) {
 												measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, target_value );
@@ -2509,9 +2509,9 @@ namespace ProductInfor
 													break;
 												}
 												//检查是否从备电切换到主电
-												parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
+												parameters_Working = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
 												if (error_information != string.Empty) { continue; }
-												if (parameters_Woring.ActrulyPower > 25m) {//主电输出功率超过25W则认为恢复主电工作
+												if (parameters_Working.ActrulyPower > 25m) {//主电输出功率超过25W则认为恢复主电工作
 													specific_value = target_value - 1m;
 													break;
 												}
@@ -2678,9 +2678,9 @@ namespace ProductInfor
 													error_information = "主电过压输出存在跌落"; break;
 												}
 												//检查是否从主电切换到备电
-												AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
+												AN97002H.Parameters_Working parameters_Working = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
 												if (error_information != string.Empty) { break; }
-												if ((parameters_Woring.ActrulyPower < 20m) && (parameters_Woring.ActrulyCurrent < 1.5m)) { //增加输入电流的限定条件，防止采集时交流电源时出现功率返回值的错误
+												if ((parameters_Working.ActrulyPower < 20m) && (parameters_Working.ActrulyCurrent < 1.5m)) { //增加输入电流的限定条件，防止采集时交流电源时出现功率返回值的错误
 													specific_value = target_value - 1m;
 													break;
 												}
@@ -2823,7 +2823,7 @@ namespace ProductInfor
 									for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
 										if (!infor_Output.Stabilivolt[ index_of_channel ]) {
 											//检查是否从备电切换到主电
-											AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
+											AN97002H.Parameters_Working parameters_Woring = measureDetails.Measure_vReadACPowerResult( serialPort, out error_information );
 											if (error_information != string.Empty) { continue; }
 											decimal first_value = parameters_Woring.ActrulyVoltage;
 											decimal target_value = 0m;

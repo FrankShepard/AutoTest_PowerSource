@@ -82,7 +82,7 @@ namespace Instrument_Control
         /// <summary>
         /// 交流电源的电压、电流、频率、功率实时测量值
         /// </summary>
-        public struct Parameters_Woring
+        public struct Parameters_Working
         {
             /// <summary>
             /// 实际输出电压
@@ -313,17 +313,17 @@ namespace Instrument_Control
 						obj = ( object )working_Status;
 						break;
 					case "RNT":
-						Parameters_Woring parameters_Woring = new Parameters_Woring();
+						Parameters_Working parameters_Working = new Parameters_Working();
 						string parameter_temp = string.Empty;
 						parameter_temp = Encoding.ASCII.GetString( received_code, 8, 5 );
-						parameters_Woring.ActrulyVoltage = Convert.ToDecimal( parameter_temp );
+						parameters_Working.ActrulyVoltage = Convert.ToDecimal( parameter_temp );
 						parameter_temp = Encoding.ASCII.GetString( received_code, 14, 6 );
-						parameters_Woring.ActrulyCurrent = Convert.ToDecimal( parameter_temp );
+						parameters_Working.ActrulyCurrent = Convert.ToDecimal( parameter_temp );
 						parameter_temp = Encoding.ASCII.GetString( received_code, 21, 4 );
-						parameters_Woring.ActrulyFrequency = Convert.ToDecimal( parameter_temp );
+						parameters_Working.ActrulyFrequency = Convert.ToDecimal( parameter_temp );
 						parameter_temp = Encoding.ASCII.GetString( received_code, 26, 6 );
-						parameters_Woring.ActrulyPower = Convert.ToDecimal( parameter_temp ) / 10m;
-						obj = ( object )parameters_Woring;
+						parameters_Working.ActrulyPower = Convert.ToDecimal( parameter_temp ) / 10m;
+						obj = ( object )parameters_Working;
 						break;
 					case "RNS":
 						Parameters_Setting parameters_Setting = new Parameters_Setting();
@@ -790,19 +790,19 @@ namespace Instrument_Control
 		/// <param name="sp_acpower">交流电源与上位机连接的串口</param>
 		/// <param name="error_information">查询错误信息</param>
 		/// <returns>输出的真实值结构体</returns>
-		public Parameters_Woring ACPower_vQueryResult(byte address,  SerialPort sp_acpower,out string error_information)
+		public Parameters_Working ACPower_vQueryResult(byte address,  SerialPort sp_acpower,out string error_information)
 		{
 			error_information = string.Empty;
-			Parameters_Woring parameters_Woring = new Parameters_Woring();
+			Parameters_Working parameters_Working = new Parameters_Working();
 			object obj;
 			int retry_count = 0;
 			do {
 				obj = ACPower_vQuery( address, 0x07, "RNT*", sp_acpower, out error_information );
 				Thread.Sleep( 100 );
 			} while (((error_information != string.Empty) || (obj == null)) && (++retry_count < 3));
-			if (retry_count >= 3) { error_information += "\r\n查询程控交流电源工作时数据出现错误 "; return parameters_Woring; }
-			parameters_Woring = ( Parameters_Woring )obj;
-			return parameters_Woring;
+			if (retry_count >= 3) { error_information += "\r\n查询程控交流电源工作时数据出现错误 "; return parameters_Working; }
+			parameters_Working = ( Parameters_Working )obj;
+			return parameters_Working;
         }
 
 		/// <summary>

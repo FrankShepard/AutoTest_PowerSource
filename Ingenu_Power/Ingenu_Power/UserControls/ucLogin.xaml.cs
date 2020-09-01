@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -10,29 +11,35 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml;
 using Ingenu_Power.Domain;
 using MaterialDesignThemes.Wpf;
 
 namespace Ingenu_Power.UserControls
 {
-    /// <summary>
-    /// ucLogin.xaml 的交互逻辑
-    /// </summary>
-    public partial class UcLogin : UserControl
-    {
-        public UcLogin()
-        {
-            InitializeComponent();			
+	/// <summary>
+	/// ucLogin.xaml 的交互逻辑
+	/// </summary>
+	public partial class UcLogin : UserControl
+	{
+		public UcLogin()
+		{
+			InitializeComponent();
 		}
 
 		/// <summary>
 		/// 使用到的多线程声明
 		/// </summary>
 		Thread trdSQL_Validation;
+		/// <summary>
+		/// 控件坐标信息
+		/// </summary>
+		Point pos = new Point();
 
 		/// <summary>
 		/// 载入用户控件时所需要的逻辑 - 记住密码所需要的逻辑处理
@@ -54,8 +61,8 @@ namespace Ingenu_Power.UserControls
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void BtnLogin_Click(object sender, RoutedEventArgs e)
-        {
-			if ((TxtUserName.Text.Trim() != string.Empty) && (FloatingPasswordBox.Password.Trim() != string.Empty)) {
+		{
+			if (( TxtUserName.Text.Trim() != string.Empty ) && ( FloatingPasswordBox.Password.Trim() != string.Empty )) {
 
 				StaticInfor.sQL_Information.SQL_Name = Properties.Settings.Default.SQL_Name;
 				StaticInfor.sQL_Information.SQL_User = Properties.Settings.Default.SQL_User;
@@ -63,9 +70,9 @@ namespace Ingenu_Power.UserControls
 
 				string login_user = TxtUserName.Text.Trim();
 				string password = FloatingPasswordBox.Password.Trim();
-				bool remeberstatus = ( bool )ChkRememberPassword.IsChecked;
+				bool remeberstatus = ( bool ) ChkRememberPassword.IsChecked;
 				//工作线程中校验SQL状态是否正常
-				trdSQL_Validation = new Thread( () => V_ValidateSQL( StaticInfor.sQL_Information, login_user , password , remeberstatus ) ) {
+				trdSQL_Validation = new Thread( () => V_ValidateSQL( StaticInfor.sQL_Information, login_user, password, remeberstatus ) ) {
 					IsBackground = true
 				};
 				trdSQL_Validation.SetApartmentState( ApartmentState.STA );
@@ -73,15 +80,36 @@ namespace Ingenu_Power.UserControls
 			} else {
 				StaticInfor.Error_Message = "请正确填写用户名和密码";
 				MainWindow.MessageTips( StaticInfor.Error_Message );
-			}			
+			}
+
+			////动态加载 xmal 的元素方式 及 鼠标拖拽方式的实现
+			//var stop = Convert.ToString( "<Button xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'>"+
+			//	" <TextBlock  Text='代码中动态加载!' />"+				
+			//	"</Button>" );
+			//StringReader stringReader = new StringReader( stop );
+			//XmlTextReader xmlTextReader = new XmlTextReader( stringReader );
+			//object obj = XamlReader.Load( xmlTextReader );
+			//UIElement uIElement = ( UIElement ) obj;
+			//uIElement.MouseMove += UIElement_MouseMove; ;
+			//GrdLogin.Children.Add( uIElement );			
 		}
 
+		private void UIElement_MouseMove(object sender, MouseEventArgs e)
+		{
+			if (e.RightButton == MouseButtonState.Pressed) {
+				Button tmp = ( Button ) sender;
+				double dx = e.GetPosition( null ).X - pos.X + tmp.Margin.Left;
+				double dy = e.GetPosition( null ).Y - pos.Y + tmp.Margin.Top;
+				tmp.Margin = new Thickness( dx, dy, 0, 0 );
+				pos = e.GetPosition( null );
+			}
+		}
 
 		/// <summary>
 		/// 数据库的校验程序 -- 工作于后台工作线程中
 		/// </summary>
 		/// <param name="information">服务器信息的集合体</param>        
-		private void V_ValidateSQL(StaticInfor.SQL_Information information,string login_user,string password,bool remeberpassword)
+		private void V_ValidateSQL(StaticInfor.SQL_Information information, string login_user, string password, bool remeberpassword)
 		{
 			string error_information = string.Empty;
 			using (Database database = new Database()) {
@@ -95,7 +123,7 @@ namespace Ingenu_Power.UserControls
 						int index = 0;
 						for (index = 0; index < table.Rows.Count; index++) {
 							if (login_user == table.Rows[ index ][ "用户名" ].ToString().Trim()) {
-								if ((password != table.Rows[ index ][ "登陆密码" ].ToString().Trim().ToUpper()) && (password.ToUpper() != "RESET")) {
+								if (( password != table.Rows[ index ][ "登陆密码" ].ToString().Trim().ToUpper() ) && ( password.ToUpper() != "RESET" )) {
 									//密码不匹配									
 									error_information = "密码错误，请重新输入密码";
 									StaticInfor.UserRightLevel = 0;
@@ -137,6 +165,7 @@ namespace Ingenu_Power.UserControls
 				this.Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), StaticInfor.Error_Message, false );
 			}
 		}
+
 
 	}
 }

@@ -402,8 +402,8 @@ namespace ProductInfor
 			for ( int index = 0 ; index < 2 ; index++ ) {
 				Product_vCommandSend ( SerialportData, serialPort, out error_information );
 			}
-			//等待200ms保证单片机可以执行从用户模式到管理员模式的切换，同时保证采样处于稳定状态
-			Thread.Sleep ( 200 );
+			//等待50ms保证单片机可以执行从用户模式到管理员模式的切换，同时保证采样处于稳定状态
+			Thread.Sleep ( 50 );
 		}
 
 		/// <summary>
@@ -929,12 +929,16 @@ namespace ProductInfor
 			StringBuilder sb = new StringBuilder();
 			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
 
+			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
 			if (temp != string.Empty) {
 				for (int i = 0; i < temp.Length; i++) {
 					text_value += temp[ i ] + " ";
 				}
 				sb.AppendLine( text_value );
-				System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+				if(!System.IO.File.Exists( file_name )) {
+					System.IO.File.Create( file_name );
+				}
+				System.IO.File.AppendAllText( file_name, sb.ToString() );
 			}
 
 			sp_product.Write( command_bytes, 0, command_bytes.Length );
@@ -944,7 +948,7 @@ namespace ProductInfor
 				text_value += command_bytes[ i ].ToString( "x" ).ToUpper() + " ";
 			}
 			sb.AppendLine( text_value );
-			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+			System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 			sp_product.ReadExisting ( );
 			sp_product.Write ( command_bytes, 0, command_bytes.Length );
@@ -958,6 +962,12 @@ namespace ProductInfor
 		private string Product_vWaitForRespond( SerialPort sp_product )
 		{
 			string error_information = string.Empty;
+			//注意通讯方向
+			using (MeasureDetails measureDetails = new MeasureDetails()) {
+				measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_ProductToPC, sp_product, out error_information );
+				if(error_information != string.Empty) { return error_information; }
+			}
+
 			Int32 waittime = 0;
 			while ( sp_product.BytesToRead == 0 ) {
 				Thread.Sleep ( 5 );
@@ -996,17 +1006,27 @@ namespace ProductInfor
 						text_value += (received_cmd[ i ].ToString( "x" ).ToUpper() + " ");
 					}
 					sb.AppendLine( text_value );
-					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+					string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+					if(!System.IO.File.Exists( file_name )) {
+						System.IO.File.Create( file_name );
+					}
+					System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 				}
 				if ( received_cmd.Length > 5 ) {
 					if ( ( received_cmd [ 3 ] == 0x68 ) && ( received_cmd [ 4 ] == 0x10 ) ) {
 						if ( received_cmd [ received_cmd [ 2 ] + 4 ] != Product_vGetCalibrateCode ( received_cmd ) ) {
-							return "待测产品的串口校验和不匹配";
+							error_information = "待测产品的串口校验和不匹配";
 						}
 					} else {
-						return "待测产品返回的数据出现了逻辑不匹配的异常";
+						error_information = "待测产品返回的数据出现了逻辑不匹配的异常";
 					}
+				}
+
+				//注意通讯方向
+				using (MeasureDetails measureDetails = new MeasureDetails()) {
+					measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_PCToProduct, sp_product, out error_information );
+					if (error_information != string.Empty) { return error_information; }
 				}
 			} catch ( Exception ex ) {
 				error_information = ex.ToString ( );
@@ -1132,7 +1152,11 @@ namespace ProductInfor
 					StringBuilder sb = new StringBuilder();
 					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "产品校准";
 					sb.AppendLine( temp );
-					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+					string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+					if(!System.IO.File.Exists( file_name )) {
+						System.IO.File.Create( file_name );
+					}
+					System.IO.File.AppendAllText( file_name, sb.ToString() );
 
 					//真正开始进行待测产品的校准操作
 					Calibrate_vDoEvent ( measureDetails, serialPort, out error_information_Calibrate );
@@ -1140,10 +1164,10 @@ namespace ProductInfor
 					sb = new StringBuilder();
 					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "结束产品校准";
 					sb.AppendLine( temp );
-					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+					System.IO.File.AppendAllText( file_name, sb.ToString() );
 #else
 					//真正开始进行待测产品的校准操作
-					Calibrate_vDoEvent ( measureDetails, serialPort, out error_information_Calibrate );
+					Calibrate_vDoEvent( measureDetails, serialPort, out error_information_Calibrate );
 #endif
 					//关电源输出
 					measureDetails.Measure_vInstrumentPowerOff ( whole_function_enable, 5m, serialPort, out error_information );
@@ -1405,7 +1429,7 @@ namespace ProductInfor
 											Thread.Sleep( 100 );
 											error_information = "强制启动模式下，产品串口采集到的数据与真实电压/电流的输出超过了限定的最大范围0.5V \r\n" + infor_Uart.Measured_OutputCurrent.ToString() + " " + currents[ 0 ].ToString() + "\r\n" + infor_Uart.Measured_OutputVoltage.ToString() + " " + voltages[ 0 ].ToString();
 										}
-									} while ( ( error_information != string.Empty ) && ( ++retry_count < 10 ) );
+									} while ( ( error_information != string.Empty ) && ( ++retry_count < 50 ) );
 								}
 							}
 						}
@@ -1553,16 +1577,20 @@ namespace ProductInfor
 								}
 							}
 							//关闭备电，查看是否可以在2s时间内自杀（方法为查看程控直流电源的输出电流是否低于60mA）
-							Thread.Sleep ( 2800 );
+							Thread.Sleep ( 2500 );
 							if ( infor_Sp.UsedBatsCount > 2 ) {
 								Thread.Sleep ( 1000 );
 							}
-							Thread.Sleep ( delay_magnification * 50 );
-							generalData_DCPower = measureDetails.Measure_vReadDCPowerResult ( serialPort, out error_information );
-							if ( generalData_DCPower.ActrulyCurrent > 0.06m ) { //需要注意：程控直流电源采集输出电流存在偏差，此处设置为60mA防止错误判断
-								error_information = "待测电源的自杀功能失败，请注意此异常"; continue;
-							}
-							measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, source_voltage, true, false, serialPort, out error_information );
+                            int retry_count = 0;
+                            do {
+                                Thread.Sleep(delay_magnification * 50);
+                                generalData_DCPower = measureDetails.Measure_vReadDCPowerResult(serialPort, out error_information);
+                                if (generalData_DCPower.ActrulyCurrent > 0.06m) { //需要注意：程控直流电源采集输出电流存在偏差，此处设置为60mA防止错误判断
+                                    error_information = "待测电源的自杀功能失败，请注意此异常"; 
+                                }
+                            } while ((++retry_count < 3) && (error_information != string.Empty));
+                            if(error_information != string.Empty) { continue; }
+                            measureDetails.Measure_vSetDCPowerStatus(infor_Sp.UsedBatsCount, source_voltage, true, false, serialPort, out error_information);
 						}
 					}
 				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充
@@ -1618,12 +1646,12 @@ namespace ProductInfor
 								}
 								//合格范围的检测
 								specific_value [ index_of_channel ] = real_voltage;
-								if ( index_of_channel == 1 ) { //应急照明电源输出2压降存在于工装走线影响情况，在满载时增加上120mV的补偿
+								if ( index_of_channel == 1 ) { //应急照明电源输出2压降存在于工装走线影响情况，在满载时增加上200mV的补偿
 									if ( real_voltage < infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) {
-										specific_value [ index_of_channel ] += 0.12m;
+										specific_value [ index_of_channel ] += 0.2m;
 									}
 								}
-								if ( ( real_voltage >= infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) && ( real_voltage <= infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 1 ] ) ) {
+								if ( (specific_value[ index_of_channel ] >= infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) && (specific_value[ index_of_channel ] <= infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 1 ] ) ) {
 									check_okey [ index_of_channel ] = true;
 								}
 
@@ -1632,7 +1660,7 @@ namespace ProductInfor
 								if ( error_information != string.Empty ) { break; }
 								switch ( index_of_channel ) {
 									case 0:
-										if ( Math.Abs ( infor_Uart.Measured_OutputVoltage - real_voltage ) > 0.5m ) {
+										if ( Math.Abs ( infor_Uart.Measured_OutputVoltage - specific_value[ index_of_channel ] ) > 0.5m ) {
 											error_information = "电源测试得到的输出电压超过了合格误差范围";
 										}
 										if ( Math.Abs ( infor_Uart.Measured_OutputCurrent - real_current ) > 0.5m ) {
@@ -2014,14 +2042,17 @@ namespace ProductInfor
 										 /*恢复主电的欠压输出*/
 									measureDetails.Measure_vSetACPowerStatus ( true, serialPort, out error_information, infor_Mp.MpVoltage [ 0 ] );
 									if ( error_information != string.Empty ) { continue; }
-									AN97002H.Parameters_Woring parameters_Woring = new AN97002H.Parameters_Woring ( );
+									//等待主电重新上电后稳定时间段
+									Thread.Sleep( infor_PowerSourceChange.Delay_WaitForOverVoltageRecovery );
+
+									AN97002H.Parameters_Working parameters_Working = new AN97002H.Parameters_Working ( );
 									int retry_count = 0;
 									do {
-										Thread.Sleep ( 200 );
-										parameters_Woring = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
-									} while ( ( parameters_Woring.ActrulyPower < 50m ) && ( ++retry_count < 20 ) );
+										Thread.Sleep ( 600 );
+										parameters_Working = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
+									} while ( ( parameters_Working.ActrulyPower < 50m ) && ( ++retry_count < 10 ) );
 
-									if ( retry_count < 20 ) { //限定主电重置时的可以正常使用主电工作
+									if ( retry_count < 10 ) { //限定主电重置时的可以正常使用主电工作
 										check_okey = true;
 									}
 
@@ -2178,9 +2209,9 @@ namespace ProductInfor
 								}
 #endif
 								//读取交流电源时，数据更新太慢，引发逻辑判断错误
-								AN97002H.Parameters_Woring parameters_Woring = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
+								AN97002H.Parameters_Working parameters_Working = measureDetails.Measure_vReadACPowerResult ( serialPort, out error_information );
 								if ( error_information != string.Empty ) { continue; }
-								if ( parameters_Woring.ActrulyPower < 5m ) { //主输出关闭功能为正常
+								if ( parameters_Working.ActrulyPower < 5m ) { //主输出关闭功能为正常
 									check_okey [ 0 ] = true;
 								}
 							}
@@ -2283,24 +2314,38 @@ namespace ProductInfor
 								if ( error_information != string.Empty ) { continue; }
 
 								//撤销短路之后输出1和输出2可以正常启动
-								Thread.Sleep ( 1200 );
+								Thread.Sleep ( 1500 );
 								Thread.Sleep ( 100 * delay_magnification );
 								ArrayList list = new ArrayList ( );
-								using ( Itech itech = new Itech ( ) ) {
-									list = measureDetails.Measure_vReadOutputLoadResult ( serialPort, out error_information );
-									if ( error_information != string.Empty ) { continue; }
-									for ( int channel_index = 0 ; channel_index < infor_Output.OutputChannelCount ; channel_index++ ) {
-										for ( int index = 0 ; index < MeasureDetails.Address_Load_Output.Length ; index++ ) {
-											if ( allocate_channel [ index ] == channel_index ) {
-												Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load ) list [ index ];
-												if ( generalData_Load.ActrulyVoltage > 0.95m * infor_Output.Qualified_OutputVoltageWithLoad [ channel_index, 0 ] ) {
-													check_okey [ channel_index ] = true;
-												}
-												break;
-											}
-										}
-									}
-								}
+                                using (Itech itech = new Itech())
+                                {
+                                    for (int retry_count = 0; retry_count < 3; retry_count++)
+                                    {
+                                        list = measureDetails.Measure_vReadOutputLoadResult(serialPort, out error_information);
+                                        if (error_information != string.Empty) { continue; }
+                                        for (int channel_index = 0; channel_index < infor_Output.OutputChannelCount; channel_index++)
+                                        {
+                                            for (int index = 0; index < MeasureDetails.Address_Load_Output.Length; index++)
+                                            {
+                                                if (allocate_channel[index] == channel_index)
+                                                {
+                                                    Itech.GeneralData_Load generalData_Load = (Itech.GeneralData_Load)list[index];
+                                                    if (generalData_Load.ActrulyVoltage > 0.95m * infor_Output.Qualified_OutputVoltageWithLoad[channel_index, 0])
+                                                    {
+                                                        check_okey[channel_index] = true;
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                            //若是出现不合格的通道，则再一次检查
+                                            if (!check_okey[channel_index])
+                                            {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
 							}
 						}
 					}

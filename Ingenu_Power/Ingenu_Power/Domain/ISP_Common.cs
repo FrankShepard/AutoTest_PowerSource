@@ -201,7 +201,7 @@ namespace Ingenu_Power.Domain
 								//if ( error_information != string.Empty ) { return; }
 
 								//执行ISP的具体操作
-								serialPort.BaudRate = 57600;
+								serialPort.BaudRate = 56000;
 								error_information = isp.ISP_vISPMode_In( serialPort );
 								if (error_information != string.Empty) { return; }
 								error_information = isp.ISP_vProgram( buffer_hex, serialPort, true );

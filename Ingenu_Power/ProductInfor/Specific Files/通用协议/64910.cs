@@ -830,12 +830,16 @@ namespace ProductInfor
 			StringBuilder sb = new StringBuilder();
 			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
 
+			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
 			if (temp != string.Empty) {
 				for (int i = 0; i < temp.Length; i++) {
 					text_value += temp[ i ] + " ";
 				}
-				sb.AppendLine( text_value );
-				System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+				sb.AppendLine( text_value );				
+				if(!System.IO.File.Exists( file_name )) {
+					System.IO.File.Create( file_name );
+				}
+				System.IO.File.AppendAllText( file_name, sb.ToString() );
 			}
 
 			sp_product.Write( command_bytes, 0, command_bytes.Length );
@@ -845,7 +849,7 @@ namespace ProductInfor
 				text_value += command_bytes[ i ].ToString( "x" ).ToUpper() + " ";
 			}
 			sb.AppendLine( text_value );
-			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+			System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 			sp_product.ReadExisting();
 			sp_product.Write( command_bytes, 0, command_bytes.Length );
@@ -859,6 +863,13 @@ namespace ProductInfor
 		private string Product_vWaitForRespond( SerialPort sp_product )
 		{
 			string error_information = string.Empty;
+
+			//注意通讯方向
+			using (MeasureDetails measureDetails = new MeasureDetails()) {
+				measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_ProductToPC, sp_product, out error_information );
+				if (error_information != string.Empty) { return error_information; }
+			}
+
 			Int32 waittime = 0;
 			while ( sp_product.BytesToRead == 0 ) {
 				Thread.Sleep ( 5 );
@@ -898,20 +909,30 @@ namespace ProductInfor
 						text_value += (received_cmd[ i ].ToString( "x" ).ToUpper() + " ");
 					}
 					sb.AppendLine( text_value );
-					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+					string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+					if(!System.IO.File.Exists( file_name )) {
+						System.IO.File.Create( file_name );
+					}
+					System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 				}
 				if (received_cmd.Length > 5) {
 					if ((sent_cmd[ 2 ] == received_cmd[ 2 ]) && (sent_cmd[ 0 ] == 0x68)) {
 						if (received_cmd[ received_cmd.Length - 2 ] != Product_vGetCalibrateCode( received_cmd, 5, received_cmd[ 4 ] )) {
-							return "待测产品的串口校验和不匹配";
+							error_information = "待测产品的串口校验和不匹配";
 						}
 					} else {
-						return "待测产品返回的数据出现了逻辑不匹配的异常";
+						error_information = "待测产品返回的数据出现了逻辑不匹配的异常";
 					}
 				}
 			} catch (Exception ex){
 				error_information = ex.ToString();
+			}
+
+			//注意通讯方向
+			using (MeasureDetails measureDetails = new MeasureDetails()) {
+				measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_PCToProduct, sp_product, out error_information );
+				if (error_information != string.Empty) { return error_information; }
 			}
 
 			//关闭对产品串口的使用，防止出现后续被占用而无法打开的情况
@@ -1045,7 +1066,11 @@ namespace ProductInfor
 					StringBuilder sb = new StringBuilder();
 					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "产品校准";
 					sb.AppendLine( temp );
-					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+					string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+					if(!System.IO.File.Exists( file_name )) {
+						System.IO.File.Create( file_name );
+					}
+					System.IO.File.AppendAllText( file_name, sb.ToString() );
 
 					//真正开始进行待测产品的校准操作
 					Calibrate_vDoEvent ( measureDetails, serialPort, out error_information_Calibrate );
@@ -1053,7 +1078,7 @@ namespace ProductInfor
 					sb = new StringBuilder();
 					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "结束产品校准";
 					sb.AppendLine( temp );
-					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+					System.IO.File.AppendAllText( file_name, sb.ToString() );
 #else
 					//真正开始进行待测产品的校准操作
 					Calibrate_vDoEvent( measureDetails, serialPort, out error_information_Calibrate );

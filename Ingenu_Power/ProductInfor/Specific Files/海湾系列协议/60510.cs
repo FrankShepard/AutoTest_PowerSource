@@ -190,17 +190,21 @@ namespace ProductInfor
 			try { if (!sp_product.IsOpen) { sp_product.Open(); } } catch { error_information = "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
 			sp_product.ReadExisting();
 #if false //以下为调试保留代码，实际调用时不使用
-			//string temp = sp_product.ReadExisting();
-			//StringBuilder sb = new StringBuilder();
-			//string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			string temp = sp_product.ReadExisting();
+			StringBuilder sb = new StringBuilder();
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
 
-			//if (temp != string.Empty) {
-			//	for (int i = 0; i < temp.Length; i++) {
-			//		text_value += temp[ i ] + " ";
-			//	}
-			//	sb.AppendLine( text_value );
-			//	System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
-			//}
+			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			if (temp != string.Empty) {
+				for (int i = 0; i < temp.Length; i++) {
+					text_value += temp[ i ] + " ";
+				}
+				sb.AppendLine( text_value );				
+				if(!System.IO.File.Exists( file_name )) {
+					System.IO.File.Create( file_name );
+				}
+				System.IO.File.AppendAllText( file_name, sb.ToString() );
+			}
 
 			sp_product.Write( command_bytes, 0, command_bytes.Length );
 
@@ -209,7 +213,7 @@ namespace ProductInfor
 				text_value += command_bytes[ i ].ToString( "x" ).ToUpper() + " ";
 			}
 			sb.AppendLine( text_value );
-			System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+			System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 			sp_product.Write( command_bytes, 0, command_bytes.Length );
 		}
@@ -222,6 +226,13 @@ namespace ProductInfor
 		private string Product_vWaitForRespond( SerialPort sp_product )
 		{
 			string error_information = string.Empty;
+
+			//注意通讯方向
+			using (MeasureDetails measureDetails = new MeasureDetails()) {
+				measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_ProductToPC, sp_product, out error_information );
+				if (error_information != string.Empty) { return error_information; }
+			}
+
 			Int32 waittime = 0;
 			while ( sp_product.BytesToRead == 0 ) {
 				Thread.Sleep ( 5 );
@@ -259,17 +270,27 @@ namespace ProductInfor
 					text_value += (SerialportData[ i ].ToString( "x" ).ToUpper() + " ");
 				}
 				sb.AppendLine( text_value );
-				System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+				string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+				if(!System.IO.File.Exists( file_name )) {
+					System.IO.File.Create( file_name );
+				}
+				System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 			}
 
-			if(SerialportData.Length == 15) { 
+			if (SerialportData.Length == 15) { 
 				//先判断同步头字节和校验和是否满足要求
-				if ( ( SerialportData [ 0 ] != 0x5A ) || ( SerialportData [ 1 ] != 0x22 ) ) { return "待测产品返回的数据出现了逻辑不匹配的异常"; }
-				if ( SerialportData [ 14 ] != Product_vGetCalibrateCode ( SerialportData, 0, 14 ) ) { return "待测产品的串口校验和不匹配"; }
+				if ( ( SerialportData [ 0 ] != 0x5A ) || ( SerialportData [ 1 ] != 0x22 ) ) { error_information = "待测产品返回的数据出现了逻辑不匹配的异常"; }
+				if ( SerialportData [ 14 ] != Product_vGetCalibrateCode ( SerialportData, 0, 14 ) ) { error_information = "待测产品的串口校验和不匹配"; }
 			} else {
 				sp_product.ReadExisting ( );
 				error_information = "待测产品返回的数据出现了返回数据字节数量不匹配的异常";
+			}
+
+			//注意通讯方向
+			using (MeasureDetails measureDetails = new MeasureDetails()) {
+				measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_PCToProduct, sp_product, out error_information );
+				if (error_information != string.Empty) { return error_information; }
 			}
 
 			//关闭对产品串口的使用，防止出现后续被占用而无法打开的情况
@@ -365,7 +386,11 @@ namespace ProductInfor
 					StringBuilder sb = new StringBuilder();
 					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "产品校准";
 					sb.AppendLine( temp );
-					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+					string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+					if(!System.IO.File.Exists( file_name )) {
+						System.IO.File.Create( file_name );
+					}
+					System.IO.File.AppendAllText( file_name, sb.ToString() );
 
 					//真正开始进行待测产品的校准操作
 					Calibrate_vDoEvent( measureDetails, serialPort, out error_information_Calibrate );
@@ -373,7 +398,7 @@ namespace ProductInfor
 					sb = new StringBuilder();
 					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "结束产品校准";
 					sb.AppendLine( temp );
-					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
+					System.IO.File.AppendAllText( file_name, sb.ToString() );
 #else
 					//真正开始进行待测产品的校准操作
 					Calibrate_vDoEvent( measureDetails, serialPort, out error_information_Calibrate );

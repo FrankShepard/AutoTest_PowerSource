@@ -79,27 +79,27 @@
             第6快捷组
             </summary>
         </member>
-        <member name="T:Instrument_Control.AN97002H.Parameters_Woring">
+        <member name="T:Instrument_Control.AN97002H.Parameters_Working">
             <summary>
             交流电源的电压、电流、频率、功率实时测量值
             </summary>
         </member>
-        <member name="F:Instrument_Control.AN97002H.Parameters_Woring.ActrulyVoltage">
+        <member name="F:Instrument_Control.AN97002H.Parameters_Working.ActrulyVoltage">
             <summary>
             实际输出电压
             </summary>
         </member>
-        <member name="F:Instrument_Control.AN97002H.Parameters_Woring.ActrulyCurrent">
+        <member name="F:Instrument_Control.AN97002H.Parameters_Working.ActrulyCurrent">
             <summary>
             实际输出电流
             </summary>
         </member>
-        <member name="F:Instrument_Control.AN97002H.Parameters_Woring.ActrulyFrequency">
+        <member name="F:Instrument_Control.AN97002H.Parameters_Working.ActrulyFrequency">
             <summary>
             实际输出频率
             </summary>
         </member>
-        <member name="F:Instrument_Control.AN97002H.Parameters_Woring.ActrulyPower">
+        <member name="F:Instrument_Control.AN97002H.Parameters_Working.ActrulyPower">
             <summary>
             实际输出功率
             </summary>

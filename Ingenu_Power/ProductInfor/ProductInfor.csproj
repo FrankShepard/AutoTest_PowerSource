@@ -53,6 +53,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Specific Files\依爱系列协议\60710.cs" />
     <Compile Include="Specific Files\应急照明系列协议\67510.cs" />
+    <Compile Include="Specific Files\应急照明系列协议\sub class\71410.cs" />
+    <Compile Include="Specific Files\应急照明系列协议\sub class\72110.cs" />
+    <Compile Include="Specific Files\应急照明系列协议\sub class\63199.cs" />
     <Compile Include="Specific Files\应急照明系列协议\sub class\72210.cs" />
     <Compile Include="Specific Files\应急照明系列协议\sub class\71510.cs" />
     <Compile Include="Specific Files\应急照明系列协议\sub class\69611.cs" />

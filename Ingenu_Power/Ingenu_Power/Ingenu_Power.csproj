@@ -31,7 +31,7 @@
     <ProductName>电源自动测试系统</ProductName>
     <PublisherName>北京盈帜新源科技有限公司</PublisherName>
     <SuiteName>IngenuPower_AutoTest</SuiteName>
-    <ApplicationRevision>7</ApplicationRevision>
+    <ApplicationRevision>8</ApplicationRevision>
     <ApplicationVersion>2.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
