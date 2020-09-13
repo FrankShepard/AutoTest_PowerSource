@@ -38,6 +38,14 @@ namespace ProductInfor
 						InitalizeParemeters( dataTable, out error_information );
 						if (error_information != string.Empty) { continue; }
 
+						/*以下进行SG端子相关数据的获取*/
+						dataTable = database.V_SGInfor_Get( product_id, out error_information );
+						if (error_information != string.Empty) { continue; }
+						//以下进行校准数据的填充
+						if (( dataTable.Rows.Count == 0 ) || ( dataTable.Rows.Count > 1 )) { error_information = "数据库中保存的SG端子参数信息无法匹配"; continue; }
+						InitalizeParemeters_SG( dataTable, out error_information );
+						if (error_information != string.Empty) { continue; }
+
 						//添加专用的通讯部分
 						infor_Uart = new Infor_Uart() {
 							Measured_MpErrorSignal = false,
@@ -120,6 +128,11 @@ namespace ProductInfor
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
 						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
 							//先检查备电带载情况下的状态识别
+							measureDetails.Measure_vCommSGGndSet( infor_SG.Index_GND, serialPort, out error_information );
+							if(error_information != string.Empty) { continue; }
+							measureDetails.Measure_vCommSGUartParamterSet( infor_SG.Comm_Type, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
+							if (error_information != string.Empty) { continue; }
+
 							int wait_count = 0;
 							do {
 								Communicate_User_QueryWorkingStatus( serialPort, out error_information );
@@ -167,7 +180,6 @@ namespace ProductInfor
 							Thread.Sleep ( 100 );
 							Thread.Sleep ( delay_magnification * 50 );
 							//串口读取备电的电压，查看采集误差
-							serialPort.BaudRate = CommunicateBaudrate;
 							Communicate_User ( serialPort, out error_information );
 							if ( error_information != string.Empty ) { continue; }
 							if ( Math.Abs ( infor_Uart.Measured_SpValue - generalData_Load.ActrulyVoltage ) > 0.5m ) {
@@ -179,8 +191,18 @@ namespace ProductInfor
 							while ( source_voltage > (infor_Sp.Qualified_CutoffLevel [ 1 ] + VoltageDrop +0.5m)) {
 								measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, source_voltage, true, true, serialPort, out error_information );
 								if ( error_information != string.Empty ) { continue; }
-								Thread.Sleep ( 30 * delay_magnification );
+								Thread.Sleep ( 10 * delay_magnification );
 								source_voltage -= 0.5m;
+							}
+
+							//再次设置输出1的OCP为18A；在后续OCP中需要测试？
+							using (MCU_Control mCU_Control = new MCU_Control()) {
+								serialPort.BaudRate = CommunicateBaudrate;
+								Communicate_Admin( serialPort, out error_information );
+								if (error_information != string.Empty) { continue; }
+
+								mCU_Control.McuCalibrate_vOxpSet( 0, infor_Calibration.OutputOXP[ 0 ], serialPort, out error_information );
+								if (error_information != string.Empty) { continue; }	
 							}
 
 							Itech.GeneralData_DCPower generalData_DCPower = new Itech.GeneralData_DCPower();
@@ -213,8 +235,14 @@ namespace ProductInfor
 									}
 								}
 							}
-							//关闭备电，等待测试人员确认蜂鸣器响
-							Thread.Sleep( 3300 ); //非面板式电源的蜂鸣器只在关断输出一段时间之后才会响，所以此处的延时时间不可忽略
+
+							//将备电电压设置低一些
+							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, (infor_Sp.Qualified_CutoffLevel[1] - 1m), true, true, serialPort, out error_information );
+							if (error_information != string.Empty) { continue; }
+							//防止自杀时总线抢占，关电之前解除抢占数据
+							measureDetails.Measure_vCommSGUartParamterSet( MCU_Control.Comm_Type.Comm_None, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
+							if (error_information != string.Empty) { continue; }
+							Thread.Sleep( 7000 ); //非面板式电源的蜂鸣器只在关断输出一段时间之后才会响，所以此处的延时时间不可忽略
 							Thread.Sleep ( delay_magnification * 100 ); //保证蜂鸣器能响
 							//将备电电压设置到19V以下，验证备电自杀功能
 							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, 19m, true, true, serialPort, out error_information );
@@ -295,12 +323,7 @@ namespace ProductInfor
 										}
 										real_current += generalData_Load.ActrulyCurrent;
 									}
-								}
-								//合格范围的检测
-								specific_value[ index_of_channel ] = real_voltage;
-								if((real_voltage >= infor_Output.Qualified_OutputVoltageWithLoad[index_of_channel,0] ) && (real_voltage <= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 1 ])) {
-									check_okey[ index_of_channel ] = true;
-								}
+								}							
 
 								//检查串口上报的输出通道电压和电流参数是否准确
 								Communicate_User( serialPort, out error_information );
@@ -310,6 +333,7 @@ namespace ProductInfor
 										if (Math.Abs( infor_Uart.Measured_OutputVoltageValue[ 0 ] - real_voltage ) > 0.5m) {
 											error_information = "电源测试得到的输出电压1超过了合格误差范围";
 										}
+										if (error_information != string.Empty) { break; }
 										if (Math.Abs( infor_Uart.Measured_OutputCurrentValue[ 0 ] - real_current ) > 0.8m) { //注意此处的电流采样偏差是电源产品设计问题，无法进行更有效的解决方式
 											error_information = "电源测试得到的输出电流1超过了合格误差范围";
 										}
@@ -326,6 +350,14 @@ namespace ProductInfor
 										break;
 									default: break;
 								}
+								if (error_information != string.Empty) { break; }
+
+								//合格范围的检测
+								specific_value[ index_of_channel ] = real_voltage;
+								if (( real_voltage >= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] ) && ( real_voltage <= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 1 ] )) {
+									check_okey[ index_of_channel ] = true;
+								}
+
 							}
 						}
 					}

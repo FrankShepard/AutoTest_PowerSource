@@ -399,6 +399,46 @@
             AC/DC电源效率的最小值
             </summary>
         </member>
+        <member name="T:ProductInfor.Base.Infor_SG">
+            <summary>
+            SG端子相关信息
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_SG.Index_GND">
+            <summary>
+            SG端子中的GND的索引，从1开始
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_SG.Index_Txd">
+            <summary>
+            SG端子中的Txd的索引，为0表示不含串口通讯功能
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_SG.Index_Rxd">
+            <summary>
+            SG端子中的Rxd的索引，为0表示不含串口通讯功能
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_SG.Reverse_Txd">
+            <summary>
+            SG端子中的Txd电平反向与否，为1表示电平取反
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_SG.Reverse_Rxd">
+            <summary>
+            SG端子中的Rxd电平反向与否，为1表示电平取反
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_SG.Comm_Type">
+            <summary>
+            SG端子使用到的串口的类型
+            </summary>
+        </member>
+        <member name="F:ProductInfor.Base.Infor_SG.SG_NeedADCMeasuredPins">
+            <summary>
+            需要进行ADC测试的SG端子电平
+            </summary>
+        </member>
         <member name="F:ProductInfor.Base.IDVerion_Product">
             <summary>
             整机ID+版本 - 具有唯一性
@@ -444,6 +484,11 @@
             输出相关参数的结构体实例化对象
             </summary>
         </member>
+        <member name="F:ProductInfor.Base.infor_SG">
+            <summary>
+            SG端子相关信息的实例化对象
+            </summary>
+        </member>
         <member name="F:ProductInfor.Base.default_baudrate">
             <summary>
             初始化串口时的默认波特率
@@ -460,6 +505,13 @@
             返回自制控制板(MCU控制)的波特率，用于不包含在本Dll中的ISP功能的实现
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:ProductInfor.Base.InitalizeParemeters_SG(System.Data.DataTable,System.String@)">
+            <summary>
+            SG端子相关数据的获取
+            </summary>
+            <param name="dataTable">数据表</param>
+            <param name="error_information">可能存在的错误信息</param>
         </member>
         <member name="M:ProductInfor.Base.InitalizeParemeters(System.Data.DataTable,System.String@)">
             <summary>
@@ -886,6 +938,14 @@
             <param name="error_information"> 可能存在的错误信息</param>
             <returns>单片机程序相关信息</returns>
         </member>
+        <member name="M:ProductInfor.Database.V_SGInfor_Get(System.String,System.String@)">
+            <summary>
+            获取指定产品ID+Verion的SG端子的细节
+            </summary>
+            <param name="product_id">产品ID</param>
+            <param name="error_information"> 可能存在的错误信息</param>
+            <returns>单片机程序相关信息</returns>
+        </member>
         <member name="M:ProductInfor.Database.V_QueryInfor(System.String,System.String@)">
             <summary>
             在数据库中查询相信息
@@ -1140,6 +1200,41 @@
             <summary>
             准备读取直流的输出值
             </summary>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vCommMcuControlAwake(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            唤醒MCU控制板单片机
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vCommSGGndSet(System.Byte,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            设置SG端子上的GND管脚序号
+            </summary>
+            <param name="index_gnd">gnd的索引，从1开始</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vCommSGUartParamterSet(Instrument_Control.MCU_Control.Comm_Type,System.Byte,System.Byte,System.Boolean,System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            设置SG端子上的串口相关参数
+            </summary>
+            <param name="comm_Type">使用到的串口类型</param>
+            <param name="txd_pin">TXD的管脚索引</param>
+            <param name="rxd_pin">RXD的管教索引</param>
+            <param name="txd_level_reverse">TXD的电平取反与否</param>
+            <param name="rxd_level_reverse">RXD的电平取反与否</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vCommDirectionSet(Instrument_Control.MCU_Control.Comm_Direction,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            控制与待测单片机之间的通讯方向
+            </summary>
+            <param name="comm_Direction">PC与产品通讯的方向</param>
+            <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
         <member name="M:ProductInfor.MeasureDetails.Measure_vMandatory(System.Boolean,System.IO.Ports.SerialPort,System.String@)">

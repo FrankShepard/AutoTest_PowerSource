@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="Ingenu_Power.exe" version="2.2.0.8" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
+  <asmv1:assemblyIdentity name="Ingenu_Power.exe" version="2.3.0.3" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
   <description asmv2:iconFile="Resources\owl.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="Ingenu_Power" version="2.2.0.7" language="neutral" processorArchitecture="x86" />
+    <assemblyIdentity name="Ingenu_Power" version="2.3.0.1" language="neutral" processorArchitecture="x86" />
     <commandLine file="Ingenu_Power.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -43,26 +43,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="823856">
-      <assemblyIdentity name="Ingenu_Power" version="2.2.0.7" language="neutral" processorArchitecture="x86" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="822320">
+      <assemblyIdentity name="Ingenu_Power" version="2.3.0.1" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>p7nRoHuggA7bhu8C9biQupCltC1yBtLgx2o/O4rvuwQ=</dsig:DigestValue>
+        <dsig:DigestValue>zEOFr89WodEXPUhlXrI0UbywIeDlugJoV82sQ+kk+dA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Instrument_Control.dll" size="100864">
-      <assemblyIdentity name="Instrument_Control" version="3.0.0.0" language="neutral" processorArchitecture="x86" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Instrument_Control.dll" size="103424">
+      <assemblyIdentity name="Instrument_Control" version="3.1.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>bSCHG2JX5gE0nqcSkvIFQvvXTpPauDn9MIOMIIpTmdE=</dsig:DigestValue>
+        <dsig:DigestValue>IJvMIhFXFAbwBbigfnQwwniniB8Xrj3oiOOSlpEN9ok=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -74,7 +74,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>qH0/ryQQoJDmqATolqEerJt99oHe5l1NH80EPiQJD5U=</dsig:DigestValue>
+        <dsig:DigestValue>RfIyeWgljnfhxG9YH4ZGV7PlNYujlRzFTdeulQXtMdc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

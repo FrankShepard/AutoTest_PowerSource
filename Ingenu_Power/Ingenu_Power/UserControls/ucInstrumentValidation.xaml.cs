@@ -57,8 +57,12 @@ namespace Ingenu_Power.UserControls
 			pckConnect.Visibility = Visibility.Hidden;
 
 			//检查选择的串口和扫描到的ID，查看是否满足要求
-			if ((CobSp.SelectedIndex < 0) || (TxtINS.Text.Trim() == string.Empty)) {
-				MainWindow.MessageTips( "请选择正确的串口和填充正确的示波器INS码操作" ); return;
+			//if (( CobSp.SelectedIndex < 0 ) || ( TxtINS.Text.Trim() == string.Empty )) {
+			//	MainWindow.MessageTips( "请选择正确的串口和填充正确的示波器INS码操作" ); return;
+			//}
+
+			if ( CobSp.SelectedIndex < 0 ) {
+				MainWindow.MessageTips( "请选择正确的串口和  填充正确的示波器INS码  操作" ); return;
 			}
 
 			string sp_name = CobSp.SelectedValue.ToString();
@@ -132,8 +136,8 @@ namespace Ingenu_Power.UserControls
 			//反射进行动态调用
 			try {
 				//string bin_filePath = Directory.GetCurrentDirectory ( ) + "\\Download\\ProductInfor.dll";
-				string bin_filePath = Properties.Settings.Default.Dll文件保存路径;
-				//string bin_filePath = @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
+				//string bin_filePath = Properties.Settings.Default.Dll文件保存路径;
+				string bin_filePath = @"E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 				Assembly assembly = Assembly.LoadFrom ( bin_filePath );
 				Type [ ] tys = assembly.GetTypes ( );
 				foreach ( Type id_verion in tys ) {

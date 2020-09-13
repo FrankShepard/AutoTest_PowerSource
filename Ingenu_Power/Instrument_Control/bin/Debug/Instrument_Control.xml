@@ -2931,6 +2931,11 @@
             通用校准协议中使用的通讯同步 帧尾
             </summary>
         </member>
+        <member name="F:Instrument_Control.MCU_Control.Baudrate_McuControlBoard">
+            <summary>
+            单片机通讯板的波特率
+            </summary>
+        </member>
         <member name="T:Instrument_Control.MCU_Control.Cmd">
             <summary>
             管理员模式下的命令cmd码
@@ -3281,6 +3286,11 @@
             MCU返回代码 - 校验和错误
             </summary>
         </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.WatchDogCheck">
+            <summary>
+            MCU的定时查询操作-类似看门狗操作，防止待测产品通讯异常造成总线抢占
+            </summary>
+        </member>
         <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Reset_Model">
             <summary>
             软件复位特定地址的单片机
@@ -3392,6 +3402,13 @@
             设置PC与产品单片机之间的应答方向
             </summary>
             <param name="comm_Direction">通讯方向</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vWatchDogCheck(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            类似看门狗操作，周期性（3s内）发送给控制板，防止待测产品通讯异常导致485总线被抢占
+            </summary>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>

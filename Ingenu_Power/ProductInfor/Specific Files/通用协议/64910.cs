@@ -394,6 +394,14 @@ namespace ProductInfor
 						InitalizeParemeters( dataTable, out error_information );
 						if (error_information != string.Empty) { continue; }
 
+						/*以下进行SG端子相关数据的获取*/
+						dataTable = database.V_SGInfor_Get( product_id, out error_information );
+						if (error_information != string.Empty) { continue; }
+						//以下进行校准数据的填充
+						if (( dataTable.Rows.Count == 0 ) || ( dataTable.Rows.Count > 1 )) { error_information = "数据库中保存的SG端子参数信息无法匹配"; continue; }
+						InitalizeParemeters_SG( dataTable, out error_information );
+						if (error_information != string.Empty) { continue; }
+
 						//添加专用的通讯部分
 						infor_Uart = new Infor_Uart() {
 							communicate_Signal = new Communicate_Signal() {
@@ -828,9 +836,9 @@ namespace ProductInfor
 			string temp = sp_product.ReadExisting();
 
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 
-			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			string file_name = @"D:\Desktop\串口数据记录.txt";
 			if (temp != string.Empty) {
 				for (int i = 0; i < temp.Length; i++) {
 					text_value += temp[ i ] + " ";
@@ -863,12 +871,6 @@ namespace ProductInfor
 		private string Product_vWaitForRespond( SerialPort sp_product )
 		{
 			string error_information = string.Empty;
-
-			//注意通讯方向
-			using (MeasureDetails measureDetails = new MeasureDetails()) {
-				measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_ProductToPC, sp_product, out error_information );
-				if (error_information != string.Empty) { return error_information; }
-			}
 
 			Int32 waittime = 0;
 			while ( sp_product.BytesToRead == 0 ) {
@@ -904,12 +906,12 @@ namespace ProductInfor
 					sp_product.Read( received_cmd, 0, sp_product.BytesToRead );
 #if false //以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
-					string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+					string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 					for (int i = 0; i < received_cmd.Length; i++) {
 						text_value += (received_cmd[ i ].ToString( "x" ).ToUpper() + " ");
 					}
 					sb.AppendLine( text_value );
-					string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+					string file_name = @"D:\Desktop\串口数据记录.txt";
 					if(!System.IO.File.Exists( file_name )) {
 						System.IO.File.Create( file_name );
 					}
@@ -927,12 +929,6 @@ namespace ProductInfor
 				}
 			} catch (Exception ex){
 				error_information = ex.ToString();
-			}
-
-			//注意通讯方向
-			using (MeasureDetails measureDetails = new MeasureDetails()) {
-				measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_PCToProduct, sp_product, out error_information );
-				if (error_information != string.Empty) { return error_information; }
 			}
 
 			//关闭对产品串口的使用，防止出现后续被占用而无法打开的情况
@@ -1064,9 +1060,9 @@ namespace ProductInfor
 					if ( error_information != string.Empty ) { return error_information; }
 #if false //以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
-					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "产品校准";
+					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "产品校准";
 					sb.AppendLine( temp );
-					string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+					string file_name = @"D:\Desktop\串口数据记录.txt";
 					if(!System.IO.File.Exists( file_name )) {
 						System.IO.File.Create( file_name );
 					}
@@ -1076,7 +1072,7 @@ namespace ProductInfor
 					Calibrate_vDoEvent ( measureDetails, serialPort, out error_information_Calibrate );
 
 					sb = new StringBuilder();
-					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "结束产品校准";
+					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "结束产品校准";
 					sb.AppendLine( temp );
 					System.IO.File.AppendAllText( file_name, sb.ToString() );
 #else

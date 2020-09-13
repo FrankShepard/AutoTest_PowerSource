@@ -59,7 +59,21 @@ namespace ProductInfor
 			DataTable dtTarget = new DataTable();
 			dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[电源产品合格范围] WHERE [硬件IdVerion] = '" + product_id.Substring(5,5).Trim() + "'" , out error_information );			
 			return dtTarget;
-		}		
+		}
+				
+		/// <summary>
+		/// 获取指定产品ID+Verion的SG端子的细节
+		/// </summary>
+		/// <param name="product_id">产品ID</param>
+		/// <param name="error_information"> 可能存在的错误信息</param>
+		/// <returns>单片机程序相关信息</returns>
+		public DataTable V_SGInfor_Get(string product_id, out string error_information)
+		{
+			error_information = string.Empty;
+			DataTable dtTarget = new DataTable();
+			dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[待测产品信号端子信息] WHERE [硬件IdVerion] = '" + product_id.Substring( 5, 5 ).Trim() + "'", out error_information );
+			return dtTarget;
+		}
 
 		#endregion
 

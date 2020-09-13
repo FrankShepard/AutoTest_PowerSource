@@ -43,7 +43,7 @@ namespace ProductInfor
 		/// <summary>
 		/// 仪表通讯波特率 - 艾德克斯直流电源
 		/// </summary>
-		private const int Baudrate_Instrument_DCPower = 115200;
+		private const int Baudrate_Instrument_DCPower = 38400;
 		/// <summary>
 		/// 仪表通讯波特率 - 程控交流电源
 		/// </summary>
@@ -87,37 +87,40 @@ namespace ProductInfor
 							using ( SiglentOSC siglentOSC = new SiglentOSC ( ) ) {
 								/* 示波器初始化 - 简化测试时无需使用示波器 */
 								if (whole_function_enable) {
-									if (SessionRM == 0) {
-										SessionRM = siglentOSC.SiglentOSC_vOpenSessionRM( out error_information_osc );
-									}
-									if ((error_information_osc == string.Empty) && (SessionRM > 0)) {
-										SessionOSC = siglentOSC.SiglentOSC_vOpenSession( SessionRM, "USB0::62700::60986::" + osc_ins + "::0::INSTR", out error_information_osc );
-									}
-									if ((error_information_osc == string.Empty) && (SessionOSC > 0) && (SessionRM > 0)) {
-										error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC );
-										error_information += error_information_temp;
-										error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC, 1, SiglentOSC.Coupling_Type.AC, SiglentOSC.Voltage_DIV._100mV );
-										error_information += error_information_temp;
-										error_information = siglentOSC.SiglentOSC_vSetScanerDIV( SessionRM, SessionOSC, SiglentOSC.ScanerTime_DIV._10ms );
-										error_information += error_information_temp;
-									} else {
-
-										if (SessionRM <= 0) {
-											error_information_osc += "VISA中的ResourceMangener未能正常打开会话，请检查Agilent相关服务是否启动";
+									if (osc_ins != string.Empty) {
+										if (SessionRM == 0) {
+											SessionRM = siglentOSC.SiglentOSC_vOpenSessionRM( out error_information_osc );
 										}
-
-										if (SessionOSC <= 0) {
-											error_information_osc += "指定示波器未能正常打开会话，请检查USB线的连接";
+										if (( error_information_osc == string.Empty ) && ( SessionRM > 0 )) {
+											SessionOSC = siglentOSC.SiglentOSC_vOpenSession( SessionRM, "USB0::62700::60986::" + osc_ins + "::0::INSTR", out error_information_osc );
 										}
-										error_information = error_information_osc;
-									}
-									if ((error_information != string.Empty) || (SessionOSC <= 0) || (SessionRM <= 0)) {//关闭示波器的VISA会话端口,防止长期打开造成的通讯失败情况
-										try {
-											siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
-											siglentOSC.SiglentOSC_vCloseSession( SessionRM );
-											SessionRM = 0;
-										} catch {
-											SessionRM = 0;
+										if (( error_information_osc == string.Empty ) && ( SessionOSC > 0 ) && ( SessionRM > 0 )) {
+											error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC );
+											error_information += error_information_temp;
+											error_information_temp = siglentOSC.SiglentOSC_vInitializate( SessionRM, SessionOSC, 1, SiglentOSC.Coupling_Type.AC, SiglentOSC.Voltage_DIV._100mV );
+											error_information += error_information_temp;
+											error_information = siglentOSC.SiglentOSC_vSetScanerDIV( SessionRM, SessionOSC, SiglentOSC.ScanerTime_DIV._10ms );
+											error_information += error_information_temp;
+										} else {
+
+											if (SessionRM <= 0) {
+												error_information_osc += "VISA中的ResourceMangener未能正常打开会话，请检查Agilent相关服务是否启动";
+											}
+
+											if (SessionOSC <= 0) {
+												error_information_osc += "指定示波器未能正常打开会话，请检查USB线的连接";
+											}
+											error_information = error_information_osc;
+										}
+										if (( error_information != string.Empty ) || ( SessionOSC <= 0 ) || ( SessionRM <= 0 )) {//关闭示波器的VISA会话端口,防止长期打开造成的通讯失败情况
+											try {
+												siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
+												siglentOSC.SiglentOSC_vCloseSession( SessionRM );
+												SessionRM = 0;
+											}
+											catch {
+												SessionRM = 0;
+											}
 										}
 									}
 								}
@@ -146,17 +149,22 @@ namespace ProductInfor
 								error_information_temp = acpower.ACPower_vSetParameters ( Address_ACPower, 220m, 50m, false, serialPort );
 								error_information += error_information_temp;
 
-								/*备电控制继电器板和通道分选板软件复位*/
-								serialPort.BaudRate = Baudrate_Instrument_BatsControlBoard;
-								mcu.McuControl_vReset ( MCU_Control.Address_BatsControl, serialPort, out error_information_temp );
-								error_information += error_information_temp;
-								serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
-								mcu.McuControl_vReset ( MCU_Control.Address_ChannelChoose, serialPort, out error_information_temp );
-								error_information += error_information_temp;
-								//通道分选板设置为右侧，选择通道1进行完纹波测试
-								mcu.McuControl_vMeasureLocation ( MCU_Control.Location.Location_Right, serialPort, out error_information_temp );
-								error_information += error_information_temp;
-								mcu.McuControl_vRappleChannelChoose ( 0, serialPort, out error_information_temp );
+								//注意：单片机模块的执行代码出现错误时需要最多3次错误之后才可以真正上报
+								int retry_count = 0;
+								do {
+									/*备电控制继电器板和通道分选板软件复位*/
+									serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+									mcu.McuControl_vReset( MCU_Control.Address_ChannelChoose, serialPort, out error_information_temp );
+									if(error_information_temp != string.Empty) { continue; }
+									serialPort.BaudRate = Baudrate_Instrument_BatsControlBoard;
+									mcu.McuControl_vReset( MCU_Control.Address_BatsControl, serialPort, out error_information_temp );
+									if (error_information_temp != string.Empty) { continue; }
+									//通道分选板设置为右侧，选择通道1进行完纹波测试
+									serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+									mcu.McuControl_vMeasureLocation( MCU_Control.Location.Location_Right, serialPort, out error_information_temp );
+									if (error_information_temp != string.Empty) { continue; }
+									mcu.McuControl_vRappleChannelChoose( 0, serialPort, out error_information_temp );									
+								} while (( ++retry_count < 3 ) && ( error_information_temp != string.Empty ));
 								error_information += error_information_temp;
 							}
 						}
@@ -190,6 +198,10 @@ namespace ProductInfor
 									siglentOSC.SiglentOSC_vClearError( SessionRM, SessionOSC );
 									siglentOSC.SiglentOSC_vCloseSession( SessionOSC );
 								}
+								//断开与待测产品的串口通讯
+								serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+								mcu.McuControl_vReset( MCU_Control.Address_ChannelChoose, serialPort, out error_information );
+
 								//断开与产品间的通讯，防止产品掉电而导致的总线占用
 								serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
 								mcu.McuControl_vReset( MCU_Control.Address_ChannelChoose, serialPort, out error_information );
@@ -892,6 +904,61 @@ namespace ProductInfor
 		#endregion
 
 		#region -- 自制控制板相关动作
+
+		/// <summary>
+		/// 唤醒MCU控制板单片机
+		/// </summary>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vCommMcuControlAwake(SerialPort serialPort, out string error_information)
+		{
+			Thread.Sleep(50);
+			error_information = string.Empty;
+			int baudrate_before = serialPort.BaudRate;
+			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+			using (MCU_Control mCU_Control = new MCU_Control()) {
+				mCU_Control.McuControl_vWatchDogCheck( serialPort, out error_information );
+			}
+			serialPort.BaudRate = baudrate_before;
+		}
+
+		/// <summary>
+		/// 设置SG端子上的GND管脚序号
+		/// </summary>
+		/// <param name="index_gnd">gnd的索引，从1开始</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vCommSGGndSet(byte index_gnd,SerialPort serialPort,out string error_information)
+		{
+			error_information = string.Empty;
+			int baudrate_before = serialPort.BaudRate;
+			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+			using (MCU_Control mCU_Control = new MCU_Control()) {
+				mCU_Control.McuControl_vProductGndChoose( index_gnd, serialPort, out error_information );
+			}
+			serialPort.BaudRate = baudrate_before;
+		}
+
+		/// <summary>
+		/// 设置SG端子上的串口相关参数
+		/// </summary>
+		/// <param name="comm_Type">使用到的串口类型</param>
+		/// <param name="txd_pin">TXD的管脚索引</param>
+		/// <param name="rxd_pin">RXD的管教索引</param>
+		/// <param name="txd_level_reverse">TXD的电平取反与否</param>
+		/// <param name="rxd_level_reverse">RXD的电平取反与否</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vCommSGUartParamterSet(MCU_Control.Comm_Type comm_Type, byte txd_pin, byte rxd_pin, bool txd_level_reverse, bool rxd_level_reverse, SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			int baudrate_before = serialPort.BaudRate;
+			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+			using (MCU_Control mCU_Control = new MCU_Control()) {
+				mCU_Control.McuControl_vSetCommParameter( comm_Type, txd_pin, rxd_pin, txd_level_reverse, rxd_level_reverse, serialPort, out error_information );
+			}
+			serialPort.BaudRate = baudrate_before;
+		}
 
 		/// <summary>
 		/// 控制与待测单片机之间的通讯方向

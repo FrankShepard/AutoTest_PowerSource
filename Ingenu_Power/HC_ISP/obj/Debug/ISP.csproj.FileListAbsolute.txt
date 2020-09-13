@@ -19,3 +19,10 @@ F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\bin\Debug\ISP.pdb
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.csproj.CoreCompileInputs.cache
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.dll
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.pdb
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\bin\Debug\ISP.XML
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\bin\Debug\ISP.dll
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\bin\Debug\ISP.pdb
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.csprojAssemblyReference.cache
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.csproj.CoreCompileInputs.cache
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.dll
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.pdb

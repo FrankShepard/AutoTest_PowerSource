@@ -801,9 +801,9 @@ namespace ProductInfor
 			string temp = sp_product.ReadExisting();
 
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 
-			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			string file_name = @"D:\Desktop\串口数据记录.txt";
 			if (temp != string.Empty) {
 				for (int i = 0; i < temp.Length; i++) {
 					text_value += temp[ i ] + " ";
@@ -869,12 +869,12 @@ namespace ProductInfor
 			string error_information = string.Empty;
 			received_cmd = new byte [ sp_product.BytesToRead ];
 
-			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			string file_name = @"D:\Desktop\串口数据记录.txt";
 			if (sp_product.BytesToRead > 0) {
 				sp_product.Read( received_cmd, 0, sp_product.BytesToRead );
 
 				StringBuilder sb = new StringBuilder();
-				string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+				string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 				for (int i = 0; i < received_cmd.Length; i++) {
 					text_value += (received_cmd[ i ].ToString( "x" ).ToUpper() + " ");
 				}
@@ -1029,9 +1029,9 @@ namespace ProductInfor
 					if ( error_information != string.Empty ) { return error_information; }
 
 					StringBuilder sb = new StringBuilder();
-					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "产品校准";
+					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "产品校准";
 					sb.AppendLine( temp );
-					string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+					string file_name = @"D:\Desktop\串口数据记录.txt";
 					if(!System.IO.File.Exists( file_name )) {
 						System.IO.File.Create( file_name );
 					}
@@ -1041,7 +1041,7 @@ namespace ProductInfor
 					Calibrate_vDoEvent ( measureDetails, serialPort, out error_information_Calibrate );
 
 					sb = new StringBuilder();
-					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "结束产品校准";
+					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "结束产品校准";
 					sb.AppendLine( temp );
 					System.IO.File.AppendAllText( file_name, sb.ToString() );
 

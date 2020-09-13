@@ -38,6 +38,14 @@ namespace ProductInfor
 						InitalizeParemeters( dataTable, out error_information );
 						if (error_information != string.Empty) { continue; }
 
+						/*以下进行SG端子相关数据的获取*/
+						dataTable = database.V_SGInfor_Get( product_id, out error_information );
+						if (error_information != string.Empty) { continue; }
+						//以下进行校准数据的填充
+						if (( dataTable.Rows.Count == 0 ) || ( dataTable.Rows.Count > 1 )) { error_information = "数据库中保存的SG端子参数信息无法匹配"; continue; }
+						InitalizeParemeters_SG( dataTable, out error_information );
+						if (error_information != string.Empty) { continue; }
+
 						//添加专用的通讯部分
 						infor_Uart = new Infor_Uart() {
 							Measured_MpErrorSignal = false,
@@ -119,6 +127,7 @@ namespace ProductInfor
 				if ( temp_index == 0 ) {
 					using ( MeasureDetails measureDetails = new MeasureDetails ( ) ) {
 						using ( SerialPort serialPort = new SerialPort ( port_name, default_baudrate, Parity.None, 8, StopBits.One ) ) {
+													   
 							//先检查备电带载情况下的状态识别
 							int wait_count = 0;
 							do {

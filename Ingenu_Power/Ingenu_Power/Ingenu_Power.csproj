@@ -17,7 +17,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>ftp://192.168.1.99/盈帜测试程序安装包/IngenuPower/</PublishUrl>
+    <PublishUrl>ftp://192.168.1.99/盈帜测试程序安装包/IngenuPower_Mcu2.0/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -27,12 +27,12 @@
     <UpdatePeriodically>true</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>http://192.168.1.99:82/盈帜测试程序安装包/IngenuPower/</InstallUrl>
+    <InstallUrl>http://192.168.1.99:82/盈帜测试程序安装包/IngenuPower_Mcu2.0/</InstallUrl>
     <ProductName>电源自动测试系统</ProductName>
     <PublisherName>北京盈帜新源科技有限公司</PublisherName>
     <SuiteName>IngenuPower_AutoTest</SuiteName>
-    <ApplicationRevision>8</ApplicationRevision>
-    <ApplicationVersion>2.2.0.%2a</ApplicationVersion>
+    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationVersion>2.3.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>false</BootstrapperEnabled>
@@ -98,7 +98,7 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Instrument_Control, Version=3.0.0.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Instrument_Control, Version=3.1.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Instrument_Control\bin\Debug\Instrument_Control.dll</HintPath>
     </Reference>

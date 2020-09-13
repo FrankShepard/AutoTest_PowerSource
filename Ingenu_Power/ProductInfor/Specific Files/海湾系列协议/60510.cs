@@ -80,6 +80,14 @@ namespace ProductInfor
 						InitalizeParemeters( dataTable,out error_information );
 						if (error_information != string.Empty) { continue; }
 
+						/*以下进行SG端子相关数据的获取*/
+						dataTable = database.V_SGInfor_Get( product_id, out error_information );
+						if (error_information != string.Empty) { continue; }
+						//以下进行校准数据的填充
+						if (( dataTable.Rows.Count == 0 ) || ( dataTable.Rows.Count > 1 )) { error_information = "数据库中保存的SG端子参数信息无法匹配"; continue; }
+						InitalizeParemeters_SG( dataTable, out error_information );
+						if (error_information != string.Empty) { continue; }
+
 						//添加专用的通讯部分
 						infor_Uart = new Infor_Uart() {
 							Measured_MpErrorSignal = false,
@@ -116,33 +124,38 @@ namespace ProductInfor
 		{
 			error_information = string.Empty;
 			int index = 0;
-			/*判断串口打开是否正常，若不正常则先要进行打开设置*/
-			serialPort.BaudRate = CommunicateBaudrate;
+			/*首先需要选择待测产品使用到的串口类型和管脚*/
+			using (MCU_Control mCU_Control = new MCU_Control()) {
+				/*判断串口打开是否正常，若不正常则先要进行打开设置*/
+				serialPort.BaudRate = CommunicateBaudrate;
 
-			try { if (!serialPort.IsOpen) { serialPort.Open(); } } catch { error_information = "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
+				try { if (!serialPort.IsOpen) { serialPort.Open(); } } catch { error_information = "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
 
-			byte[] receive_data = new byte[ 15 ];
-			do {
-				switch (index) {
-					case 0:
-						byte[] SerialportData = new byte[] { 0xA5, 0x22, 0x22, 0xE9 };
-						Product_vCommandSend( SerialportData, serialPort, out error_information ); break;
-					case 1:
-						error_information = Product_vWaitForRespond( serialPort ); break;
-					case 2:
-						error_information = Product_vCheckRespond( serialPort, out receive_data ); break;
-					case 3:
-						error_information = Product_vGetQueryedValue( receive_data ); break;
-					default: break;
-				}
-			} while ((++index < 4) && (error_information == string.Empty));
-			if (error_information != string.Empty) {
-				if (++retry_time < 3) {//连续3次异常才可以真实上报故障
-					Communicate_User_QueryWorkingStatus( serialPort, out error_information );
-				} else {
-					retry_time = 0;
-				}
-			} else { retry_time = 0; }
+				byte[] receive_data = new byte[ 15 ];
+				do {
+					switch (index) {
+						case 0:
+							byte[] SerialportData = new byte[] { 0xA5, 0x22, 0x22, 0xE9 };
+							Product_vCommandSend( SerialportData, serialPort, out error_information );							
+							break;
+						case 1:
+							error_information = Product_vWaitForRespond( serialPort ); break;
+						case 2:
+							error_information = Product_vCheckRespond( serialPort, out receive_data ); break;
+						case 3:
+							error_information = Product_vGetQueryedValue( receive_data ); break;
+						default: break;
+					}
+				} while (( ++index < 4 ) && ( error_information == string.Empty ));
+				
+				if (error_information != string.Empty) {
+					if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+						Communicate_User_QueryWorkingStatus( serialPort, out error_information );
+					} else {
+						retry_time = 0;
+					}
+				} else { retry_time = 0; }
+			}
 		}
 
 		/// <summary>
@@ -192,9 +205,9 @@ namespace ProductInfor
 #if false //以下为调试保留代码，实际调用时不使用
 			string temp = sp_product.ReadExisting();
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 
-			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			string file_name = @"D:\Desktop\串口数据记录.txt";
 			if (temp != string.Empty) {
 				for (int i = 0; i < temp.Length; i++) {
 					text_value += temp[ i ] + " ";
@@ -227,11 +240,13 @@ namespace ProductInfor
 		{
 			string error_information = string.Empty;
 
-			//注意通讯方向
-			using (MeasureDetails measureDetails = new MeasureDetails()) {
-				measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_ProductToPC, sp_product, out error_information );
-				if (error_information != string.Empty) { return error_information; }
-			}
+			//注意通讯方向；改变串口的方向，防止数据传输异常（波特率较低时影响不大，较高时影响很大）
+			//using (MeasureDetails measureDetails = new MeasureDetails()) {
+			//	sp_product.BaudRate = MeasureDetails.Baudrate_Instrument_ControlBoard;
+			//	measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_ProductToPC, sp_product, out error_information );
+			//	sp_product.BaudRate = CommunicateBaudrate;
+			//	if (error_information != string.Empty) { return error_information; }
+			//}
 
 			Int32 waittime = 0;
 			while ( sp_product.BytesToRead == 0 ) {
@@ -265,12 +280,12 @@ namespace ProductInfor
 				sp_product.Read( SerialportData, 0, sp_product.BytesToRead );
 #if false //以下为调试保留代码，实际调用时不使用
 				StringBuilder sb = new StringBuilder();
-				string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+				string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 				for (int i = 0; i < SerialportData.Length; i++) {
 					text_value += (SerialportData[ i ].ToString( "x" ).ToUpper() + " ");
 				}
 				sb.AppendLine( text_value );
-				string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+				string file_name = @"D:\Desktop\串口数据记录.txt";
 				if(!System.IO.File.Exists( file_name )) {
 					System.IO.File.Create( file_name );
 				}
@@ -285,12 +300,6 @@ namespace ProductInfor
 			} else {
 				sp_product.ReadExisting ( );
 				error_information = "待测产品返回的数据出现了返回数据字节数量不匹配的异常";
-			}
-
-			//注意通讯方向
-			using (MeasureDetails measureDetails = new MeasureDetails()) {
-				measureDetails.Measure_vCommDirectionSet( MCU_Control.Comm_Direction.CommDir_PCToProduct, sp_product, out error_information );
-				if (error_information != string.Empty) { return error_information; }
 			}
 
 			//关闭对产品串口的使用，防止出现后续被占用而无法打开的情况
@@ -384,9 +393,9 @@ namespace ProductInfor
 					if ( error_information != string.Empty ) { return error_information; }
 #if false //以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
-					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "产品校准";
+					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "产品校准";
 					sb.AppendLine( temp );
-					string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+					string file_name = @"D:\Desktop\串口数据记录.txt";
 					if(!System.IO.File.Exists( file_name )) {
 						System.IO.File.Create( file_name );
 					}
@@ -396,7 +405,7 @@ namespace ProductInfor
 					Calibrate_vDoEvent( measureDetails, serialPort, out error_information_Calibrate );
 
 					sb = new StringBuilder();
-					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "结束产品校准";
+					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "结束产品校准";
 					sb.AppendLine( temp );
 					System.IO.File.AppendAllText( file_name, sb.ToString() );
 #else
@@ -409,41 +418,42 @@ namespace ProductInfor
 				return error_information;
 			}
 		}
-		
+
 		/// <summary>
 		/// 实际进行校准的操作过程，此过程需要根据不同产品的校准步骤进行调整
 		/// </summary>
 		/// <param name="measureDetails">测试部分的实例化对象</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		private void Calibrate_vDoEvent( MeasureDetails measureDetails, SerialPort serialPort, out string error_information )
+		private void Calibrate_vDoEvent(MeasureDetails measureDetails, SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
 
-			using ( AN97002H acpower = new AN97002H ( ) ) {
-				using ( Itech itech = new Itech ( ) ) {
-					using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
-						//获取负载的分配控制
-						decimal[] calibrated_load_currents = new decimal[ MeasureDetails.Address_Load_Output.Length ];
-						decimal[] target_voltage = new decimal[ infor_Output.OutputChannelCount ];
-						for(int index = 0;index < infor_Output.OutputChannelCount; index++) {
-							target_voltage[ index ] = infor_Output.Qualified_OutputVoltageWithLoad[ index, 1 ];
-						}
-						int[] allocate_channel = measureDetails.Measure_vCurrentAllocate( exist.MandatoryMode, infor_Output.OutputChannelCount, infor_Calibration.OutputCurrent_Mp, target_voltage, out calibrated_load_currents );
-
-						/*主电欠压点时启动，先擦除校准数据，后重启防止之前记录的校准数据对MCU采集的影响*/
-						Calibrate_vClearValidata( measureDetails, mCU_Control, serialPort, out error_information );
-						if(error_information != string.Empty) { return; }
-						/*执行空载输出时电压的校准、主电周期及主电欠压点的校准*/
-						Calibrate_vEmptyLoad_Mp( allocate_channel, itech, mCU_Control, serialPort, out error_information );
-						if (error_information != string.Empty) { return; }
-						/*执行主电带载时的电流校准*/
-						Calibrate_vFullLoad_Mp( measureDetails,allocate_channel, calibrated_load_currents, itech, mCU_Control, serialPort, out error_information );
-						if (error_information != string.Empty) { return; }
-						/*输出空载情况下，备电电压、OCP、蜂鸣器时长等其它相关的设置*/
-						Calibrate_vEmptyLoad_Sp( measureDetails, mCU_Control, serialPort, out error_information );
-						if (error_information != string.Empty) { return; }						
+			using (Itech itech = new Itech()) {
+				using (MCU_Control mCU_Control = new MCU_Control()) {
+					//获取负载的分配控制
+					decimal[] calibrated_load_currents = new decimal[ MeasureDetails.Address_Load_Output.Length ];
+					decimal[] target_voltage = new decimal[ infor_Output.OutputChannelCount ];
+					for (int index = 0; index < infor_Output.OutputChannelCount; index++) {
+						target_voltage[ index ] = infor_Output.Qualified_OutputVoltageWithLoad[ index, 1 ];
 					}
+					int[] allocate_channel = measureDetails.Measure_vCurrentAllocate( exist.MandatoryMode, infor_Output.OutputChannelCount, infor_Calibration.OutputCurrent_Mp, target_voltage, out calibrated_load_currents );
+					/*主电欠压点时启动，先擦除校准数据，后重启防止之前记录的校准数据对MCU采集的影响*/
+					Calibrate_vClearValidata( measureDetails, mCU_Control, serialPort, out error_information );
+					if (error_information != string.Empty) { return; }
+					/*执行空载输出时电压的校准、主电周期及主电欠压点的校准*/
+					Calibrate_vEmptyLoad_Mp( allocate_channel, itech, mCU_Control, serialPort, out error_information );
+					if (error_information != string.Empty) { return; }
+					/*执行主电带载时的电流校准*/
+					Calibrate_vFullLoad_Mp( measureDetails, allocate_channel, calibrated_load_currents, itech, mCU_Control, serialPort, out error_information );
+					if (error_information != string.Empty) { return; }
+					/*输出空载情况下，备电电压、OCP、蜂鸣器时长等其它相关的设置*/
+					Calibrate_vEmptyLoad_Sp( measureDetails, mCU_Control, serialPort, out error_information );
+					if (error_information != string.Empty) { return; }
+
+					/*断开待测产品的串口接入*/
+					measureDetails.Measure_vCommSGUartParamterSet( MCU_Control.Comm_Type.Comm_None, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
+					if (error_information != string.Empty) { return; }
 				}
 			}
 		}
@@ -554,6 +564,6 @@ namespace ProductInfor
 			}
 			return arrayList;
 		}
-#endregion
+		#endregion
 	}
 }

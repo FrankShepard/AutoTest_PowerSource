@@ -311,8 +311,8 @@ namespace Ingenu_Power.UserControls
 					Directory.CreateDirectory( bin_filePath );
 				}
 				//bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
-				bin_filePath = Properties.Settings.Default.Dll文件保存路径;
-				//bin_filePath = @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
+				//bin_filePath = Properties.Settings.Default.Dll文件保存路径;
+				bin_filePath = @"E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 				Assembly assembly = Assembly.LoadFrom( bin_filePath );
 				Type[] tys = assembly.GetTypes();
 				bool found_file = false;
@@ -366,8 +366,8 @@ namespace Ingenu_Power.UserControls
 					Directory.CreateDirectory( bin_filePath );
 				}
 				//bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
-				bin_filePath = Properties.Settings.Default.Dll文件保存路径;
-				//bin_filePath = @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
+				//bin_filePath = Properties.Settings.Default.Dll文件保存路径;
+				bin_filePath = @"E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 				Assembly assembly = Assembly.LoadFrom( bin_filePath );
 				Type [ ] tys = assembly.GetTypes();
 				//检查是否存在指定ID的测试方式；如果没有则需要使用Base中的方式进行测试
@@ -411,7 +411,7 @@ namespace Ingenu_Power.UserControls
 								case 2://仪表初始化操作
 									mi = id_verion.GetMethod( "Measure_vInstrumentInitalize" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
-									error_information_step = mi.Invoke( obj, parameters ).ToString();									
+									error_information_step = mi.Invoke( obj, parameters ).ToString();
 									break;
 								case 3://备电单投启动功能检查
 									mi = id_verion.GetMethod( "Measure_vCheckSingleSpStartupAbility" );
@@ -482,7 +482,21 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 7://满载电压测试
+								case 7://备电（可调直流电源）输出打开动作，准备充电
+									mi = id_verion.GetMethod( "Measure_vDCPowerOutputSet" );
+									parameters = new object[] { measureCondition.Magnification, Properties.Settings.Default.UsedSerialport, true, true };
+									arrayList = ( ArrayList ) mi.Invoke( obj, parameters );
+									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
+									StaticInfor.measureItemShow.Measure_Item = "备电开启动作";
+									StaticInfor.measureItemShow.Measure_Value = string.Empty;
+									if (( bool ) arrayList[ 1 ] != false) { //元素1 - 备电设置状态的正常执行与否
+										StaticInfor.measureItemShow.Measure_Value = "Pass";
+									} else {
+										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
+									}
+									break;
+								case 8://满载电压测试
 									mi = id_verion.GetMethod ( "Measure_vVoltageWithLoad" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -496,7 +510,7 @@ namespace Ingenu_Power.UserControls
 												measuredValue.Voltage_WithLoad[ index ] = ( decimal )arrayList[ 2 + ( byte )arrayList[ 1 ] + index ]; //元素 2+ index + arrayList[1] 为满载输出电压具体值
 												StaticInfor.measureItemShow.Measure_Value += measuredValue.Voltage_WithLoad[ index ].ToString( "0.0#" ) + "V ";
 											} else {
-												error_information_step = "第 " + (index+1).ToString() + " 路输出满载电压超过合格范围";
+												error_information_step += "\r\n第 " + (index+1).ToString() + " 路输出满载电压测试时超过合格范围";
 												StaticInfor.measureItemShow.Measure_Value = "Failed";
 												break;
 											}
@@ -506,7 +520,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;								
-								case 8://测试输出纹波
+								case 9://测试输出纹波
 									mi = id_verion.GetMethod ( "Measure_vRapple" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -519,7 +533,7 @@ namespace Ingenu_Power.UserControls
 												measuredValue.Voltage_Rapple[ index ] = ( decimal )arrayList[ 2 + ( byte )arrayList[ 1 ] + index ]; //元素 2+ index + arrayList[1] 为输出纹波具体值
 												StaticInfor.measureItemShow.Measure_Value += measuredValue.Voltage_Rapple[ index ].ToString( "0" ) + "mV ";
 											} else {
-												error_information_step = "第 " + (index+1).ToString() + " 路输出纹波超过合格范围";
+												error_information_step += "\r\n第 " + (index+1).ToString() + " 路输出纹波超过合格范围";
 												StaticInfor.measureItemShow.Measure_Value = "Failed";
 												break;
 											}
@@ -528,21 +542,7 @@ namespace Ingenu_Power.UserControls
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
 										measuredValue.AllCheckOkey &= false;
 									}
-									break;
-								case 9://备电（可调直流电源）输出打开动作，准备充电
-									mi = id_verion.GetMethod ( "Measure_vDCPowerOutputSet" );
-									parameters = new object[] {measureCondition.Magnification, Properties.Settings.Default.UsedSerialport ,true,true};
-									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
-									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
-									StaticInfor.measureItemShow.Measure_Item = "备电开启动作";
-									StaticInfor.measureItemShow.Measure_Value = string.Empty;
-									if ( (bool)arrayList[1] != false ) { //元素1 - 备电设置状态的正常执行与否
-										StaticInfor.measureItemShow.Measure_Value = "Pass";
-									} else {
-										StaticInfor.measureItemShow.Measure_Value = "Failed";
-										measuredValue.AllCheckOkey &= false;
-									}
-									break;
+									break;								
 								case 10://计算AC/DC部分效率
 									mi = id_verion.GetMethod ( "Measure_vEfficiency" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
@@ -573,7 +573,7 @@ namespace Ingenu_Power.UserControls
 												}
 												StaticInfor.measureItemShow.Measure_Value += measuredValue.Voltage_WithoutLoad[ index ].ToString( "0.0#" ) + "V ";
 											} else {
-												error_information_step = "第 " + (index + 1).ToString() + " 路输出空载电压超过合格范围";
+												error_information_step += "\r\n第 " + (index + 1).ToString() + " 路输出空载电压超过合格范围";
 												StaticInfor.measureItemShow.Measure_Value = "Failed";
 												break;
 											}
@@ -583,7 +583,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 12://测试均充电流
+								case 12://测试均充电流 -- 此时需要唤醒一次MCU控制板
 									mi = id_verion.GetMethod ( "Measure_vCurrentEqualizedCharge" );
 									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -638,7 +638,7 @@ namespace Ingenu_Power.UserControls
 												measuredValue.Effect_Load[ index ] = ( decimal )arrayList[ 2 + ( byte )arrayList[ 1 ] + index ]; //元素 2+ index + arrayList[1] 为负载效应具体值
 												StaticInfor.measureItemShow.Measure_Value += measuredValue.Effect_Load[ index ].ToString( "P2" ) + " ";
 											} else {
-												error_information_step = "第 " + (index + 1).ToString() + " 路负载效应超过合格范围";
+												error_information_step += "\r\n第 " + (index + 1).ToString() + " 路负载效应超过合格范围";
 												StaticInfor.measureItemShow.Measure_Value = "Failed";
 												measuredValue.AllCheckOkey &= false;
 												break;
@@ -663,7 +663,7 @@ namespace Ingenu_Power.UserControls
 													measuredValue.Effect_Source[ index ] = ( decimal )arrayList[ 3 + ( byte )arrayList[ 2 ] + index ]; //元素 3+ index + arrayList[2] 为源效应具体值
 													StaticInfor.measureItemShow.Measure_Value += measuredValue.Effect_Source[ index ].ToString( "P2" ) + " ";
 												} else {
-													error_information_step = "第 " + (index + 1).ToString() + " 路源效应超过合格范围";
+													error_information_step += "\r\n第 " + (index + 1).ToString() + " 路源效应超过合格范围";
 													StaticInfor.measureItemShow.Measure_Value = "Failed";
 													measuredValue.AllCheckOkey &= false;
 													break;
@@ -703,7 +703,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 19://主电丢失切换检查
+								case 19://主电丢失切换检查  -- 此时需要唤醒一次MCU控制板
 									Thread.Sleep ( 500 );
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpLost" );
 									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
@@ -808,7 +808,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 25://测试OXP
+								case 25://测试OXP  -- 此时需要唤醒一次MCU控制板
 									mi = id_verion.GetMethod ( "Measure_vOXP" );
 									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );

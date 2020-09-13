@@ -2896,6 +2896,11 @@
             定义管理员模式下的待测电源产品单片机通讯方式和双通道分选板、备电控制板的控制方式
             </summary>
         </member>
+        <member name="F:Instrument_Control.MCU_Control.McuControl_uReceivedData">
+            <summary>
+            单片机接收到的有效数据的数组，用于接收单片机返回值
+            </summary>
+        </member>
         <member name="F:Instrument_Control.MCU_Control.Address_BatsControl">
             <summary>
             备电模块的地址
@@ -2924,6 +2929,11 @@
         <member name="F:Instrument_Control.MCU_Control.Ender_Vali">
             <summary>
             通用校准协议中使用的通讯同步 帧尾
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Baudrate_McuControlBoard">
+            <summary>
+            单片机通讯板的波特率
             </summary>
         </member>
         <member name="T:Instrument_Control.MCU_Control.Cmd">
@@ -3156,6 +3166,46 @@
             从
             </summary>
         </member>
+        <member name="T:Instrument_Control.MCU_Control.Comm_Type">
+            <summary>
+            与待测产品通讯的串口方式
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Comm_Type.Comm_None">
+            <summary>
+            无通讯功能
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Comm_Type.Comm_TTL">
+            <summary>
+            通讯使用TTL电平的Uart
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Comm_Type.Comm_RS232">
+            <summary>
+            通讯使用RS232
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Comm_Type.Comm_RS485">
+            <summary>
+            通讯使用RS485
+            </summary>
+        </member>
+        <member name="T:Instrument_Control.MCU_Control.Comm_Direction">
+            <summary>
+            PC与待测产品的通讯方向
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Comm_Direction.CommDir_PCToProduct">
+            <summary>
+            PC->ProductMcu
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Comm_Direction.CommDir_ProductToPC">
+            <summary>
+            ProductMcu->PC
+            </summary>
+        </member>
         <member name="T:Instrument_Control.MCU_Control.Cmd_MCUModel">
             <summary>
             对备电控制继电器模块和双通道分选继电器模块的通讯命令
@@ -3196,6 +3246,31 @@
             设置待测产品的左右安装位置
             </summary>
         </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_GndConnection">
+            <summary>
+            设置待测产品的GND
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_PinsNeedADTest">
+            <summary>
+            设置需要进行ADC测试的管脚状态
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Read_PinsADValue">
+            <summary>
+            获取产品SG端子的AD合格状态及高低电平
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_CommunicationParameter">
+            <summary>
+            设置待测产品的通讯方式及TXD/RXD的电平反向与否状态(485总线时后面置为0)
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Set_CommunicationDirection">
+            <summary>
+            设置PC与待测产品通讯的数据流方向（此命令是由于IS3082的电路缺陷引发）
+            </summary>
+        </member>
         <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Respond_Busy">
             <summary>
             MCU返回代码 - busy
@@ -3209,6 +3284,11 @@
         <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Respond_ValiError">
             <summary>
             MCU返回代码 - 校验和错误
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.WatchDogCheck">
+            <summary>
+            MCU的定时查询操作-类似看门狗操作，防止待测产品通讯异常造成总线抢占
             </summary>
         </member>
         <member name="F:Instrument_Control.MCU_Control.Cmd_MCUModel.Reset_Model">
@@ -3279,6 +3359,57 @@
             </summary>
             <param name="address">模块地址</param>
             <param name="serialPort">使用到串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vProductGndChoose(System.Byte,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            选择产品GND对应的数据管脚
+            </summary>
+            <param name="gnd_pin">产品端子上的GND的管脚索引，1~10表示对应的GND管脚，0表示无需连接GND到产品端子上</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vPinsNeedADMeasureSetting(System.UInt16,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            设置需要使用AD进行测试信号端子高低电平的管脚的状态
+            </summary>
+            <param name="need_ad_pins_status">需要使用AD进行测试的信号端子的状态；对应bit上为1表示需要使用AD功能进行测试</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vGetPinsADValue(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            获取AD测试的管脚的状态
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>AD采集到的高低电平及逻辑电平合格状态</returns>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vSetCommParameter(Instrument_Control.MCU_Control.Comm_Type,System.Byte,System.Byte,System.Boolean,System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            设置与产品的通讯相关参数
+            </summary>
+            <param name="comm_Type">通讯类型</param>
+            <param name="txd_pin">TXD对应的端子管脚（485时为0）</param>
+            <param name="rxd_pin">RXD对应的端子管脚（485时为0）</param>
+            <param name="txd_level_reverse">TXD电平是否反向（485时为0）</param>
+            <param name="rxd_level_reverse">RXD电平是否反向（485时为0）</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vSetCommDirection(Instrument_Control.MCU_Control.Comm_Direction,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            设置PC与产品单片机之间的应答方向
+            </summary>
+            <param name="comm_Direction">通讯方向</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuControl_vWatchDogCheck(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            类似看门狗操作，周期性（3s内）发送给控制板，防止待测产品通讯异常导致485总线被抢占
+            </summary>
+            <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
         <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vMpOutputVoltage(System.Int32,System.Decimal,System.IO.Ports.SerialPort,System.String@)">

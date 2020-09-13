@@ -85,8 +85,8 @@
             </materialDesign:Card>
 
             <Grid Height="50" VerticalAlignment="Top" HorizontalAlignment="Center" Width="120" Margin="294,330,293,0">
-				<Button IsDefault="True" Name="BtnLogin" Click="BtnLogin_Click" DragEnter="BtnLogin_DragEnter" DragLeave="BtnLogin_DragLeave" DragDrop.Drop="BtnLogin_Drop"
-                        FontSize="25"
+				<Button IsDefault="True" Name="BtnLogin" Click="BtnLogin_Click"  
+						FontSize="25"
                         Style="{StaticResource MaterialDesignRaisedDarkButton}"
                         Height="Auto" 
                         materialDesign:ButtonAssist.CornerRadius="25">

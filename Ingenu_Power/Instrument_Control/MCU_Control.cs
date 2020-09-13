@@ -989,14 +989,14 @@ namespace Instrument_Control
 		private void McuControl_vCommandSend( byte [ ] command_bytes, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
-#if false
+#if true
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "->";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + serialPort.BaudRate.ToString() + "   ->";
 			for (int i = 0; i < command_bytes.Length; i++) {
 				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
 			}
 			sb.AppendLine( text_value );
-			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			string file_name = @"D:\Desktop\串口数据记录.txt";
 			if(!System.IO.File.Exists( file_name )) {
 				System.IO.File.Create( file_name );
 			}
@@ -1006,20 +1006,24 @@ namespace Instrument_Control
 			/*以下执行串口数据传输指令*/
 			if ( !serialPort.IsOpen ) { serialPort.Open ( ); }
 			serialPort.Write ( command_bytes, 0, command_bytes.Length );
-			/*等待回码后解析回码*/
-			Int32 waittime = 0;
-			while ( serialPort.BytesToRead == 0 ) {
-				Thread.Sleep ( 5 );
-				if ( ++waittime > 100 ) {
-					error_information = "地址为 " + command_bytes [ 1 ].ToString ( ) + " 的设备串口响应超时 \r\n";//设备响应超时
-					return;
+			/*等待回码后解析回码;仅在使用非方向更改时等待回码，原因是硬件上继电器切换可能造成通道不通*/
+			if ((command_bytes[ 2 ] != ( byte ) Cmd_MCUModel.Set_CommunicationDirection) && (command_bytes[2] != (byte)Cmd_MCUModel.WatchDogCheck)) {
+				Int32 waittime = 0;
+				while (serialPort.BytesToRead == 0) {
+					Thread.Sleep( 5 );
+					if (++waittime > 100) {
+						error_information = "地址为 " + command_bytes[ 1 ].ToString() + " 的设备串口响应超时 \r\n";//设备响应超时
+						return;
+					}
 				}
-			}
-			//! 等待传输结束，结束的标志为连续两个2ms之间的接收字节数量是相同的
-			int last_byte_count = 0;
-			while ( ( serialPort.BytesToRead > last_byte_count ) && ( serialPort.BytesToRead != 0 ) ) {
-				last_byte_count = serialPort.BytesToRead;
-				Thread.Sleep ( 2 );
+				//! 等待传输结束，结束的标志为连续两个20ms之间的接收字节数量是相同的
+				int last_byte_count = 0;
+				while (( serialPort.BytesToRead > last_byte_count ) && ( serialPort.BytesToRead != 0 )) {
+					last_byte_count = serialPort.BytesToRead;
+					Thread.Sleep( 20 );
+				}
+			} else {				
+				serialPort.ReadExisting();				
 			}
 		}
 
@@ -1032,20 +1036,6 @@ namespace Instrument_Control
 		private void McuControl_vCheckRespond( byte [ ] command_bytes, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
-#if false
-			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
-			for (int i = 0; i < command_bytes.Length; i++) {
-				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
-			}
-			sb.AppendLine( text_value );
-			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
-			if(!System.IO.File.Exists( file_name )) {
-				System.IO.File.Create( file_name );
-			}
-			System.IO.File.AppendAllText( file_name, sb.ToString() );
-#endif
-
 			//先将之前发送出去的命令字节做一个备份，需要在查询指令时使用
 			byte address = command_bytes [ 1 ];
 			byte command_before = command_bytes [ 2 ];
@@ -1054,12 +1044,23 @@ namespace Instrument_Control
 			byte [ ] received_data = new byte [ serialPort.BytesToRead ];
 			serialPort.Read ( received_data, 0, serialPort.BytesToRead );
 
-			//防止出现串口异常导致的接收数据与发送数据相同的情况
-			int index = 0;
-			do {
-				if ( command_bytes [ index ] != received_data [ index ] ) { break; }
-			} while ( ++index < received_data.Length );
-			if ( index > received_data.Length ) { error_information = "使用的到串口出现了接收数据与发送数据相同的异常 \r\n"; return; }
+#if true
+			StringBuilder sb = new StringBuilder();
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
+			for (int i = 0; i < received_data.Length; i++) {
+				text_value += ( received_data[ i ].ToString( "x" ).ToUpper() + " " );
+			}
+			sb.AppendLine( text_value );
+			string file_name = @"D:\Desktop\串口数据记录.txt";
+			if (!System.IO.File.Exists( file_name )) {
+				System.IO.File.Create( file_name );
+			}
+			System.IO.File.AppendAllText( file_name, sb.ToString() );
+#endif
+			//设置方向的代码不检查返回值，原因是可能存在继电器引发线路不通的情况
+			if((command_before == ( byte ) Cmd_MCUModel.Set_CommunicationDirection)|| (command_before == (byte)Cmd_MCUModel.WatchDogCheck)) {
+				return;
+			}
 
 			//先判断同步头字节和帧尾是否满足要求
 			if ( ( received_data [ 0 ] == Header_Control ) && ( received_data [ received_data.Length - 1 ] == Ender_Control ) ) {
@@ -1107,7 +1108,7 @@ namespace Instrument_Control
 			McuControl_vCommandSend ( complete_cmd, serialPort, out error_information );
 			if ( error_information == string.Empty ) {
 				//接收代码查看信息
-				McuControl_vCheckRespond ( complete_cmd, serialPort, out error_information );
+				McuControl_vCheckRespond( complete_cmd, serialPort, out error_information );
 			}
 		}
 
@@ -1145,14 +1146,14 @@ namespace Instrument_Control
 			//将串口受到的数据移到aByte数组中，并依据读取的数量进行判断0
 			byte [ ] received_data = new byte [ serialPort.BytesToRead ];
 			serialPort.Read ( received_data, 0, serialPort.BytesToRead );
-#if false
+#if true
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 			for (int i = 0; i < received_data.Length; i++) {
 				text_value += (received_data[ i ].ToString( "x" ).ToUpper() + " ");
 			}
 			sb.AppendLine( text_value );
-			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			string file_name = @"D:\Desktop\串口数据记录.txt";
 			if(!System.IO.File.Exists( file_name )) {
 				System.IO.File.Create( file_name );
 			}
@@ -1160,7 +1161,7 @@ namespace Instrument_Control
 #endif
 
 			//先判断同步头字节是否满足要求;取消帧尾的判断（个别型号的电源重启时可能发送异常多个无意义字节）
-			if ( ( received_data [ 0 ] == Header_Vali ) && ( received_data [ 3 ] == 0x1F ) ) {
+			if ( ( received_data [ 0 ] == Header_Vali ) && ( received_data [ 3 ] == 0x1F ) && (received_data.Length == 9) ) {
 				byte recevied_validatecode = McuCalibrate_vCalculateVali ( received_data );
 				byte validatecode = received_data [ 7 ];
 				if ( recevied_validatecode != validatecode ) {
@@ -1178,10 +1179,12 @@ namespace Instrument_Control
 			//个别型号的产品电源在上电下电时会错误的上传多余数据，此数据可能会对后续逻辑造成异常干扰；此处清除串口中的数据
 			serialPort.ReadExisting ( );
 
-			//将McuControl控制板流向设置为产品接收PC数据使用
-			int baudrate_product = serialPort.BaudRate;
-			serialPort.BaudRate = Baudrate_McuControlBoard;
-			McuControl_vSetCommDirection( Comm_Direction.CommDir_PCToProduct, serialPort, out error_information );
+			////将McuControl控制板流向设置为产品接收PC数据使用
+			//int baudrate_product = serialPort.BaudRate;
+			//serialPort.BaudRate = Baudrate_McuControlBoard;
+			//McuControl_vSetCommDirection( Comm_Direction.CommDir_PCToProduct, serialPort, out error_information );
+			//serialPort.BaudRate = baudrate_product;
+
 			return need_retry;
 		}
 
@@ -1195,14 +1198,14 @@ namespace Instrument_Control
 		{
 			error_information = string.Empty;
 			error_information = string.Empty;
-#if false
+#if true
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "->";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + serialPort.BaudRate.ToString()  + "   ->";
 			for (int i = 0; i < command_bytes.Length; i++) {
 				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
 			}
 			sb.AppendLine( text_value );
-			string file_name = @"C:\Users\Administrator\Desktop\串口数据记录.txt";
+			string file_name = @"D:\Desktop\串口数据记录.txt";
 			if(!System.IO.File.Exists( file_name )) {
 				System.IO.File.Create( file_name );
 			}
@@ -1212,14 +1215,7 @@ namespace Instrument_Control
 			if ( !serialPort.IsOpen ) { serialPort.Open ( ); }
 			serialPort.ReadExisting ( );
 			serialPort.Write ( command_bytes, 0, command_bytes.Length );
-			//由于本次使用的IS3082问题，在发送后等待待测产品回码时必须将方向信息设定
-			int baudrate_product = serialPort.BaudRate;
-			serialPort.BaudRate = Baudrate_McuControlBoard;
-			McuControl_vSetCommDirection( Comm_Direction.CommDir_ProductToPC, serialPort, out error_information );
-			if(error_information != string.Empty) {
-				return;
-			}
-			serialPort.BaudRate = baudrate_product;
+			
 			/*等待回码后解析回码*/
 			Int32 waittime = 0;
 			while ( serialPort.BytesToRead == 0 ) {
@@ -1229,11 +1225,11 @@ namespace Instrument_Control
 					return;
 				}
 			}
-			//! 等待传输结束，结束的标志为连续两个5ms之间的接收字节数量是相同的
+			//! 等待传输结束，结束的标志为连续两个20ms之间的接收字节数量是相同的
 			int last_byte_count = 0;
 			while ( ( serialPort.BytesToRead > last_byte_count ) && ( serialPort.BytesToRead != 0 ) ) {
 				last_byte_count = serialPort.BytesToRead;
-				Thread.Sleep ( 2 );
+				Thread.Sleep ( 20 );
 			}
 		}
 
