@@ -599,6 +599,44 @@ namespace ProductInfor
 			} else { retry_time = 0; }
 		}
 
+		/// <summary>
+		/// 设置输出开路电流的最大值
+		/// <param name="target_openMaxCurrent">设置的最大输出开路电流 - 单位 A </param>
+		/// <param name="serialPort">使用到的实际串口 </param>
+		/// <param name="error_information">可能存在的异常信息</param>
+		/// </summary>
+		private void Communicate_UserSetMaxOpenCurrent(decimal target_openMaxCurrent, SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			int index = 0;
+			/*判断串口打开是否正常，若不正常则先要进行打开设置*/
+			serialPort.BaudRate = CommunicateBaudrate;
+
+			try { if (!serialPort.IsOpen) { serialPort.Open(); } } catch { error_information = "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
+
+			byte[] sent_data = Product_vCmdSet_OutputOpenCurrent( target_openMaxCurrent );
+			if (error_information != string.Empty) { return; }
+
+			do {
+				switch (index) {
+					case 0:
+						Product_vCommandSend( sent_data, serialPort, out error_information ); break;
+					case 1:
+						error_information = Product_vWaitForRespond( serialPort ); break;
+					case 2:
+						error_information = Product_vCheckRespond( serialPort, out receive_data ); break;
+					default: break;
+				}
+			} while (( ++index < 4 ) && ( error_information == string.Empty ));
+			if (error_information != string.Empty) {
+				if (++retry_time < 3) {//连续3次异常才可以真实上报故障
+					Communicate_UserSetMaxOpenCurrent( target_openMaxCurrent, serialPort, out error_information );
+				} else {
+					retry_time = 0;
+				}
+			} else { retry_time = 0; }
+		}
+
 		#endregion
 
 		#region -- 具体的与待测产品进行通讯的过程
@@ -927,7 +965,7 @@ namespace ProductInfor
 			string temp = sp_product.ReadExisting();
 
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 
 			if (temp != string.Empty) {
 				for (int i = 0; i < temp.Length; i++) {
@@ -991,7 +1029,7 @@ namespace ProductInfor
 					sp_product.Read ( received_cmd, 0, sp_product.BytesToRead );
 #if false //以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
-					string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+					string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 					for (int i = 0; i < received_cmd.Length; i++) {
 						text_value += (received_cmd[ i ].ToString( "x" ).ToUpper() + " ");
 					}
@@ -1130,7 +1168,7 @@ namespace ProductInfor
 					if ( error_information != string.Empty ) { return error_information; }
 #if false //以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
-					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "产品校准";
+					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "产品校准";
 					sb.AppendLine( temp );
 					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
 
@@ -1138,7 +1176,7 @@ namespace ProductInfor
 					Calibrate_vDoEvent ( measureDetails, serialPort, out error_information_Calibrate );
 
 					sb = new StringBuilder();
-					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "结束产品校准";
+					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "结束产品校准";
 					sb.AppendLine( temp );
 					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
 #else
@@ -1239,6 +1277,12 @@ namespace ProductInfor
 				if ( error_information != string.Empty ) { return; }
 				Communicate_UserSetUnderVoltage ( infor_Sp.Target_UnderVoltageLevel, serialPort, out error_information );
 				if ( error_information != string.Empty ) { return; }
+			}
+
+			//中山左向的相关产品的输出开路最大判断电流需要设置到0.1A
+			if (id_ver.Contains( "694" ) || id_ver.Contains( "695" ) || id_ver.Contains( "696" ) || id_ver.Contains( "740" ) || id_ver.Contains( "741" ) || id_ver.Contains( "742" )) {
+				Communicate_UserSetMaxOpenCurrent( 0.1m, serialPort, out error_information );
+				if (error_information != string.Empty) { return; }
 			}
 
 			//软件复位以生效设置

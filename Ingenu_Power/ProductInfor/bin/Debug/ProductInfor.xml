@@ -1855,6 +1855,14 @@
             <param name="error_information">可能存在的异常信息</param>
             </summary>
         </member>
+        <member name="M:ProductInfor._67510.Communicate_UserSetMaxOpenCurrent(System.Decimal,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            设置输出开路电流的最大值
+            <param name="target_openMaxCurrent">设置的最大输出开路电流 - 单位 A </param>
+            <param name="serialPort">使用到的实际串口 </param>
+            <param name="error_information">可能存在的异常信息</param>
+            </summary>
+        </member>
         <member name="M:ProductInfor._67510.Product_vCmdQueryCommon(System.String@)">
             <summary>
             对产品电源的查询命令 - 最常规使用的
@@ -2092,6 +2100,21 @@
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
+        </member>
+        <member name="T:ProductInfor._74110">
+            <summary>
+            继承自 _67510 的 IG-Z2121F 电源的相关信息
+            </summary>
+        </member>
+        <member name="T:ProductInfor._74210">
+            <summary>
+            继承自 _67510 的 IG-Z2181F 电源的相关信息
+            </summary>
+        </member>
+        <member name="T:ProductInfor._74010">
+            <summary>
+            继承自 _67510 的 IG-Z2071F 电源的相关信息
+            </summary>
         </member>
         <member name="T:ProductInfor._72210">
             <summary>

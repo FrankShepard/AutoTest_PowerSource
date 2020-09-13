@@ -808,7 +808,7 @@ namespace Instrument_Control
 			error_information = string.Empty;
 #if false
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "->";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "->";
 			for (int i = 0; i < command_bytes.Length; i++) {
 				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
 			}
@@ -847,7 +847,7 @@ namespace Instrument_Control
 			error_information = string.Empty;
 #if false
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 			for (int i = 0; i < command_bytes.Length; i++) {
 				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
 			}
@@ -953,7 +953,7 @@ namespace Instrument_Control
 			serialPort.Read ( received_data, 0, serialPort.BytesToRead );
 #if false
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 			for (int i = 0; i < received_data.Length; i++) {
 				text_value += (received_data[ i ].ToString( "x" ).ToUpper() + " ");
 			}
@@ -995,7 +995,7 @@ namespace Instrument_Control
 			error_information = string.Empty;
 #if false
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "->";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "->";
 			for (int i = 0; i < command_bytes.Length; i++) {
 				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
 			}

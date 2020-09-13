@@ -19,3 +19,13 @@ F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\Produ
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csproj.CopyComplete
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.dll
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.pdb
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csproj.CoreCompileInputs.cache
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.dll
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.pdb
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.xml
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.pdb
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\Instrument_Control.dll
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\Instrument_Control.pdb
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\Instrument_Control.xml
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csproj.CopyComplete

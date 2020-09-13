@@ -454,7 +454,7 @@ namespace ProductInfor
 			string temp = sp_product.ReadExisting();
 
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 
 			if (temp != string.Empty) {
 				for (int i = 0; i < temp.Length; i++) {
@@ -519,7 +519,7 @@ namespace ProductInfor
 					sp_product.Read( received_cmd, 0, sp_product.BytesToRead );
 #if false //以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
-					string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "<-";
+					string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 					for (int i = 0; i < received_cmd.Length; i++) {
 						text_value += (received_cmd[ i ].ToString( "x" ).ToUpper() + " ");
 					}
@@ -632,7 +632,7 @@ namespace ProductInfor
 					if ( error_information != string.Empty ) { return error_information; }
 #if false //以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
-					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "产品校准";
+					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "产品校准";
 					sb.AppendLine( temp );
 					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
 
@@ -640,7 +640,7 @@ namespace ProductInfor
 					Calibrate_vDoEvent ( measureDetails, serialPort, out error_information_Calibrate );
 
 					sb = new StringBuilder();
-					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:ms" ) + " " + "结束产品校准";
+					temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "结束产品校准";
 					sb.AppendLine( temp );
 					System.IO.File.AppendAllText( @"C:\Users\Administrator\Desktop\串口数据记录.txt", sb.ToString() );
 #else
