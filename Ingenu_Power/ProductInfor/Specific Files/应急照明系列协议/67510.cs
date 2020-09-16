@@ -2027,6 +2027,9 @@ namespace ProductInfor
 											break;
 										}
 									}
+
+									if (error_information != string.Empty) { continue; } //若有错误需要返回
+			
 									//所有通道使用电子负载查看输出,不可以低于0.95倍合格最低电压
 									Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
 									for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {

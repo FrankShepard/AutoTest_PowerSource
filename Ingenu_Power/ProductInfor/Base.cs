@@ -1109,6 +1109,38 @@ namespace ProductInfor
 		}
 
 		/// <summary>
+		/// 停止充电点的校准
+		/// </summary>
+		/// <param name="measureDetails">使用到的测试细节对象</param>
+		/// <param name="mCU_Control">使用到的校准集合对象</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能储存在的错误信息</param>
+		public void Calibrate_vStopChargeSet(MeasureDetails measureDetails, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+
+			measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, infor_Calibration.MpOverVoltage, infor_Mp.MpFrequncy[ 1 ] );
+			if (error_information != string.Empty) { return; }
+			Thread.Sleep( 800 ); //等待800ms让AC电源的输出稳定
+
+			serialPort.BaudRate = CommunicateBaudrate;
+			//检查串口功能正常与否
+			int retry_count = 0;
+			do {
+				Thread.Sleep( 50 );
+				Communicate_User_QueryWorkingStatus( serialPort, out error_information );
+			} while (( error_information != string.Empty ) && ( ++retry_count < 30 ));
+			if (retry_count >= 30) { return; }
+
+			Communicate_Admin( serialPort, out error_information );
+			if (error_information != string.Empty) { return; }
+			mCU_Control.McuCalibrate_vMpVoltage_StopCharge( serialPort, out error_information );
+			if (error_information != string.Empty) { return; }
+			//mCU_Control.McuCalibrate_vReset( serialPort, out error_information );
+			//if (error_information != string.Empty) { return; }
+		}
+
+		/// <summary>
 		/// 主电供电时   输出带载的相关信息校准
 		/// </summary>
 		/// <param name="measureDetails">实际测试的对象</param>
@@ -1341,7 +1373,7 @@ namespace ProductInfor
 			measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, 0m, false, out error_information );
 			if ( error_information != string.Empty ) { return; }
 
-			Thread.Sleep( 600 );  //保证备电电压采集准确而进行的延时
+			Thread.Sleep( 800 );  //保证备电电压采集准确而进行的延时
 			Itech.GeneralData_Load generalData_Load = measureDetails.Measure_vReadChargeLoadResult ( serialPort, out error_information );
 			if (error_information != string.Empty) { return; }
 
@@ -2359,6 +2391,9 @@ namespace ProductInfor
 										break;
 									}
 								}
+
+								if(error_information != string.Empty) { continue; } //若有错误需要返回
+
 								//所有通道使用电子负载查看输出,不可以低于0.95倍合格最低电压
 								Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load ( );
 								for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {

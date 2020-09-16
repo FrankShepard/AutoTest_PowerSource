@@ -31,9 +31,7 @@ namespace Ingenu_Power.Domain
 			//元素3：产品使用串口模块时的提示信息
 			ArrayList arrayList = new ArrayList ( );
 			bool exist_code = false;
-			bool need_isp = false;			
-			int model_type = 0;
-			string infor = string.Empty;
+			bool need_isp = false;	
 
 			bool no_need_to_isp = false; //没有必要进行后续的ISP操作，若是数据库中程序获取出错或者没有相应的ISP程序，则需要将这个标志位设置为真
 
@@ -56,8 +54,6 @@ namespace Ingenu_Power.Domain
 								need_isp = Convert.ToBoolean ( dataTable.Rows [ 0 ] [ "型号_HC89S003F4" ] );
 								if ( need_isp ) {
 									exist_code = true;
-									model_type = Convert.ToInt32 ( dataTable.Rows [ 0 ] [ "通讯模块类型" ] );
-									infor = dataTable.Rows [ 0 ] [ "通讯模块提示" ].ToString ( );
 
 									int id_software = Convert.ToInt32 ( dataTable.Rows [ 0 ] [ "程序ID" ] );
 									int ver_software = Convert.ToInt32 ( dataTable.Rows [ 0 ] [ "程序版本号" ] );
@@ -100,9 +96,7 @@ namespace Ingenu_Power.Domain
 					}
 				} else {
 					arrayList.Add ( exist_code );
-					arrayList.Add ( need_isp );					
-					arrayList.Add ( model_type );
-					arrayList.Add ( infor );
+					arrayList.Add ( need_isp );
 
 					if ( no_need_to_isp ) { //烧录程序获取错误或者无需使用ISP时，需要将之前记录的本地烧录文件清除
 						bin_filePath = Directory.GetCurrentDirectory ( ) + "\\Download\\master.bin";

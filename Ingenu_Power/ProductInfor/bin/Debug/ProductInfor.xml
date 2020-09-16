@@ -596,6 +596,15 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能储存在的错误信息</param>
         </member>
+        <member name="M:ProductInfor.Base.Calibrate_vStopChargeSet(ProductInfor.MeasureDetails,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            停止充电点的校准
+            </summary>
+            <param name="measureDetails">使用到的测试细节对象</param>
+            <param name="mCU_Control">使用到的校准集合对象</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能储存在的错误信息</param>
+        </member>
         <member name="M:ProductInfor.Base.Calibrate_vFullLoad_Mp(ProductInfor.MeasureDetails,System.Int32[],System.Decimal[],Instrument_Control.Itech,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             主电供电时   输出带载的相关信息校准

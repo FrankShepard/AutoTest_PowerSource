@@ -706,12 +706,19 @@ namespace ProductInfor
 						/*执行空载输出时电压的校准、主电周期及主电欠压点的校准*/
 						Calibrate_vEmptyLoad_Mp( allocate_channel_mp, itech, mCU_Control, serialPort, out error_information );
 						if (error_information != string.Empty) { return; }
+						/*在此型号的电源测试时需要对主电较高电压点进行校准判断*/
+						Calibrate_vStopChargeSet( measureDetails, mCU_Control, serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
 						/*执行主电带载时的电流校准*/
 						Calibrate_vFullLoad_Mp( measureDetails, allocate_channel_mp, calibrated_load_currents_mp, itech, mCU_Control, serialPort, out error_information );
 						if (error_information != string.Empty) { return; }
 						/*输出空载情况下，备电电压、OCP、蜂鸣器时长等其它相关的设置*/
 						Calibrate_vEmptyLoad_Sp( measureDetails, mCU_Control, serialPort, out error_information );
-						if (error_information != string.Empty) { return; }						
+						if (error_information != string.Empty) { return; }
+
+						/*断开待测产品的串口接入*/
+						measureDetails.Measure_vCommSGUartParamterSet( MCU_Control.Comm_Type.Comm_None, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
+						if (error_information != string.Empty) { return; }
 					}
 				}
 			}

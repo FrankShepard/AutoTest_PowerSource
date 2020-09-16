@@ -228,6 +228,7 @@ namespace ProductInfor
 			sb.AppendLine( text_value );
 			System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
+			sp_product.ReadExisting();
 			sp_product.Write( command_bytes, 0, command_bytes.Length );
 		}
 

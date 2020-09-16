@@ -934,7 +934,10 @@ namespace ProductInfor
 			int baudrate_before = serialPort.BaudRate;
 			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
 			using (MCU_Control mCU_Control = new MCU_Control()) {
-				mCU_Control.McuControl_vProductGndChoose( index_gnd, serialPort, out error_information );
+				int retry_count = 0;
+				do {
+					mCU_Control.McuControl_vProductGndChoose( index_gnd, serialPort, out error_information );
+				} while (( error_information != string.Empty ) && (++retry_count < 3));
 			}
 			serialPort.BaudRate = baudrate_before;
 		}
@@ -955,7 +958,10 @@ namespace ProductInfor
 			int baudrate_before = serialPort.BaudRate;
 			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
 			using (MCU_Control mCU_Control = new MCU_Control()) {
-				mCU_Control.McuControl_vSetCommParameter( comm_Type, txd_pin, rxd_pin, txd_level_reverse, rxd_level_reverse, serialPort, out error_information );
+				int retry_count = 0;
+				do {
+					mCU_Control.McuControl_vSetCommParameter( comm_Type, txd_pin, rxd_pin, txd_level_reverse, rxd_level_reverse, serialPort, out error_information );
+				} while (( error_information != string.Empty ) && ( ++retry_count < 3 ));
 			}
 			serialPort.BaudRate = baudrate_before;
 		}
@@ -972,7 +978,10 @@ namespace ProductInfor
 			int baudrate_product = serialPort.BaudRate;
 			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
 			using (MCU_Control mCU_Control = new MCU_Control()) {
-				mCU_Control.McuControl_vSetCommDirection( comm_Direction, serialPort, out error_information );
+				int retry_count = 0;
+				do {
+					mCU_Control.McuControl_vSetCommDirection( comm_Direction, serialPort, out error_information );
+				} while (( error_information != string.Empty ) && ( ++retry_count < 3 ));
 			}
 			serialPort.BaudRate = baudrate_product;
 		}
@@ -987,8 +996,11 @@ namespace ProductInfor
 		{
 			error_information = String.Empty;
 			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
-			using(MCU_Control mCU_Control =  new MCU_Control ( ) ) {
-				mCU_Control.McuControl_vMandatory ( mandatory_status, serialPort, out error_information );
+			using (MCU_Control mCU_Control = new MCU_Control()) {
+				int retry_count = 0;
+				do {
+					mCU_Control.McuControl_vMandatory( mandatory_status, serialPort, out error_information );
+				} while (( error_information != string.Empty ) && ( ++retry_count < 3 ));
 			}
 		}
 
@@ -1003,7 +1015,10 @@ namespace ProductInfor
 			error_information = String.Empty;
 			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
 			using ( MCU_Control mCU_Control = new MCU_Control ( ) ) {
-				mCU_Control.McuControl_vRappleChannelChoose ( channel_index, serialPort, out error_information );
+				int retry_count = 0;
+				do {
+					mCU_Control.McuControl_vRappleChannelChoose( channel_index, serialPort, out error_information );
+				} while (( error_information != string.Empty ) && ( ++retry_count < 3 ));
 			}
 		}
 

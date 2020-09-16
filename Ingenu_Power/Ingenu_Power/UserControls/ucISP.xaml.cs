@@ -122,15 +122,6 @@ namespace Ingenu_Power.UserControls
 			PgbStep.IsIndeterminate = status;
 		}
 
-		/// <summary>
-		/// Expander中的提示信息
-		/// </summary>
-		/// <param name="infor"></param>
-		private void PromptShow(string infor,string source_name) {
-			ImgPrompt.Source = new BitmapImage( new Uri( Directory.GetCurrentDirectory() + "\\Resources\\"+ source_name));
-			TxtPrompt.Text = infor;
-		}
-
 		#endregion
 
 		#region -- 工作线程执行的具体操作
@@ -158,17 +149,6 @@ namespace Ingenu_Power.UserControls
 							} else {
 								if (!( bool )arrayList[ 1 ]) {
 									error_information += "当前电源无需使用ISP进行烧录 \r\n";
-								} else {
-									switch (( int )arrayList[ 2 ]) {
-										case 1://显示含外部供电的485转TTL隔离模块
-											Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), arrayList[ 3 ].ToString(), "485转TTL.png" ); break;
-										case 2://显示不含外部供电的485转TTL/232隔离模块
-											Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), arrayList[ 3 ].ToString(), "485转232.png" ); break;
-										case 3://显示485转485隔离模块
-											Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), arrayList[ 3 ].ToString(), "485转485.png" ); break;
-										default: //不使用串口通讯
-											Dispatcher.Invoke( new dlg_PromptShow( PromptShow ), "无需串口通讯", "null.png" ); break;
-									}
 								}
 							}
 						}						

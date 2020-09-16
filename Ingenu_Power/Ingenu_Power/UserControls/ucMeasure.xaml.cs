@@ -340,8 +340,9 @@ namespace Ingenu_Power.UserControls
 				if (!found_file) {
 					error_information = "没有找到对应ID和版本号的产品的测试方法"; return;
 				}
-			} catch {
-				error_information = "没有能正常加载用户指定的dll文件";
+			} catch(Exception ex) {				
+				error_information = "没有能正常加载用户指定的dll文件\r\n";
+				error_information += ex.ToString();
 			}
 
 		}
