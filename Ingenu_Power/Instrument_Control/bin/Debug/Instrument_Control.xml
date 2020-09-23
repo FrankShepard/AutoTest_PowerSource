@@ -3578,15 +3578,13 @@
             <param name="cmd">待计算校验和的数组对象</param>
             <returns>校验和</returns>
         </member>
-        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vCheckRespond(System.Int32,System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
              <summary>
              设备对用户发送指令的响应数据
              </summary>
-             <param name="retey_times">同一条命令反复发送的次数，为了防止电子负载错误响应时使用</param>
              <param name="command_bytes">发送到设备的命令</param>
              <param name="serialPort">设备连接的电脑串口</param>
             <param name="error_information">可能出现的错误信息</param>
-            <returns>是否需要再次发送的标志</returns>
         </member>
         <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
             <summary>

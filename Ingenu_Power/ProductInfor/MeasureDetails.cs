@@ -136,19 +136,7 @@ namespace ProductInfor
 								error_information += error_information_temp;
 								error_information_temp = itech.ElecLoad_vInputStatusSet ( Address_Load_Bats, Itech.OperationMode.CV, cv_target, Itech.OnOffStatus.Off, serialPort );
 								error_information += error_information_temp;
-
-								/*主备电关闭*/
-								serialPort.BaudRate = Baudrate_Instrument_DCPower;
-								error_information_temp = itech.Itech_vRemoteControl ( Address_DCPower, Itech.RemoteControlMode.Remote, serialPort );
-								error_information += error_information_temp;
-								error_information_temp = itech.DCPower_vOutputStatusSet ( Address_DCPower, 0m, false, serialPort );
-								error_information += error_information_temp;
-								serialPort.BaudRate = Baudrate_Instrument_ACPower;
-								error_information_temp = acpower.ACPower_vControlStop ( Address_ACPower, serialPort );
-								error_information += error_information_temp;
-								error_information_temp = acpower.ACPower_vSetParameters ( Address_ACPower, 220m, 50m, false, serialPort );
-								error_information += error_information_temp;
-
+								
 								//注意：单片机模块的执行代码出现错误时需要最多3次错误之后才可以真正上报
 								int retry_count = 0;
 								do {
@@ -165,6 +153,18 @@ namespace ProductInfor
 									if (error_information_temp != string.Empty) { continue; }
 									mcu.McuControl_vRappleChannelChoose( 0, serialPort, out error_information_temp );									
 								} while (( ++retry_count < 3 ) && ( error_information_temp != string.Empty ));
+								error_information += error_information_temp;
+
+								/*主备电关闭*/
+								serialPort.BaudRate = Baudrate_Instrument_DCPower;
+								error_information_temp = itech.Itech_vRemoteControl( Address_DCPower, Itech.RemoteControlMode.Remote, serialPort );
+								error_information += error_information_temp;
+								error_information_temp = itech.DCPower_vOutputStatusSet( Address_DCPower, 0m, false, serialPort );
+								error_information += error_information_temp;
+								serialPort.BaudRate = Baudrate_Instrument_ACPower;
+								error_information_temp = acpower.ACPower_vControlStop( Address_ACPower, serialPort );
+								error_information += error_information_temp;
+								error_information_temp = acpower.ACPower_vSetParameters( Address_ACPower, 220m, 50m, false, serialPort );
 								error_information += error_information_temp;
 							}
 						}
@@ -238,7 +238,7 @@ namespace ProductInfor
 		#region -- 输出通道的带载自动分配
 
 		/// <summary>
-		/// 功率的自动分配，根据预计带载值，将其分配到对应的电子负载上
+		/// 功率的自动分配，根据预计带载值，将其分配到对应的电子负载上；大于0为有效
 		/// </summary>
 		/// <param name="is_emergencypower">是否为应急照明电源</param>
 		/// <param name="output_count">输出通道数量</param>
@@ -247,7 +247,7 @@ namespace ProductInfor
 		/// <returns>输出使用的电子负载对应的硬件通道索引</returns>
 		public int[] Measure_vPowerAllocate(bool is_emergencypower, int output_count, decimal[] powers, out decimal[] real_powers)
 		{
-			int[] AllocateChannel = new int[ Address_Load_Output.Length ];
+			int[] AllocateChannel = new int[] { -1,-1,-1,-1,-1,-1};
 			real_powers = new decimal[ Address_Load_Output.Length ];
 			int used_load_count = 0;
 			if (!is_emergencypower) {
@@ -338,7 +338,7 @@ namespace ProductInfor
 		/// <returns>输出使用的电子负载对应的硬件通道索引</returns>
 		public int [ ] Measure_vCurrentAllocate(bool is_emergencypower, int output_count, decimal [ ] currents, decimal [ ] real_voltages, out decimal [ ] real_currents )
 		{
-			int [ ] AllocateChannel = new int [ Address_Load_Output.Length ];
+			int[] AllocateChannel = new int[] { -1, -1, -1, -1, -1, -1 };
 			real_currents = new decimal [ Address_Load_Output.Length ];
 			int used_load_count = 0;
 			if (!is_emergencypower) {
@@ -430,8 +430,13 @@ namespace ProductInfor
 		/// <returns>输出使用的电子负载对应的硬件通道索引</returns>
 		public int [ ] Measure_vResistanceAllocate( bool is_emergencypower,int output_count, decimal [ ] resistances, decimal [ ] real_voltages, out decimal [ ] real_resistances )
 		{
-			int [ ] AllocateChannel = new int [ Address_Load_Output.Length ];
+			int[] AllocateChannel = new int[] { -1, -1, -1, -1, -1, -1 };
 			real_resistances = new decimal [ Address_Load_Output.Length ];
+			//对应电阻的初始值设置为最大的 7500m
+			for (int index = 0; index < real_resistances.Length; index++) {
+				real_resistances[ index ] = 7500m; //使用最大的电阻，对输出电压影响放到最低
+			}
+
 			int used_load_count = 0;
 			if (!is_emergencypower) {
 				for (int index = 0; index < output_count; index++) {
@@ -439,7 +444,6 @@ namespace ProductInfor
 					if ((Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ]) <= 2 * SingleLoadMaxPower) { //输出功率可以被两个并联的负载直接吸收
 						if ((Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ]) < SingleLoadMaxPower) {
 							real_resistances[ used_load_count ] = resistances[ index ];
-							real_resistances[ used_load_count + 1 ] = 7500m; //使用最大的电阻，对输出电压影响放到最低
 						} else {
 							real_resistances[ used_load_count ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
 							real_resistances[ used_load_count + 1 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - SingleLoadMaxPower);
@@ -452,7 +456,6 @@ namespace ProductInfor
 						real_resistances[ used_load_count + 1 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
 						if ((resistances[ index ] * real_voltages[ index ]) <= 3 * SingleLoadMaxPower) {
 							real_resistances[ used_load_count + 2 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - 2 * SingleLoadMaxPower);
-							real_resistances[ used_load_count + 3 ] = 7500m; //使用最大的电阻，对输出电压影响放到最低
 						} else {
 							real_resistances[ used_load_count + 2 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
 							real_resistances[ used_load_count + 3 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - 3 * SingleLoadMaxPower);
@@ -469,7 +472,6 @@ namespace ProductInfor
 						real_resistances[ used_load_count + 3 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
 						if ((resistances[ index ] * real_voltages[ index ]) <= 5 * SingleLoadMaxPower) {
 							real_resistances[ used_load_count + 4 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - 4 * SingleLoadMaxPower);
-							real_resistances[ used_load_count + 5 ] = 7500m; //使用最大的电阻，对输出电压影响放到最低
 						} else {
 							real_resistances[ used_load_count + 4 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / SingleLoadMaxPower;
 							real_resistances[ used_load_count + 5 ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / (Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ index ] ), 2.0 ) ) / resistances[ index ] - 5 * SingleLoadMaxPower);
@@ -904,6 +906,49 @@ namespace ProductInfor
 		#endregion
 
 		#region -- 自制控制板相关动作
+
+		/// <summary>
+		/// 获取SG端子上待测电平及状态的实际值
+		/// </summary>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		/// <returns></returns>
+		public ushort[] Measure_vCommSGLevelGet( SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			int baudrate_before = serialPort.BaudRate;
+			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+
+			ushort[] level_status = new ushort[2];
+			using (MCU_Control mCU_Control = new MCU_Control()) {
+				int retry_count = 0;
+				do {
+					level_status = mCU_Control.McuControl_vGetPinsADValue( serialPort, out error_information );
+				} while (( error_information != string.Empty ) && ( ++retry_count < 3 ));
+			}
+			serialPort.BaudRate = baudrate_before;
+			return level_status;
+		}
+
+		/// <summary>
+		/// SG端子上待测的管脚
+		/// </summary>
+		/// <param name="need_tested_pins">待测管脚使能数据</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void Measure_vCommSGLevelSet(int need_tested_pins,SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			int baudrate_before = serialPort.BaudRate;
+			serialPort.BaudRate = Baudrate_Instrument_ControlBoard;
+			using (MCU_Control mCU_Control = new MCU_Control()) {
+				int retry_count = 0;
+				do {
+					mCU_Control.McuControl_vPinsNeedADMeasureSetting( Convert.ToUInt16(need_tested_pins), serialPort, out error_information );
+				} while (( error_information != string.Empty ) && ( ++retry_count < 3 ));
+			}
+			serialPort.BaudRate = baudrate_before;
+		}
 
 		/// <summary>
 		/// 唤醒MCU控制板单片机

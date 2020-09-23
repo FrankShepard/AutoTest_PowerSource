@@ -506,6 +506,46 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:ProductInfor.Base.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对产品串口发送的帧的实际过程
+            </summary>
+            <param name="command_bytes">待发送的命令帧</param>
+            <param name="sp_product">使用到的串口</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor.Base.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
+            <summary>
+            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
+            </summary>
+            <param name="sp_product">使用到的串口</param>
+            <returns>可能存在的异常情况</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Product_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.Byte[]@)">
+            <summary>
+            待测产品对用户发送指令的响应数据；可以被重写，不同产品的协议中存在不同的判断依据
+            </summary>
+            <param name="sent_cmd">已经发送的命令字节</param>
+            <param name="sp_product">仪表连接的电脑串口</param>
+            <param name="received_cmd">串口接收数据</param>
+            <returns>仪表响应，正确与否的判定依据</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Product_vGetQueryedValue(System.Byte[],System.Byte[])">
+            <summary>
+            提取接收到的数据中的产品相关信息 -- 不同产品的协议不同，需要按照产品进行对应重写
+            </summary>
+            <param name="sent_data">发送给产品的数组信息</param>
+            <param name="SerialportData">接收到的数组信息</param>
+            <returns>可能存在的异常信息</returns>
+        </member>
+        <member name="M:ProductInfor.Base.Communicate_User_DoEvent(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            具体的与产品通讯的过程
+            </summary>
+            <param name="sent_data">待发送的命令字节</param>
+            <param name="serialPort">使用到的实际串口</param>
+            <param name="error_information">可能存在的异常信息</param>
+        </member>
         <member name="M:ProductInfor.Base.InitalizeParemeters_SG(System.Data.DataTable,System.String@)">
             <summary>
             SG端子相关数据的获取
@@ -592,15 +632,6 @@
             </summary>
             <param name="channel">电子负载对应的输出通道分配索引</param>
             <param name="itech">使用到的电子负载的对象</param>
-            <param name="mCU_Control">使用到的校准集合对象</param>
-            <param name="serialPort">使用到的串口</param>
-            <param name="error_information">可能储存在的错误信息</param>
-        </member>
-        <member name="M:ProductInfor.Base.Calibrate_vStopChargeSet(ProductInfor.MeasureDetails,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            停止充电点的校准
-            </summary>
-            <param name="measureDetails">使用到的测试细节对象</param>
             <param name="mCU_Control">使用到的校准集合对象</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能储存在的错误信息</param>
@@ -1065,7 +1096,7 @@
         </member>
         <member name="M:ProductInfor.MeasureDetails.Measure_vPowerAllocate(System.Boolean,System.Int32,System.Decimal[],System.Decimal[]@)">
             <summary>
-            功率的自动分配，根据预计带载值，将其分配到对应的电子负载上
+            功率的自动分配，根据预计带载值，将其分配到对应的电子负载上；大于0为有效
             </summary>
             <param name="is_emergencypower">是否为应急照明电源</param>
             <param name="output_count">输出通道数量</param>
@@ -1209,6 +1240,22 @@
             <summary>
             准备读取直流的输出值
             </summary>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vCommSGLevelGet(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            获取SG端子上待测电平及状态的实际值
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns></returns>
+        </member>
+        <member name="M:ProductInfor.MeasureDetails.Measure_vCommSGLevelSet(System.Int32,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            SG端子上待测的管脚
+            </summary>
+            <param name="need_tested_pins">待测管脚使能数据</param>
+            <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
         <member name="M:ProductInfor.MeasureDetails.Measure_vCommMcuControlAwake(System.IO.Ports.SerialPort,System.String@)">
@@ -1463,16 +1510,6 @@
             输出通道的电流
             </summary>
         </member>
-        <member name="F:ProductInfor._60710.retry_time">
-            <summary>
-            控制命令出现通讯错误之后重新操作的次数
-            </summary>
-        </member>
-        <member name="F:ProductInfor._60710.receive_data">
-            <summary>
-            产品返回的串口代码
-            </summary>
-        </member>
         <member name="M:ProductInfor._60710.Initalize(System.String,System.String,System.String,System.String)">
             <summary>
             产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
@@ -1526,21 +1563,6 @@
             产品进入校准模式
             </summary>
             <returns>具体的命令字节</returns>
-        </member>
-        <member name="M:ProductInfor._60710.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            对产品串口发送的帧的实际过程
-            </summary>
-            <param name="command_bytes">待发送的命令帧</param>
-            <param name="sp_product">使用到的串口</param>
-            <param name="error_information">可能存在的异常</param>
-        </member>
-        <member name="M:ProductInfor._60710.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
-            <summary>
-            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
-            </summary>
-            <param name="sp_product">使用到的串口</param>
-            <returns>可能存在的异常情况</returns>
         </member>
         <member name="M:ProductInfor._60710.Product_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.Byte[]@)">
             <summary>
@@ -1602,6 +1624,15 @@
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._60710.Measure_vCheckSourceChangeMpOverVoltage(System.Boolean,System.Int32,System.String)">
+            <summary>
+            主电过压切换检查;J-EI8212测试时仅保证在设置过压点±3V之间上报主电过压即可
+            </summary>
+            <param name="whole_function_enable">全项测试，为true时需要获取具体的主电过压点</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._67510">
             <summary>
@@ -1878,16 +1909,6 @@
             串口采集数据的对象
             </summary>
         </member>
-        <member name="F:ProductInfor._67510.retry_time">
-            <summary>
-            控制命令出现通讯错误之后重新操作的次数
-            </summary>
-        </member>
-        <member name="F:ProductInfor._67510.receive_data">
-            <summary>
-            产品返回的串口代码
-            </summary>
-        </member>
         <member name="M:ProductInfor._67510.Initalize(System.String,System.String,System.String,System.String)">
             <summary>
             产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
@@ -2034,25 +2055,11 @@
             </summary>
             <returns>具体的命令字节</returns>
         </member>
-        <member name="M:ProductInfor._67510.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            对产品串口发送的帧的实际过程
-            </summary>
-            <param name="command_bytes">待发送的命令帧</param>
-            <param name="sp_product">使用到的串口</param>
-            <param name="error_information">可能存在的异常</param>
-        </member>
-        <member name="M:ProductInfor._67510.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
-            <summary>
-            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
-            </summary>
-            <param name="sp_product">使用到的串口</param>
-            <returns>可能存在的异常情况</returns>
-        </member>
-        <member name="M:ProductInfor._67510.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
+        <member name="M:ProductInfor._67510.Product_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.Byte[]@)">
             <summary>
             待测产品对用户发送指令的响应数据
             </summary>
+            <param name="sent_cmd">已经发送的命令字节</param>
             <param name="sp_product">仪表连接的电脑串口</param>
             <param name="received_cmd">串口接收数据</param>
             <returns>仪表响应，正确与否的判定依据</returns>
@@ -2397,11 +2404,6 @@
             用于海湾通讯系列电源的通讯协议结构体
             </summary>
         </member>
-        <member name="F:ProductInfor._61710.retry_time">
-            <summary>
-            控制命令出现通讯错误之后重新操作的次数
-            </summary>
-        </member>
         <member name="M:ProductInfor._61710.Initalize(System.String,System.String,System.String,System.String)">
             <summary>
             产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
@@ -2440,33 +2442,20 @@
             <param name="serialPort">使用到的实际串口</param>
             <param name="error_information">可能存在的异常</param>
         </member>
-        <member name="M:ProductInfor._61710.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            对产品串口发送的帧的实际过程
-            </summary>
-            <param name="command_bytes">待发送的命令帧</param>
-            <param name="sp_product">使用到的串口</param>
-            <param name="error_information">可能存在的异常</param>
-        </member>
-        <member name="M:ProductInfor._61710.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
-            <summary>
-            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
-            </summary>
-            <param name="sp_product">使用到的串口</param>
-            <returns>可能存在的异常情况</returns>
-        </member>
-        <member name="M:ProductInfor._61710.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
+        <member name="M:ProductInfor._61710.Product_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.Byte[]@)">
             <summary>
             待测产品对用户发送指令的响应数据
             </summary>
+            <param name="sent_cmd">已经发送的命令字节</param>
             <param name="sp_product">仪表连接的电脑串口</param>
-            <param name="SerialportData">串口接收数据</param>
+            <param name="received_cmd">串口接收数据</param>
             <returns>仪表响应，正确与否的判定依据</returns>
         </member>
-        <member name="M:ProductInfor._61710.Product_vGetQueryedValue(System.Byte[])">
+        <member name="M:ProductInfor._61710.Product_vGetQueryedValue(System.Byte[],System.Byte[])">
             <summary>
             提取接收到的数据中的产品相关信息
             </summary>
+            <param name="sent_data">发送给产品的数组信息</param>
             <param name="SerialportData">接收到的数组信息</param>
             <returns>可能存在的异常信息</returns>
         </member>
@@ -2529,12 +2518,13 @@
             <param name="sql_password">sql登录密码</param>
             <returns>可能存在的错误信息和用户ID</returns>
         </member>
-        <member name="M:ProductInfor._60610.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
+        <member name="M:ProductInfor._60610.Product_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.Byte[]@)">
             <summary>
             待测产品对用户发送指令的响应数据
             </summary>
+            <param name="sent_cmd">已经发送的命令字节</param>
             <param name="sp_product">仪表连接的电脑串口</param>
-            <param name="SerialportData">串口接收数据</param>
+            <param name="received_cmd">串口接收数据</param>
             <returns>仪表响应，正确与否的判定依据</returns>
         </member>
         <member name="M:ProductInfor._60610.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
@@ -2965,16 +2955,6 @@
             备电切断之后蜂鸣器工作的时间(s)
             </summary>
         </member>
-        <member name="F:ProductInfor._64910.retry_time">
-            <summary>
-            控制命令出现通讯错误之后重新操作的次数
-            </summary>
-        </member>
-        <member name="F:ProductInfor._64910.receive_data">
-            <summary>
-            产品返回的串口代码
-            </summary>
-        </member>
         <member name="M:ProductInfor._64910.Initalize(System.String,System.String,System.String,System.String)">
             <summary>
             产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
@@ -3078,21 +3058,6 @@
             </summary>
             <returns>具体的命令字节</returns>
         </member>
-        <member name="M:ProductInfor._64910.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            对产品串口发送的帧的实际过程
-            </summary>
-            <param name="command_bytes">待发送的命令帧</param>
-            <param name="sp_product">使用到的串口</param>
-            <param name="error_information">可能存在的异常</param>
-        </member>
-        <member name="M:ProductInfor._64910.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
-            <summary>
-            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
-            </summary>
-            <param name="sp_product">使用到的串口</param>
-            <returns>可能存在的异常情况</returns>
-        </member>
         <member name="M:ProductInfor._64910.Product_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.Byte[]@)">
             <summary>
             待测产品对用户发送指令的响应数据
@@ -3154,6 +3119,24 @@
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
+        <member name="M:ProductInfor._64910.Measure_vCurrentEqualizedCharge(System.Boolean,System.Int32,System.String)">
+            <summary>
+            测试均充电流
+            </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
+        <member name="M:ProductInfor._64910.Measure_vVoltageFloatingCharge(System.Boolean,System.Int32,System.String)">
+            <summary>
+            测试浮充电压
+            </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
         <member name="T:ProductInfor._60010">
             <summary>
             继承自_60510的 GST5000H 电源的相关信息
@@ -3169,12 +3152,13 @@
             <param name="sql_password">sql登录密码</param>
             <returns>可能存在的错误信息和用户ID</returns>
         </member>
-        <member name="M:ProductInfor._60010.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
+        <member name="M:ProductInfor._60010.Product_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.Byte[]@)">
             <summary>
             待测产品对用户发送指令的响应数据
             </summary>
+            <param name="sent_cmd">已经发送的命令字节</param>
             <param name="sp_product">仪表连接的电脑串口</param>
-            <param name="SerialportData">串口接收数据</param>
+            <param name="received_cmd">串口接收数据</param>
             <returns>仪表响应，正确与否的判定依据</returns>
         </member>
         <member name="M:ProductInfor._60010.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
@@ -3240,11 +3224,6 @@
             用于海湾通讯系列电源的通讯协议结构体
             </summary>
         </member>
-        <member name="F:ProductInfor._60510.retry_time">
-            <summary>
-            控制命令出现通讯错误之后重新操作的次数
-            </summary>
-        </member>
         <member name="M:ProductInfor._60510.Initalize(System.String,System.String,System.String,System.String)">
             <summary>
             产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
@@ -3276,33 +3255,20 @@
             <param name="serialPort">使用到的实际串口</param>
             <param name="error_information">可能存在的异常</param>
         </member>
-        <member name="M:ProductInfor._60510.Product_vCommandSend(System.Byte[],System.IO.Ports.SerialPort,System.String@)">
-            <summary>
-            对产品串口发送的帧的实际过程
-            </summary>
-            <param name="command_bytes">待发送的命令帧</param>
-            <param name="sp_product">使用到的串口</param>
-            <param name="error_information">可能存在的异常</param>
-        </member>
-        <member name="M:ProductInfor._60510.Product_vWaitForRespond(System.IO.Ports.SerialPort)">
-            <summary>
-            等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
-            </summary>
-            <param name="sp_product">使用到的串口</param>
-            <returns>可能存在的异常情况</returns>
-        </member>
-        <member name="M:ProductInfor._60510.Product_vCheckRespond(System.IO.Ports.SerialPort,System.Byte[]@)">
+        <member name="M:ProductInfor._60510.Product_vCheckRespond(System.Byte[],System.IO.Ports.SerialPort,System.Byte[]@)">
             <summary>
             待测产品对用户发送指令的响应数据
             </summary>
+            <param name="sent_cmd">已经发送的命令字节</param>
             <param name="sp_product">仪表连接的电脑串口</param>
-            <param name="SerialportData">串口接收数据</param>
+            <param name="received_cmd">串口接收数据</param>
             <returns>仪表响应，正确与否的判定依据</returns>
         </member>
-        <member name="M:ProductInfor._60510.Product_vGetQueryedValue(System.Byte[])">
+        <member name="M:ProductInfor._60510.Product_vGetQueryedValue(System.Byte[],System.Byte[])">
             <summary>
             提取接收到的数据中的产品相关信息
             </summary>
+            <param name="sent_data">发送给产品的数组信息</param>
             <param name="SerialportData">接收到的数组信息</param>
             <returns>可能存在的异常信息</returns>
         </member>
@@ -3335,6 +3301,15 @@
         <member name="M:ProductInfor._60510.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             满载电压测试 - 检查主电情况下输出电压和电流的采集误差
+            </summary>
+            <param name="whole_function_enable">全项测试与否</param>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._60510.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
+            <summary>
+            备电切断点检查 - 检查备电电压的采集误差
             </summary>
             <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>

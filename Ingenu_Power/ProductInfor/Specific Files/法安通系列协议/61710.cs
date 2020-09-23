@@ -46,11 +46,6 @@ namespace ProductInfor
 		public Infor_Uart infor_Uart = new Infor_Uart();
 
 		/// <summary>
-		/// 控制命令出现通讯错误之后重新操作的次数
-		/// </summary>
-		public static int retry_time = 0;
-
-		/// <summary>
 		/// 产品相关信息的初始化 - 特定产品会在此处进行用户ID和厂内ID的关联
 		/// </summary>
 		/// <param name="product_id">产品的厂内ID</param>
@@ -122,29 +117,10 @@ namespace ProductInfor
 			serialPort.BaudRate = CommunicateBaudrate;
 
 			try { if (!serialPort.IsOpen) { serialPort.Open(); } } catch { error_information = "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
-
-			byte[] receive_data = new byte[ 13 ];
+			byte[] sent_data = new byte[] { 0x02, 0x10, 0x00, 0x12 };
 			do {
-				switch (index) {
-					case 0:
-						byte[] SerialportData = new byte[] { 0x02, 0x10, 0x00, 0x12 };
-						Product_vCommandSend( SerialportData, serialPort, out error_information ); break;
-					case 1:
-						error_information = Product_vWaitForRespond( serialPort ); break;
-					case 2:
-						error_information = Product_vCheckRespond( serialPort, out receive_data ); break;
-					case 3:
-						error_information = Product_vGetQueryedValue( receive_data ); break;
-					default: break;
-				}
-			} while ((++index < 4) && (error_information == string.Empty));
-			if (error_information != string.Empty) {
-				if (++retry_time < 3) {//连续3次异常才可以真实上报故障
-					Communicate_User_QueryWorkingStatus( serialPort, out error_information );
-				} else {
-					retry_time = 0;
-				}
-			} else { retry_time = 0; }
+				Communicate_User_DoEvent( sent_data, serialPort, out error_information );
+			} while (( ++index < 3 ) && ( error_information != string.Empty ));		
 		}
 
 		/// <summary>
@@ -166,7 +142,7 @@ namespace ProductInfor
 		{
 			error_information = string.Empty;
 			serialPort.BaudRate = CommunicateBaudrate;
-			byte[] SerialportData = new byte[] { 0x02, 0x30, 0x00, 0x32 };
+			byte[] SerialportData = new byte[] { 0x02, 0x30, 0x01, 0x33 };
 			//连续发送2次进入管理员模式的命令
 			for (int index = 0; index < 2; index++) {
 				Product_vCommandSend( SerialportData, serialPort, out error_information );
@@ -196,108 +172,53 @@ namespace ProductInfor
 		#region -- 具体的与待测产品进行通讯的过程
 
 		/// <summary>
-		/// 对产品串口发送的帧的实际过程
-		/// </summary>
-		/// <param name="command_bytes">待发送的命令帧</param>
-		/// <param name="sp_product">使用到的串口</param>
-		/// <param name="error_information">可能存在的异常</param>
-		private void Product_vCommandSend(byte[] command_bytes, SerialPort sp_product, out string error_information)
-		{
-			error_information = string.Empty;
-			/*以下执行串口数据传输指令*/
-			try { if (!sp_product.IsOpen) { sp_product.Open(); } } catch { error_information = "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
-			sp_product.ReadExisting();
-#if false //以下为调试保留代码，实际调用时不使用
-			string temp = sp_product.ReadExisting();
-			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
-
-			string file_name = @"D:\Desktop\串口数据记录.txt";
-			if (temp != string.Empty) {
-				for (int i = 0; i < temp.Length; i++) {
-					text_value += temp[ i ] + " ";
-				}
-				sb.AppendLine( text_value );				
-				if(!System.IO.File.Exists( file_name )) {
-					System.IO.File.Create( file_name );
-				}
-				System.IO.File.AppendAllText( file_name, sb.ToString() );
-			}
-
-			sp_product.Write( command_bytes, 0, command_bytes.Length );
-
-			text_value += " ->";
-			for (int i = 0; i < command_bytes.Length; i++) {
-				text_value += command_bytes[ i ].ToString( "x" ).ToUpper() + " ";
-			}
-			sb.AppendLine( text_value );
-			System.IO.File.AppendAllText( file_name, sb.ToString() );
-#endif
-			sp_product.Write( command_bytes, 0, command_bytes.Length );
-		}
-
-		/// <summary>
-		/// 等待仪表的回码的时间限制，只有在串口检测到了连续的数据之后才可以进行串口数据的提取
-		/// </summary>
-		/// <param name="sp_product">使用到的串口</param>
-		/// <returns>可能存在的异常情况</returns>
-		private string Product_vWaitForRespond(SerialPort sp_product)
-		{
-			string error_information = string.Empty;
-
-			Int32 waittime = 0;
-			while (sp_product.BytesToRead == 0) {
-				Thread.Sleep( 5 );
-				if (++waittime > 20) {
-					error_information = "待测产品通讯响应超时";//仪表响应超时
-					return error_information;
-				}
-			}
-			//! 等待传输结束，结束的标志为连续两个5ms之间的接收字节数量是相同的
-			int last_byte_count = 0;
-			while ((sp_product.BytesToRead > last_byte_count) && (sp_product.BytesToRead != 0)) {
-				last_byte_count = sp_product.BytesToRead;
-				Thread.Sleep( 5 );
-			}
-			return error_information;
-		}
-
-		/// <summary>
 		/// 待测产品对用户发送指令的响应数据
 		/// </summary>
+		/// <param name="sent_cmd">已经发送的命令字节</param>
 		/// <param name="sp_product">仪表连接的电脑串口</param>
-		/// <param name="SerialportData">串口接收数据</param>
+		/// <param name="received_cmd">串口接收数据</param>
 		/// <returns>仪表响应，正确与否的判定依据</returns>
-		public virtual string Product_vCheckRespond(SerialPort sp_product, out byte[] SerialportData)
+		public override string Product_vCheckRespond(byte[] sent_cmd, SerialPort sp_product, out byte[] received_cmd)
 		{
 			string error_information = string.Empty;
-			SerialportData = new byte[ sp_product.BytesToRead ];
+			byte[] received_data = new byte[ sp_product.BytesToRead ];
 
 			if (sp_product.BytesToRead > 0) {
-				sp_product.Read( SerialportData, 0, sp_product.BytesToRead );
+				sp_product.Read( received_data, 0, sp_product.BytesToRead );
 #if false //以下为调试保留代码，实际调用时不使用
 				StringBuilder sb = new StringBuilder();
 				string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
-				for (int i = 0; i < SerialportData.Length; i++) {
-					text_value += (SerialportData[ i ].ToString( "x" ).ToUpper() + " ");
+				for (int i = 0; i < received_data.Length; i++) {
+					if (received_data[ i ] < 0x10) {
+						text_value += "0";
+					}
+					text_value += ( received_data[ i ].ToString( "x" ).ToUpper() + " " );
 				}
 				sb.AppendLine( text_value );
 				string file_name = @"D:\Desktop\串口数据记录.txt";
-				if(!System.IO.File.Exists( file_name )) {
+				if (!System.IO.File.Exists( file_name )) {
 					System.IO.File.Create( file_name );
 				}
 				System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
 			}
 
-			if (SerialportData.Length == 13) {
-				//先判断同步头字节和校验和是否满足要求
-				if ((SerialportData[ 0 ] != 0x02) || (SerialportData[ 1 ] != 0x10)) { error_information = "待测产品返回的数据出现了逻辑不匹配的异常"; }
-				if (SerialportData[ 12 ] != Product_vGetCalibrateCode( SerialportData, 0, 12 )) { error_information = "待测产品的串口校验和不匹配"; }
-			} else {
-				sp_product.ReadExisting();
-				error_information = "待测产品返回的数据出现了返回数据字节数量不匹配的异常";
-			}
+			//先判断同步头字节和帧尾是否满足要求 
+			//此处需要特殊注意：有些电源在正式上电时可能上传若干 0x00 字节；可能在帧头也有可能在帧尾
+			int real_data_startindex = 0;
+
+			do {
+				if (received_data[ real_data_startindex ] == 0x02) {
+					break;
+				}
+			} while (++real_data_startindex < received_data.Length);
+
+			received_cmd = new byte[ 13 ];
+			Buffer.BlockCopy( received_data, real_data_startindex, received_cmd, 0, Math.Min( received_data.Length, received_cmd.Length ) );
+
+			//先判断同步头字节和校验和是否满足要求
+			if (( received_cmd[ 0 ] != 0x02 ) || ( received_cmd[ 1 ] != 0x10 )) { error_information = "待测产品返回的数据出现了逻辑不匹配的异常"; }
+			if (received_cmd[ received_cmd.Length - 1 ] != Product_vGetCalibrateCode( received_cmd, 0, ( received_cmd.Length - 1 ) )) { error_information = "待测产品的串口校验和不匹配"; }
 
 			//关闭对产品串口的使用，防止出现后续被占用而无法打开的情况
 			sp_product.Close();
@@ -308,9 +229,10 @@ namespace ProductInfor
 		/// <summary>
 		/// 提取接收到的数据中的产品相关信息
 		/// </summary>
+		/// <param name="sent_data">发送给产品的数组信息</param>
 		/// <param name="SerialportData">接收到的数组信息</param>
 		/// <returns>可能存在的异常信息</returns>
-		private string Product_vGetQueryedValue(byte[] SerialportData)
+		public override string Product_vGetQueryedValue(byte[] sent_data, byte[] SerialportData)
 		{
 			string error_information = string.Empty;
 			try {
@@ -477,6 +399,16 @@ namespace ProductInfor
 				if (temp_index == 0) {
 					using (MeasureDetails measureDetails = new MeasureDetails()) {
 						using (SerialPort serialPort = new SerialPort( port_name,default_baudrate, Parity.None, 8, StopBits.One )) {
+
+							measureDetails.Measure_vCommSGGndSet( infor_SG.Index_GND, serialPort, out error_information );
+							if (error_information != string.Empty) { continue; }
+							measureDetails.Measure_vCommSGUartParamterSet( infor_SG.Comm_Type, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
+							if (error_information != string.Empty) { continue; }
+
+							if (infor_SG.SG_NeedADCMeasuredPins > 0) {
+								measureDetails.Measure_vCommSGLevelSet( infor_SG.SG_NeedADCMeasuredPins, serialPort, out error_information );
+							}
+
 							//输出负载变化，减为轻载8W，备电使用可调电源
 							decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
 							decimal[] target_power = new decimal[] { 8m, 0m, 0m };
@@ -548,6 +480,22 @@ namespace ProductInfor
 							}
 							//蜂鸣器响
 							Communicate_BeepWorking( serialPort, out error_information );
+
+							//检查待测管脚的电平及状态
+							ushort[] level_status = measureDetails.Measure_vCommSGLevelGet( serialPort, out error_information );
+							if (( level_status[ 1 ] & infor_SG.SG_NeedADCMeasuredPins ) == infor_SG.SG_NeedADCMeasuredPins) {
+								//具体检查逻辑是否匹配 - 此处为检查9脚对应的5V是否正常
+								if (( ( level_status[ 0 ] & infor_SG.SG_NeedADCMeasuredPins ) & 0x0100 ) == 0) {
+									error_information = "SG的9脚电平不匹配，请注意此异常";
+								}
+							} else {
+								error_information = "待测SG端子不满足电平的合格范围要求  " + level_status[ 1 ].ToString( "x" ) + "  合格为:  " + infor_SG.SG_NeedADCMeasuredPins.ToString( "x" );
+							}
+							if (error_information != string.Empty) { continue; }
+							//防止自杀时总线抢占，关电之前解除抢占数据
+							measureDetails.Measure_vCommSGUartParamterSet( MCU_Control.Comm_Type.Comm_None, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
+							if (error_information != string.Empty) { continue; }
+
 							//关闭备电，等待测试人员确认蜂鸣器响
 							Thread.Sleep( 300 ); //保证蜂鸣器能响
 							Thread.Sleep( delay_magnification * 100 ); //保证蜂鸣器能响
@@ -605,7 +553,7 @@ namespace ProductInfor
 								if (index_of_channel <= 1) { real_current = 0m; } //协议中的输出2和输出3的电流合并表示
 								for (int index_of_load = 0; index_of_load < allocate_channel.Length; index_of_load++) {
 									if (allocate_channel[ index_of_load ] == index_of_channel) {
-										generalData_Load = ( Itech.GeneralData_Load )generalData_Loads[ index_of_load ];
+										generalData_Load = ( Itech.GeneralData_Load ) generalData_Loads[ index_of_load ];
 										if (generalData_Load.ActrulyVoltage > real_voltage) { //并联负载中电压较高的值认为输出电压
 											real_voltage = generalData_Load.ActrulyVoltage;
 										}
@@ -614,24 +562,28 @@ namespace ProductInfor
 								}
 								//合格范围的检测
 								specific_value[ index_of_channel ] = real_voltage;
-								if ((real_voltage >= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ]) && (real_voltage <= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 1 ])) {
+								if (( real_voltage >= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] ) && ( real_voltage <= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 1 ] )) {
 									check_okey[ index_of_channel ] = true;
 								}
 
-								//检查串口上报的输出通道电压和电流参数是否准确
-								Communicate_User( serialPort, out error_information );
-								if (error_information != string.Empty) { break; }
-								switch (index_of_channel) {
-									case 1:
-										if (Math.Abs( infor_Uart.Measured_OutputVoltageValue[ 1 ] - real_voltage ) > 0.5m) {
-											error_information = "电源测试得到的输出电压2超过了合格误差范围";
-										}
-										if (Math.Abs( infor_Uart.Measured_OutputCurrentValue[ 1 ] - real_current ) > 0.5m) {
-											error_information = "电源测试得到的输出电流2超过了合格误差范围";
-										}
-										break;
-									default: break;
-								}
+								int retry_count = 0;
+								do {
+									//检查串口上报的输出通道电压和电流参数是否准确
+									Communicate_User( serialPort, out error_information );
+									if (error_information != string.Empty) { break; }
+									switch (index_of_channel) {
+										case 1:
+											if (Math.Abs( infor_Uart.Measured_OutputVoltageValue[ 1 ] - real_voltage ) > 0.5m) {
+												error_information = "电源测试得到的输出电压2超过了合格误差范围";
+											}
+											if (Math.Abs( infor_Uart.Measured_OutputCurrentValue[ 1 ] - real_current ) > 0.5m) {
+												error_information = "电源测试得到的输出电流2超过了合格误差范围";
+											}
+											break;
+										default: break;
+									}
+									Thread.Sleep( 100 );
+								} while (( ++retry_count < 5 ) && ( error_information != string.Empty ));
 							}
 						}
 					}

@@ -544,7 +544,7 @@ namespace Instrument_Control
 			error_information = string.Empty;
 			UInt16[] result = new UInt16[] { 0, 0 };
 
-			byte[] datas = BitConverter.GetBytes( 0 );
+			byte[] datas = new byte[] { 0 };
 			McuControl_vSendCmd( Address_ChannelChoose, Cmd_MCUModel.Read_PinsADValue, datas, serialPort, out error_information );
 			if(error_information == string.Empty) {
 				result[ 0 ] = BitConverter.ToUInt16( McuControl_uReceivedData, 0 );
@@ -993,6 +993,9 @@ namespace Instrument_Control
 			StringBuilder sb = new StringBuilder();
 			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + serialPort.BaudRate.ToString() + "   ->";
 			for (int i = 0; i < command_bytes.Length; i++) {
+				if (command_bytes[ i ] < 0x10) {
+					text_value += "0";
+				}
 				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
 			}
 			sb.AppendLine( text_value );
@@ -1048,6 +1051,9 @@ namespace Instrument_Control
 			StringBuilder sb = new StringBuilder();
 			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 			for (int i = 0; i < received_data.Length; i++) {
+				if (received_data[ i ] < 0x10) {
+					text_value += "0";
+				}
 				text_value += ( received_data[ i ].ToString( "x" ).ToUpper() + " " );
 			}
 			sb.AppendLine( text_value );
@@ -1062,21 +1068,48 @@ namespace Instrument_Control
 				return;
 			}
 
-			//先判断同步头字节和帧尾是否满足要求
-			if ( ( received_data [ 0 ] == Header_Control ) && ( received_data [ received_data.Length - 1 ] == Ender_Control ) ) {
-				if ( received_data [ 2 ] == command_before ) {
-					UInt16 recevied_validatecode = McuControl_vCalculateVali ( received_data );
-					UInt16 validatecode = BitConverter.ToUInt16 ( received_data, received_data.Length - 3 );
-					if ( recevied_validatecode != validatecode ) {
-						error_information = "地址为 " + address.ToString ( ) + " 的设备返回的校验码不匹配 \r\n";
-					} else {
-						//正常命令，将返回数据填充到全局变量的数组中
-						Buffer.BlockCopy( received_data, 4, McuControl_uReceivedData, 0, received_data[ 4 ] );
-					}
-				} else { error_information = "地址为 " + address.ToString ( ) + " 的设备不能正确执行命令 \r\n"; }
-			} else {
-				error_information = "地址为 " + address.ToString ( ) + " 的设备回传数据格式错误 \r\n";
+			//先判断同步头字节和帧尾是否满足要求 
+			//此处需要特殊注意：有些电源在正式上电时可能上传若干 0x00 字节；可能在帧头也有可能在帧尾
+			int real_data_startindex = 0;
+			int real_data_endindex = received_data.Length - 1;
+
+			do {
+				if (received_data[ real_data_startindex ] == Header_Control) {
+					break;
+				}
+			} while (++real_data_startindex < received_data.Length);
+
+			do {
+				if (received_data[ real_data_endindex ] == Ender_Control) {
+					break;
+				}
+			} while (--real_data_endindex > 0);
+
+			if (real_data_endindex <= real_data_startindex) {
+				error_information = "串口数据接收异常，请重试"; return;
 			}
+
+			byte[] real_data = new byte[ real_data_endindex  - real_data_startindex + 1];
+			Buffer.BlockCopy( received_data, real_data_startindex, real_data, 0, Math.Min( real_data.Length, real_data.Length ) );
+
+			if (real_data.Length > 5) {
+				if (( real_data[ 0 ] == Header_Control ) && ( real_data[ real_data.Length - 1 ] == Ender_Control )) {
+					if (real_data[ 2 ] == command_before) {
+						UInt16 recevied_validatecode = McuControl_vCalculateVali( real_data );
+						UInt16 validatecode = BitConverter.ToUInt16( real_data, real_data.Length - 3 );
+						if (recevied_validatecode != validatecode) {
+							error_information = "地址为 " + address.ToString() + " 的设备返回的校验码不匹配 \r\n";
+						} else {
+							//正常命令，将返回数据填充到全局变量的数组中
+							Buffer.BlockCopy( real_data, 5, McuControl_uReceivedData, 0, real_data[ 4 ] );
+						}
+					} else { error_information = "地址为 " + address.ToString() + " 的设备不能正确执行命令 \r\n"; }
+				} else {
+					error_information = "地址为 " + address.ToString() + " 的设备回传数据格式错误 \r\n";
+				}
+			} else {
+				error_information = "地址为 " + address.ToString() + " 的设备回传数据格式错误 \r\n";
+			}			
 		}
 
 		/// <summary>
@@ -1134,15 +1167,12 @@ namespace Instrument_Control
 		/// <summary>
 		/// 设备对用户发送指令的响应数据
 		/// </summary>
-		/// <param name="retey_times">同一条命令反复发送的次数，为了防止电子负载错误响应时使用</param>
 		/// <param name="command_bytes">发送到设备的命令</param>
 		/// <param name="serialPort">设备连接的电脑串口</param>
 		///<param name="error_information">可能出现的错误信息</param>
-		///<returns>是否需要再次发送的标志</returns>
-		private bool McuCalibrate_vCheckRespond( int retey_times, byte [ ] command_bytes, SerialPort serialPort, out string error_information )
+		private void McuCalibrate_vCheckRespond( byte [ ] command_bytes, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
-			bool need_retry = false;
 			//将串口受到的数据移到aByte数组中，并依据读取的数量进行判断0
 			byte [ ] received_data = new byte [ serialPort.BytesToRead ];
 			serialPort.Read ( received_data, 0, serialPort.BytesToRead );
@@ -1150,6 +1180,9 @@ namespace Instrument_Control
 			StringBuilder sb = new StringBuilder();
 			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
 			for (int i = 0; i < received_data.Length; i++) {
+				if (received_data[ i ] < 0x10) {
+					text_value += "0";
+				}
 				text_value += (received_data[ i ].ToString( "x" ).ToUpper() + " ");
 			}
 			sb.AppendLine( text_value );
@@ -1159,20 +1192,34 @@ namespace Instrument_Control
 			}
 			System.IO.File.AppendAllText( file_name, sb.ToString() );
 #endif
+			//先判断同步头字节和帧尾是否满足要求 
+			//此处需要特殊注意：有些电源在正式上电时可能上传若干 0x00 字节；可能在帧头也有可能在帧尾
+			int real_data_startindex = 0;
+			int real_data_endindex = received_data.Length - 1;
 
-			//先判断同步头字节是否满足要求;取消帧尾的判断（个别型号的电源重启时可能发送异常多个无意义字节）
-			if ( ( received_data [ 0 ] == Header_Vali ) && ( received_data [ 3 ] == 0x1F ) && (received_data.Length == 9) ) {
-				byte recevied_validatecode = McuCalibrate_vCalculateVali ( received_data );
-				byte validatecode = received_data [ 7 ];
-				if ( recevied_validatecode != validatecode ) {
-					error_information = "待测单片机返回的校验码不匹配 \r\n";
+			do {
+				if (received_data[ real_data_startindex ] == Header_Vali) {
+					break;
 				}
-			} else {
-				//由于电子负载也使用到了关键字0xAA作为同步头，个别负载在校准过程中发生错误返回代码的情况，此种问题需要特别注意
-				if ( retey_times > 5 ) {
-					error_information = "待测单片机回传数据格式错误 \r\n";
-				} else {
-					need_retry = true;
+			} while (++real_data_startindex < received_data.Length);
+
+			do {
+				if (received_data[ real_data_endindex ] == Ender_Vali) {
+					break;
+				}
+			} while (--real_data_endindex > 0);
+
+			byte[] real_data = new byte[ real_data_endindex - real_data_startindex + 1 ];
+			Buffer.BlockCopy( received_data, real_data_startindex, real_data, 0, Math.Min( received_data.Length, real_data.Length ) );
+
+			if (real_data.Length == 9) {
+				//先判断同步头字节是否满足要求;取消帧尾的判断（个别型号的电源重启时可能发送异常多个无意义字节）
+				if (( real_data[ 0 ] == Header_Vali ) && ( real_data[ 3 ] == 0x1F )) {
+					byte recevied_validatecode = McuCalibrate_vCalculateVali( real_data );
+					byte validatecode = real_data[ 7 ];
+					if (recevied_validatecode != validatecode) {
+						error_information = "待测单片机返回的校验码不匹配 \r\n";
+					}
 				}
 			}
 
@@ -1184,8 +1231,6 @@ namespace Instrument_Control
 			//serialPort.BaudRate = Baudrate_McuControlBoard;
 			//McuControl_vSetCommDirection( Comm_Direction.CommDir_PCToProduct, serialPort, out error_information );
 			//serialPort.BaudRate = baudrate_product;
-
-			return need_retry;
 		}
 
 		/// <summary>
@@ -1202,6 +1247,9 @@ namespace Instrument_Control
 			StringBuilder sb = new StringBuilder();
 			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + serialPort.BaudRate.ToString()  + "   ->";
 			for (int i = 0; i < command_bytes.Length; i++) {
+				if (command_bytes[ i ] < 0x10) {
+					text_value += "0";
+				}
 				text_value += (command_bytes[ i ].ToString( "x" ).ToUpper() + " ");
 			}
 			sb.AppendLine( text_value );
@@ -1251,16 +1299,14 @@ namespace Instrument_Control
 			complete_cmd [ 7 ] = validate_code;
 			complete_cmd [ 8 ] = Ender_Vali;
 
-			bool need_retry = false;
 			int retry_times = 0;
 			do {
 				McuCalibrate_vCommandSend ( complete_cmd, serialPort, out error_information );
 				if ( error_information == string.Empty ) {
 					//接收代码查看信息
-					need_retry = McuCalibrate_vCheckRespond ( retry_times, complete_cmd, serialPort, out error_information );
+					McuCalibrate_vCheckRespond ( complete_cmd, serialPort, out error_information );
 				}
-				retry_times++;
-			} while ( need_retry && ( retry_times < 10 ) );
+			} while ( ( error_information  != string.Empty) && ( ++retry_times < 10 ) );
 		}
 
 		#endregion
