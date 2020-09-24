@@ -177,15 +177,14 @@ namespace Ingenu_Power.Domain
 					objCommand.Connection = objConnection;
 					objCommand.CommandType = CommandType.Text;
 					//先删除现存的数据，再更新
-					objCommand.CommandText = "DELETE FROM [盈帜电源].[dbo].[dll文件保存表]";
+					objCommand.CommandText = "DELETE FROM [盈帜电源].[dbo].[dll文件保存表] WHERE [Mcu2_0_ProductInfor文件] is not null";
 					V_UpdateInfor( objCommand, out error_information );
 					if(error_information != string.Empty) { return; }
 
-
-					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[dll文件保存表] (ProductInfor文件,修改时间) VALUES (@ProductInfor文件,@修改时间)";
+					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[dll文件保存表] (Mcu2_0_ProductInfor文件,修改时间) VALUES (@Mcu2_0_ProductInfor文件,@修改时间)";
 					//插入数据的填充
 					objCommand.Parameters.Clear();
-					objCommand.Parameters.AddWithValue( "@ProductInfor文件", file_bin );
+					objCommand.Parameters.AddWithValue( "@Mcu2_0_ProductInfor文件", file_bin );
 					objCommand.Parameters.AddWithValue( "@修改时间", DateTime.Now );
 
 					V_UpdateInfor( objCommand, out error_information );

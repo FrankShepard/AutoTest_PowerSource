@@ -420,25 +420,31 @@ namespace Ingenu_Power
 								if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
 								System.Data.DataTable dataTable = database.V_DownloadFile( out error_information_temp );
 								if (error_information_temp != string.Empty) { error_information += (error_information_temp + "\r\n"); continue; }
-								if (dataTable.Rows.Count > 0) {
-									//保存到用户指定地址上
-									SaveFileDialog saveFileDialog = new SaveFileDialog {
-										RestoreDirectory = true, //保护对话框记忆的上次打开的目录
-									};
+								//检查 Mcu2.0_ProductInfor文件 是否存在
+								int row_index = 0;
+								for (row_index = 0; row_index < dataTable.Rows.Count; row_index++) {
+									if (!Equals( dataTable.Rows[ row_index ][ "Mcu2_0_ProductInfor文件" ], DBNull.Value )) {
+										//保存到用户指定地址上
+										SaveFileDialog saveFileDialog = new SaveFileDialog {
+											RestoreDirectory = true, //保护对话框记忆的上次打开的目录
+										};
 
-									saveFileDialog.Filter = "动态库文件(*.dll)|*.dll";
-									if (( bool )saveFileDialog.ShowDialog() == true) {
-										string filePath = saveFileDialog.FileName;
-										FileStream fs = new FileStream( saveFileDialog.FileName, FileMode.Create, FileAccess.Write );
-										byte[] file_data = ObjectToBytes( dataTable.Rows[ 0 ][ "ProductInfor文件" ] );
-										fs.Write( file_data, 0, file_data.Length );
-										fs.Close();
-										//图标变化
-										Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
-										Properties.Settings.Default.Dll文件保存路径 = filePath;
-										Properties.Settings.Default.Save();
-									}
-								} else {
+										saveFileDialog.Filter = "动态库文件(*.dll)|*.dll";
+										if (( bool ) saveFileDialog.ShowDialog() == true) {
+											string filePath = saveFileDialog.FileName;
+											FileStream fs = new FileStream( saveFileDialog.FileName, FileMode.Create, FileAccess.Write );
+											byte[] file_data = ObjectToBytes( dataTable.Rows[ row_index ][ "Mcu2_0_ProductInfor文件" ] );
+											fs.Write( file_data, 0, file_data.Length );
+											fs.Close();
+											//图标变化
+											Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
+											Properties.Settings.Default.Dll文件保存路径 = filePath;
+											Properties.Settings.Default.Save();
+										}
+										break;
+									}									
+								}
+								if ((row_index >= dataTable.Rows.Count) || ( dataTable.Rows.Count == 0)) {
 									error_information = "数据库中缺少对应的DLL文件";
 								}
 							}

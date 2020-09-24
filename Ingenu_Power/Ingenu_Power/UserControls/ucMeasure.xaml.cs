@@ -311,8 +311,8 @@ namespace Ingenu_Power.UserControls
 					Directory.CreateDirectory( bin_filePath );
 				}
 				//bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
-				//bin_filePath = Properties.Settings.Default.Dll文件保存路径;
-				bin_filePath = @"E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
+				bin_filePath = Properties.Settings.Default.Dll文件保存路径;
+				//bin_filePath = @"E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 				Assembly assembly = Assembly.LoadFrom( bin_filePath );
 				Type[] tys = assembly.GetTypes();
 				bool found_file = false;
@@ -367,8 +367,8 @@ namespace Ingenu_Power.UserControls
 					Directory.CreateDirectory( bin_filePath );
 				}
 				//bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
-				//bin_filePath = Properties.Settings.Default.Dll文件保存路径;
-				bin_filePath = @"E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
+				bin_filePath = Properties.Settings.Default.Dll文件保存路径;
+				//bin_filePath = @"E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 				Assembly assembly = Assembly.LoadFrom( bin_filePath );
 				Type [ ] tys = assembly.GetTypes();
 				//检查是否存在指定ID的测试方式；如果没有则需要使用Base中的方式进行测试
@@ -450,24 +450,19 @@ namespace Ingenu_Power.UserControls
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
 									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "备电切断点合格检查";
-									if (( bool )arrayList[ 1 ] != false) { //元素1 - 备电切断点的合格检查
+									if (( bool ) arrayList[ 1 ] != false) { //元素1 - 备电切断点的合格检查
 										measuredValue.Check_SpCutoff = true;
-										if (measureCondition.WholeFunction_Enable) {  //具体测试的情况，需要将数据填充
-											measuredValue.Voltage_SpCutoff = ( decimal )arrayList[ 2 ];//元素2 - 具体的备电切断点值
-											if (( bool )arrayList[ 3 ] != false) { //元素3 - 需要进行备电欠压点的检查测试
-												measuredValue.Check_SpUnderVoltage = true;
-												measuredValue.Voltage_SpUnder = ( decimal )arrayList[ 4 ]; //元素4 - 具体的备电欠压点值
-											}
-											StaticInfor.measureItemShow.Measure_Value = "Pass " + measuredValue.Voltage_SpCutoff.ToString("0.#") + "V"; //具体显示值保留1位小数
-										} else {
+										measuredValue.Voltage_SpCutoff = ( decimal ) arrayList[ 2 ];//元素2 - 具体的备电切断点值
+										if (( bool ) arrayList[ 3 ] != false) { //元素3 - 需要进行备电欠压点的检查测试
 											measuredValue.Check_SpUnderVoltage = true;
-											StaticInfor.measureItemShow.Measure_Value = "Pass";
-
+											measuredValue.Voltage_SpUnder = ( decimal ) arrayList[ 4 ]; //元素4 - 具体的备电欠压点值
 										}
+										StaticInfor.measureItemShow.Measure_Value = "Pass " + measuredValue.Voltage_SpCutoff.ToString( "0.#" ) + "V"; //具体显示值保留1位小数
+
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
 										measuredValue.AllCheckOkey &= false;
-									}									
+									}							
 									break;
 								case 6://主电单投启动功能检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSingleMpStartupAbility" );
@@ -741,12 +736,9 @@ namespace Ingenu_Power.UserControls
 									StaticInfor.measureItemShow.Measure_Item = "检查主电欠压点主备电切换功能";
 									if ( ( bool ) arrayList [ 1 ] != false ) { //元素1 - 检查主电欠压点主备电切换功能正常与否的判断
 										measuredValue.Check_SourceChange_MpUnderVoltage = true;
-										if (measureCondition.WholeFunction_Enable) {  //元素2 - 具体的主电欠压点
-											measuredValue.Voltage_SourceChange_MpUnderVoltage =  Convert.ToInt16 ( arrayList [ 2 ]);
-											StaticInfor.measureItemShow.Measure_Value = "Pass " + measuredValue.Voltage_SourceChange_MpUnderVoltage.ToString("0");
-										} else {
-											StaticInfor.measureItemShow.Measure_Value = "Pass";
-										}
+										//元素2 - 具体的主电欠压点
+										measuredValue.Voltage_SourceChange_MpUnderVoltage =  Convert.ToInt16 ( arrayList [ 2 ]);
+										StaticInfor.measureItemShow.Measure_Value = "Pass " + measuredValue.Voltage_SourceChange_MpUnderVoltage.ToString("0");										
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
 										measuredValue.AllCheckOkey &= false;
@@ -760,12 +752,9 @@ namespace Ingenu_Power.UserControls
 									StaticInfor.measureItemShow.Measure_Item = "检查主电欠压恢复点主备电切换功能";
 									if ( ( bool ) arrayList [ 1 ] != false ) { //元素1 - 检查主电欠压恢复点主备电切换功能正常与否的判断
 										measuredValue.Check_SourceChange_MpUnderVoltageRecovery = true;
-										if (measureCondition.WholeFunction_Enable) {  //元素2 - 具体的主电欠压恢复点
-											measuredValue.Voltage_SourceChange_MpUnderVoltageRecovery = Convert.ToInt16( arrayList[ 2 ] );
-											StaticInfor.measureItemShow.Measure_Value = "Pass " + measuredValue.Voltage_SourceChange_MpUnderVoltageRecovery.ToString ( "0" );
-										} else {
-											StaticInfor.measureItemShow.Measure_Value = "Pass";
-										}
+										//元素2 - 具体的主电欠压恢复点
+										measuredValue.Voltage_SourceChange_MpUnderVoltageRecovery = Convert.ToInt16( arrayList[ 2 ] );
+										StaticInfor.measureItemShow.Measure_Value = "Pass " + measuredValue.Voltage_SourceChange_MpUnderVoltageRecovery.ToString ( "0" );
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
 										measuredValue.AllCheckOkey &= false;
@@ -779,12 +768,9 @@ namespace Ingenu_Power.UserControls
 									StaticInfor.measureItemShow.Measure_Item = "检查主电过压点主备电切换功能";
 									if ( ( bool ) arrayList [ 1 ] != false ) { //元素1 - 检查主电过压点主备电切换功能正常与否的判断
 										measuredValue.Check_SourceChange_MpOverVoltage = true;
-										if (measureCondition.WholeFunction_Enable) {  //元素2 - 具体的主电过压点
-											measuredValue.Voltage_SourceChange_MpOverVoltage = Convert.ToInt16 (arrayList [ 2 ]);
-											StaticInfor.measureItemShow.Measure_Value = "Pass " + measuredValue.Voltage_SourceChange_MpOverVoltage.ToString ( "0" );
-										} else {
-											StaticInfor.measureItemShow.Measure_Value = "Pass";
-										}
+										//元素2 - 具体的主电过压点
+										measuredValue.Voltage_SourceChange_MpOverVoltage = Convert.ToInt16 (arrayList [ 2 ]);
+										StaticInfor.measureItemShow.Measure_Value = "Pass " + measuredValue.Voltage_SourceChange_MpOverVoltage.ToString ( "0" );
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
 										measuredValue.AllCheckOkey &= false;
@@ -798,12 +784,9 @@ namespace Ingenu_Power.UserControls
 									StaticInfor.measureItemShow.Measure_Item = "检查主电过压恢复点主备电切换功能";
 									if ( ( bool ) arrayList [ 1 ] != false ) { //元素1 - 检查主电过压恢复点主备电切换功能正常与否的判断
 										measuredValue.Check_SourceChange_MpOverVoltageRecovery = true;
-										if (measureCondition.WholeFunction_Enable) {  //元素2 - 具体的主电过压恢复点
-											measuredValue.Voltage_SourceChange_MpOverVoltageRecovery = Convert.ToInt16 (arrayList [ 2 ]);
-											StaticInfor.measureItemShow.Measure_Value = "Pass " + measuredValue.Voltage_SourceChange_MpOverVoltageRecovery.ToString ( "0" );
-										} else {
-											StaticInfor.measureItemShow.Measure_Value = "Pass";
-										}
+										 //元素2 - 具体的主电过压恢复点
+										measuredValue.Voltage_SourceChange_MpOverVoltageRecovery = Convert.ToInt16 (arrayList [ 2 ]);
+										StaticInfor.measureItemShow.Measure_Value = "Pass " + measuredValue.Voltage_SourceChange_MpOverVoltageRecovery.ToString ( "0" );
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
 										measuredValue.AllCheckOkey &= false;

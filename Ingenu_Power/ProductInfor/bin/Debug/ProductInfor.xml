@@ -3179,6 +3179,24 @@
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
+        <member name="M:ProductInfor._60010.Measure_vCheckSourceChangeMpUnderVoltage(System.Boolean,System.Int32,System.String)">
+            <summary>
+            主电欠压切换检查 //与Base中保持一致，可以忽略测试
+            </summary>
+            /// <param name="whole_function_enable">全项测试，为true时需要获取具体的主电欠压点</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
+        <member name="M:ProductInfor._60010.Measure_vCheckSourceChangeMpUnderVoltageRecovery(System.Boolean,System.Int32,System.String)">
+            <summary>
+            主电欠压恢复切换检查 //与Base中保持一致，可以忽略测试
+            </summary>
+            <param name="whole_function_enable">全项测试，为true时需要获取具体的主电欠压恢复点</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
         <member name="T:ProductInfor._60510">
             <summary>
             继承自Base的 GST-LD-D02 电源的相关信息
@@ -3315,6 +3333,24 @@
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._60510.Measure_vCheckSourceChangeMpUnderVoltage(System.Boolean,System.Int32,System.String)">
+            <summary>
+            主电欠压切换检查 // D02/D06 必测项
+            </summary>
+            /// <param name="whole_function_enable">全项测试，为true时需要获取具体的主电欠压点</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
+        <member name="M:ProductInfor._60510.Measure_vCheckSourceChangeMpUnderVoltageRecovery(System.Boolean,System.Int32,System.String)">
+            <summary>
+            主电欠压恢复切换检查 --  //D02/D06 必测项
+            </summary>
+            <param name="whole_function_enable">全项测试，为true时需要获取具体的主电欠压恢复点</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
         </member>
     </members>
 </doc>

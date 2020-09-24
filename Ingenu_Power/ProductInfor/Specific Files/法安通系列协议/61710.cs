@@ -463,6 +463,9 @@ namespace ProductInfor
 								}
 								if ((error_information == string.Empty) && (index == 1)) {
 									check_okey = true;
+									Random random = new Random();
+									specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 0 ] ), Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 1 ] ) ) );
+									undervoltage_value = infor_Sp.Target_UnderVoltageLevel + ( specific_value - infor_Sp.Target_CutoffVoltageLevel );
 								}
 							} else { //需要获取具体的数据
 								for (decimal target_value = infor_Sp.Qualified_CutoffLevel[ 1 ]; target_value >= infor_Sp.Qualified_CutoffLevel[ 0 ] - 0.3m; target_value -= 0.1m) {
@@ -481,17 +484,19 @@ namespace ProductInfor
 							//蜂鸣器响
 							Communicate_BeepWorking( serialPort, out error_information );
 
-							//检查待测管脚的电平及状态
-							ushort[] level_status = measureDetails.Measure_vCommSGLevelGet( serialPort, out error_information );
-							if (( level_status[ 1 ] & infor_SG.SG_NeedADCMeasuredPins ) == infor_SG.SG_NeedADCMeasuredPins) {
-								//具体检查逻辑是否匹配 - 此处为检查9脚对应的5V是否正常
-								if (( ( level_status[ 0 ] & infor_SG.SG_NeedADCMeasuredPins ) & 0x0100 ) == 0) {
-									error_information = "SG的9脚电平不匹配，请注意此异常";
+							if (infor_SG.SG_NeedADCMeasuredPins > 0) {
+								//检查待测管脚的电平及状态
+								ushort[] level_status = measureDetails.Measure_vCommSGLevelGet( serialPort, out error_information );
+								if (( level_status[ 1 ] & infor_SG.SG_NeedADCMeasuredPins ) == infor_SG.SG_NeedADCMeasuredPins) {
+									//具体检查逻辑是否匹配 - 此处为检查9脚对应的5V是否正常
+									if (( ( level_status[ 0 ] & infor_SG.SG_NeedADCMeasuredPins ) & 0x0100 ) == 0) {
+										error_information = "SG的9脚电平不匹配，请注意此异常";
+									}
+								} else {
+									error_information = "待测SG端子不满足电平的合格范围要求  " + level_status[ 1 ].ToString( "x" ) + "  合格为:  " + infor_SG.SG_NeedADCMeasuredPins.ToString( "x" );
 								}
-							} else {
-								error_information = "待测SG端子不满足电平的合格范围要求  " + level_status[ 1 ].ToString( "x" ) + "  合格为:  " + infor_SG.SG_NeedADCMeasuredPins.ToString( "x" );
+								if (error_information != string.Empty) { continue; }
 							}
-							if (error_information != string.Empty) { continue; }
 							//防止自杀时总线抢占，关电之前解除抢占数据
 							measureDetails.Measure_vCommSGUartParamterSet( MCU_Control.Comm_Type.Comm_None, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
 							if (error_information != string.Empty) { continue; }

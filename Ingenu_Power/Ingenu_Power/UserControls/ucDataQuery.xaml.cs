@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -524,6 +525,35 @@ namespace Ingenu_Power.UserControls
 		}
 
 		/// <summary>
+		/// 获取EXCEL的指定列后指定数量的列索引
+		/// </summary>
+		/// <param name="column_name">指定列名</param>
+		/// <param name="next_count">向后的列数</param>
+		/// <returns>新的列名</returns>
+		private string DataQuery_vExcelNextColumn(string column_name,int next_count)
+		{
+			if (!Regex.IsMatch( column_name.ToUpper(), @"[A-Z]+" )) { throw new Exception( "invalid parameter" ); }
+
+			int index = 0;
+			char[] chars = column_name.ToUpper().ToCharArray();
+			for (int i = 0; i < chars.Length; i++) {
+				index += ( ( int ) chars[ i ] - ( int ) 'A' + 1 ) * ( int ) Math.Pow( 26, chars.Length - i - 1 );
+			}
+
+			index += next_count;
+			index -= 1;
+
+			List<string> chars_new = new List<string>();
+			do {
+				if (chars_new.Count > 0) index--;
+				chars_new.Insert( 0, ( ( char ) ( index % 26 + ( int ) 'A' ) ).ToString() );
+				index = ( int ) ( ( index - index % 26 ) / 26 );
+			} while (index > 0);
+
+			return String.Join( string.Empty, chars_new.ToArray() );
+		}
+
+		/// <summary>
 		/// 具体的执行ExcelSheet中数据的修改的操作
 		/// </summary>
 		/// <param name="dt_data">数据表</param>
@@ -706,10 +736,14 @@ namespace Ingenu_Power.UserControls
 						objExcelWorkSheet.Range[ "U" + (row_index + 8).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出OCP保护点2" );
 					} else {
 						if (( byte )dt_qualified.Rows[ 0 ][ "InforOut_ChannelCount" ] >= 2) {
-							if (( bool )dt_data.Rows[ row_index ][ "输出OCP保护检查2" ]) {
-								objExcelWorkSheet.Range[ "U" + (row_index + 8).ToString() ].Value2 = "√";
+							if (!Equals( dt_data.Rows[ row_index ][ "输出OCP保护检查2" ], DBNull.Value )){
+								if (( bool ) dt_data.Rows[ row_index ][ "输出OCP保护检查2" ]) {
+									objExcelWorkSheet.Range[ "U" + ( row_index + 8 ).ToString() ].Value2 = "√";
+								} else {
+									objExcelWorkSheet.Range[ "U" + ( row_index + 8 ).ToString() ].Value2 = "X";
+								}
 							} else {
-								objExcelWorkSheet.Range[ "U" + (row_index + 8).ToString() ].Value2 = "X";
+								objExcelWorkSheet.Range[ "U" + ( row_index + 8 ).ToString() ].Value2 = "-";
 							}
 						} else {
 							objExcelWorkSheet.Range[ "U" + (row_index + 8).ToString() ].Value2 = "-";

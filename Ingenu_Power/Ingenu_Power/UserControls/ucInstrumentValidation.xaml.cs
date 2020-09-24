@@ -136,8 +136,8 @@ namespace Ingenu_Power.UserControls
 			//反射进行动态调用
 			try {
 				//string bin_filePath = Directory.GetCurrentDirectory ( ) + "\\Download\\ProductInfor.dll";
-				//string bin_filePath = Properties.Settings.Default.Dll文件保存路径;
-				string bin_filePath = @"E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
+				string bin_filePath = Properties.Settings.Default.Dll文件保存路径;
+				//string bin_filePath = @"E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 				Assembly assembly = Assembly.LoadFrom ( bin_filePath );
 				Type [ ] tys = assembly.GetTypes ( );
 				foreach ( Type id_verion in tys ) {

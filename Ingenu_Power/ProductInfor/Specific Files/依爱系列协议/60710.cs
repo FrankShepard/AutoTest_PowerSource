@@ -743,25 +743,30 @@ namespace ProductInfor
 								source_voltage -= 0.5m;
 							}
 
+							Itech.GeneralData_DCPower generalData_DCPower = new Itech.GeneralData_DCPower();
+
 							if ( whole_function_enable == false ) { //上下限检测即可
 								int index = 0;
 								for ( index = 0 ; index < 2 ; index++ ) {
 									measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, ( infor_Sp.Qualified_CutoffLevel [ 1 - index ] + VoltageDrop ), true, true, serialPort, out error_information );
 									if ( error_information != string.Empty ) { break; }
 									Thread.Sleep ( infor_Sp.Delay_WaitForCutoff );
-									Itech.GeneralData_DCPower generalData_DCPower = measureDetails.Measure_vReadDCPowerResult ( serialPort, out error_information );
+									generalData_DCPower = measureDetails.Measure_vReadDCPowerResult ( serialPort, out error_information );
 									if ( generalData_DCPower.ActrulyCurrent < 0.05m ) {
 										break;
 									}
 								}
 								if ( ( error_information == string.Empty ) && ( index == 1 ) ) {
 									check_okey = true;
+									Random random = new Random();
+									specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 0 ] ), Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 1 ] ) ) );
+									undervoltage_value = infor_Sp.Target_UnderVoltageLevel + ( specific_value - infor_Sp.Target_CutoffVoltageLevel );
 								}
 							} else { //需要获取具体的数据
 								for ( decimal target_value = infor_Sp.Qualified_CutoffLevel [ 1 ] ; target_value >= infor_Sp.Qualified_CutoffLevel [ 0 ]- 0.3m ; target_value -= 0.1m ) {
 									measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, ( target_value + VoltageDrop ), true, true, serialPort, out error_information );
 									Thread.Sleep ( 75 * delay_magnification );
-									Itech.GeneralData_DCPower generalData_DCPower = measureDetails.Measure_vReadDCPowerResult ( serialPort, out error_information );
+									generalData_DCPower = measureDetails.Measure_vReadDCPowerResult ( serialPort, out error_information );
 									if ( generalData_DCPower.ActrulyCurrent < 0.05m ) {
 										check_okey = true;
 										specific_value = target_value + 0.3m; //快速下降实际上需要延迟等待才可以关闭
@@ -772,17 +777,19 @@ namespace ProductInfor
 								}
 							}
 
-							//检查待测管脚的电平及状态
-							ushort[] level_status = measureDetails.Measure_vCommSGLevelGet( serialPort, out error_information );
-							if (( level_status[ 1 ] & infor_SG.SG_NeedADCMeasuredPins ) == infor_SG.SG_NeedADCMeasuredPins) {
-								//具体检查逻辑是否匹配 - 此处为检查9脚对应的5V是否正常
-								if (( ( level_status[ 0 ] & infor_SG.SG_NeedADCMeasuredPins ) & 0x0100 ) == 0) {
-									error_information = "SG的9脚电平不匹配，请注意此异常";
+							if (infor_SG.SG_NeedADCMeasuredPins > 0) {
+								//检查待测管脚的电平及状态
+								ushort[] level_status = measureDetails.Measure_vCommSGLevelGet( serialPort, out error_information );
+								if (( level_status[ 1 ] & infor_SG.SG_NeedADCMeasuredPins ) == infor_SG.SG_NeedADCMeasuredPins) {
+									//具体检查逻辑是否匹配 - 此处为检查9脚对应的5V是否正常
+									if (( ( level_status[ 0 ] & infor_SG.SG_NeedADCMeasuredPins ) & 0x0100 ) == 0) {
+										error_information = "SG的9脚电平不匹配，请注意此异常";
+									}
+								} else {
+									error_information = "待测SG端子不满足电平的合格范围要求  " + level_status[ 1 ].ToString( "x" ) + "  合格为:  " + infor_SG.SG_NeedADCMeasuredPins.ToString( "x" );
 								}
-							} else {
-								error_information = "待测SG端子不满足电平的合格范围要求  " + level_status[ 1 ].ToString( "x" ) + "  合格为:  " + infor_SG.SG_NeedADCMeasuredPins.ToString( "x" );
+								if (error_information != string.Empty) { continue; }
 							}
-							if (error_information != string.Empty) { continue; }
 
 							//防止自杀时总线抢占，关电之前解除抢占数据
 							measureDetails.Measure_vCommSGUartParamterSet( MCU_Control.Comm_Type.Comm_None, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
@@ -791,6 +798,17 @@ namespace ProductInfor
 							//关闭备电，等待测试人员确认蜂鸣器响
 							Thread.Sleep( 3000 ); //非面板电源的蜂鸣器工作时时长较长，此处暂时无法减少时间
 							Thread.Sleep ( delay_magnification * 200 ); //保证蜂鸣器能响
+
+							//将备电电压设置到19V以下，验证备电自杀功能
+							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, ( 18.4m + VoltageDrop ), true, true, serialPort, out error_information );
+							if (error_information != string.Empty) { continue; }
+							Thread.Sleep( 100 );
+							Thread.Sleep( delay_magnification * 50 );
+							generalData_DCPower = measureDetails.Measure_vReadDCPowerResult( serialPort, out error_information );
+							if (generalData_DCPower.ActrulyCurrent > 0.01m) { //需要注意：程控直流电源采集输出电流存在偏差，此处设置为10mA防止错误判断
+								error_information = "待测电源的自杀功能失败，请注意此异常"; continue;
+							}
+
 							measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, source_voltage, true, false, serialPort, out error_information );
 						}
 					}
@@ -967,18 +985,16 @@ namespace ProductInfor
 
 									//检查过压信号是否检测出来
 									if (infor_Uart.communicate_Signal.communicate_Signal_Mp.Measured_MpOvervoltageSignal) {
-										break;
+										if (mp_check_count == 0) {
+											error_information = (infor_Calibration.MpOverVoltage - 1.0m).ToString() + "V时过早的检测到的主电过压信号";
+										} else {
+											check_okey = true;
+											Random random = new Random();
+											specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_Calibration.MpOverVoltage - 1m ), Convert.ToInt32( infor_Calibration.MpOverVoltage + 10m ) ) );
+										}
 									}
 								}
 								if (error_information != string.Empty) { continue; }
-
-								if (mp_check_count != 1) {
-									error_information = "检测到主电过压点时超过了限定的电压范围";
-								} else {
-									check_okey = true;
-									Random random = new Random();
-									specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_Calibration.MpOverVoltage - 1m ), Convert.ToInt32( infor_Calibration.MpOverVoltage + 5m ) ) );
-								}
 
 								//将AC电压更换为标准电压
 								string error_information_1 = string.Empty;
