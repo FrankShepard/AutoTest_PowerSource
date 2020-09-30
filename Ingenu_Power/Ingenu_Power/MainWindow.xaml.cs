@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Ingenu_Power.Domain;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Win32;
 
@@ -19,15 +20,20 @@ namespace Ingenu_Power
         public MainWindow()
         {
             InitializeComponent();
+			listener.ScanerEvent += Listener_ScanerEvent; //绑定扫码枪监听事件
 
-		/*
-		 * 开启定时器（周期性的进行内存回收使用）
-		 */
+			pCurrentWin = this;
+
+			/*
+			 * 开启定时器（周期性的进行内存回收使用）
+			 */
 			myTimer = new System.Timers.Timer ( TIM_MemoryClearTime );
 			myTimer.Elapsed += MyTimer_Elapsed;
 			myTimer.AutoReset = true;
 			myTimer.Enabled = true;
 		}
+
+		public static MainWindow pCurrentWin = null;
 
 		#region -- 涉及到主线程控件的全局变量及函数
 
@@ -56,6 +62,10 @@ namespace Ingenu_Power
 		/// 更新文件所用线程
 		/// </summary>
 		Thread trdFileRefresh;
+		/// <summary>
+		/// 扫码枪使用到的监听类对象
+		/// </summary>
+		private ScanerHook listener = new ScanerHook();
 
 		#endregion
 
@@ -85,7 +95,8 @@ namespace Ingenu_Power
 			}
             ucMeasure.Visibility = Visibility.Hidden;
             index_of_measure_in_grid = GrdMain.Children.Add( ucMeasure );
-            GrdMain.Children.Add( ucLogin );
+            GrdMain.Children.Add( ucLogin );			
+			listener.Start(); //启用扫码枪的键盘监听
 		}
 
 		/// <summary>
@@ -98,6 +109,8 @@ namespace Ingenu_Power
 			Properties.Settings.Default.ISP_ID_Hardware = 0;
 			Properties.Settings.Default.ISP_Ver_Hardware = 0;
 			Properties.Settings.Default.Save();
+			//停止钩子监听键盘值
+			listener.Stop();
 		}
 
 		/// <summary>
@@ -132,6 +145,7 @@ namespace Ingenu_Power
 					BtnMenu_Measure.IsEnabled = false;
 
 					BtnMenu_DataQuery.IsEnabled = false;
+					BtnMenu_Setting.IsEnabled = false;
 					break;
 				case 1: //仅用于查询与打印数据
 					BtnMenu_InstumentValidate.IsEnabled = false;
@@ -139,15 +153,21 @@ namespace Ingenu_Power
 					BtnMenu_Measure.IsEnabled = false;
 
 					BtnMenu_DataQuery.IsEnabled = true;
+					BtnMenu_Setting.IsEnabled = false;
 					break;
 				case 2: //可以执行产品测试
 				case 3: //全功能(异常产品数据不包含)
 				case 4: //全功能(异常产品数据包含)
+				case 5://全功能+高级设置+dll上传更新
 					BtnMenu_InstumentValidate.IsEnabled = true;
 					BtnMenu_ISP.IsEnabled = true;
 					BtnMenu_Measure.IsEnabled = true;
 
 					BtnMenu_DataQuery.IsEnabled = true;
+					BtnMenu_Setting.IsEnabled = false;
+					if(StaticInfor.UserRightLevel >= 3) {
+						BtnMenu_Setting.IsEnabled = true;
+					}
 					break;
 				default:
 					break;
@@ -164,7 +184,41 @@ namespace Ingenu_Power
 			if (StaticInfor.Error_Message != string.Empty) {
 				MessageTips( StaticInfor.Error_Message );
 			}
-		}		
+		}
+
+		/// <summary>
+		/// 鼠标双击同步图标，从数据库中获取新的 ProductInfor.dll 文件
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void PkiSyncDll_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			bool can_refresh_dll_data = false;
+
+			if (ucMeasure.trdMeasure == null) { //测试线程不存在，可以更新dll
+				can_refresh_dll_data = true;
+			} else {
+				if (!ucMeasure.trdMeasure.IsAlive) {//测试线程没有激活，可以更新dll
+					can_refresh_dll_data = true;
+				}
+			}
+
+			if (can_refresh_dll_data) {
+				if (trdFileRefresh == null) {
+					trdFileRefresh = new Thread( () => Main_vRefreshDllFile( StaticInfor.UserRightLevel ) ) {
+						Name = "DLL文件更新线程",
+						Priority = ThreadPriority.AboveNormal,
+						IsBackground = true
+					};
+					trdFileRefresh.SetApartmentState( ApartmentState.STA );
+					trdFileRefresh.Start();
+				} else {
+					if (trdFileRefresh.ThreadState != ThreadState.Stopped) { return; }
+					trdFileRefresh = new Thread( () => Main_vRefreshDllFile( StaticInfor.UserRightLevel ) );
+					trdFileRefresh.Start();
+				}
+			}
+		}
 
 		#region -- 确定待显示的窗体
 
@@ -206,7 +260,7 @@ namespace Ingenu_Power
             }
             UserControls.UcLogin ucLogin = new UserControls.UcLogin {
 				Name = "NewLogin",
-				Margin = new Thickness( 0, 0, 0, 0 )
+				Margin = new Thickness( 0, 0, 0, 0 )				
 			};
 			GrdMain.Children.Add( ucLogin );
 		}
@@ -290,13 +344,34 @@ namespace Ingenu_Power
 			GrdMain.Children.Add( ucDataQuery );
 		}
 
+		/// <summary>
+		/// 菜单选择高级设置 - 进行电压误差修正
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnMenu_Setting_Click(object sender, RoutedEventArgs e)
+		{
+			for (int index = 0; index < GrdMain.Children.Count; index++) {
+				if (index != index_of_measure_in_grid) {
+					GrdMain.Children.RemoveAt( index );
+				} else {
+					GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Hidden;
+				}
+			}
+			UserControls.UcDataQuery ucDataQuery = new UserControls.UcDataQuery {
+				Name = "NewDataQuery",
+				Margin = new Thickness( 0, 0, 0, 0 )
+			};
+			GrdMain.Children.Add( ucDataQuery );
+		}
+
 		#endregion
 
 		#endregion
 
 		#region -- 线程间委托及函数
 
-		private delegate void Dlg_PkiKindChange(MaterialDesignThemes.Wpf.PackIconKind packIconKind);
+		public delegate void Dlg_PkiKindChange(PackIconKind packIconKind,string infor);
 		public delegate void Dlg_MessageTips(string message, bool cancel_showed = false);
 
 		/// <summary>
@@ -312,59 +387,22 @@ namespace Ingenu_Power
 			}
 		}
 
-		private void PkiKindChange(MaterialDesignThemes.Wpf.PackIconKind packIconKind)
+		public void PkiKindChange(PackIconKind packIconKind, string infor)
 		{
 			PkiSyncDll.Kind = packIconKind;
+			PkiSyncDll.ToolTip = infor;
 		}
 
 		#endregion
 
 		/// <summary>
-		/// 鼠标双击同步图标，从数据库中获取新的 ProductInfor.dll 文件
+		/// 扫码枪的数据获取-键盘钩子的方式
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void PkiSyncDll_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		/// <param name="codes">扫码枪数据</param>
+		private void Listener_ScanerEvent(ScanerHook.ScanerCodes codes)
 		{
-			bool can_refresh_dll_data = false;
-			
-			if(ucMeasure.trdMeasure == null) { //测试线程不存在，可以更新dll
-				can_refresh_dll_data = true;
-			} else {
-				if (!ucMeasure.trdMeasure.IsAlive) {//测试线程没有激活，可以更新dll
-					can_refresh_dll_data = true;
-				}
-			}
-
-			if (can_refresh_dll_data) {
-				if (trdFileRefresh == null) {
-					trdFileRefresh = new Thread( () => Main_vRefreshDllFile( StaticInfor.UserRightLevel ) ) {
-						Name = "DLL文件更新线程",
-						Priority = ThreadPriority.AboveNormal,
-						IsBackground = true
-					};
-					trdFileRefresh.SetApartmentState( ApartmentState.STA );
-					trdFileRefresh.Start();
-				} else {
-					if (trdFileRefresh.ThreadState != ThreadState.Stopped) { return; }
-					trdFileRefresh = new Thread( () => Main_vRefreshDllFile( StaticInfor.UserRightLevel ) );
-					trdFileRefresh.Start();
-				}
-			}
-		}
-
-		/// <summary>
-		/// 鼠标进入，更改提示
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void PkiSyncDll_MouseEnter(object sender, MouseEventArgs e)
-		{
-			if(PkiSyncDll.Kind == MaterialDesignThemes.Wpf.PackIconKind.CloudSync) {
-				PkiSyncDll.ToolTip = "双击鼠标用以更新 测试使用的 dll文件";
-			}else if(PkiSyncDll.Kind == MaterialDesignThemes.Wpf.PackIconKind.Check) {
-				PkiSyncDll.ToolTip = "测试使用的 dll文件，更新完成";
-			}
+			StaticInfor.ScanerCodes = codes.Result;
+			StaticInfor.ScannerCodeRefreshed = true;
 		}
 
 		#region -- 最重要的dll文件更新与下载功能
@@ -412,7 +450,7 @@ namespace Ingenu_Power
 								}
 
 								//图标变化
-								Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
+								Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), PackIconKind.CloudCheck,"dll文件上传更新完成" );
 							}
 						} else { //其它权限双击此处执行的是下载dll
 							using (Database database = new Database()) {
@@ -437,9 +475,12 @@ namespace Ingenu_Power
 											fs.Write( file_data, 0, file_data.Length );
 											fs.Close();
 											//图标变化
-											Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
+											Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), PackIconKind.CloudCheck, "dll文件下载更新完成" );
 											Properties.Settings.Default.Dll文件保存路径 = filePath;
 											Properties.Settings.Default.Save();
+
+											//更新数据库，防止再次提示更新
+											database.V_UserInfor_Update( false, out error_information );
 										}
 										break;
 									}									
@@ -506,6 +547,6 @@ namespace Ingenu_Power
 
 
 		#endregion
-		
+
 	}
 }

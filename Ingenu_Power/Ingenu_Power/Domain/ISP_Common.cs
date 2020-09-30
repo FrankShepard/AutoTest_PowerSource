@@ -129,7 +129,7 @@ namespace Ingenu_Power.Domain
 						int Baudrate_Instrument = 0;
 						try {
 							//bin_filePath = Directory.GetCurrentDirectory() + "\\Download\\ProductInfor.dll";
-							//bin_filePath = @"F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
+							//bin_filePath = @"E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\bin\Debug\ProductInfor.dll";
 							bin_filePath = Properties.Settings.Default.Dll文件保存路径;
 							Assembly assembly = Assembly.LoadFrom( bin_filePath );
 							Type[] tys = assembly.GetTypes();
@@ -171,11 +171,7 @@ namespace Ingenu_Power.Domain
 									if (!File.Exists( bin_filePath )) { continue; }
 									mcu.McuControl_vISPMasterOrSlaver( MCU_Control.MS_Choose.Slaver, serialPort, out error_information );
 								}
-								//if ( error_information != string.Empty ) { return; }
-
-								//对应MCU需要重新上电的操作
-								mcu.McuControl_vISPRestartPower( serialPort, out error_information );
-								//if ( error_information != string.Empty ) { return; }
+								//if ( error_information != string.Empty ) { return; }							
 
 								//以下执行程序的具体烧录过程
 								FileStream fileStream = new FileStream( bin_filePath, FileMode.Open );
@@ -192,6 +188,10 @@ namespace Ingenu_Power.Domain
 
 								//待测产品的ISP引脚接入
 								mcu.McuControl_vConnectISP( true, serialPort, out error_information );
+								//if ( error_information != string.Empty ) { return; }
+
+								//对应MCU需要重新上电的操作
+								mcu.McuControl_vISPRestartPower( serialPort, out error_information );
 								//if ( error_information != string.Empty ) { return; }
 
 								//执行ISP的具体操作

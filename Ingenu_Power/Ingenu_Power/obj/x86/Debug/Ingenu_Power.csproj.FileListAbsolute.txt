@@ -167,9 +167,6 @@ E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\A
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Office.dll
 E:\GitHub\过年任务\测试系统\综合测试\上位机控制软件\NewTest\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Microsoft.Office.Interop.Excel.dll
 F:\学习\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csprojAssemblyReference.cache
-E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\485转232.png
-E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\485转485.png
-E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\485转TTL.png
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\null.png
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\消防电源检验报告(标准定版）.xls
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Ingenu_Power.exe.config
@@ -223,4 +220,7 @@ E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_P
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.exe
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.pdb
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\ISP.xml
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\请重开备电.wav
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\测试不合格.wav
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\测试合格.wav
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csprojAssemblyReference.cache

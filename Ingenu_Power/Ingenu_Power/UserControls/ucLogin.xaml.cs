@@ -116,20 +116,34 @@ namespace Ingenu_Power.UserControls
 				database.V_Initialize( information.SQL_Name, information.SQL_User, information.SQL_Password, out error_information );
 				StaticInfor.Error_Message = error_information;
 				if (error_information == string.Empty) {
-					//获取用户登录信息
+					//获取用户登录信息，检查是否有新版本的productinfor需要更新
 					DataTable table = database.V_UserInfor_Get( out error_information );
 					StaticInfor.Error_Message = error_information;
 					if (error_information == string.Empty) {
 						int index = 0;
 						for (index = 0; index < table.Rows.Count; index++) {
 							if (login_user == table.Rows[ index ][ "用户名" ].ToString().Trim()) {
+								//检查提示是否需要更新dll文件
+								bool need_refresh_dll = false;
+								if(!Equals(table.Rows[index][ "ProductInfor文件需要更新" ],DBNull.Value )) {
+									need_refresh_dll = ( bool ) table.Rows[ index ][ "ProductInfor文件需要更新" ];
+								}
+								if (need_refresh_dll) {
+									//若是有dll更新，则需要修改提示图标
+									Dispatcher.Invoke( new MainWindow.Dlg_PkiKindChange( MainWindow.pCurrentWin.PkiKindChange ), PackIconKind.CloudDownload, "存在测试文件更新" );
+								}
+
 								if (( password != table.Rows[ index ][ "登陆密码" ].ToString().Trim().ToUpper() ) && ( password.ToUpper() != "RESET" )) {
 									//密码不匹配									
 									error_information = "密码错误，请重新输入密码";
 									StaticInfor.UserRightLevel = 0;
 								} else {
 									//密码匹配或者密码重置 - 更新当前登陆时间和登陆的电脑
-									database.V_UserInfor_Update( table.Rows[ index ][ "用户名" ].ToString().Trim().ToUpper(), password, out error_information );
+									if (password.ToUpper() != "RESET") {
+										database.V_UserInfor_Update( table.Rows[ index ][ "用户名" ].ToString().Trim().ToUpper(), password, out error_information );
+									} else {
+										database.V_UserInfor_Update( table.Rows[ index ][ "用户名" ].ToString().Trim().ToUpper(), "000000", out error_information );
+									}
 									StaticInfor.Error_Message = error_information;
 									if (error_information == string.Empty) {
 										StaticInfor.UserRightLevel = Convert.ToInt32( table.Rows[ index ][ "权限等级" ] ); //获取权限等级

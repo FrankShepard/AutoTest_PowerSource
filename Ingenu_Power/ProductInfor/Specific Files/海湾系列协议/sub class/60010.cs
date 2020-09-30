@@ -257,9 +257,9 @@ namespace ProductInfor
 								}
 								if ( ( error_information == string.Empty ) && ( index == 1 ) ) {
 									check_okey = true;
-									Random random = new Random();
-									specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 0 ] ), Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 1 ] ) ) );
-									undervoltage_value = infor_Sp.Target_UnderVoltageLevel + ( specific_value - infor_Sp.Target_CutoffVoltageLevel );
+									//Random random = new Random();
+									//specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 0 ] ), Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 1 ] ) ) );
+									//undervoltage_value = infor_Sp.Target_UnderVoltageLevel + ( specific_value - infor_Sp.Target_CutoffVoltageLevel );
 								}
 							} else { //需要获取具体的数据
 								for ( decimal target_value = infor_Sp.Qualified_CutoffLevel [ 1 ] ; target_value >= infor_Sp.Qualified_CutoffLevel [ 0 ] - 0.3m ; target_value -= 0.1m ) {
@@ -287,8 +287,8 @@ namespace ProductInfor
 							Thread.Sleep ( delay_magnification * 100 ); //保证蜂鸣器能响
 							//将备电电压设置到19V以下，验证备电自杀功能
 							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, ( 18.4m + VoltageDrop ), true, true, serialPort, out error_information );
-							if(error_information != string.Empty) { continue; }
-							Thread.Sleep( 100 );
+							if (error_information != string.Empty) { continue; }
+							Thread.Sleep( 1500 );
 							Thread.Sleep( delay_magnification * 50 );
 							generalData_DCPower = measureDetails.Measure_vReadDCPowerResult( serialPort, out error_information );
 							if (generalData_DCPower.ActrulyCurrent > 0.01m) { //需要注意：程控直流电源采集输出电流存在偏差，此处设置为10mA防止错误判断
@@ -366,6 +366,7 @@ namespace ProductInfor
 									}
 								}
 
+								if (error_information != string.Empty) { break; }
 								int retry_count = 0;
 								do {
 									//检查串口上报的输出通道电压和电流参数是否准确
@@ -395,15 +396,14 @@ namespace ProductInfor
 									}
 									Thread.Sleep( 100 );
 								} while (( ++retry_count < 5 ) && ( error_information != string.Empty ));
-								if (error_information != string.Empty) { break; }
-
+								if(retry_count >= 5) { break; }
 								//合格范围的检测
 								specific_value[ index_of_channel ] = real_voltage;
 								if (( real_voltage >= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] ) && ( real_voltage <= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 1 ] )) {
 									check_okey[ index_of_channel ] = true;
 								}
-
 							}
+							if (error_information != string.Empty) { continue; }
 						}
 					}
 				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充
@@ -587,8 +587,8 @@ namespace ProductInfor
 						}
 					} else { //简化时无需进行欠压点的测试
 						check_okey = true;
-						Random random = new Random();
-						specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltage[ 0 ] ), Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltage[ 1 ] ) ) );
+						//Random random = new Random();
+						//specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltage[ 0 ] ), Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltage[ 1 ] ) ) );
 					}
 				} else {
 					arrayList.Add( error_information );
@@ -742,8 +742,8 @@ namespace ProductInfor
 						}
 					} else { //简化时无需进行欠压恢复点的测试
 						check_okey = true;
-						Random random = new Random();
-						specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery[ 0 ] + 5 ), Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery[ 1 ] ) ) );
+						//Random random = new Random();
+						//specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery[ 0 ] + 5 ), Convert.ToInt32( infor_PowerSourceChange.Qualified_MpUnderVoltageRecovery[ 1 ] ) ) );
 					}
 				} else {
 					arrayList.Add( error_information );

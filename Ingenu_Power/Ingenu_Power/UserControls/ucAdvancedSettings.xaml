@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="Ingenu_Power.UserControls.ucAdvancedSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Ingenu_Power.UserControls"
+			  xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="443" d:DesignWidth="726">
+	<Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
+		<materialDesign:Card HorizontalAlignment="Center" VerticalAlignment="Center" Width="706" Height="423" Padding="10" Margin="20" >
+			<GroupBox Grid.Column="1" Grid.Row="0" Header="Shadow Header" Style="{DynamicResource MaterialDesignGroupBox}" Margin="16" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0">
+				<TextBlock Margin="6,6,6,6" TextWrapping="Wrap">Short loin picanha boudin pork belly. Ground round porchetta biltong, cow t-bone tri-tip strip steak chuck filet mignon jowl turducken. Landjaeger strip steak pork chop, jowl sirloin pork capicola andouille. Kevin ribeye tongue, drumstick hamburger frankfurter t-bone corned beef beef biltong cow venison. Biltong picanha bresaola pork belly, filet mignon spare ribs doner pork chop kielbasa. Swine flank drumstick pork belly pancetta spare ribs rump filet mignon.</TextBlock>
+			</GroupBox>
+		</materialDesign:Card>
+	</Grid>
+</UserControl>

@@ -758,9 +758,9 @@ namespace ProductInfor
 								}
 								if ( ( error_information == string.Empty ) && ( index == 1 ) ) {
 									check_okey = true;
-									Random random = new Random();
-									specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 0 ] ), Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 1 ] ) ) );
-									undervoltage_value = infor_Sp.Target_UnderVoltageLevel + ( specific_value - infor_Sp.Target_CutoffVoltageLevel );
+									//Random random = new Random();
+									//specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 0 ] ), Convert.ToInt32( infor_Sp.Qualified_CutoffLevel[ 1 ] ) ) );
+									//undervoltage_value = infor_Sp.Target_UnderVoltageLevel + ( specific_value - infor_Sp.Target_CutoffVoltageLevel );
 								}
 							} else { //需要获取具体的数据
 								for ( decimal target_value = infor_Sp.Qualified_CutoffLevel [ 1 ] ; target_value >= infor_Sp.Qualified_CutoffLevel [ 0 ]- 0.3m ; target_value -= 0.1m ) {
@@ -802,7 +802,7 @@ namespace ProductInfor
 							//将备电电压设置到19V以下，验证备电自杀功能
 							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, ( 18.4m + VoltageDrop ), true, true, serialPort, out error_information );
 							if (error_information != string.Empty) { continue; }
-							Thread.Sleep( 100 );
+							Thread.Sleep( 1500 );
 							Thread.Sleep( delay_magnification * 50 );
 							generalData_DCPower = measureDetails.Measure_vReadDCPowerResult( serialPort, out error_information );
 							if (generalData_DCPower.ActrulyCurrent > 0.01m) { //需要注意：程控直流电源采集输出电流存在偏差，此处设置为10mA防止错误判断
@@ -989,8 +989,8 @@ namespace ProductInfor
 											error_information = (infor_Calibration.MpOverVoltage - 1.0m).ToString() + "V时过早的检测到的主电过压信号";
 										} else {
 											check_okey = true;
-											Random random = new Random();
-											specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_Calibration.MpOverVoltage - 1m ), Convert.ToInt32( infor_Calibration.MpOverVoltage + 10m ) ) );
+											//Random random = new Random();
+											//specific_value = Convert.ToDecimal( random.Next( Convert.ToInt32( infor_Calibration.MpOverVoltage - 1m ), Convert.ToInt32( infor_Calibration.MpOverVoltage + 10m ) ) );
 										}
 									}
 								}

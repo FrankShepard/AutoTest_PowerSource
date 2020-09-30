@@ -21,9 +21,19 @@ namespace Ingenu_Power.UserControls
 		public UcISP()
 		{
 			InitializeComponent();
+
+			//开启定时器，用于实时刷新进度条、测试环节、测试项、测试值
+			timer = new System.Timers.Timer( 300 );   //实例化Timer类，设置间隔时间单位毫秒
+			timer.Elapsed += new System.Timers.ElapsedEventHandler( UpdateWork ); //到达时间的时候执行事件；     
+			timer.AutoReset = true;   //设置是执行一次（false）还是一直执行(true)；     
+			timer.Enabled = true;     //是否执行System.Timers.Timer.Elapsed事件；  
 		}
 
 		Thread trdFlash;
+		/// <summary>
+		/// Timer组件中进行ID刷新
+		/// </summary>
+		private System.Timers.Timer timer;
 
 		#region -- 控件事件
 
@@ -95,11 +105,26 @@ namespace Ingenu_Power.UserControls
 
 		#endregion
 
+		#region -- 定时器操作
+
+		/// <summary>
+		/// 定时器中执行委托用于显示实时情况和产品ID的刷新情况
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void UpdateWork(object sender, System.Timers.ElapsedEventArgs e)
+		{
+			this.Dispatcher.Invoke( new dlg_TextSet( TextIDRefresh ) );
+		}
+
+		#endregion
+
 		#region -- 线程间委托及函数
 
 		private delegate void dlg_PackIconShow(PackIconKind packIconKind, bool visable);
 		private delegate void dlg_ProgressBarWorkingSet( bool status );
 		private delegate void dlg_PromptShow(string infor,string source_name);
+		private delegate void dlg_TextSet();
 
 		/// <summary>
 		/// 图标显示设置
@@ -120,6 +145,17 @@ namespace Ingenu_Power.UserControls
 		private void ProgressBarWorkingSet( bool status )
 		{
 			PgbStep.IsIndeterminate = status;
+		}
+
+		/// <summary>
+		/// 在测试界面上更新产品ID
+		/// </summary>
+		private void TextIDRefresh()
+		{
+			if (StaticInfor.ScannerCodeRefreshed) {
+				TxtID.Text = StaticInfor.ScanerCodes;
+				StaticInfor.ScannerCodeRefreshed = false;
+			}
 		}
 
 		#endregion

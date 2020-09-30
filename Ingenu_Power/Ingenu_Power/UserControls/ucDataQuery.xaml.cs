@@ -70,7 +70,7 @@ namespace Ingenu_Power.UserControls
 		/// <summary>
 		/// 数据导出线程
 		/// </summary>
-		Thread trdExportDate;		
+		Thread trdExportDate;
 
 		#endregion
 
@@ -91,7 +91,7 @@ namespace Ingenu_Power.UserControls
 		/// <param name="eventArgs"></param>
 		public void CalendarStartDialogOpenedEventHandler(object sender, DialogOpenedEventArgs eventArgs)
 		{
-			Calendar_Start.SelectedDate = (( PickersViewModel ) DataContext_Start ).Date;			
+			Calendar_Start.SelectedDate = (( PickersViewModel ) DataContext_Start ).Date;
 		}
 		/// <summary>
 		/// 起始日期选择完毕，关闭DialogHost，更新日期事件
@@ -108,7 +108,7 @@ namespace Ingenu_Power.UserControls
 			}
 
 			(( PickersViewModel ) DataContext_Start ).Date = Calendar_Start.SelectedDate.Value;
-			BtnStartDate.Content = ((DateTime) Calendar_Start.SelectedDate).ToString ( "yyyy/MM/dd" ); 
+			BtnStartDate.Content = ((DateTime) Calendar_Start.SelectedDate).ToString ( "yyyy/MM/dd" );
 		}
 		/// <summary>
 		/// 截止日期打开DialogHost事件
@@ -134,7 +134,7 @@ namespace Ingenu_Power.UserControls
 			}
 
 			( ( PickersViewModel ) DataContext_End ).Date = Calendar_End.SelectedDate.Value;
-			BtnEndDate.Content = ((DateTime)Calendar_End.SelectedDate).ToString ( "yyyy/MM/dd" ); 
+			BtnEndDate.Content = ((DateTime)Calendar_End.SelectedDate).ToString ( "yyyy/MM/dd" );
 		}
 
 		#endregion
@@ -197,7 +197,7 @@ namespace Ingenu_Power.UserControls
 		private void TgbChoose_Checked( object sender, RoutedEventArgs e )
 		{
 			GrdSingleProductQuery.Visibility = Visibility.Hidden;
-			GrdProductQuery.Visibility = Visibility.Visible;			
+			GrdProductQuery.Visibility = Visibility.Visible;
 		}
 
 		/// <summary>
@@ -256,7 +256,7 @@ namespace Ingenu_Power.UserControls
 					}
 					string product_id = TxtSingleID.Text;
 					bool use_custmer_id = ( bool )TgbIDType.IsChecked;
-					
+
 					//在新线程中执行数据查询
 					if (trdQueryData == null) {
 						trdQueryData = new Thread( () => DataQuery_vQuerySingleData( product_id, super_administrator_right, use_custmer_id ) ) {
@@ -312,10 +312,10 @@ namespace Ingenu_Power.UserControls
 						trdQueryData = new Thread ( ( ) => DataQuery_vQueryMultiData ( limit, product_type, start_date, end_date, super_administrator_right ) );
 						trdQueryData.Start();
 					}
-				}				
+				}
 			}
 		}
-				
+
 		/// <summary>
 		/// 将DataGrid中的数据导出到Excel中
 		/// </summary>
@@ -375,7 +375,7 @@ namespace Ingenu_Power.UserControls
 			//记录当前修改的数据的行列索引
 			ShouldChange_RowIndex = e.Row.GetIndex();
 			//标记需要更新数据
-			NeedUpdateQueryedValue = true;			
+			NeedUpdateQueryedValue = true;
 		}
 
 		#endregion
@@ -511,15 +511,37 @@ namespace Ingenu_Power.UserControls
 		/// </summary>
 		/// <param name="dt">数据表对象</param>
 		/// <param name="row_index">数据表的行索引</param>
-		/// <param name="item">数据表中的列名</param>
+		/// <param name="item1">数据表中的列名</param>
+		/// <param name="item2">数据表中的列名(补充)</param>
 		/// <returns>对应单元格中的数据</returns>
-		private object DataQuery_vDisplayValue(DataTable dt,int row_index, string item)
+		private object DataQuery_vDisplayValue( DataTable dt , int row_index , string item1 , string item2 = "输出空载电压1" )
 		{
 			object obj;
-			if ( Equals ( dt.Rows [ row_index ] [ item ], DBNull.Value ) ) {
-				obj = "-";
-			} else {
-				obj = dt.Rows [ row_index ] [ item ];
+			bool status = false;
+			try {
+				if ( Equals( dt.Rows[ row_index ][ item1 ] , DBNull.Value ) ) {
+					if ( Equals( dt.Rows[ row_index ][ item2 ] , DBNull.Value ) ) {
+						obj = "-";
+					} else {
+						try {
+							status = ( bool ) dt.Rows[ row_index ][ item2 ];
+							if (status) { obj = 1; } else { obj = 0; }
+						}catch {
+							obj = dt.Rows[ row_index ][ item1 ];
+						}
+					}
+				} else {
+					try {
+						status = ( bool ) dt.Rows[ row_index ][ item1 ];
+						if (status) { obj = 1; } else { obj = 0; }
+					}
+					catch {
+						obj = dt.Rows[ row_index ][ item1 ];
+					}
+				}
+			} catch ( Exception ex ) {
+				MessageBox.Show( ex.ToString( ) );
+				obj = "Err";
 			}
 			return obj;
 		}
@@ -564,7 +586,7 @@ namespace Ingenu_Power.UserControls
 		{
 			error_information = string.Empty;
 			//判断当前电源是应急照明电源还是消防电源；用于不同数据表格中使用
-			bool product_is_emergencypower = ( bool )dt_qualified.Rows[ 0 ][ "属于应急照明电源" ];
+			bool product_is_emergencypower = ( bool ) dt_qualified.Rows[ 0 ][ "属于应急照明电源" ];
 			//执行页眉上测试型号的填充
 			string show_font = "&\"微软雅黑\"&18 & ";
 			string name = string.Empty;
@@ -577,6 +599,141 @@ namespace Ingenu_Power.UserControls
 			string time_show = DateTime.Now.ToString( "yyyy/MM/dd" );
 			objExcelWorkSheet.PageSetup.RightHeader = show_font + time_show;
 
+			bool display_source_effects = false;
+			if (target_excelsheet_name == "D02D06电源记录") {
+				display_source_effects = true;
+			}
+			int channel_index = 0;
+
+			//*先执行合格范围的填充
+			objExcelWorkSheet.Range[ "C5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "浮充电压_Min" );
+			objExcelWorkSheet.Range[ "C7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "浮充电压_Max" );
+			objExcelWorkSheet.Range[ "D5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "均充电流_Min" );
+			objExcelWorkSheet.Range[ "D7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "均充电流_Max" );
+			objExcelWorkSheet.Range[ "E5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "主电欠压点_Min" );
+			objExcelWorkSheet.Range[ "E7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "主电欠压点_Max" );
+			objExcelWorkSheet.Range[ "F5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "主电欠压恢复点_Min" );
+			objExcelWorkSheet.Range[ "F7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "主电欠压恢复点_Max" );
+			objExcelWorkSheet.Range[ "G5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "主电过压点_Min" );
+			objExcelWorkSheet.Range[ "G7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "主电过压点_Max" );
+			objExcelWorkSheet.Range[ "H5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "主电过压恢复点_Min" );
+			objExcelWorkSheet.Range[ "H7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "主电过压恢复点_Max" );
+			objExcelWorkSheet.Range[ "I5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "备电欠压点_Min" );
+			objExcelWorkSheet.Range[ "I7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "备电欠压点_Max" );
+			objExcelWorkSheet.Range[ "J5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "备电切断点_Min" );
+			objExcelWorkSheet.Range[ "J7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "备电切断点_Max" );
+
+			objExcelWorkSheet.Range[ "N5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出空载电压1_Min" );
+			objExcelWorkSheet.Range[ "N7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出空载电压1_Max" );
+			objExcelWorkSheet.Range[ "O5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压1_Min" );
+			objExcelWorkSheet.Range[ "O7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压1_Max" );
+			//应急照明电源系列需要调整过流保护点为过功率保护点
+			if (product_is_emergencypower) {
+				objExcelWorkSheet.Range[ "P2" ].Value2 = "过功率保护(W)";
+			}
+			objExcelWorkSheet.Range[ "P5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点1_Min" );
+			objExcelWorkSheet.Range[ "P7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点1_Max" );
+			objExcelWorkSheet.Range[ "Q7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出纹波1_Max" );
+			if (display_source_effects) {
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 1 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "源效应1_Max" );
+				channel_index++;
+			}
+
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 2 + channel_index ) + "5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出空载电压2_Min", "输出空载电压2_Min");
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 2 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出空载电压2_Max", "输出空载电压2_Max" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 3 + channel_index ) + "5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压2_Min", "输出满载电压2_Min" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 3 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压2_Max", "输出满载电压2_Max" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 4 + channel_index ) + "5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点2_Min", "输出OCP保护点2_Min" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 4 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点2_Max", "输出OCP保护点2_Max" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 5 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出纹波2_Max", "输出纹波2_Max" );
+			if (display_source_effects) {
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 6 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "源效应2_Max", "源效应2_Max" );
+				channel_index++;
+			}
+
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 7 + channel_index ) + "5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出空载电压3_Min", "输出空载电压3_Min" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 7 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出空载电压3_Max", "输出空载电压3_Max" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 8 + channel_index ) + "5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压3_Min", "输出满载电压3_Min" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 8 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出满载电压3_Max", "输出满载电压3_Max" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 9 + channel_index ) + "5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点3_Min", "输出OCP保护点3_Min" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 9 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出OCP保护点3_Max", "输出OCP保护点3_Max" );
+			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 10 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "输出纹波3_Max", "输出纹波3_Max" );
+			if (display_source_effects) {
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 11 + channel_index ) + "7" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "源效应3_Max", "源效应3_Max" );
+				channel_index++;
+			}
+
+			//执行测试数据的填充			
+			for (int row_index = 0; row_index < dt_data.Rows.Count; row_index++) {
+				channel_index = 0;
+				objExcelWorkSheet.Range[ "A" + ( row_index + 8 ).ToString() ].Value2 = row_index + 1;
+				//产品ID优先选择用户ID进行填充
+				if (!Equals( dt_data.Rows[ row_index ][ "客户ID" ], DBNull.Value )) {
+					objExcelWorkSheet.Range[ "B" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "客户ID" );
+				} else {
+					objExcelWorkSheet.Range[ "B" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "产品ID" );
+				}
+				objExcelWorkSheet.Range[ "C" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "浮充电压" );
+				objExcelWorkSheet.Range[ "D" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "均充电流" );
+				objExcelWorkSheet.Range[ "E" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "主电欠压点", "主电欠压点检查" );
+				objExcelWorkSheet.Range[ "F" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "主电欠压恢复点", "主电欠压恢复点检查" );
+				objExcelWorkSheet.Range[ "G" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "主电过压点", "主电过压点检查" );
+				objExcelWorkSheet.Range[ "H" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "主电过压恢复点", "主电过压恢复点检查" );
+				objExcelWorkSheet.Range[ "I" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "备电欠压点", "备电欠压点检查" );
+				objExcelWorkSheet.Range[ "J" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "备电切断点", "备电切断点检查" );
+				objExcelWorkSheet.Range[ "K" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "通讯或信号检查", "通讯或信号检查" );
+				//if (!Equals( dt_data.Rows[ row_index ][ "通讯或信号检查" ], DBNull.Value )) {
+				//		objExcelWorkSheet.Range[ "K" + (row_index + 8).ToString() ].Value2 = Convert.ToInt32( dt_data.Rows[ row_index ][ "通讯或信号检查" ] );
+				//	} else {
+				//		objExcelWorkSheet.Range[ "K" + (row_index + 8).ToString() ].Value2 = "-";
+				//	}
+				objExcelWorkSheet.Range[ "L" + ( row_index + 8 ).ToString() ].Value2 = Convert.ToInt32( dt_qualified.Rows[ 0 ][ "ExistVoltmeter" ] );
+				objExcelWorkSheet.Range[ "M" + ( row_index + 8 ).ToString() ].Value2 = Convert.ToInt32( dt_qualified.Rows[ 0 ][ "ExistFan" ] );
+				objExcelWorkSheet.Range[ "N" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出空载电压1" );
+				objExcelWorkSheet.Range[ "O" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出满载电压1" );
+				objExcelWorkSheet.Range[ "P" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出OCP保护点1", "输出OCP保护检查1" );
+				objExcelWorkSheet.Range[ "Q" + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出纹波1" );
+				if (display_source_effects) {
+					objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 1 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "源效应1" );
+					channel_index++;
+				}
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 1 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出短路保护检查1", "输出短路保护检查1" );
+				//if (!Equals( dt_qualified.Rows[ 0 ][ "InforOut_NeedShort_CH1" ], DBNull.Value )) {
+				//	if (( bool ) dt_qualified.Rows[ 0 ][ "InforOut_NeedShort_CH1" ]) {
+				//		if (!Equals( dt_data.Rows[ row_index ][ "输出短路保护检查1" ], DBNull.Value )) {
+				//			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 1 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = Convert.ToInt32( dt_data.Rows[ row_index ][ "输出短路保护检查1" ] );
+				//		} else {
+				//			objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 1 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = 0; //需要测试对应通道短路但是检查值为空，则强制认为此项故障
+				//		}
+				//	} else {
+				//		objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 1 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = "-";
+				//	}
+				//} else {
+				//	objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 1 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = "-";
+				//}
+
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 2 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出空载电压2", "输出空载电压2" );
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 3 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出满载电压2", "输出满载电压2" );
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 4 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出OCP保护点2", "输出OCP保护检查2" );
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 5 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出纹波2", "输出纹波2" );
+				if (display_source_effects) {
+					objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 6 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "源效应2", "源效应2" );
+					channel_index++;
+				}
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 6 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出短路保护检查2", "输出短路保护检查2" );
+
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 7 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出空载电压3", "输出空载电压3" );
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 8 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出满载电压3", "输出满载电压3" );
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 9 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出OCP保护点3", "输出OCP保护检查3" );
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 10 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出纹波3", "输出纹波3" );
+				if (display_source_effects) {
+					objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 11 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "源效应3", "源效应3" );
+					channel_index++;
+				}
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 11 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "输出短路保护检查3", "输出短路保护检查3" );
+				objExcelWorkSheet.Range[ DataQuery_vExcelNextColumn( "Q", 12 + channel_index ) + ( row_index + 8 ).ToString() ].Value2 = DataQuery_vDisplayValue( dt_data, row_index, "合格判断", "合格判断" ); 
+			}
+#if false
 			if (target_excelsheet_name == "消防电源记录") {
 				//先执行合格范围的填充
 				objExcelWorkSheet.Range[ "C5" ].Value2 = DataQuery_vDisplayValue( dt_qualified, 0, "浮充电压_Min" );
@@ -1010,6 +1167,7 @@ namespace Ingenu_Power.UserControls
 					objExcelWorkSheet.Range[ "AF" + (row_index + 8).ToString() ].Value2 = Convert.ToInt32( dt_data.Rows[ row_index ][ "合格判断" ] );
 				}
 			}
+#endif
 		}
 
 		/// <summary>
@@ -1044,7 +1202,7 @@ namespace Ingenu_Power.UserControls
 					objExcelWorkbook.Save();
 					objExcelApp.Quit();
 					//自动打开之前修改过数据的Excel文件
-					System.Diagnostics.Process.Start( target_filePath ); //不使用ExcelApp，单独打开某一文件的默认方式				
+					System.Diagnostics.Process.Start( target_filePath ); //不使用ExcelApp，单独打开某一文件的默认方式
 				} catch (Exception ex) {
 					error_information = ex.ToString();
 					error_information += "\r\n 一次仅可打印同一型号的产品数据";
@@ -1086,8 +1244,8 @@ namespace Ingenu_Power.UserControls
 				Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), StaticInfor.Error_Message, false );
 			}
 		}
-		
-		#endregion
+
+#endregion
 
 	}
 }

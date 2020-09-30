@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Ingenu_Power.Domain;
+using System.Media;
 
 namespace Ingenu_Power.UserControls
 {
@@ -21,6 +22,12 @@ namespace Ingenu_Power.UserControls
             InitializeComponent();
 			prgStep.Maximum = MAX_STEP_COUNT;
 			BasicRatingBar.Value = Properties.Settings.Default.MeasureDelayMagnification;
+
+			//开启定时器，用于实时刷新进度条、测试环节、测试项、测试值
+			timer = new System.Timers.Timer( 300 );   //实例化Timer类，设置间隔时间单位毫秒
+			timer.Elapsed += new System.Timers.ElapsedEventHandler( UpdateWork ); //到达时间的时候执行事件；     
+			timer.AutoReset = true;   //设置是执行一次（false）还是一直执行(true)；     
+			timer.Enabled = true;     //是否执行System.Timers.Timer.Elapsed事件；  
 		}
 
 		/// <summary>
@@ -106,13 +113,6 @@ namespace Ingenu_Power.UserControls
 				trdMeasure = new Thread( () => Measure_vAutoTest( measureCondition ) );
 				trdMeasure.Start();
 			}
-
-			//开启定时器，用于实时刷新进度条、测试环节、测试项、测试值
-			timer = new System.Timers.Timer ( 300 );   //实例化Timer类，设置间隔时间单位毫秒
-			timer.Elapsed += new System.Timers.ElapsedEventHandler ( UpdateWork ); //到达时间的时候执行事件；     
-			timer.AutoReset = true;   //设置是执行一次（false）还是一直执行(true)；     
-			timer.Enabled = true;     //是否执行System.Timers.Timer.Elapsed事件；  
-
 			//初始显示值重置
 			StaticInfor.measureItemShow.Measure_Link = string.Empty;
 			StaticInfor.measureItemShow.Measure_Item = string.Empty;
@@ -128,13 +128,14 @@ namespace Ingenu_Power.UserControls
 		#region -- 定时器操作
 
 		/// <summary>
-		/// 定时器中执行委托用于显示实时情况
+		/// 定时器中执行委托用于显示实时情况和产品ID的刷新情况
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void UpdateWork(object sender, System.Timers.ElapsedEventArgs e)
 		{
 			this.Dispatcher.Invoke( new dlg_TextSet( TextSet ) );
+			this.Dispatcher.Invoke( new dlg_TextSet( TextIDRefresh ) );
 		}
 
 		#endregion
@@ -185,6 +186,21 @@ namespace Ingenu_Power.UserControls
 			TxtMeasuredResult.Text = StaticInfor.measureItemShow.Measure_Value;
 		}
 
+		/// <summary>
+		/// 在测试界面上更新产品ID
+		/// </summary>
+		private void TextIDRefresh()
+		{
+			if (StaticInfor.ScannerCodeRefreshed) {
+				TxtID.Text = StaticInfor.ScanerCodes;
+				StaticInfor.ScannerCodeRefreshed = false;
+				//触发开始测试的事件
+				object s = null;
+				RoutedEventArgs a = new RoutedEventArgs();
+				BtnMeasure_Click( s, a );
+			}
+		}
+
 		#endregion
 
 		#region -- 实际测试的函数过程
@@ -196,7 +212,6 @@ namespace Ingenu_Power.UserControls
 		/// </summary>
 		private void Measure_vFailedShow()
 		{
-			timer.Enabled = false;
 			this.Dispatcher.Invoke( new dlg_LedValueSet( LedValueSet ), Brushes.Red );
 			this.Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), StaticInfor.Error_Message,false );
 		}
@@ -206,7 +221,6 @@ namespace Ingenu_Power.UserControls
 		/// </summary>
 		private void Measure_vOkeyShow()
 		{
-			timer.Enabled = false;
 			this.Dispatcher.Invoke( new dlg_LedValueSet( LedValueSet ), Brushes.Lime );
 		}
 
@@ -378,7 +392,7 @@ namespace Ingenu_Power.UserControls
 						exist_idverion_file = true;
 						break;
 					}
-				}				
+				}
 				foreach (Type id_verion in tys) {
 					string target_file_name = "Base";
 					if (exist_idverion_file) { target_file_name = "_" + measureCondition.ID_Hardware.ToString() + measureCondition.Ver_Hardware.ToString(); }
@@ -394,10 +408,11 @@ namespace Ingenu_Power.UserControls
 						MethodInfo mi;
 						object[] parameters;
 						Measure_vParmetersReset( measureCondition.Product_ID ); //测试参数初始化
-												
-//						while ((error_information == string.Empty) && (++measure_index <= MAX_STEP_COUNT) && (limit_status)) {
+
+						SoundPlayer player = new SoundPlayer(); //准备语音播放					
+
+						//						while ((error_information == string.Empty) && (++measure_index <= MAX_STEP_COUNT) && (limit_status)) {
 						while ((++measure_index <= MAX_STEP_COUNT) && (limit_status)) {
-//						while ( (++measure_index <= MAX_STEP_COUNT)) {
 							switch (measure_index) {
 								case 1:
 									//对象的初始化
@@ -415,6 +430,10 @@ namespace Ingenu_Power.UserControls
 									error_information_step = mi.Invoke( obj, parameters ).ToString();
 									break;
 								case 3://备电单投启动功能检查
+									string source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请重开备电.wav";
+									player.SoundLocation = source_filePath;
+								    player.Load(  );
+									player.Play();
 									mi = id_verion.GetMethod( "Measure_vCheckSingleSpStartupAbility" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
@@ -508,6 +527,7 @@ namespace Ingenu_Power.UserControls
 											} else {
 												error_information_step += "\r\n第 " + (index+1).ToString() + " 路输出满载电压测试时超过合格范围";
 												StaticInfor.measureItemShow.Measure_Value = "Failed";
+												measuredValue.AllCheckOkey &= false;
 												break;
 											}
 										}
@@ -531,6 +551,7 @@ namespace Ingenu_Power.UserControls
 											} else {
 												error_information_step += "\r\n第 " + (index+1).ToString() + " 路输出纹波超过合格范围";
 												StaticInfor.measureItemShow.Measure_Value = "Failed";
+												measuredValue.AllCheckOkey &= false;
 												break;
 											}
 										}
@@ -571,6 +592,7 @@ namespace Ingenu_Power.UserControls
 											} else {
 												error_information_step += "\r\n第 " + (index + 1).ToString() + " 路输出空载电压超过合格范围";
 												StaticInfor.measureItemShow.Measure_Value = "Failed";
+												measuredValue.AllCheckOkey &= false;
 												break;
 											}
 										}
@@ -844,27 +866,39 @@ namespace Ingenu_Power.UserControls
 								default:break;
 							}
 							if(error_information_step != string.Empty) {
-								error_information += (error_information_step + "\r\n");
+								error_information += (error_information_step + "\r\n");								
 							}
 
 							//限定条件-决定是否忽略异常的测试项结果而执行后续操作
 							if ( !measureCondition.IgnoreFault_KeepMeasure ) {
 								limit_status &= measuredValue.AllCheckOkey;
-								if (error_information != string.Empty) {
-									limit_status = false;
-								}
+								//if (error_information != string.Empty) {
+								//	limit_status = false;
+								//}
 							}
 
 							//单项测试数据显示
 							if (!measuredValue.AllCheckOkey) {
-								error_information += (StaticInfor.measureItemShow.Measure_Item + "产品性能不合格: " + "\r\n");
+								error_information += ( StaticInfor.measureItemShow.Measure_Item + "产品性能不合格: " + "\r\n" );
 								for (int index = 0; index < arrayList.Count; index++) {
-									error_information += (arrayList[ index ].ToString() + "\r\n");
-								}
+									error_information += ( arrayList[ index ].ToString() + "\r\n" );
+								}								
 							}
 
 							//进度条显示
 							Dispatcher.Invoke( new dlg_PrograssBarSet( PrograssBarSet ), prgStep, measure_index, false );
+						}
+
+						if (!measuredValue.AllCheckOkey) {
+							string source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\测试不合格.wav";
+							player.SoundLocation = source_filePath;
+							player.Load();
+							player.Play();
+						} else {
+							string source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\测试合格.wav";
+							player.SoundLocation = source_filePath;
+							player.Load();
+							player.Play();
 						}
 
 						//仪表状态重置，防止更换产品时带电

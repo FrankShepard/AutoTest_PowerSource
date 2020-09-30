@@ -8,7 +8,7 @@
              xmlns:domain="clr-namespace:Ingenu_Power.Domain"             
 			 x:Class="Ingenu_Power.UserControls.UcMeasure"
              mc:Ignorable="d" 
-             d:DesignHeight="443" d:DesignWidth="726" >
+             d:DesignHeight="443" d:DesignWidth="726">
 	<Grid>
 		<Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center" >
 			<materialDesign:Card Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="706" Height="423" Padding="10" Margin="20" >

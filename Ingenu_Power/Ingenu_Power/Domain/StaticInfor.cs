@@ -260,5 +260,13 @@ namespace Ingenu_Power.Domain
 		/// 用户权限等级，登陆成功之后存在等级1~4；不成功则为0
 		/// </summary>
 		public static int UserRightLevel = 0;
+		/// <summary>
+		/// 扫码枪获取的值
+		/// </summary>
+		public static string ScanerCodes = string.Empty;
+		/// <summary>
+		/// 扫码枪值已被更新的标记
+		/// </summary>
+		public static bool ScannerCodeRefreshed = false;
 	}
 }

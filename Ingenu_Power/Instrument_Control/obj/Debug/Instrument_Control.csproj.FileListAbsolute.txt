@@ -28,4 +28,3 @@ E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\bin\Debug\Instru
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\obj\Debug\Instrument_Control.csproj.CoreCompileInputs.cache
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\obj\Debug\Instrument_Control.dll
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\obj\Debug\Instrument_Control.pdb
-E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Instrument_Control\obj\Debug\Instrument_Control.csprojAssemblyReference.cache

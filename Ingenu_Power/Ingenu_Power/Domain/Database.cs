@@ -99,12 +99,12 @@ namespace Ingenu_Power.Domain
 			}
 		}
 
-        /// <summary>
-        /// 更新用户数据
-        /// </summary>
-        /// <param name="user_name">用户登录名</param>
-        /// <param name="password">用户登录密码</param>
-        /// <param name="error_information">可能存在的错误信息</param>
+		/// <summary>
+		/// 更新用户数据 - 是否有文件更新除外
+		/// </summary>
+		/// <param name="user_name">用户登录名</param>
+		/// <param name="password">用户登录密码</param>
+		/// <param name="error_information">可能存在的错误信息</param>
 		public void V_UserInfor_Update(string user_name, string password, out string error_information)
 		{
 			error_information = string.Empty;
@@ -116,12 +116,41 @@ namespace Ingenu_Power.Domain
 					objCommand.Parameters.Clear();
 					objCommand.Parameters.AddWithValue( "@登陆密码", password );
 					objCommand.Parameters.AddWithValue( "@最近登陆时间", DateTime.Now );
-					objCommand.Parameters.AddWithValue( "@计算机名", Environment.GetEnvironmentVariable( "ComputerName" )); 
+					objCommand.Parameters.AddWithValue( "@计算机名", Environment.GetEnvironmentVariable( "ComputerName" ) );
 
 					V_UpdateInfor( objCommand, out error_information );
 				}
-			} catch {
-				error_information = "Database.V_UpdateUserInfor 数据库操作异常  \r\n";
+			}
+			catch (Exception ex) {
+				error_information = ex.ToString() + "\r\n";
+				error_information += "Database.V_UpdateUserInfor 非文件更新 数据库操作异常  \r\n";
+			}
+		}
+
+		/// <summary>
+		/// 更新用户数据 - 是否有文件更新
+		/// </summary>
+		/// <param name="user_name">用户登录名</param>
+		/// <param name="password">用户登录密码</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void V_UserInfor_Update(bool refresh_dll_completed,out string error_information)
+		{
+			error_information = string.Empty;
+			try {
+				using (SqlCommand objCommand = objConnection.CreateCommand()) {
+					objCommand.Connection = objConnection;
+					objCommand.CommandType = CommandType.Text;
+
+					objCommand.CommandText = "UPDATE [盈帜电源].[dbo].[测试软件用户信息] SET [ProductInfor文件需要更新] = @ProductInfor文件需要更新 WHERE [计算机名] = '" + Environment.GetEnvironmentVariable( "ComputerName" ) + "'";
+					objCommand.Parameters.Clear();
+					objCommand.Parameters.AddWithValue( "@ProductInfor文件需要更新", false );
+
+					V_UpdateInfor( objCommand, out error_information );
+				}
+			}
+			catch (Exception ex) {
+				error_information = ex.ToString() + "\r\n";
+				error_information += "Database.V_UpdateUserInfor 文件更新 数据库操作异常  \r\n";
 			}
 		}
 

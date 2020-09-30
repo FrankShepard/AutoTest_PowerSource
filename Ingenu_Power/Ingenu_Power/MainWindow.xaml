@@ -55,6 +55,12 @@
 							<TextBlock TextWrapping="Wrap" Text="数据查询" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
 						</WrapPanel>
 					</Button>
+					<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Left}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Name="BtnMenu_Setting" Click="BtnMenu_Setting_Click">
+						<WrapPanel>
+							<materialDesign:PackIcon Kind="AccountSettings" Margin="5" VerticalAlignment="Center"/>
+							<TextBlock TextWrapping="Wrap" Text="高级设置" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
+						</WrapPanel>
+					</Button>
 				</StackPanel>
 			</materialDesign:DrawerHost.LeftDrawerContent>
 
@@ -76,7 +82,7 @@
 										<materialDesign:PackIcon Kind="Settings" Margin =" 0"/>
 									</materialDesign:ToggleButtonAssist.OnContent>
 								</ToggleButton>
-								<materialDesign:PackIcon Name="PkiSyncDll" Kind="CloudSync" Height="20" Width="20" Margin="2" MouseEnter="PkiSyncDll_MouseEnter" MouseDoubleClick="PkiSyncDll_MouseDoubleClick" />
+								<materialDesign:PackIcon Name="PkiSyncDll" Kind="CloudSync" Height="20" Width="20" Margin="2" MouseDoubleClick="PkiSyncDll_MouseDoubleClick"/>
 							</WrapPanel>
 							<TextBlock Text="盈帜电源自动测试系统" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFB0A5A5" FontFamily="YouYuan" FontStyle="Italic" FontSize="16" FontWeight="Normal" />
 							<WrapPanel HorizontalAlignment="Right">

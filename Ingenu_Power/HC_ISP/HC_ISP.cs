@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Ports;
+using System.Text;
 using System.Threading;
 
 namespace ISP
@@ -259,6 +260,23 @@ namespace ISP
 			bool mcu_in_isp_mode = false;
 			byte[] command_bytes = BitConverter.GetBytes( ISP_Cmd_Induct );
 
+#if true
+			StringBuilder sb = new StringBuilder();
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + sp_mcu.BaudRate.ToString() + "->";
+			for (int i = 0; i < command_bytes.Length; i++) {
+				if (command_bytes[ i ] < 0x10) {
+					text_value += "0";
+				}
+				text_value += ( command_bytes[ i ].ToString( "x" ).ToUpper() + " " );
+			}
+			sb.AppendLine( text_value );
+			string file_name = @"D:\Desktop\串口数据记录.txt";
+			if (!System.IO.File.Exists( file_name )) {
+				System.IO.File.Create( file_name );
+			}
+			System.IO.File.AppendAllText( file_name, sb.ToString() );
+#endif
+
 			/*以下执行串口数据传输指令*/
 			sp_mcu.ReadExisting( );
 			sp_mcu.Write( command_bytes , 0 , 3 );
@@ -274,13 +292,30 @@ namespace ISP
 					last_byte_count = sp_mcu.BytesToRead;
 					Thread.Sleep( 1 );
 				}
-
+							   
 				//检查MCU返回的代码是否为已经进入了ISP模式的代码
-				if ( sp_mcu.BytesToRead == 17 ) {
+//				if ( sp_mcu.BytesToRead == 17 ) {
 					byte[] Serialport_Redata = new byte[ sp_mcu.BytesToRead ];
 					sp_mcu.Read( Serialport_Redata , 0 , Serialport_Redata.Length );
 
-					ushort data_temp = BitConverter.ToUInt16( Serialport_Redata , 0 );
+#if true
+				sb = new StringBuilder();
+				text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
+				for (int i = 0; i < Serialport_Redata.Length; i++) {
+					if (Serialport_Redata[ i ] < 0x10) {
+						text_value += "0";
+					}
+					text_value += ( Serialport_Redata[ i ].ToString( "x" ).ToUpper() + " " );
+				}
+				sb.AppendLine( text_value );
+				file_name = @"D:\Desktop\串口数据记录.txt";
+				if (!System.IO.File.Exists( file_name )) {
+					System.IO.File.Create( file_name );
+				}
+				System.IO.File.AppendAllText( file_name, sb.ToString() );
+#endif
+
+				ushort data_temp = BitConverter.ToUInt16( Serialport_Redata , 0 );
 					if ( data_temp != ISP_Header ) { return false; }//匹配通讯帧头
 					data_temp = BitConverter.ToUInt16( Serialport_Redata , 2 );
 					if ( data_temp != ISP_Identifier_MCU ) { return false; }//匹配标识符
@@ -299,7 +334,7 @@ namespace ISP
 					if ( Serialport_Redata[ Serialport_Redata.Length - 1 ] != ISP_Ender ) { return false; }//匹配通讯帧尾
 
 					mcu_in_isp_mode = true;
-				}
+//				}
 			}
 
 			return mcu_in_isp_mode;

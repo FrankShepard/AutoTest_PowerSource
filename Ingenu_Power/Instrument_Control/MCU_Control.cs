@@ -154,9 +154,9 @@ namespace Instrument_Control
 			/// </summary>
 			MainpowerVoltageCalibrate = 0x51,
 			/// <summary>
-			/// 备电时的输出电流1与主电时电流的系数
+			/// 备电时的输出电流1的系数
 			/// </summary>
-			RatioSpCurrentToMp_1 = 0x52,
+			RatioSpCurrent_1 = 0x52,
 			/// <summary>
 			/// 管理员指令，对特定的产品而言，使用本指令来保证始终处于充电的状态
 			/// </summary>
@@ -166,9 +166,17 @@ namespace Instrument_Control
 			/// </summary>
 			BatsSingleWorkDisable = 0x54,
 			/// <summary>
+			/// 备电时的输出电流2的系数
+			/// </summary>
+			RatioSpCurrent_2 = 0x55,
+			/// <summary>
+			/// 备电时的输出电流3的系数
+			/// </summary>
+			RatioSpCurrent_3 = 0x56,
+			/// <summary>
 			/// 管理员指令，对特定产品，使用本指令之后会减少充电周期
 			/// </summary>
-			ChargePeriodSet = 0x55,
+			ChargePeriodSet = 0x57,
 			/// <summary>
 			/// 清除单片机中相应的扇区中的校准数据
 			/// </summary>
@@ -182,13 +190,29 @@ namespace Instrument_Control
 			/// </summary>
 			SetBeValidatedFlag = 0x5A,
 			/// <summary>
-			/// 备电时的输出电流2与主电时电流的系数
+			/// 管理员命令 - 备电自杀
 			/// </summary>
-			RatioSpCurrentToMp_2 = 0x60,
+			SelfKill = 0x5B,
 			/// <summary>
-			/// 备电时的输出电流3与主电时电流的系数
+			/// 管理员指令，不论产品状态，强制使能蜂鸣器工作逻辑
 			/// </summary>
-			RatioSpCurrentToMp_3 = 0x61,
+			StartBeepFunction = 0x5C,
+			/// <summary>
+			/// 管理员指令，设置风扇的占空比
+			/// </summary>
+			FanDutySet = 0x5D,
+			/// <summary>
+			/// 减少信号的检查上报时间
+			/// </summary>
+			ReduceSingalCheckTime = 0x5E,
+			/// <summary>
+			/// 显示面板的自检命令
+			/// </summary>
+			DisplayBoadSelfCheck = 0x5F,
+			/// <summary>
+			/// 管理员命令 - 电源放电一段时间
+			/// </summary>
+			Discharg = 0x60,
 			/// <summary>
 			/// 设置单片机内指定地址的Flash数据
 			/// </summary>
@@ -431,7 +455,10 @@ namespace Instrument_Control
 			Byte [ ] datas = new byte [ ] { 0 };
 			if ( connect_status ) { datas [ 0 ] = 1; }
 
-			McuControl_vSendCmd ( Address_ChannelChoose, Cmd_MCUModel.Set_ISPConnection, datas, serialPort, out error_information );
+			int count = 0;
+			do {
+				McuControl_vSendCmd( Address_ChannelChoose, Cmd_MCUModel.Set_ISPConnection, datas, serialPort, out error_information );
+			} while (++count < 3);
 		}
 
 
@@ -1010,7 +1037,7 @@ namespace Instrument_Control
 			if ( !serialPort.IsOpen ) { serialPort.Open ( ); }
 			serialPort.Write ( command_bytes, 0, command_bytes.Length );
 			/*等待回码后解析回码;仅在使用非方向更改时等待回码，原因是硬件上继电器切换可能造成通道不通*/
-			if ((command_bytes[ 2 ] != ( byte ) Cmd_MCUModel.Set_CommunicationDirection) && (command_bytes[2] != (byte)Cmd_MCUModel.WatchDogCheck)) {
+			if ((command_bytes[ 2 ] != ( byte ) Cmd_MCUModel.Set_CommunicationDirection) && (command_bytes[2] != (byte)Cmd_MCUModel.WatchDogCheck) && (command_bytes[2] != (byte) Cmd_MCUModel.Set_ISPConnection)) {
 				Int32 waittime = 0;
 				while (serialPort.BytesToRead == 0) {
 					Thread.Sleep( 5 );
@@ -1140,8 +1167,11 @@ namespace Instrument_Control
 
 			McuControl_vCommandSend ( complete_cmd, serialPort, out error_information );
 			if ( error_information == string.Empty ) {
-				//接收代码查看信息
-				McuControl_vCheckRespond( complete_cmd, serialPort, out error_information );
+
+				if (( complete_cmd[ 2 ] != ( byte ) Cmd_MCUModel.Set_CommunicationDirection ) && ( complete_cmd[ 2 ] != ( byte ) Cmd_MCUModel.WatchDogCheck ) && ( complete_cmd[ 2 ] != ( byte ) Cmd_MCUModel.Set_ISPConnection )) {
+					//接收代码查看信息,特殊命令不需要查看
+					McuControl_vCheckRespond( complete_cmd, serialPort, out error_information );
+				}
 			}
 		}
 

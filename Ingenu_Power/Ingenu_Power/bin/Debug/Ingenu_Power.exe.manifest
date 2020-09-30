@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="Ingenu_Power.exe" version="2.3.0.8" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
+  <asmv1:assemblyIdentity name="Ingenu_Power.exe" version="2.3.0.18" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
   <description asmv2:iconFile="Resources\owl.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="Ingenu_Power" version="2.3.0.1" language="neutral" processorArchitecture="x86" />
+    <assemblyIdentity name="Ingenu_Power" version="2.3.0.8" language="neutral" processorArchitecture="x86" />
     <commandLine file="Ingenu_Power.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="821808">
-      <assemblyIdentity name="Ingenu_Power" version="2.3.0.1" language="neutral" processorArchitecture="x86" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="820272">
+      <assemblyIdentity name="Ingenu_Power" version="2.3.0.8" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>KGnEbwmAUxwloIOVsDCXUs2jcrpsThMrT9ta3OjzNwg=</dsig:DigestValue>
+        <dsig:DigestValue>Pa6rNcPD2LOMTAYhkf72S3xb0Qj2/U7CxueuM+jVVRc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -62,19 +62,19 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>NmFQm2S3DeGcZoSSeQss5b/Q5hiMSfSe3f1C+BxtT54=</dsig:DigestValue>
+        <dsig:DigestValue>1vOAfh8RLyqRtQKeXG6K+KCUzMKrRcXagWLB9Tq7zzQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ISP.dll" size="14336">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ISP.dll" size="14848">
       <assemblyIdentity name="ISP" version="2.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>RfIyeWgljnfhxG9YH4ZGV7PlNYujlRzFTdeulQXtMdc=</dsig:DigestValue>
+        <dsig:DigestValue>LfNRBMzLZSlc2+DRW2IkZi8wERxSWztU0Qu6MeayCxA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -147,33 +147,6 @@
       <dsig:DigestValue>2NwsIb20ZgZcBmvJT5KhMsDY0F3SYOqT6bg6HGLuq7I=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Resources\485转232.png" size="21018">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>E34sWfP66vUdxxbZ4rdiYo8wiUUvewTGPbLGvXjcGrU=</dsig:DigestValue>
-    </hash>
-  </file>
-  <file name="Resources\485转485.png" size="16636">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>U4JOkEo7cs39Y0piW5qo9JP+p86dJVqhTrV3BtRjhh0=</dsig:DigestValue>
-    </hash>
-  </file>
-  <file name="Resources\485转TTL.png" size="25417">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>WN28GRHZuQJKu3i8o4LGn4IjpAr0sdVGBM+Z9obiy4s=</dsig:DigestValue>
-    </hash>
-  </file>
   <file name="Resources\null.png" size="1069">
     <hash>
       <dsig:Transforms>
@@ -192,13 +165,40 @@
       <dsig:DigestValue>6fMYIF06LLgNFpo4of5jp4cDdG9NMBjnWVNJ0nDlOwM=</dsig:DigestValue>
     </hash>
   </file>
+  <file name="Resources\测试不合格.wav" size="54078">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>WqNnQRGk2RVUnS6jO0ICHu7r8rUfm6mkJoSRg71CSkQ=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Resources\测试合格.wav" size="47724">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>gNHdmsbzfQlnYSImZYtujETGTlkZdyW8owQoNa2rqRg=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Resources\请重开备电.wav" size="47404">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>q2W/Tu64a43hZ7X4YaK32VbtoeurtlzHTecd8wjVwq0=</dsig:DigestValue>
+    </hash>
+  </file>
   <file name="Resources\消防电源检验报告(标准定版）.xls" size="134656">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>A/RI8/ee3NO7Fq1vE4K9wJBnincjxrP4avw8OC0CMa4=</dsig:DigestValue>
+      <dsig:DigestValue>olMvoBKYpvTLwI2cVYGYhTkC/qoCBQMy/MAGNR2DRyQ=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>
