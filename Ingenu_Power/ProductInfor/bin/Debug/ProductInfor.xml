@@ -2588,6 +2588,15 @@
             <param name="port_name">串口名</param>
             <returns>测试结果集合</returns>
         </member>
+        <member name="M:ProductInfor._67210.Measure_vCheckSourceChangeMpLost(System.Boolean,System.Int32,System.String)">
+            <summary>
+            主电丢失切换检查
+            </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
         <member name="T:ProductInfor._64910">
             <summary>
             继承自Base的 6200/30A 电源的相关信息

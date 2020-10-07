@@ -127,7 +127,7 @@ namespace ProductInfor
 											if (allocate_channel[ allocate_index ] < 0) { continue; }
 											if (allocate_channel[ allocate_index ] == channel_index) {
 												Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load ) list[ allocate_index ];
-												if (generalData_Load.ActrulyVoltage > infor_Output.Qualified_OutputVoltageWithLoad[ channel_index, 0 ]) {
+												if (generalData_Load.ActrulyVoltage > infor_Output.Qualified_OutputVoltageWithLoad[ channel_index, 0 ] - 0.4m) { //暂时使用此值为满载压降补偿值
 													if (++make_sure_count[ channel_index ] > 3) {
 														restart_okey[ channel_index ] = true;
 													}
@@ -152,6 +152,110 @@ namespace ProductInfor
 									}
 								}
 								if (error_information == string.Empty) { check_okey = true; }
+							}
+						}
+					}
+				} else {
+					arrayList.Add( error_information );
+					arrayList.Add( check_okey );
+				}
+			}
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 主电丢失切换检查
+		/// </summary>
+		/// <param name="whole_function_enable">全项测试使能状态</param>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public override ArrayList Measure_vCheckSourceChangeMpLost(bool whole_function_enable, int delay_magnification, string port_name)
+		{
+			//元素0 - 可能存在的错误信息 ； 元素1 - 检查主电丢失主备电切换功能正常与否的判断
+			ArrayList arrayList = new ArrayList();
+			string error_information = string.Empty;
+			bool check_okey = false;
+			for (int temp_index = 0; temp_index < 2; temp_index++) {
+				if (temp_index == 0) {
+					//设置示波器的触发电平后关闭主电；检查是否捕获到输出跌落
+					using (MeasureDetails measureDetails = new MeasureDetails()) {
+						using (Itech itech = new Itech()) {
+							using (SerialPort serialPort = new SerialPort( port_name, default_baudrate, Parity.None, 8, StopBits.One )) {
+
+								//唤醒MCU控制板
+								measureDetails.Measure_vCommMcuControlAwake( serialPort, out error_information );
+
+								//先保证切换前负载为满载
+								decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
+								int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
+								measureDetails.Measure_vSetOutputLoad( serialPort, infor_PowerSourceChange.OutputLoadType, real_value, true, out error_information );
+								if (error_information != string.Empty) { continue; }
+
+								//备电使用CC模式带载值为  target_cc_value ,保证固定电平的备电可以带载)	
+								decimal target_cc_value = infor_Charge.Qualified_EqualizedCurrent[ 1 ] + 3m;
+								measureDetails.Measure_vSetChargeLoad( serialPort, Itech.OperationMode.CC, target_cc_value, true, out error_information );
+								if (error_information != string.Empty) { continue; }
+
+								//设置主电为欠压值
+								measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, infor_Mp.MpVoltage[ 0 ] );
+								if (error_information != string.Empty) { continue; }
+								Thread.Sleep( 1500 );
+								//只使用示波器监测非稳压的第一路输出是否跌落
+								if (whole_function_enable) {
+									for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
+										if (!infor_Output.Stabilivolt[ index_of_channel ]) {
+											measureDetails.Measure_vSetOscCapture( infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] * 0.75m, out error_information );
+											if (error_information != string.Empty) { break; }
+											measureDetails.Measure_vRappleChannelChoose( index_of_channel, serialPort, out error_information );
+											if (error_information != string.Empty) { break; }
+
+											measureDetails.Measure_vSetACPowerStatus( false, serialPort, out error_information, infor_Mp.MpVoltage[ 0 ] );//关主电
+											if (error_information != string.Empty) { break; }
+											Thread.Sleep( 30 * delay_magnification ); //等待产品进行主备电切换
+											decimal value = measureDetails.Measure_vReadVpp( out error_information );
+											if (error_information != string.Empty) { break; }
+											if (value > infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 0 ] * 0.1m) { //说明被捕获
+												error_information = "主电丢失输出存在跌落";
+											}
+											break;
+										}
+										if (error_information != string.Empty) { break; }
+									}
+									if (error_information != string.Empty) { continue; }
+								} else {
+									measureDetails.Measure_vSetACPowerStatus( false, serialPort, out error_information, infor_Mp.MpVoltage[ 0 ] );//关主电
+									if (error_information != string.Empty) { break; }
+									Thread.Sleep( 500 );
+									Thread.Sleep( 30 * delay_magnification ); //等待产品进行主备电切换
+								}
+
+								//其它通道使用电子负载查看输出,不可以低于0.85倍的标称固定电平的备电
+								Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
+								int[] delay_count_check = new int[ infor_Output.OutputChannelCount ];
+								for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
+									if (infor_Output.Stabilivolt[ index_of_channel ] == false) {
+										for (int index_of_load = 0; index_of_load < MeasureDetails.Address_Load_Output.Length; index_of_load++) {
+											if (allocate_channel[ index_of_load ] == index_of_channel) {
+												serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
+												generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_of_load ], serialPort, out error_information );
+												if (generalData_Load.ActrulyVoltage < 0.75m * 12m * infor_Sp.UsedBatsCount) {
+													check_okey = false;
+													error_information += "主电丢失输出通道 " + ( index_of_channel + 1 ).ToString() + " 存在跌落";
+													continue;
+												}
+												break;
+											}
+										}
+									}
+								}
+
+								if (error_information == string.Empty) { check_okey = true; }
+
+								//停止备电使用的电子负载带载	
+								measureDetails.Measure_vSetChargeLoad( serialPort, Itech.OperationMode.CC, 0m, false, out error_information );
+								if (error_information != string.Empty) { continue; }
+
 							}
 						}
 					}

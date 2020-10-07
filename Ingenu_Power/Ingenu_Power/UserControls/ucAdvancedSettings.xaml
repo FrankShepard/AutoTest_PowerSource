@@ -7,11 +7,65 @@
 			  xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="443" d:DesignWidth="726">
-	<Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
+	<Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">		
 		<materialDesign:Card HorizontalAlignment="Center" VerticalAlignment="Center" Width="706" Height="423" Padding="10" Margin="20" >
-			<GroupBox Grid.Column="1" Grid.Row="0" Header="Shadow Header" Style="{DynamicResource MaterialDesignGroupBox}" Margin="16" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0">
-				<TextBlock Margin="6,6,6,6" TextWrapping="Wrap">Short loin picanha boudin pork belly. Ground round porchetta biltong, cow t-bone tri-tip strip steak chuck filet mignon jowl turducken. Landjaeger strip steak pork chop, jowl sirloin pork capicola andouille. Kevin ribeye tongue, drumstick hamburger frankfurter t-bone corned beef beef biltong cow venison. Biltong picanha bresaola pork belly, filet mignon spare ribs doner pork chop kielbasa. Swine flank drumstick pork belly pancetta spare ribs rump filet mignon.</TextBlock>
-			</GroupBox>
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="2*"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="3*"/>
+					</Grid.ColumnDefinitions>
+					<GroupBox Grid.Row="0" Grid.Column="0" Header="通用设置" Style="{DynamicResource MaterialDesignGroupBox}" Margin="16" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0">
+						<TextBlock Text="主题设置..."/>
+					</GroupBox>
+					<GroupBox Grid.Row="0" Grid.Column="1" Header="生产经理设置" Style="{DynamicResource MaterialDesignGroupBox}" Margin="16,16,16,10" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0">
+						<Grid>
+							<Grid.RowDefinitions >
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="3*"/>
+							</Grid.RowDefinitions>
+
+							<WrapPanel Grid.Row="0">
+								<TextBlock Text="测试流程控制" />
+								<CheckBox Content="程序烧录" />
+								<CheckBox Content="采集校准" />
+								<CheckBox Content="初测" />
+								<CheckBox Content="复测" />
+							</WrapPanel>
+
+							<WrapPanel Grid.Row="1">
+								<TextBlock Text="测试人员权限分配     "/>
+								<TextBlock Text="测试工位流程分配"/>
+							</WrapPanel>
+
+							<WrapPanel Grid.Row="2">
+								<TextBlock Text="测试项选择" />
+								<CheckBox Content="备电强制启动功能检查"/>
+								<CheckBox Content="备电单投功能检查"/>
+								<CheckBox Content="备电切断点检查"/>
+								<CheckBox Content="备电自杀功能检查"/>
+								<CheckBox Content="主电单投功能检查..."/>
+								
+							</WrapPanel>
+							
+						</Grid>
+
+
+
+					</GroupBox>
+				</Grid>				
+				<GroupBox Grid.Row="1" Header="管理员设置" Style="{DynamicResource MaterialDesignGroupBox}" Margin="16" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0">
+				</GroupBox>
+			</Grid>
+				
+			
+			
 		</materialDesign:Card>
 	</Grid>
 </UserControl>
