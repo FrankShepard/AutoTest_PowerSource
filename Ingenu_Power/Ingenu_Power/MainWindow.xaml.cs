@@ -83,6 +83,11 @@ namespace Ingenu_Power
 		/// <param name="e"></param>
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			//主题的选择
+			UserControls.ucAdvancedSettings ucAdvancedSettings = new UserControls.ucAdvancedSettings( );
+			ucAdvancedSettings.ChooseLightOrDark( Properties.Settings.Default.明暗主题_dark );
+			ucAdvancedSettings.ChoosePalette( Properties.Settings.Default.Palette );
+
 			//默认界面是用户登录界面
 			UserControls.UcLogin ucLogin = new UserControls.UcLogin {
 				Name = "NewLogin",
@@ -145,7 +150,7 @@ namespace Ingenu_Power
 					BtnMenu_Measure.IsEnabled = false;
 
 					BtnMenu_DataQuery.IsEnabled = false;
-					BtnMenu_Setting.IsEnabled = false;
+					BtnMenu_Setting.IsEnabled = true;
 					break;
 				case 1: //仅用于查询与打印数据
 					BtnMenu_InstumentValidate.IsEnabled = false;
@@ -358,11 +363,11 @@ namespace Ingenu_Power
 					GrdMain.Children[ index_of_measure_in_grid ].Visibility = Visibility.Hidden;
 				}
 			}
-			UserControls.UcDataQuery ucDataQuery = new UserControls.UcDataQuery {
-				Name = "NewDataQuery",
+			UserControls.ucAdvancedSettings ucAdvancedSettings = new UserControls.ucAdvancedSettings {
+				Name = "AdvancedSettings" ,
 				Margin = new Thickness( 0, 0, 0, 0 )
 			};
-			GrdMain.Children.Add( ucDataQuery );
+			GrdMain.Children.Add( ucAdvancedSettings );
 		}
 
 		#endregion

@@ -38,5 +38,11 @@
     <Setting Name="Dll文件保存路径" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="明暗主题_dark" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Palette" Type="System.String" Scope="User">
+      <Value Profile="(Default)">DeepPurple</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

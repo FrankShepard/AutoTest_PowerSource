@@ -58,7 +58,7 @@
 					<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Left}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Name="BtnMenu_Setting" Click="BtnMenu_Setting_Click">
 						<WrapPanel>
 							<materialDesign:PackIcon Kind="AccountSettings" Margin="5" VerticalAlignment="Center"/>
-							<TextBlock TextWrapping="Wrap" Text="高级设置" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
+							<TextBlock TextWrapping="Wrap" Text="功能设置" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Left" />
 						</WrapPanel>
 					</Button>
 				</StackPanel>
