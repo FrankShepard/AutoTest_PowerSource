@@ -355,7 +355,10 @@ namespace ProductInfor
 
 		#endregion
 
-		Infor_Uart infor_Uart = new Infor_Uart ( );
+		/// <summary>
+		/// 串口结构体的对象
+		/// </summary>
+	    public	Infor_Uart infor_Uart = new Infor_Uart ( );
 
 		#endregion
 

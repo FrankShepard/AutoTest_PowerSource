@@ -24,7 +24,7 @@
 
 							<WrapPanel  Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center">
 								<TextBlock Text="窗体主题"  Margin="0 0 0 0" VerticalAlignment="Center" FontFamily="黑体" FontSize="16"/>
-								<TextBlock VerticalAlignment="Center" Text="亮"  FontSize="14"/>
+								<TextBlock VerticalAlignment="Center" Margin="15 0 0 0" Text="亮"  FontSize="14"/>
 								<ToggleButton Margin="8 0 8 0" Click="ToggleButton_Click" Name="TogDark"/>
 								<TextBlock VerticalAlignment="Center" Text="暗"  FontSize="14"/>
 							</WrapPanel>
@@ -59,7 +59,7 @@
 							</Expander>
 						</Grid>
 					</GroupBox>
-					<GroupBox Grid.Row="0" Grid.Column="1" Header="高级设置" Style="{DynamicResource MaterialDesignGroupBox}" Margin="10" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0">
+					<GroupBox Grid.Row="0" Grid.Column="1" Header="高级设置" Style="{DynamicResource MaterialDesignGroupBox}" Margin="10" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0" Visibility="Hidden">
 						<Grid>
 							<Grid.RowDefinitions >
 								<RowDefinition Height="*"/>
@@ -68,6 +68,11 @@
 							</Grid.RowDefinitions>
 
 							<WrapPanel Grid.Row="0">
+								<TextBlock Text="测试人员权限分配     "/>
+								<TextBlock Text="测试工位流程分配"/>
+							</WrapPanel>
+
+							<WrapPanel Grid.Row="1">
 								<TextBlock Text="测试流程控制" />
 								<CheckBox Content="程序烧录" />
 								<CheckBox Content="采集校准" />
@@ -75,10 +80,7 @@
 								<CheckBox Content="复测" />
 							</WrapPanel>
 
-							<WrapPanel Grid.Row="1">
-								<TextBlock Text="测试人员权限分配     "/>
-								<TextBlock Text="测试工位流程分配"/>
-							</WrapPanel>
+							
 
 							<WrapPanel Grid.Row="2">
 								<TextBlock Text="测试项选择" />

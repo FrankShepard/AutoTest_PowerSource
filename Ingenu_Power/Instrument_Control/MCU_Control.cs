@@ -16,6 +16,10 @@ namespace Instrument_Control
 		/// 单片机接收到的有效数据的数组，用于接收单片机返回值
 		/// </summary>
 		byte[] McuControl_uReceivedData = new byte[20];
+		/// <summary>
+		/// 校准数据读取
+		/// </summary>
+		byte[] McuBackdoor_uReceivedData = new byte[] { 0, 0 };
 
 		#endregion
 
@@ -212,7 +216,7 @@ namespace Instrument_Control
 			/// <summary>
 			/// 管理员命令 - 电源放电一段时间
 			/// </summary>
-			Discharg = 0x60,
+			Discharging = 0x60,
 			/// <summary>
 			/// 设置单片机内指定地址的Flash数据
 			/// </summary>
@@ -803,9 +807,9 @@ namespace Instrument_Control
 			byte [ ] datas = new byte [ ] { 0, 0, 0, 0, 0, 0 };
 			datas [ 0 ] = ( byte ) Cmd.Cmd_Set;
 			switch ( channel_index ) {
-				case 0: datas [ 1 ] = ( byte ) Config.RatioSpCurrentToMp_1; break;
-				case 1: datas [ 1 ] = ( byte ) Config.RatioSpCurrentToMp_2; break;
-				case 2: datas [ 1 ] = ( byte ) Config.RatioSpCurrentToMp_3; break;
+				case 0: datas [ 1 ] = ( byte ) Config.RatioSpCurrent_1; break;
+				case 1: datas [ 1 ] = ( byte ) Config.RatioSpCurrent_2; break;
+				case 2: datas [ 1 ] = ( byte ) Config.RatioSpCurrent_3; break;
 				default: break;
 			}
 			byte [ ] value = BitConverter.GetBytes ( Convert.ToUInt32 ( voltage * 1000 ) );
@@ -940,18 +944,123 @@ namespace Instrument_Control
 		#region -- 后门控制
 
 		/// <summary>
-		/// 对待测产品MCU进行后门控制 - 强制充电的控制逻辑
+		/// 对待测产品MCU进行后门控制 - 备电快速自杀
 		/// </summary>
-		/// <param name="always_charging">始终100%充电</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void McuBackdoor_vAlwaysCharging( bool always_charging, SerialPort serialPort, out string error_information )
+		public void McuBackdoor_vSelfKill(SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
+			datas[ 0 ] = ( byte ) Cmd.Cmd_Set;
+			datas[ 1 ] = ( byte ) Config.SelfKill;
+			datas[ 2 ] = 0x01;
+			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 对待测产品MCU进行后门控制 - 蜂鸣器后门工作与否的控制逻辑
+		/// </summary>
+		/// <param name="backdoor_beep">进入后门控制蜂鸣器响与否</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuBackdoor_vStartBeepFunction(bool backdoor_beep,SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
+			datas[ 0 ] = ( byte ) Cmd.Cmd_Set;
+			datas[ 1 ] = ( byte ) Config.StartBeepFunction;
+			if (backdoor_beep) {
+				datas[ 2 ] = 0x01;
+			}
+			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 对待测产品MCU进行后门控制 - 风扇后门工作与否的控制逻辑
+		/// </summary>
+		/// <param name="backdoor_fan">进入后门控制风扇工作与否</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuBackdoor_vFanDutySet(bool backdoor_fan, SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
+			datas[ 0 ] = ( byte ) Cmd.Cmd_Set;
+			datas[ 1 ] = ( byte ) Config.FanDutySet;
+			if (backdoor_fan) {
+				datas[ 2 ] = 0x01;
+			}
+			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 对待测产品MCU进行后门控制 - 减少状态信号的延时时间
+		/// </summary>
+		/// <param name="backdoor_reduce_check_time">进入减少状态时间的延时状态与否</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuBackdoor_vReduceSingalCheckTime(bool backdoor_reduce_check_time, SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
+			datas[ 0 ] = ( byte ) Cmd.Cmd_Set;
+			datas[ 1 ] = ( byte ) Config.ReduceSingalCheckTime;
+			if (backdoor_reduce_check_time) {
+				datas[ 2 ] = 0x01;
+			}
+			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 对待测产品MCU进行后门控制 - 显示面板自检
+		/// </summary>
+		/// <param name="backdoor_selfcheck">进入显示面板自检的状态与否</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuBackdoor_vDisplayBoadSelfCheck(bool backdoor_selfcheck, SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
+			datas[ 0 ] = ( byte ) Cmd.Cmd_Set;
+			datas[ 1 ] = ( byte ) Config.DisplayBoadSelfCheck;
+			if (backdoor_selfcheck) {
+				datas[ 2 ] = 0x01;
+			}
+			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 对待测产品MCU进行后门控制 - 充电的放电控制
+		/// </summary>
+		/// <param name="backdoor_discharging">是否进入放电控制后门</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuBackdoor_vDisCharging(bool backdoor_discharging, SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
+			datas[ 0 ] = ( byte ) Cmd.Cmd_Set;
+			datas[ 1 ] = ( byte ) Config.Discharging;
+			if (backdoor_discharging) {
+				datas[ 2 ] = 0x01;
+			}
+			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 对待测产品MCU进行后门控制 - 强制充电的控制逻辑
+		/// </summary>
+		/// <param name="backdoor_always_charging">始终100%充电</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuBackdoor_vAlwaysCharging( bool backdoor_always_charging, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			byte [ ] datas = new byte [ ] { 0, 0, 0, 0, 0, 0 };
 			datas [ 0 ] = ( byte ) Cmd.Cmd_Set;
 			datas [ 1 ] = ( byte ) Config.AlwaysCharging;
-			if ( always_charging ) {
+			if ( backdoor_always_charging ) {
 				datas [ 2 ] = 0x01;
 			}
 			McuCalibrate_vSendCmd ( datas, serialPort, out error_information );
@@ -960,19 +1069,57 @@ namespace Instrument_Control
 		/// <summary>
 		/// 对待测产品MCU进行后门控制 - 设置充电周期的长短类型
 		/// </summary>
-		/// <param name="use_short_period">命令产品使用短周期进行充电</param>
+		/// <param name="backdoor_reduce_period">命令产品使用短周期进行充电</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void McuBackdoor_vChargePeriodSet( bool use_short_period, SerialPort serialPort, out string error_information )
+		public void McuBackdoor_vChargePeriodSet( bool backdoor_reduce_period, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			byte [ ] datas = new byte [ ] { 0, 0, 0, 0, 0, 0 };
 			datas [ 0 ] = ( byte ) Cmd.Cmd_Set;
 			datas [ 1 ] = ( byte ) Config.ChargePeriodSet;
-			if ( use_short_period ) {
+			if ( backdoor_reduce_period ) {
 				datas [ 2 ] = 0x01;
 			}
 			McuCalibrate_vSendCmd ( datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 对待测产品MCU进行后门控制 - 向指定偏移地址写入校准真实数据
+		/// </summary>
+		/// <param name="shift_address">偏移地址</param>
+		/// <param name="target_value">目标校准数据</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void McuBackdoor_vCalibratedValueWrite(byte shift_address, byte[] target_value, SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
+			datas[ 0 ] = ( byte ) Cmd.Cmd_Set;
+			datas[ 1 ] = ( byte ) Config.FlashDataSet;
+			datas[ 2 ] = shift_address;
+			datas[ 4 ] = target_value[ 1 ];
+			datas[ 5 ] = target_value[ 0 ];			
+			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+		}
+
+		/// <summary>
+		/// 对待测产品MCU进行后门控制 - 从指定偏移地址读取校准真实数据
+		/// </summary>
+		/// <param name="shift_address">偏移地址</param>
+		/// <param name="serialPort">使用到的串口</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		/// <returns>实际的校准数据</returns>
+		public byte[] McuBackdoor_vCalibratedValueRead(byte shift_address, SerialPort serialPort, out string error_information)
+		{			
+			error_information = string.Empty;
+			byte[] datas = new byte[] { 0, 0, 0, 0, 0, 0 };
+			datas[ 0 ] = ( byte ) Cmd.Cmd_Set;
+			datas[ 1 ] = ( byte ) Config.FlashDataRead;
+			datas[ 2 ] = shift_address;
+			McuCalibrate_vSendCmd( datas, serialPort, out error_information );
+
+			return McuBackdoor_uReceivedData;
 		}
 
 		#endregion
@@ -1249,6 +1396,11 @@ namespace Instrument_Control
 					byte validatecode = real_data[ 7 ];
 					if (recevied_validatecode != validatecode) {
 						error_information = "待测单片机返回的校验码不匹配 \r\n";
+					} else {
+						if (real_data[ 2 ] == ( byte ) Config.FlashDataRead) {
+							McuBackdoor_uReceivedData[ 0 ] = real_data[ 5 ];
+							McuBackdoor_uReceivedData[ 1 ] = real_data[ 6 ];
+						}
 					}
 				}
 			}

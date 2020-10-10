@@ -43,10 +43,6 @@
 								<ColumnDefinition Width="*"/>
 								<ColumnDefinition Width="*"/>
 							</Grid.ColumnDefinitions>
-							<WrapPanel Margin="3" Grid.Column="1">
-								<materialDesign:PackIcon Kind="Bullseye" />
-								<TextBlock FontStyle="Italic" Text="波特率4800"></TextBlock>
-							</WrapPanel>
 							<WrapPanel Margin="3" Grid.Column="0">
 								<materialDesign:PackIcon Kind="CrosshairsGps" />
 								<TextBlock FontStyle="Italic" Text="通讯地址"></TextBlock>
@@ -62,17 +58,17 @@
                             <ColumnDefinition Width="65"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <materialDesign:PackIcon  Kind="SerialPort"  Width="70" Height="60" Grid.ColumnSpan="1" Margin="0"/>
-						<ComboBox   Grid.Column="2" Margin="20,0" materialDesign:HintAssist.Hint="测试使用的串口" Name="CobSp"  PreviewMouseDown ="ComboBox_PreviewMouseDown"  Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <materialDesign:PackIcon  Grid.Column="0" Kind="SerialPort"  Width="65" Height="55" HorizontalAlignment="Center" Margin="0"/>
+						<ComboBox   Grid.Column="1" Margin="20,0" materialDesign:HintAssist.Hint="测试使用的串口" Name="CobSp"  PreviewMouseDown ="ComboBox_PreviewMouseDown"  Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         </ComboBox>
                     </Grid>
 				<Grid Margin="5">
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="60"/>
+						<ColumnDefinition Width="65"/>
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
-					<materialDesign:PackIcon Kind="Barcode" Width="50" Height="45" Grid.ColumnSpan="1" Margin="5,0,0,0"/>
-					<TextBox Margin="20,0" materialDesign:HintAssist.Hint="示波器INS码" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" Name="TxtINS" />
+					<materialDesign:PackIcon Kind="Barcode" Width="65" Height="55" Grid.Column="0" HorizontalAlignment="Center" Margin="0"/>
+					<TextBox Margin="20,0" materialDesign:HintAssist.Hint="示波器INS码" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="1" Name="TxtINS" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
 				</Grid>
 				<WrapPanel Margin="5">
 						<ProgressBar Margin="20" Height="8" Width="230" Name="PgbStep"/>

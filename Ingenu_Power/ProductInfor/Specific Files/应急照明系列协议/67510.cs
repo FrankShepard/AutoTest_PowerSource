@@ -420,7 +420,7 @@ namespace ProductInfor
 		/// <param name="serialPort">使用到的实际串口</param>
 		/// <param name="error_information">可能存在的异常信息</param>
 		/// </summary>
-		private void Communicate_UserSetBeepTime( int beep_keep_time, SerialPort serialPort, out string error_information )
+		public  void Communicate_UserSetBeepTime( int beep_keep_time, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			int index = 0;
@@ -443,7 +443,7 @@ namespace ProductInfor
 		/// <param name="serialPort">使用到的实际串口 </param>
 		/// <param name="error_information">可能存在的异常信息</param>
 		/// </summary>
-		private void Communicate_UserSetOWP( decimal target_owp, SerialPort serialPort, out string error_information )
+		public  void Communicate_UserSetOWP( decimal target_owp, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			int index = 0;
@@ -466,7 +466,7 @@ namespace ProductInfor
 		/// <param name="serialPort">使用到的实际串口 </param>
 		/// <param name="error_information">可能存在的异常信息</param>
 		/// </summary>
-		private void Communicate_UserSetCutoffVoltage( decimal target_cutoffvoltage, SerialPort serialPort, out string error_information )
+		public  void Communicate_UserSetCutoffVoltage( decimal target_cutoffvoltage, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			int index = 0;
@@ -489,7 +489,7 @@ namespace ProductInfor
 		/// <param name="serialPort">使用到的实际串口 </param>
 		/// <param name="error_information">可能存在的异常信息</param>
 		/// </summary>
-		private void Communicate_UserSetUnderVoltage( decimal target_undervoltage, SerialPort serialPort, out string error_information )
+		public  void Communicate_UserSetUnderVoltage( decimal target_undervoltage, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			int index = 0;
@@ -1101,7 +1101,7 @@ namespace ProductInfor
 		/// <param name="mCU_Control">单片机控制模块对象</param>
 		/// <param name="serialPort">使用到的串口对象</param>
 		/// <param name="error_information">可能存在的异常</param>
-		private void Calibrate_vEmergencyPowerSet( string id_ver, MCU_Control mCU_Control, SerialPort serialPort, out string error_information )
+		public virtual void Calibrate_vEmergencyPowerSet( string id_ver, MCU_Control mCU_Control, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			serialPort.BaudRate = CommunicateBaudrate;
@@ -1129,12 +1129,11 @@ namespace ProductInfor
 			if ( error_information != string.Empty ) { return; }
 
 			//特殊型号电源需要设置输出开路最大电流、欠压点、切断点
-			if ( id_ver.Contains ( "675" ) || id_ver.Contains ( "676" ) || id_ver.Contains ( "677" ) ) { //赋安  L系列应急照明电源 切断点和欠压点设置
-				Communicate_UserSetCutoffVoltage ( infor_Sp.Target_CutoffVoltageLevel, serialPort, out error_information );
-				if ( error_information != string.Empty ) { return; }
-				Communicate_UserSetUnderVoltage ( infor_Sp.Target_UnderVoltageLevel, serialPort, out error_information );
-				if ( error_information != string.Empty ) { return; }
-			}
+			//赋安  L系列应急照明电源 切断点和欠压点设置
+			Communicate_UserSetCutoffVoltage ( infor_Sp.Target_CutoffVoltageLevel, serialPort, out error_information );
+			if ( error_information != string.Empty ) { return; }
+			Communicate_UserSetUnderVoltage ( infor_Sp.Target_UnderVoltageLevel, serialPort, out error_information );
+			if ( error_information != string.Empty ) { return; }
 
 			//软件复位以生效设置
 			Communicate_Admin ( serialPort, out error_information );

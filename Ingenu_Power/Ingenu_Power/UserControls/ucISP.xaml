@@ -34,20 +34,20 @@
 			<StackPanel Margin="0,30,0,0">				
 					<Grid Margin="5">
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="60"/>
+							<ColumnDefinition Width="65"/>
 							<ColumnDefinition Width="*"/>
 						</Grid.ColumnDefinitions>
-						<materialDesign:PackIcon  Kind="SerialPort"  Width="60" Height="60" Grid.ColumnSpan="1" Margin="0"/>
-						<ComboBox   Grid.Column="2" Margin="20,0" materialDesign:HintAssist.Hint="ISP使用的串口" Name="CobSp" PreviewMouseDown="ComboBox_PreviewMouseDown" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+						<materialDesign:PackIcon  Kind="SerialPort"  Width="65" Height="55" Grid.Column="0" HorizontalAlignment="Center" Margin="0"/>
+						<ComboBox   Grid.Column="1" Margin="20,0" materialDesign:HintAssist.Hint="ISP使用的串口" Name="CobSp" PreviewMouseDown="ComboBox_PreviewMouseDown" Style="{StaticResource MaterialDesignFloatingHintComboBox}">
 						</ComboBox>
 					</Grid>
 					<Grid Margin="5">
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="60"/>
+							<ColumnDefinition Width="65"/>
 							<ColumnDefinition Width="*"/>
 						</Grid.ColumnDefinitions>
-						<materialDesign:PackIcon Kind="BarcodeScan" Width="50" Height="45" Grid.ColumnSpan="1" Margin="5,0,0,0"/>
-						<TextBox Margin="20,0" materialDesign:HintAssist.Hint="产品ID" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="2" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="15" Name="TxtID" />
+						<materialDesign:PackIcon Kind="BarcodeScan" Width="65" Height="45" Grid.Column="0" Margin="0" HorizontalAlignment="Center"/>
+						<TextBox Margin="20,0" materialDesign:HintAssist.Hint="产品ID" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Grid.Column="1" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="15" Name="TxtID" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
 					</Grid>
 					<WrapPanel Margin="5">
 						<ProgressBar Margin="20" Height="8" Width="230" Name="PgbStep"/>

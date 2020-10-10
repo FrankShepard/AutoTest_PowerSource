@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="Ingenu_Power.exe" version="2.3.0.18" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
+  <asmv1:assemblyIdentity name="Ingenu_Power.exe" version="2.3.0.20" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
   <description asmv2:iconFile="Resources\owl.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="Ingenu_Power" version="2.3.0.8" language="neutral" processorArchitecture="x86" />
+    <assemblyIdentity name="Ingenu_Power" version="2.3.0.18" language="neutral" processorArchitecture="x86" />
     <commandLine file="Ingenu_Power.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -43,26 +43,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="823856">
-      <assemblyIdentity name="Ingenu_Power" version="2.3.0.8" language="neutral" processorArchitecture="x86" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Ingenu_Power.exe" size="832048">
+      <assemblyIdentity name="Ingenu_Power" version="2.3.0.18" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>VkOJ3QlIl+3unu1g9JKtlvrWcTenvNEFM57HTIJL3Io=</dsig:DigestValue>
+        <dsig:DigestValue>57kcDj8UKLICrFBqQsmOIDb4NBAjY8wteZr95dz6oRU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Instrument_Control.dll" size="103424">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Instrument_Control.dll" size="104960">
       <assemblyIdentity name="Instrument_Control" version="3.1.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>1vOAfh8RLyqRtQKeXG6K+KCUzMKrRcXagWLB9Tq7zzQ=</dsig:DigestValue>
+        <dsig:DigestValue>aixis8WWNYHG615kv3tFfqhaYtvW4OFrqZfB0+892QQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -138,13 +138,13 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="Ingenu_Power.exe.config" size="2158">
+  <file name="Ingenu_Power.exe.config" size="2375">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>2NwsIb20ZgZcBmvJT5KhMsDY0F3SYOqT6bg6HGLuq7I=</dsig:DigestValue>
+      <dsig:DigestValue>cQnc/zQvf7NA4Btg3dIbg2289nnKTjdUrPSnz8AHTi4=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Resources\null.png" size="1069">
@@ -198,7 +198,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>olMvoBKYpvTLwI2cVYGYhTkC/qoCBQMy/MAGNR2DRyQ=</dsig:DigestValue>
+      <dsig:DigestValue>AM/fBk0Ow6YWYQqlbnOxyqbQj1nHe4mJl6JPt93fEjM=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

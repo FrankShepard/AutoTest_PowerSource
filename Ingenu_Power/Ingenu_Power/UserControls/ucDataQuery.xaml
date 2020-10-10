@@ -7,7 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Ingenu_Power.Domain"
              mc:Ignorable="d" 
-             d:DesignHeight="443" d:DesignWidth="726" >
+             d:DesignHeight="443" d:DesignWidth="726" Loaded="UserControl_Loaded">
 	<UserControl.Resources>
 		<SolidColorBrush x:Key="InputBoxHintAssistForegorundBrush" Color="Purple"/>
 		<Style x:Key="InputIcon" TargetType="materialDesign:PackIcon">
@@ -146,10 +146,25 @@
 						</Button>
 					</Grid>
 					<Grid Grid.Column="2">
-						<Grid Name="GrdPrintShow" VerticalAlignment="Center" HorizontalAlignment="Center" Height="80" Width="80" Visibility="Hidden">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="2.5*"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+						<Grid Grid.Row="0" Name="GrdPrintShow" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Hidden">
 							<materialDesign:PackIcon Kind="CloudPrintOutline" VerticalAlignment="Center" HorizontalAlignment="Center" Height="50" Width="50" />
 							<ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Value="33" IsIndeterminate="True" Height="70" Margin="0" Width="70" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 						</Grid>
+
+						<Button IsDefault="True" x:Name="BtnExportData_Fast" FontSize="12" Visibility="Hidden"
+						Style="{StaticResource MaterialDesignRaisedDarkButton}" 				
+						materialDesign:ButtonAssist.CornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" 
+						VerticalAlignment="Center" HorizontalAlignment="Center" Click="BtnExportData_Fast_Click" Width="95" Height="31" Grid.Row="1" >
+							<WrapPanel>
+								<materialDesign:PackIcon Kind="FastForward" Height="18" Width="15" />
+								<TextBlock  Text="快速导出" />
+							</WrapPanel>
+						</Button>
+
 					</Grid>
 				</Grid>
 			</materialDesign:Card>

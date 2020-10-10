@@ -16,5 +16,5 @@ E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\App.xaml
 22-1427305456
 Domain\ResultMessageDialog.xaml;MainWindow.xaml;UserControls\ucAdvancedSettings.xaml;UserControls\ucDatabaseLogin.xaml;UserControls\ucInstrumentValidation.xaml;UserControls\ucDataQuery.xaml;UserControls\ucMeasure.xaml;UserControls\ucISP.xaml;UserControls\ucLogin.xaml;
 resources\spcstart.png
-False
+True
 

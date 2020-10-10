@@ -2204,155 +2204,471 @@
             <param name="port_name">使用到的串口名</param>
             <returns>包含多个信息的动态数组</returns>
         </member>
+        <member name="T:ProductInfor._74810">
+            <summary>
+            继承自 _67510 的 IG-Z2121Q 电源的相关信息
+            </summary>
+        </member>
+        <member name="M:ProductInfor._74810.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._74810.Measure_vCheckSingleSpStartupAbility(System.Boolean,System.Int32,System.String)">
+            <summary>
+            测试备电单投功能
+            </summary>
+            <param name="whole_function_enable">全项测试与否</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
+        <member name="T:ProductInfor._74710">
+            <summary>
+            继承自 _67510 的 IG-Z2071Q 电源的相关信息
+            </summary>
+        </member>
+        <member name="M:ProductInfor._74710.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
+        <member name="M:ProductInfor._74710.Measure_vCheckSingleSpStartupAbility(System.Boolean,System.Int32,System.String)">
+            <summary>
+            测试备电单投功能
+            </summary>
+            <param name="whole_function_enable">全项测试与否</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
         <member name="T:ProductInfor._71410">
             <summary>
             继承自 _67510 的 IG-Z2071M 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._71410.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._72110">
             <summary>
             继承自 _67510 的 IG-Z2071N 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._72110.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._63199">
             <summary>
             继承自 _67510 的 IG-Z2102F(500W改300W) 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._63199.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._72210">
             <summary>
             继承自 _67510 的 IG-Z2121N 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._72210.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._71510">
             <summary>
             继承自 _67510 的 IG-Z2121M 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._71510.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._69611">
             <summary>
             继承自 _67510 的 IG-Z2182F 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._69611.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._69511">
             <summary>
             继承自 _67510 的 IG-Z2121F 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._69511.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._69411">
             <summary>
             继承自 _67510 的 IG-Z2102F 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._69411.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._69311">
             <summary>
             继承自 _67510 的 IG-Z2121K 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._69311.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._68910">
             <summary>
             继承自 _67510 的 IG-Z2071K 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._68910.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._68811">
             <summary>
             继承自 _67510 的 IG-Z2181F 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._68811.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._68710">
             <summary>
             继承自 _67510 的 IG-Z2071F 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._68710.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._66210">
             <summary>
             继承自 _67510 的 IG-Z2272K 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._66210.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._66110">
             <summary>
             继承自 _67510 的 IG-Z2182K 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._66110.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._66010">
             <summary>
             继承自 _67510 的 IG-Z2102K 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._66010.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._65910">
             <summary>
             继承自 _67510 的 IG-Z2181K 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._65910.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._65810">
             <summary>
             继承自 _67510 的 IG-Z2121K 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._65810.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._65710">
             <summary>
             继承自 _67510 的 IG-Z2071K 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._65710.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._65610">
             <summary>
             继承自 _67510 的 IG-Z2272H 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._65610.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._65510">
             <summary>
             继承自 _67510 的 IG-Z2182H 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._65510.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._65410">
             <summary>
             继承自 _67510 的 IG-Z2102H 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._65410.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._65110">
             <summary>
             继承自 _67510 的 IG-Z2071H 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._65110.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._63310">
             <summary>
             继承自 _67510 的 IG-Z2272F 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._63310.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._63210">
             <summary>
             继承自 _67510 的 IG-Z2182F 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._63210.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._63110">
             <summary>
             继承自 _67510 的 IG-Z2102F 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._63110.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._62610">
             <summary>
             继承自 _67510 的 IG-Z2071F 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._62610.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._62710">
             <summary>
             继承自 _67510 的 IG-Z2121F 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._62710.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._62810">
             <summary>
             继承自 _67510 的 IG-Z2181F 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._62810.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._65310">
             <summary>
             继承自 _67510 的 IG-Z2181H 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._65310.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
+        </member>
         <member name="T:ProductInfor._65210">
             <summary>
             继承自 _67510 的 IG-Z2121H 电源的相关信息
             </summary>
+        </member>
+        <member name="M:ProductInfor._65210.Calibrate_vEmergencyPowerSet(System.String,Instrument_Control.MCU_Control,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            应急照明电源的特殊校准设置操作
+            </summary>
+            <param name="id_ver">对应应急照明电源产品的ID和Verion</param>
+            <param name="mCU_Control">单片机控制模块对象</param>
+            <param name="serialPort">使用到的串口对象</param>
+            <param name="error_information">可能存在的异常</param>
         </member>
         <member name="T:ProductInfor._67710">
             <summary>
@@ -2544,6 +2860,38 @@
             <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="T:ProductInfor._73010">
+            <summary>
+            继承自_64910的 IG-M1101H 电源的相关信息
+            </summary>
+        </member>
+        <member name="M:ProductInfor._73010.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
+            <summary>
+            备电切断点检查 - 检查备电电压的采集误差
+            </summary>
+            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._73010.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
+            <summary>
+            满载电压测试 - 检查主电情况下输出电压和电流的采集误差
+            </summary>
+            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
+        <member name="M:ProductInfor._73010.Measure_vCheckSourceChangeMpLost(System.Boolean,System.Int32,System.String)">
+            <summary>
+            主电丢失切换检查
+            </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="T:ProductInfor._67010">
             <summary>
@@ -2980,6 +3328,11 @@
         <member name="F:ProductInfor._64910.Infor_Uart.Measured_BeepWorkingTime">
             <summary>
             备电切断之后蜂鸣器工作的时间(s)
+            </summary>
+        </member>
+        <member name="F:ProductInfor._64910.infor_Uart">
+            <summary>
+            串口结构体的对象
             </summary>
         </member>
         <member name="M:ProductInfor._64910.Initalize(System.String,System.String,System.String,System.String)">

@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Ingenu_Power.Domain;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Ingenu_Power.UserControls
@@ -176,6 +177,36 @@ namespace Ingenu_Power.UserControls
 		#endregion
 
 		#region -- 控件事件
+
+		/// <summary>
+		/// 窗体载入时根据登录权限等级决定是否显示 快速导出  功能按键
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			if(StaticInfor.UserRightLevel > 4) {
+				BtnExportData_Fast.Visibility = Visibility.Visible;
+			}
+		}
+
+		/// <summary>
+		/// 快速导出被触发，忽略Excel文件的格式   将所有数据导出到空白excel中    仅用于数据分析使用
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnExportData_Fast_Click(object sender, RoutedEventArgs e)
+		{
+			SaveFileDialog saveFileDialog = new SaveFileDialog {
+				RestoreDirectory = true, //保护对话框记忆的上次打开的目录
+				Filter = "Excel表格(*.xls)|*.xls",
+			};
+			if (( bool ) saveFileDialog.ShowDialog() == true) {
+				string file_path = saveFileDialog.FileName;
+				DataTableToCsv( objDataTable, file_path );
+				System.Diagnostics.Process.Start( file_path ); //打开excel文件
+			}
+		}
 
 		/// <summary>
 		/// 限定产品的硬件ID类型，只能输入数字
@@ -1245,7 +1276,38 @@ namespace Ingenu_Power.UserControls
 			}
 		}
 
-#endregion
+		/// <summary>
+		/// 忽略excel格式的快速导出数据
+		/// </summary>
+		/// <param name="table"></param>
+		/// <param name="file"></param>
+		private void DataTableToCsv(DataTable table, string file)
+		{
+
+			string title = "";
+			FileStream fs = new FileStream( file, FileMode.Create );
+			//FileStream fs1 = File.Open(file, FileMode.Open, FileAccess.Read);
+			StreamWriter sw = new StreamWriter( new BufferedStream( fs ), System.Text.Encoding.Default );
+			for (int i = 0; i < table.Columns.Count; i++) {
+				title += table.Columns[ i ].ColumnName + "\t"; //栏位：自动跳到下一单元格
+			}
+
+			title = title.Substring( 0, title.Length - 1 ) + "\n";
+			sw.Write( title );
+
+			foreach (DataRow row in table.Rows) {
+				string line = "";
+				for (int i = 0; i < table.Columns.Count; i++) {
+					line += row[ i ].ToString().Trim() + "\t"; //内容：自动跳到下一单元格
+				}
+				line = line.Substring( 0, line.Length - 1 ) + "\n";
+				sw.Write( line );
+			}
+			sw.Close();
+			fs.Close();
+		}
+
+		#endregion
 
 	}
 }

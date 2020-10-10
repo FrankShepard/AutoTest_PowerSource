@@ -257,7 +257,7 @@ namespace Ingenu_Power.Domain
 		/// </summary>
 		public static string Error_Message = string.Empty;
 		/// <summary>
-		/// 用户权限等级，登陆成功之后存在等级1~4；不成功则为0
+		/// 用户权限等级，登陆成功之后存在等级1~5；不成功则为0
 		/// </summary>
 		public static int UserRightLevel = 0;
 		/// <summary>

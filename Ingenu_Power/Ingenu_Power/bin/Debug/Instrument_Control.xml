@@ -2901,6 +2901,11 @@
             单片机接收到的有效数据的数组，用于接收单片机返回值
             </summary>
         </member>
+        <member name="F:Instrument_Control.MCU_Control.McuBackdoor_uReceivedData">
+            <summary>
+            校准数据读取
+            </summary>
+        </member>
         <member name="F:Instrument_Control.MCU_Control.Address_BatsControl">
             <summary>
             备电模块的地址
@@ -3051,9 +3056,9 @@
             主电电压校准
             </summary>
         </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.RatioSpCurrentToMp_1">
+        <member name="F:Instrument_Control.MCU_Control.Config.RatioSpCurrent_1">
             <summary>
-            备电时的输出电流1与主电时电流的系数
+            备电时的输出电流1的系数
             </summary>
         </member>
         <member name="F:Instrument_Control.MCU_Control.Config.AlwaysCharging">
@@ -3064,6 +3069,16 @@
         <member name="F:Instrument_Control.MCU_Control.Config.BatsSingleWorkDisable">
             <summary>
             管理员指令，对特定产品，使用本指令之后会造成备电单投功能无效
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.RatioSpCurrent_2">
+            <summary>
+            备电时的输出电流2的系数
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.RatioSpCurrent_3">
+            <summary>
+            备电时的输出电流3的系数
             </summary>
         </member>
         <member name="F:Instrument_Control.MCU_Control.Config.ChargePeriodSet">
@@ -3086,14 +3101,34 @@
             更改产品被校准后的标志位
             </summary>
         </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.RatioSpCurrentToMp_2">
+        <member name="F:Instrument_Control.MCU_Control.Config.SelfKill">
             <summary>
-            备电时的输出电流2与主电时电流的系数
+            管理员命令 - 备电自杀
             </summary>
         </member>
-        <member name="F:Instrument_Control.MCU_Control.Config.RatioSpCurrentToMp_3">
+        <member name="F:Instrument_Control.MCU_Control.Config.StartBeepFunction">
             <summary>
-            备电时的输出电流3与主电时电流的系数
+            管理员指令，不论产品状态，强制使能蜂鸣器工作逻辑
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.FanDutySet">
+            <summary>
+            管理员指令，设置风扇的占空比
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.ReduceSingalCheckTime">
+            <summary>
+            减少信号的检查上报时间
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.DisplayBoadSelfCheck">
+            <summary>
+            显示面板的自检命令
+            </summary>
+        </member>
+        <member name="F:Instrument_Control.MCU_Control.Config.Discharging">
+            <summary>
+            管理员命令 - 电源放电一段时间
             </summary>
         </member>
         <member name="F:Instrument_Control.MCU_Control.Config.FlashDataSet">
@@ -3522,11 +3557,58 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
+        <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vSelfKill(System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行后门控制 - 备电快速自杀
+            </summary>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vStartBeepFunction(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行后门控制 - 蜂鸣器后门工作与否的控制逻辑
+            </summary>
+            <param name="backdoor_beep">进入后门控制蜂鸣器响与否</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vFanDutySet(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行后门控制 - 风扇后门工作与否的控制逻辑
+            </summary>
+            <param name="backdoor_fan">进入后门控制风扇工作与否</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vReduceSingalCheckTime(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行后门控制 - 减少状态信号的延时时间
+            </summary>
+            <param name="backdoor_reduce_check_time">进入减少状态时间的延时状态与否</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vDisplayBoadSelfCheck(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行后门控制 - 显示面板自检
+            </summary>
+            <param name="backdoor_selfcheck">进入显示面板自检的状态与否</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vDisCharging(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行后门控制 - 充电的放电控制
+            </summary>
+            <param name="backdoor_discharging">是否进入放电控制后门</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
         <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vAlwaysCharging(System.Boolean,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             对待测产品MCU进行后门控制 - 强制充电的控制逻辑
             </summary>
-            <param name="always_charging">始终100%充电</param>
+            <param name="backdoor_always_charging">始终100%充电</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
@@ -3534,9 +3616,27 @@
             <summary>
             对待测产品MCU进行后门控制 - 设置充电周期的长短类型
             </summary>
-            <param name="use_short_period">命令产品使用短周期进行充电</param>
+            <param name="backdoor_reduce_period">命令产品使用短周期进行充电</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vCalibratedValueWrite(System.Byte,System.Byte[],System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行后门控制 - 向指定偏移地址写入校准真实数据
+            </summary>
+            <param name="shift_address">偏移地址</param>
+            <param name="target_value">目标校准数据</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+        </member>
+        <member name="M:Instrument_Control.MCU_Control.McuBackdoor_vCalibratedValueRead(System.Byte,System.IO.Ports.SerialPort,System.String@)">
+            <summary>
+            对待测产品MCU进行后门控制 - 从指定偏移地址读取校准真实数据
+            </summary>
+            <param name="shift_address">偏移地址</param>
+            <param name="serialPort">使用到的串口</param>
+            <param name="error_information">可能存在的错误信息</param>
+            <returns>实际的校准数据</returns>
         </member>
         <member name="M:Instrument_Control.MCU_Control.McuControl_vCalculateVali(System.Byte[])">
             <summary>
