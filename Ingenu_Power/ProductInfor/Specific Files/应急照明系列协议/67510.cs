@@ -453,7 +453,7 @@ namespace ProductInfor
 		/// <param name="serialPort">使用到的实际串口</param>
 		/// <param name="error_information">可能存在的异常信息</param>
 		/// </summary>
-		private void Communicate_UserSetBeepTime( int beep_keep_time, SerialPort serialPort, out string error_information )
+		public void Communicate_UserSetBeepTime( int beep_keep_time, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			int index = 0;
@@ -491,7 +491,7 @@ namespace ProductInfor
 		/// <param name="serialPort">使用到的实际串口 </param>
 		/// <param name="error_information">可能存在的异常信息</param>
 		/// </summary>
-		private void Communicate_UserSetOWP( decimal target_owp, SerialPort serialPort, out string error_information )
+		public  void Communicate_UserSetOWP( decimal target_owp, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			int index = 0;
@@ -1248,9 +1248,11 @@ namespace ProductInfor
 		{
 			error_information = string.Empty;
 			serialPort.BaudRate = CommunicateBaudrate;
-			//统一禁止备电单投功能
-			mCU_Control.McuCalibrate_vBatsSingleWorkEnableSet ( serialPort, out error_information );
-			if ( error_information != string.Empty ) { return; }
+			//统一禁止备电单投功能  - 依爱的 IG-Z2071Q 和 IG-Z2121Q除外
+			if (!( id_ver.Contains( "747" ) || id_ver.Contains( "748" ) )) {
+				mCU_Control.McuCalibrate_vBatsSingleWorkEnableSet( serialPort, out error_information );
+				if (error_information != string.Empty) { return; }
+			}
 			//退出管理员模式，之前的软件版本中没有此命令，如果没有此命令则需要软件复位操作
 			mCU_Control.McuCalibrate_vExitCalibration ( serialPort, out error_information );
 			if ( error_information != string.Empty ) {
