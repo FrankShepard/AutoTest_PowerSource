@@ -716,7 +716,7 @@ namespace ProductInfor
 										if ( allocate_index [ allocate_index_1 ] == index ) {
 											Itech.GeneralData_Load generalData_Load_out = ( Itech.GeneralData_Load ) list [ allocate_index_1 ];
 											if ( Math.Abs ( generalData_Load_out.ActrulyVoltage - generalData_Load.ActrulyVoltage ) > 0.5m ) {
-												error_information = "输出通道 " + index.ToString ( ) + " 的电压与备电压降过大";
+												error_information = "输出通道 " + index.ToString() + " 的电压与备电压降过大 " + generalData_Load_out.ActrulyVoltage.ToString() + "  " + generalData_Load.ActrulyVoltage.ToString();
 											}
 											break;
 										}
@@ -731,7 +731,7 @@ namespace ProductInfor
 							Communicate_User ( serialPort, out error_information );
 							if ( error_information != string.Empty ) { continue; }
 							if ( Math.Abs ( infor_Uart.Measured_SpVoltage - generalData_Load.ActrulyVoltage ) > 0.5m ) {
-								error_information = "备电电压采集误差太大"; continue;
+								error_information = "备电电压采集误差太大 " + infor_Uart.Measured_SpVoltage.ToString() + "  "+ generalData_Load.ActrulyVoltage.ToString(); continue;
 							}
 
 							//检测备电切断点；此型号电源需要注意：需要注意二极管压降和备电电压逐渐减小的过程

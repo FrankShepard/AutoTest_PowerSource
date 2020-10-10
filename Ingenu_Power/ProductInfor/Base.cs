@@ -1221,9 +1221,12 @@ namespace ProductInfor
 		public void Calibrate_vEmptyLoad_Mp(int[] channel, Itech itech, MCU_Control mCU_Control, SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
+			int retry_count = 0;
 			do {
+				Thread.Sleep( 300 );
 				Communicate_User_QueryWorkingStatus( serialPort, out error_information );
-			} while (error_information != string.Empty);
+			} while ((error_information != string.Empty) && (++retry_count < 30));
+			if (retry_count >= 30) { error_information += "\r\n在规定的时间内未能建立通讯过程"; return; }
 			Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
 			for (int index_of_calibration_channel = 0; index_of_calibration_channel < infor_Output.OutputChannelCount; index_of_calibration_channel++) {
 				serialPort.BaudRate = MeasureDetails.Baudrate_Instrument_Load;
@@ -1243,8 +1246,15 @@ namespace ProductInfor
 						if (restart_count >= 40) {
 							error_information = "输出通道 " + (index_of_calibration_channel + 1).ToString() + " 在规定的时间内没有能正常启动"; return;
 						} else {
-							Thread.Sleep( 600 ); //等待电源采集稳定 ，退出当前通道的电压采集
-							generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_of_load ], serialPort, out error_information );
+							Thread.Sleep( 300 ); //等待电源采集稳定 ，退出当前通道的电压采集
+							retry_count = 0;
+							do {
+								Thread.Sleep( 200 );
+								generalData_Load = itech.ElecLoad_vReadMeasuredValue( MeasureDetails.Address_Load_Output[ index_of_load ], serialPort, out error_information );
+								if (generalData_Load.ActrulyVoltage < ( 0.98m * infor_Output.Qualified_OutputVoltageWithoutLoad[ index_of_calibration_channel, 0 ] )) { 
+									retry_count = 0; //连续几次测试，保证对应通道不要出现开机瞬间未正常锁定造成的误判
+								}
+							} while (( error_information != string.Empty ) && ( ++retry_count < 2 ));
 							if (error_information != string.Empty) { return; }
 							break;
 						}
@@ -1722,7 +1732,7 @@ namespace ProductInfor
 									if ( ( allocate_index [ j ] == i ) && ( !infor_Output.Stabilivolt [ i ] ) ) {
 										Itech.GeneralData_Load generalData_Load_out = ( Itech.GeneralData_Load ) list [ j ];
 										if ( Math.Abs ( generalData_Load_out.ActrulyVoltage - generalData_Load.ActrulyVoltage ) > 0.5m ) {
-											error_information = "输出通道 " + ( i + 1 ).ToString ( ) + " 的电压与备电压降过大";
+											error_information = "输出通道 " + ( i + 1 ).ToString ( ) + " 的电压与备电压降过大 " + generalData_Load_out.ActrulyVoltage.ToString() + "  " + generalData_Load.ActrulyVoltage.ToString();
 										}
 										break;
 									}
@@ -2641,8 +2651,8 @@ namespace ProductInfor
 											}
 										}
 									}
-								} while (( ++retry_count < 20 ) && (( error_information != string.Empty ) || ( restart_okey.Contains(false))));
-								if(retry_count >= 20) {
+								} while (( ++retry_count < 30 ) && (( error_information != string.Empty ) || ( restart_okey.Contains(false))));
+								if(retry_count >= 30) {
 									error_information = "在主电丢失恢复时输出通道恢复太慢";continue;
 								}
 

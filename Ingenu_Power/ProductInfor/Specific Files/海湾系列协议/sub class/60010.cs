@@ -207,7 +207,7 @@ namespace ProductInfor
 										if ( allocate_index [ allocate_index_1 ] == index ) {
 											Itech.GeneralData_Load generalData_Load_out = ( Itech.GeneralData_Load ) list [ allocate_index_1 ];
 											if ( Math.Abs ( generalData_Load_out.ActrulyVoltage - generalData_Load.ActrulyVoltage ) > 0.5m ) {
-												error_information = "输出通道 " + index.ToString ( ) + " 的电压与备电压降过大";
+												error_information = "输出通道 " + index.ToString ( ) + " 的电压与备电压降过大 " + generalData_Load_out.ActrulyVoltage.ToString() + "  " + generalData_Load.ActrulyVoltage.ToString();
 											}
 											break;
 										}
@@ -221,7 +221,7 @@ namespace ProductInfor
 							Communicate_User ( serialPort, out error_information );
 							if ( error_information != string.Empty ) { continue; }
 							if ( Math.Abs ( infor_Uart.Measured_SpValue - generalData_Load.ActrulyVoltage ) > 0.5m ) {
-								error_information = "备电电压采集误差太大"; continue;
+								error_information = "备电电压采集误差太大 " + infor_Uart.Measured_SpValue.ToString() + "  " + generalData_Load.ActrulyVoltage.ToString(); continue;
 							}
 
 							//检测备电切断点；此型号电源需要注意：需要注意二极管压降和备电电压逐渐减小的过程
@@ -375,21 +375,21 @@ namespace ProductInfor
 									switch (index_of_channel) {
 										case 0:
 											if (Math.Abs( infor_Uart.Measured_OutputVoltageValue[ 0 ] - real_voltage ) > 0.5m) {
-												error_information = "电源测试得到的输出电压1超过了合格误差范围";
+												error_information = "电源测试得到的输出电压1超过了合格误差范围 " + infor_Uart.Measured_OutputVoltageValue[ 0 ].ToString() +"  "+ real_voltage.ToString();
 											}
 											if (error_information != string.Empty) { break; }
 											if (Math.Abs( infor_Uart.Measured_OutputCurrentValue[ 0 ] - real_current ) > 0.8m) { //注意此处的电流采样偏差是电源产品设计问题，无法进行更有效的解决方式
-												error_information = "电源测试得到的输出电流1超过了合格误差范围";
+												error_information = "电源测试得到的输出电流1超过了合格误差范围 " + infor_Uart.Measured_OutputCurrentValue[ 0 ].ToString() + "  " + real_current.ToString();
 											}
 											break;
 										case 1:
 											if (Math.Abs( infor_Uart.Measured_OutputVoltageValue[ 1 ] - real_voltage ) > 0.5m) {
-												error_information = "电源测试得到的输出电压2超过了合格误差范围";
+												error_information = "电源测试得到的输出电压2超过了合格误差范围 " + infor_Uart.Measured_OutputVoltageValue[ 1 ].ToString() + "  " + real_voltage.ToString();
 											}
 											break;
 										case 2:
 											if (Math.Abs( infor_Uart.Measured_OutputCurrentValue[ 1 ] - real_current ) > 0.8m) {//注意此处的电流采样偏差是电源产品设计问题，无法进行更有效的解决方式
-												error_information = "电源测试得到的输出电流23超过了合格误差范围";
+												error_information = "电源测试得到的输出电流23超过了合格误差范围 " + infor_Uart.Measured_OutputCurrentValue[ 1 ].ToString() + "  " + real_current.ToString();
 											}
 											break;
 										default: break;

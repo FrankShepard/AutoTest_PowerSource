@@ -434,7 +434,7 @@ namespace ProductInfor
 									if ((allocate_index[ j ] == i) && (!infor_Output.Stabilivolt[ i ])) {
 										Itech.GeneralData_Load generalData_Load_out = ( Itech.GeneralData_Load )list[ j ];
 										if (Math.Abs( generalData_Load_out.ActrulyVoltage - generalData_Load.ActrulyVoltage ) > 0.5m) {
-											error_information = "输出通道 " + (i + 1).ToString() + " 的电压与备电压降过大";
+											error_information = "输出通道 " + (i + 1).ToString() + " 的电压与备电压降过大 " + generalData_Load_out.ActrulyVoltage.ToString() + "  " + generalData_Load.ToString();
 										}
 										break;
 									}
@@ -579,10 +579,10 @@ namespace ProductInfor
 									switch (index_of_channel) {
 										case 1:
 											if (Math.Abs( infor_Uart.Measured_OutputVoltageValue[ 1 ] - real_voltage ) > 0.5m) {
-												error_information = "电源测试得到的输出电压2超过了合格误差范围";
+												error_information = "电源测试得到的输出电压2超过了合格误差范围 " + infor_Uart.Measured_OutputVoltageValue[1].ToString() + "  " + real_voltage.ToString();
 											}
 											if (Math.Abs( infor_Uart.Measured_OutputCurrentValue[ 1 ] - real_current ) > 0.5m) {
-												error_information = "电源测试得到的输出电流2超过了合格误差范围";
+												error_information = "电源测试得到的输出电流2超过了合格误差范围 " + infor_Uart.Measured_OutputCurrentValue[1].ToString() + "  " + real_current.ToString();
 											}
 											break;
 										default: break;
