@@ -21,42 +21,6 @@
 								<RowDefinition Height="*"/>
 								<RowDefinition Height="7*"/>
 							</Grid.RowDefinitions>
-
-							<WrapPanel  Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center">
-								<TextBlock Text="窗体主题"  Margin="0 0 0 0" VerticalAlignment="Center" FontFamily="黑体" FontSize="16"/>
-								<TextBlock VerticalAlignment="Center" Margin="15 0 0 0" Text="亮"  FontSize="14"/>
-								<ToggleButton Margin="8 0 8 0" Click="ToggleButton_Click" Name="TogDark"/>
-								<TextBlock VerticalAlignment="Center" Text="暗"  FontSize="14"/>
-							</WrapPanel>
-							<Expander Grid.Row="1" HorizontalContentAlignment="Left" VerticalAlignment="top" ExpandDirection="Down">
-								<Expander.Header>
-									<WrapPanel Margin="-20,0,0,0">
-										<materialDesign:PackIcon Kind="Palette" Height="23" Width="23" />
-										<TextBlock Text ="主题颜色" FontSize ="16" VerticalAlignment="Center"></TextBlock>
-									</WrapPanel>
-								</Expander.Header>
-
-								<ScrollViewer Width="148">
-									<StackPanel>
-										<Button Margin="3"  Content="DeepPurple" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FF582693" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3"  Content="Yellow" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Yellow" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content ="LightBlue" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FF33BEEC" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3"  Content="Teal" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Teal" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3"  Content="Cyan" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Cyan" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content="Pink" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FFFF5B78" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content="Green" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Green" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content="Indigo" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FF10318B" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3"  Content="LightGreen" HorizontalAlignment="Left" VerticalAlignment="Center" Background="LightGreen" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content="Blue" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FF2B7FF7" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content="Lime" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FFB8E031" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content="Red" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FFEC5A2F" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content="Orange" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Orange" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content="Purple" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Purple" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content="Grey" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Gray" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-										<Button Margin="3" Content="Brown" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FF85583F" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}" Click="Button_Click"/>
-									</StackPanel>
-								</ScrollViewer>
-							</Expander>
 						</Grid>
 					</GroupBox>
 					<GroupBox Grid.Row="0" Grid.Column="1" Header="高级设置" Style="{DynamicResource MaterialDesignGroupBox}" Margin="10" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0" Visibility="Hidden">

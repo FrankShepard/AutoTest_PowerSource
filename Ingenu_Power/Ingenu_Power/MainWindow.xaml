@@ -64,6 +64,30 @@
 				</StackPanel>
 			</materialDesign:DrawerHost.LeftDrawerContent>
 
+			<materialDesign:DrawerHost.RightDrawerContent>
+				<ScrollViewer>
+					<StackPanel Name="StpPalette">
+						<TextBlock Margin="10" HorizontalAlignment="Left">Palette设置</TextBlock>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="DeepPurple" VerticalAlignment="Center" Background="#FF582693" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Yellow" VerticalAlignment="Center" Background="Yellow" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="LightBlue" VerticalAlignment="Center" Background="#FF33BEEC" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Teal" VerticalAlignment="Center" Background="Teal" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Cyan" VerticalAlignment="Center" Background="Cyan" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Pink" VerticalAlignment="Center" Background="#FFFF5B78" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Green" VerticalAlignment="Center" Background="Green" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Indigo" VerticalAlignment="Center" Background="#FF10318B" Click="Button_Click"  Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="LightGreen" VerticalAlignment="Center" Background="LightGreen" Click="Button_Click"  Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Blue" VerticalAlignment="Center" Background="#FF2B7FF7" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Lime" VerticalAlignment="Center" Background="#FFB8E031" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Red" VerticalAlignment="Center" Background="#FFEC5A2F" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Orange" VerticalAlignment="Center" Background="Orange" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Purple" VerticalAlignment="Center" Background="Purple" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Grey" VerticalAlignment="Center" Background="Gray" Click="Button_Click" Width="150"/>
+						<Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"  Margin="5" CommandParameter="{x:Static Dock.Right}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignFlatButton}" Content="Brown" VerticalAlignment="Center" Background="#FF85583F" Click="Button_Click" Width="150"/>
+					</StackPanel>
+				</ScrollViewer>
+			</materialDesign:DrawerHost.RightDrawerContent>
+
 			<Grid >
 				<Grid.RowDefinitions>
 					<RowDefinition Height="25"/>
@@ -86,12 +110,20 @@
 							</WrapPanel>
 							<TextBlock Text="盈帜电源自动测试系统" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFB0A5A5" FontFamily="YouYuan" FontStyle="Italic" FontSize="16" FontWeight="Normal" />
 							<WrapPanel HorizontalAlignment="Right">
-								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMessage" Click="BtnMessage_Click" ToolTip="最近一次出现的错误信息">
+								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnPaletteSetting" Click="BtnPaletteSetting_Click" Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Right}" >
 									<ToggleButton.Content>
-										<materialDesign:PackIcon Kind="MessageTextOutline" Margin="0" />
+										<materialDesign:PackIcon Kind="Palette" Margin="0" />
 									</ToggleButton.Content>
 									<materialDesign:ToggleButtonAssist.OnContent>
-										<materialDesign:PackIcon Kind="MessageTextOutline" Margin =" 0"/>
+										<materialDesign:PackIcon Kind="Palette" Margin =" 0"/>
+									</materialDesign:ToggleButtonAssist.OnContent>
+								</ToggleButton>
+								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnDarkOrLight" Click="BtnDarkOrLight_Click" ToolTip="系统主题选择" IsChecked="False">
+									<ToggleButton.Content>
+										<materialDesign:PackIcon Kind="WeatherNight" Margin="0" />
+									</ToggleButton.Content>
+									<materialDesign:ToggleButtonAssist.OnContent>
+										<materialDesign:PackIcon Kind="WeatherSunny" Margin =" 0"/>
 									</materialDesign:ToggleButtonAssist.OnContent>
 								</ToggleButton>
 								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnInfor" Click="BtnInfor_Click">
@@ -102,6 +134,14 @@
 										<materialDesign:PackIcon Kind="InformationVariant" Margin =" 0"/>
 									</materialDesign:ToggleButtonAssist.OnContent>
 								</ToggleButton>
+								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMessage" Click="BtnMessage_Click" ToolTip="最近一次出现的错误信息">
+									<ToggleButton.Content>
+										<materialDesign:PackIcon Kind="MessageTextOutline" Margin="0" />
+									</ToggleButton.Content>
+									<materialDesign:ToggleButtonAssist.OnContent>
+										<materialDesign:PackIcon Kind="MessageTextOutline" Margin =" 0"/>
+									</materialDesign:ToggleButtonAssist.OnContent>
+								</ToggleButton>	
 							</WrapPanel>
 						</Grid>
 					</materialDesign:ColorZone>

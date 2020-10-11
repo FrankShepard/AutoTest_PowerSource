@@ -1,10 +1,14 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Ingenu_Power.Domain;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Office.Interop.Excel;
@@ -84,9 +88,11 @@ namespace Ingenu_Power
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
 			//主题的选择
-			UserControls.ucAdvancedSettings ucAdvancedSettings = new UserControls.ucAdvancedSettings( );
-			ucAdvancedSettings.ChooseLightOrDark( Properties.Settings.Default.明暗主题_dark );
-			ucAdvancedSettings.ChoosePalette( Properties.Settings.Default.Palette );
+			if ( Properties.Settings.Default.明暗主题_dark ) {
+				BtnDarkOrLight.IsChecked = true;
+			}
+			ChooseLightOrDark( Properties.Settings.Default.明暗主题_dark );
+			ChoosePalette( Properties.Settings.Default.Palette );
 
 			//默认界面是用户登录界面
 			UserControls.UcLogin ucLogin = new UserControls.UcLogin {
@@ -116,6 +122,20 @@ namespace Ingenu_Power
 			Properties.Settings.Default.Save();
 			//停止钩子监听键盘值
 			listener.Stop();
+		}
+
+		/// <summary>
+		/// 系统主题的设置
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnDarkOrLight_Click( object sender , RoutedEventArgs e )
+		{
+			bool isDark = false;
+			if ( ( bool ) BtnDarkOrLight.IsChecked ) {
+				isDark = true;
+			}
+			ChooseLightOrDark( isDark );
 		}
 
 		/// <summary>
@@ -508,6 +528,34 @@ namespace Ingenu_Power
 
 		#endregion
 
+		#region -- 其它功能函数
+
+		/// <summary>
+		/// 具体选择明暗主题
+		/// </summary>
+		/// <param name="is_dark"></param>
+		public void ChooseLightOrDark( bool is_dark )
+		{
+			//资源字典中是否存在主题的判断；若是之前存在主题，则需要将其替换   资源字典在 App.xaml中声名
+			var existingResourceDictionary = System.Windows.Application.Current.Resources.MergedDictionaries
+				.Where( rd => rd.Source != null )
+				.SingleOrDefault( rd => Regex.Match( rd.Source.OriginalString , @"(\/MaterialDesignThemes.Wpf;component\/Themes\/MaterialDesignTheme\.)((Light)|(Dark))" ).Success );
+			if ( existingResourceDictionary == null )
+				throw new ApplicationException( "Unable to find Light/Dark base theme in Application resources." );
+
+			var source =
+				$"pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.{( is_dark ? "Dark" : "Light" )}.xaml";
+			var newResourceDictionary = new ResourceDictionary( ) { Source = new Uri( source ) };
+
+			System.Windows.Application.Current.Resources.MergedDictionaries.Remove( existingResourceDictionary );
+			System.Windows.Application.Current.Resources.MergedDictionaries.Add( newResourceDictionary );
+
+			Properties.Settings.Default.明暗主题_dark = is_dark;
+			Properties.Settings.Default.Save( );
+		}
+
+		#endregion
+
 		#region -- 内存回收 
 
 		/// <summary>
@@ -552,6 +600,90 @@ namespace Ingenu_Power
 
 
 		#endregion
+
+		/// <summary>
+		/// 动态设置所需palette的字体颜色与背景色保持互补
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void BtnPaletteSetting_Click( object sender , RoutedEventArgs e )
+		{
+			foreach ( object obj in StpPalette.Children ) {
+				if ( obj is System.Windows.Controls.Button ) {
+					System.Windows.Controls.Button button = obj as System.Windows.Controls.Button;
+					string back_value = button.Background.ToString( ); //获取背景色的 对应文本
+					/*以下 获取字体色的 对应文本*/
+					string fore_value = ForegroundBrushValue( back_value );
+					BrushConverter brushConverter = new BrushConverter( );
+					Brush brush = ( Brush ) brushConverter.ConvertFromString( fore_value );
+					button.Foreground = brush;
+				}
+			}
+		}
+
+		/// <summary>
+		/// 计算颜色互斥的值的文本形式
+		/// </summary>
+		/// <param name="background">颜色的表达</param>
+		/// <returns>互斥颜色的表达</returns>
+		private string ForegroundBrushValue(string background)
+		{
+			string foreground = "#";
+			string useful_background = background.Remove( 0 , 3 ); //结构中前三个表示 标志和透明度，默认为 "#FF"
+
+			int index = useful_background.Length - 1;
+			UInt32 back_value_int = 0;
+			do {
+				int value = 0;
+				char temp = useful_background.Substring( index , 1 ).ToUpper()[0];
+				if((temp >= 'A') && (temp <= 'F' ) ) {
+					value = 10 + temp - 'A';
+				} else {
+					value = temp - '0';
+				}
+				back_value_int += Convert.ToUInt32( value * Math.Pow( 16 , ( useful_background.Length - 1 - index ) ));
+			} while ( --index >= 0);
+			string temp_string = ( UInt32.MaxValue - back_value_int ).ToString( "x" ).ToUpper();
+			
+			foreground += temp_string;
+			return foreground;
+		}
+
+		/// <summary>
+		/// 获取具体的主题颜色
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Button_Click( object sender , RoutedEventArgs e )
+		{
+			System.Windows.Controls.Button button = sender as System.Windows.Controls.Button;
+			string new_color = button.Content.ToString( );
+			ChoosePalette( new_color );
+		}
+
+		/// <summary>
+		/// 具体调整主题颜色的代码
+		/// </summary>
+		/// <param name="new_color"></param>
+		public void ChoosePalette( string new_color )
+		{
+			//资源字典中是否存在主题的判断；若是之前存在主题，则需要将其替换   资源字典在 App.xaml中声名
+			var existingResourceDictionary = System.Windows.Application.Current.Resources.MergedDictionaries
+				.Where( rd => rd.Source != null )
+				.SingleOrDefault( rd => Regex.Match( rd.Source.OriginalString , @"(\/MaterialDesignColors;component\/Themes\/Recommended\/Primary\/MaterialDesignColor\.)((DeepPurple)|(Yellow)|(LightBlue)|(Teal)|(Cyan)|(Pink)|(Green)|(Indigo)|(LightGreen)|(Blue)|(Lime)|(Red)|(Orange)|(Purple)|(Grey)|(Brown))" ).Success );
+			if ( existingResourceDictionary == null )
+				throw new ApplicationException( "Unable to find Light/Dark base theme in Application resources." );
+
+			var source =
+				$"pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor." + new_color + ".xaml";
+			var newResourceDictionary = new ResourceDictionary( ) { Source = new Uri( source ) };
+
+			System.Windows.Application.Current.Resources.MergedDictionaries.Remove( existingResourceDictionary );
+			System.Windows.Application.Current.Resources.MergedDictionaries.Add( newResourceDictionary );
+
+			Properties.Settings.Default.Palette = new_color;
+			Properties.Settings.Default.Save( );
+		}
 
 	}
 }
