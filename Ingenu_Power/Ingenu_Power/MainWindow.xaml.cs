@@ -430,9 +430,15 @@ namespace Ingenu_Power
 									if (( bool )saveFileDialog.ShowDialog() == true) {
 										string filePath = saveFileDialog.FileName;
 										FileStream fs = new FileStream( saveFileDialog.FileName, FileMode.Create, FileAccess.Write );
-										byte[] file_data = ObjectToBytes( dataTable.Rows[ 0 ][ "ProductInfor文件" ] );
-										fs.Write( file_data, 0, file_data.Length );
-										fs.Close();
+										for(int row_index = 0;row_index < dataTable.Rows.Count; row_index++) {
+											if(Equals( dataTable.Rows[ row_index ][ "ProductInfor文件" ], DBNull.Value )) {
+												continue;
+											}
+											byte[] file_data = ObjectToBytes( dataTable.Rows[ row_index ][ "ProductInfor文件" ] );
+											fs.Write( file_data, 0, file_data.Length );
+											fs.Close();
+											break;
+										}										
 										//图标变化
 										Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
 										Properties.Settings.Default.Dll文件保存路径 = filePath;
