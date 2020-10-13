@@ -44,5 +44,17 @@
     <Setting Name="Palette" Type="System.String" Scope="User">
       <Value Profile="(Default)">DeepPurple</Value>
     </Setting>
+    <Setting Name="程序运行日期" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="产品测试总数" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="产品合格总数" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="产品异常总数" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

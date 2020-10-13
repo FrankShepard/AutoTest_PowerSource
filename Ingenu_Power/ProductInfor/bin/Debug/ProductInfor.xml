@@ -2875,6 +2875,15 @@
             <param name="port_name">使用到的串口名</param>
             <returns>可能存在的故障信息</returns>
         </member>
+        <member name="M:ProductInfor._73010.Measure_vCheckSingleMpStartupAbility(System.Boolean,System.Int32,System.String)">
+            <summary>
+            测试主电单投功能
+            </summary>
+            <param name="whole_function_enable">全项测试使能状态</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
         <member name="M:ProductInfor._73010.Measure_vVoltageWithLoad(System.Boolean,System.Int32,System.String)">
             <summary>
             满载电压测试 - 检查主电情况下输出电压和电流的采集误差
@@ -2917,15 +2926,6 @@
             <summary>
             继承自_64910的 面板式IG-M1302F 电源的相关信息
             </summary>
-        </member>
-        <member name="M:ProductInfor._67210.Measure_vCheckSingleMpStartupAbility(System.Boolean,System.Int32,System.String)">
-            <summary>
-            测试主电单投功能
-            </summary>
-            <param name="whole_function_enable">全项测试使能状态</param>
-            <param name="delay_magnification">测试过程中的延迟时间等级</param>
-            <param name="port_name">使用到的串口名</param>
-            <returns>包含多个信息的动态数组</returns>
         </member>
         <member name="M:ProductInfor._67210.Measure_vCheckSourceChangeMpRestart(System.Boolean,System.Int32,System.String)">
             <summary>

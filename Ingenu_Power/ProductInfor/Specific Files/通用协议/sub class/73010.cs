@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Data;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Instrument_Control;
@@ -108,6 +109,32 @@ namespace ProductInfor
 								source_voltage -= 0.5m;
 							}
 
+							//后门确认蜂鸣器响
+							using (MCU_Control mCU_Control = new MCU_Control()) {
+								Communicate_Admin( serialPort, out error_information );
+								mCU_Control.McuBackdoor_vStartBeepFunction( true, serialPort, out error_information );
+								if (error_information != string.Empty) { continue; }
+								Thread.Sleep( 500 );
+							}
+
+							//检查待测管脚的电平及状态
+							if (infor_SG.SG_NeedADCMeasuredPins > 0) {
+								int retry_count = 0;
+								do {
+									ushort[] level_status = measureDetails.Measure_vCommSGLevelGet( serialPort, out error_information );
+									if (( level_status[ 1 ] & infor_SG.SG_NeedADCMeasuredPins ) == infor_SG.SG_NeedADCMeasuredPins) {
+										//具体检查逻辑是否匹配 - 此电源要求  备电时 2脚为高，1脚为低
+										if (( level_status[ 0 ] & infor_SG.SG_NeedADCMeasuredPins ) != 0x0002) {
+											error_information = "SG的2脚电平不匹配（主电故障未能正常上报 - 主电故障为1脚、低电平有效），请注意此异常";
+										}
+									} else {
+										error_information = "待测SG端子不满足电平的合格范围要求  " + level_status[ 1 ].ToString( "x" ) + "  合格为:  " + infor_SG.SG_NeedADCMeasuredPins.ToString( "x" );
+									}
+									Thread.Sleep( 300 );
+								} while (( ++retry_count < 10 ) && ( error_information != string.Empty ));
+								if (retry_count >= 10) { continue; }
+							}
+
 							Itech.GeneralData_DCPower generalData_DCPower = new Itech.GeneralData_DCPower();
 
 							if (whole_function_enable == false) { //上下限检测即可
@@ -141,31 +168,10 @@ namespace ProductInfor
 									}
 								}
 							}
-
-							//检查待测管脚的电平及状态
-							if (infor_SG.SG_NeedADCMeasuredPins > 0) {
-								ushort[] level_status = measureDetails.Measure_vCommSGLevelGet( serialPort, out error_information );
-								if (( level_status[ 1 ] & infor_SG.SG_NeedADCMeasuredPins ) == infor_SG.SG_NeedADCMeasuredPins) {
-									//具体检查逻辑是否匹配 - 此电源要求  备电时 2脚为高，1脚为低
-									if (( ( level_status[ 0 ] & infor_SG.SG_NeedADCMeasuredPins ) & 0x0003 ) == 0x0002) {
-										error_information = "SG的2脚电平不匹配（主电故障未能正常上报 - 主电故障为1脚、低电平有效），请注意此异常";
-									}
-								} else {
-									error_information = "待测SG端子不满足电平的合格范围要求  " + level_status[ 1 ].ToString( "x" ) + "  合格为:  " + infor_SG.SG_NeedADCMeasuredPins.ToString( "x" );
-								}
-								if (error_information != string.Empty) { continue; }
-							}
+							
 							//防止自杀时总线抢占，关电之前解除抢占数据
 							measureDetails.Measure_vCommSGUartParamterSet( MCU_Control.Comm_Type.Comm_None, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
-							if (error_information != string.Empty) { continue; }
-
-							//等待测试人员确认蜂鸣器响
-							using (MCU_Control mCU_Control = new MCU_Control()) {
-								Communicate_Admin( serialPort, out error_information );
-								mCU_Control.McuBackdoor_vStartBeepFunction( true, serialPort, out error_information );
-								if (error_information != string.Empty) { continue; }
-								Thread.Sleep( 500 );
-							}
+							if (error_information != string.Empty) { continue; }							
 
 							//将备电电压设置到19V以下，验证备电自杀功能
 							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, ( 18.4m + VoltageDrop ), true, true, serialPort, out error_information );
@@ -186,6 +192,94 @@ namespace ProductInfor
 					arrayList.Add( specific_value );
 					arrayList.Add( need_test_UnderVoltage );
 					arrayList.Add( undervoltage_value );
+				}
+			}
+			return arrayList;
+		}
+
+		/// <summary>
+		/// 测试主电单投功能
+		/// </summary>
+		/// <param name="whole_function_enable">全项测试使能状态</param>
+		/// <param name="delay_magnification">测试过程中的延迟时间等级</param>
+		/// <param name="port_name">使用到的串口名</param>
+		/// <returns>包含多个信息的动态数组</returns>
+		public override ArrayList Measure_vCheckSingleMpStartupAbility(bool whole_function_enable, int delay_magnification, string port_name)
+		{
+			ArrayList arrayList = new ArrayList();//元素0 - 可能存在的错误信息 ； 元素1 - 主电单投启动功能正常与否
+			string error_information = string.Empty;
+			bool check_okey = false;
+
+			for (int temp_index = 0; temp_index < 2; temp_index++) {
+				if (temp_index == 0) {
+					using (MeasureDetails measureDetails = new MeasureDetails()) {
+						using (SerialPort serialPort = new SerialPort( port_name, default_baudrate, Parity.None, 8, StopBits.One )) {
+							//主电启动前先将输出带载
+							int[] allocate_channel = Base_vAllcateChannel_MpStartup( measureDetails, serialPort, out error_information );
+							if (error_information != string.Empty) { continue; }
+
+							//开启主电进行带载
+							measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, infor_Mp.MpVoltage[ 1 ], infor_Mp.MpFrequncy[ 1 ] );
+							if (error_information != string.Empty) { continue; }
+
+							//等待一段时间后查看待测电源是否成功启动；此处需要注意：个别产品电源在启动的一瞬间会造成通讯的异常，隔离也无法解决，只能依靠软件放宽的方式处理
+							int wait_index = 0;
+							bool[] check_okey_temp = new bool[ infor_Output.OutputChannelCount ];
+							while (( ++wait_index < 40 ) && ( error_information == string.Empty )) {
+								Thread.Sleep( 30 * delay_magnification );
+								ArrayList array_list = measureDetails.Measure_vReadOutputLoadResult( serialPort, out error_information );
+								Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
+								for (int j = 0; j < infor_Output.OutputChannelCount; j++) {
+									for (int i = 0; i < MeasureDetails.Address_Load_Output.Length; i++) {
+										if (allocate_channel[ i ] == j) {
+											generalData_Load = ( Itech.GeneralData_Load ) array_list[ i ];
+											if (generalData_Load.ActrulyVoltage > 0.95m * infor_Output.Qualified_OutputVoltageWithLoad[ j, 0 ]) {
+												check_okey_temp[ j ] = true;
+											}
+											break;
+										}
+									}
+								}
+								if (!check_okey_temp.Contains( false )) { check_okey = true; break; } //所有通道的重启都验证完成
+							}
+							if (wait_index >= 40) {
+								error_information = "待测产品在规定的时间内未能正常建立输出";continue;
+							}
+
+							measureDetails.Measure_vCommSGUartParamterSet( infor_SG.Comm_Type, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
+							if (error_information != string.Empty) { continue; }
+
+							//检查通讯，保证能识别到备电故障
+							int retry_count = 0;
+							do {
+								Thread.Sleep( 50 );
+								Communicate_User( serialPort, out error_information );
+							} while (( error_information != string.Empty ) && ( ++retry_count < 5 ));
+							if (retry_count >= 5) { continue; }
+
+							//检查待测管脚的电平及状态
+							if (infor_SG.SG_NeedADCMeasuredPins > 0) {
+								retry_count = 0;
+								do {
+									ushort[] level_status = measureDetails.Measure_vCommSGLevelGet( serialPort, out error_information );
+									if (( level_status[ 1 ] & infor_SG.SG_NeedADCMeasuredPins ) == infor_SG.SG_NeedADCMeasuredPins) {
+										//具体检查逻辑是否匹配 - 此电源要求  主电时 2脚为低，1脚为高
+										if (( level_status[ 0 ] & infor_SG.SG_NeedADCMeasuredPins ) != 0x0001) {
+											error_information = "SG的1脚电平不匹配（备电故障未能正常上报 - 备电故障为2脚、低电平有效），请注意此异常";
+										}
+									} else {
+										error_information = "待测SG端子不满足电平的合格范围要求  " + level_status[ 1 ].ToString( "x" ) + "  合格为:  " + infor_SG.SG_NeedADCMeasuredPins.ToString( "x" );
+									}
+									Thread.Sleep(300);
+								} while (( ++retry_count < 10 ) && ( error_information != string.Empty ));
+								if (retry_count >= 10) { continue; }
+							}
+
+						}
+					}
+				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充
+					arrayList.Add( error_information );
+					arrayList.Add( check_okey );
 				}
 			}
 			return arrayList;
@@ -280,21 +374,6 @@ namespace ProductInfor
 								mCU_Control.McuBackdoor_vFanDutySet( true, serialPort, out error_information );
 								if(error_information != string.Empty) { continue; }
 							}
-
-							//检查待测管脚的电平及状态
-							if (infor_SG.SG_NeedADCMeasuredPins > 0) {
-								ushort[] level_status = measureDetails.Measure_vCommSGLevelGet( serialPort, out error_information );
-								if (( level_status[ 1 ] & infor_SG.SG_NeedADCMeasuredPins ) == infor_SG.SG_NeedADCMeasuredPins) {
-									//具体检查逻辑是否匹配 - 此电源要求  主电时 2脚为低，1脚为高
-									if (( ( level_status[ 0 ] & infor_SG.SG_NeedADCMeasuredPins ) & 0x0003 ) == 0x0001) {
-										error_information = "SG的1脚电平不匹配（备电故障未能正常上报 - 备电故障为2脚、低电平有效），请注意此异常";
-									}
-								} else {
-									error_information = "待测SG端子不满足电平的合格范围要求  " + level_status[ 1 ].ToString( "x" ) + "  合格为:  " + infor_SG.SG_NeedADCMeasuredPins.ToString( "x" );
-								}
-								if (error_information != string.Empty) { continue; }
-							}
-
 						}
 					}					
 				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充

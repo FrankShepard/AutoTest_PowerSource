@@ -98,7 +98,7 @@
 					<materialDesign:ColorZone Padding="0" materialDesign:ShadowAssist.ShadowDepth="Depth2" Mode="PrimaryMid" DockPanel.Dock="Top">
 						<Grid Height="24">
 							<WrapPanel HorizontalAlignment="Left">
-								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMenuShow" Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" Click="BtnMenuShow_Click" >
+								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMenuShow" Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Left}" Click="BtnMenuShow_Click"  PreviewKeyDown="BtnMenuShow_PreviewKeyDown">
 									<ToggleButton.Content>
 										<materialDesign:PackIcon Kind="Settings" Margin="0" />
 									</ToggleButton.Content>
@@ -106,11 +106,11 @@
 										<materialDesign:PackIcon Kind="Settings" Margin =" 0"/>
 									</materialDesign:ToggleButtonAssist.OnContent>
 								</ToggleButton>
-								<materialDesign:PackIcon Name="PkiSyncDll" Kind="CloudSync" Height="20" Width="20" Margin="2" MouseDoubleClick="PkiSyncDll_MouseDoubleClick"/>
+								<materialDesign:PackIcon Name="PkiSyncDll" Kind="CloudSync" Height="20" Width="20" Margin="2" MouseDoubleClick="PkiSyncDll_MouseDoubleClick" />
 							</WrapPanel>
 							<TextBlock Text="盈帜电源自动测试系统" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFB0A5A5" FontFamily="YouYuan" FontStyle="Italic" FontSize="16" FontWeight="Normal" />
 							<WrapPanel HorizontalAlignment="Right">
-								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnPaletteSetting" Click="BtnPaletteSetting_Click" Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Right}" >
+								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnPaletteSetting" Click="BtnPaletteSetting_Click" Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Right}" PreviewKeyDown="BtnMenuShow_PreviewKeyDown">
 									<ToggleButton.Content>
 										<materialDesign:PackIcon Kind="Palette" Margin="0" />
 									</ToggleButton.Content>
@@ -118,7 +118,7 @@
 										<materialDesign:PackIcon Kind="Palette" Margin =" 0"/>
 									</materialDesign:ToggleButtonAssist.OnContent>
 								</ToggleButton>
-								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnDarkOrLight" Click="BtnDarkOrLight_Click" ToolTip="系统主题选择" IsChecked="False">
+								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnDarkOrLight" Click="BtnDarkOrLight_Click" ToolTip="系统主题选择" IsChecked="False" PreviewKeyDown="BtnMenuShow_PreviewKeyDown">
 									<ToggleButton.Content>
 										<materialDesign:PackIcon Kind="WeatherNight" Margin="0" />
 									</ToggleButton.Content>
@@ -126,7 +126,7 @@
 										<materialDesign:PackIcon Kind="WeatherSunny" Margin =" 0"/>
 									</materialDesign:ToggleButtonAssist.OnContent>
 								</ToggleButton>
-								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnInfor" Click="BtnInfor_Click">
+								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnInfor" Click="BtnInfor_Click" PreviewKeyDown="BtnMenuShow_PreviewKeyDown">
 									<ToggleButton.Content>
 										<materialDesign:PackIcon Kind="InformationVariant" Margin="0" />
 									</ToggleButton.Content>
@@ -134,7 +134,7 @@
 										<materialDesign:PackIcon Kind="InformationVariant" Margin =" 0"/>
 									</materialDesign:ToggleButtonAssist.OnContent>
 								</ToggleButton>
-								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMessage" Click="BtnMessage_Click" ToolTip="最近一次出现的错误信息">
+								<ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" HorizontalAlignment="Right" Height="24" Margin="0" Width="24" Name="BtnMessage" Click="BtnMessage_Click" ToolTip="最近一次出现的错误信息" PreviewKeyDown="BtnMenuShow_PreviewKeyDown">
 									<ToggleButton.Content>
 										<materialDesign:PackIcon Kind="MessageTextOutline" Margin="0" />
 									</ToggleButton.Content>

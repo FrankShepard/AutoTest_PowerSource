@@ -23,6 +23,11 @@ namespace Ingenu_Power.UserControls
 			prgStep.Maximum = MAX_STEP_COUNT;
 			BasicRatingBar.Value = Properties.Settings.Default.MeasureDelayMagnification;
 
+			//填充当天的测试数量信息
+			TxtWholeProductCount.Text = StaticInfor.Measured_WholeProductCount.ToString();
+			TxtCorrectProductCount.Text = StaticInfor.Measured_CorrectProductCount.ToString();
+			TxtUncorrectProductCount.Text = StaticInfor.Measured_UncorrectProductCount.ToString();
+
 			//开启定时器，用于实时刷新进度条、测试环节、测试项、测试值
 			timer = new System.Timers.Timer( 300 );   //实例化Timer类，设置间隔时间单位毫秒
 			timer.Elapsed += new System.Timers.ElapsedEventHandler( UpdateWork ); //到达时间的时候执行事件；     
@@ -136,6 +141,9 @@ namespace Ingenu_Power.UserControls
 		{
 			this.Dispatcher.Invoke( new dlg_TextSet( TextSet ) );
 			this.Dispatcher.Invoke( new dlg_TextSet( TextIDRefresh ) );
+			this.Dispatcher.Invoke( new dlg_MeasuredCountShow(MeasuredCountShow), TxtWholeProductCount, StaticInfor.Measured_WholeProductCount );
+			this.Dispatcher.Invoke( new dlg_MeasuredCountShow(MeasuredCountShow), TxtCorrectProductCount, StaticInfor.Measured_CorrectProductCount );
+			this.Dispatcher.Invoke( new dlg_MeasuredCountShow(MeasuredCountShow), TxtUncorrectProductCount, StaticInfor.Measured_UncorrectProductCount );
 		}
 
 		#endregion
@@ -145,6 +153,7 @@ namespace Ingenu_Power.UserControls
 		private delegate void dlg_LedValueSet(SolidColorBrush solidColorBrush);
 		private delegate void dlg_TextSet( );
 		private delegate void dlg_PrograssBarSet(ProgressBar progressBar, int value, bool changing_view);
+		private delegate void dlg_MeasuredCountShow(TextBlock textBlock, int count);
 
 		/// <summary>
 		/// 对进度条进行相关参数的设置
@@ -192,6 +201,8 @@ namespace Ingenu_Power.UserControls
 		private void TextIDRefresh()
 		{
 			if (StaticInfor.ScannerCodeRefreshed) {
+				//将焦点重新放在BtnMeasure上
+				BtnMeasure.Focus();
 				TxtID.Text = StaticInfor.ScanerCodes;
 				StaticInfor.ScannerCodeRefreshed = false;
 				//触发开始测试的事件
@@ -199,6 +210,16 @@ namespace Ingenu_Power.UserControls
 				RoutedEventArgs a = new RoutedEventArgs();
 				BtnMeasure_Click( s, a );
 			}
+		}
+
+		/// <summary>
+		/// 测试数量的显示
+		/// </summary>
+		/// <param name="textBlock">指定TextBlock控件</param>
+		/// <param name="count">对应的数据</param>
+		private void MeasuredCountShow(TextBlock textBlock, int count)
+		{
+			textBlock.Text = count.ToString();
 		}
 
 		#endregion
@@ -894,12 +915,19 @@ namespace Ingenu_Power.UserControls
 							player.SoundLocation = source_filePath;
 							player.Load();
 							player.Play();
+							StaticInfor.Measured_UncorrectProductCount++;
+							Properties.Settings.Default.产品异常总数 = StaticInfor.Measured_UncorrectProductCount;
 						} else {
 							string source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\测试合格.wav";
 							player.SoundLocation = source_filePath;
 							player.Load();
 							player.Play();
+							StaticInfor.Measured_CorrectProductCount++;
+							Properties.Settings.Default.产品合格总数 = StaticInfor.Measured_CorrectProductCount;
 						}
+						StaticInfor.Measured_WholeProductCount++;
+						Properties.Settings.Default.产品测试总数 = StaticInfor.Measured_WholeProductCount;
+						Properties.Settings.Default.Save();
 
 						//仪表状态重置，防止更换产品时带电
 						mi = id_verion.GetMethod ( "Measure_vInstrumentOff" );
@@ -973,5 +1001,6 @@ namespace Ingenu_Power.UserControls
 		}
 
 		#endregion
+
 	}
 }

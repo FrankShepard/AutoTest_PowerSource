@@ -689,7 +689,7 @@ namespace Instrument_Control
 				if ( error_information != string.Empty ) { return error_information; }
 				Int32 waittime = 0;
 				while ( sp_dcpower.BytesToRead == 0 ) {
-					if ( ++waittime > 50 ) {
+					if ( ++waittime > 100 ) {
 						//直流电源响应超时
 						error_information = Information_DCPowerTimeOver;
 						return error_information;
@@ -762,7 +762,7 @@ namespace Instrument_Control
 				Int32 waittime = 0;
 				while ( sp_dcpower.BytesToRead == 0 ) {
 					Thread.Sleep( 5 );
-					if ( ++waittime > 50 ) {
+					if ( ++waittime > 100 ) {
 						//直流电源响应超时
 						error_information = Information_DCPowerTimeOver;
 						return error_information;
@@ -825,7 +825,7 @@ namespace Instrument_Control
 				Int32 waittime = 0;
 				while (sp_dcpower.BytesToRead == 0) {
 					Thread.Sleep( 5 );
-					if (++waittime > 150) {
+					if (++waittime > 100) {
 						//直流电源响应超时
 						error_information = Information_DCPowerTimeOver;
 						return error_information;
@@ -917,7 +917,7 @@ namespace Instrument_Control
 				Int32 waittime = 0;
 				while ( sp_dcpower.BytesToRead == 0 ) {
 					Thread.Sleep( 5 );
-					if ( ++waittime > 50 ) {
+					if ( ++waittime > 100 ) {
 						//直流电源响应超时
 						error_information = Information_DCPowerTimeOver;
 						return error_information;

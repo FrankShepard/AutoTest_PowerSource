@@ -53,15 +53,15 @@
 
 										<Grid Grid.Column="0" HorizontalAlignment="Center">
 											<Label Grid.Column="0" Content="    程序烧录" Margin="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" />
-											<CheckBox Grid.Column="0" Content ="              "  Margin="0" x:Name="chkISP" Style="{StaticResource MaterialDesignCheckBox}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+											<CheckBox Grid.Column="0" Content ="              "  Margin="0" x:Name="chkISP" Style="{StaticResource MaterialDesignCheckBox}" HorizontalAlignment="Left" VerticalAlignment="Center" IsTabStop="False"/>
 										</Grid>
 										<Grid Grid.Column="1" HorizontalAlignment="Center">
 											<Label Grid.Column="0" Content="    产品校准" Margin="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" />
-											<CheckBox Grid.Column="0" Content ="              "  Margin="0" x:Name="chkCalibrate" Style="{StaticResource MaterialDesignCheckBox}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+											<CheckBox Grid.Column="0" Content ="              "  Margin="0" x:Name="chkCalibrate" Style="{StaticResource MaterialDesignCheckBox}" HorizontalAlignment="Left" VerticalAlignment="Center" IsTabStop="False"/>
 										</Grid>
 										<Grid Grid.Column="2" HorizontalAlignment="Center">
 											<Label Grid.Column="0" Content="    全项测试" Margin="0" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Left" />
-											<CheckBox Grid.Column="0" Content ="              "  Margin="0" x:Name="chkWholeFunctionTest" Style="{StaticResource MaterialDesignCheckBox}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+											<CheckBox Grid.Column="0" Content ="              "  Margin="0" x:Name="chkWholeFunctionTest" Style="{StaticResource MaterialDesignCheckBox}" HorizontalAlignment="Left" VerticalAlignment="Center" IsTabStop="False"/>
 										</Grid>
 									</Grid>
 								</GroupBox>
@@ -80,22 +80,41 @@
 						</Grid>
 						<Grid Grid.Column="1">
 							<StackPanel Margin="10,30,10,10">
-								<WrapPanel>
-									<CheckBox Name="ChkMeasureIgnoreFault" Content="异常继续测试" />
-									<materialDesign:RatingBar Max="8" Value="1" x:Name="BasicRatingBar" ToolTip="测试过程中的延时时长等级" Margin="10" HorizontalAlignment="Right"/>
+								<Grid >
+									<Grid.RowDefinitions>
+										<RowDefinition Height="*"/>
+										<RowDefinition Height="*"/>
+									</Grid.RowDefinitions>
+
+									<CheckBox Name="ChkMeasureIgnoreFault" Content="异常继续测试" IsTabStop="False" VerticalAlignment="Center" Grid.Row="0" Margin="0,5"/>
+									<WrapPanel Grid.Row="1">
+										<materialDesign:PackIcon Kind="InformationOutline" />
+										<TextBlock Text ="测试总数 " FontSize="11" VerticalAlignment="Center"/>
+										<TextBlock Text ="" Width="35" HorizontalAlignment="Center" TextAlignment="Center" Name="TxtWholeProductCount" FontSize="11" VerticalAlignment="Center"/>
+										<materialDesign:PackIcon Kind="CheckCircleOutline" />
+										<TextBlock Text="合格数量	" FontSize="11" VerticalAlignment="Center"/>
+										<TextBlock Text ="" Width="35" HorizontalAlignment="Center" TextAlignment="Center" Name="TxtCorrectProductCount" FontSize="11" VerticalAlignment="Center"/>
+										<materialDesign:PackIcon Kind="CloseCircleOutline" />
+										<TextBlock Text="异常数量	" FontSize="11" VerticalAlignment="Center"/>
+										<TextBlock Text ="" Width="35" HorizontalAlignment="Center" TextAlignment="Center" Name="TxtUncorrectProductCount" FontSize="11" VerticalAlignment="Center"/>
+									</WrapPanel>
+								</Grid>
+								<WrapPanel Visibility="Collapsed">
+									<materialDesign:RatingBar Max="8" Value="1" x:Name="BasicRatingBar" ToolTip="测试过程中的延时时长等级" Margin="10" HorizontalAlignment="Right" IsTabStop="False"/>
 								</WrapPanel>
+								<Separator Style="{StaticResource MaterialDesignDarkSeparator}" Margin="8 0" Height="16" />
 								<WrapPanel>
 									<materialDesign:PackIcon Kind="Creation" Height="30" Width="30" VerticalAlignment="Center"/>
 									<TextBlock Text="执行环节" FontSize="22" FontStyle="Italic" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" FontWeight="Bold" />
 									<TextBlock Text="" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Padding="25,5" x:Name="TxtLink"/>
 								</WrapPanel>
-								<Separator Style="{StaticResource MaterialDesignDarkSeparator}" Margin="8 0" />
+								<Separator Style="{StaticResource MaterialDesignDarkSeparator}" Margin="8 0" Height="8"/>
 								<WrapPanel>
 									<materialDesign:PackIcon Kind="Gauge" Height="30" Width="30" VerticalAlignment="Center"/>
 									<TextBlock Text="测试项" FontSize="22" FontStyle="Italic" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" FontWeight="Bold" />
 									<TextBlock Text="" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Padding="25,5" x:Name="TxtMeasuredItem"/>
 								</WrapPanel>
-								<Separator Style="{StaticResource MaterialDesignDarkSeparator}" Margin="8 0"/>
+								<Separator Style="{StaticResource MaterialDesignDarkSeparator}" Margin="8 0" Height="8"/>
 								<WrapPanel>
 									<materialDesign:PackIcon Kind="Counter" Height="30" Width="30" VerticalAlignment="Center"/>
 									<TextBlock Text="测试值" FontSize="22" FontStyle="Italic" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" FontWeight="Bold" />

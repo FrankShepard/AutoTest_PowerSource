@@ -20,9 +20,9 @@ namespace Ingenu_Power.UserControls
 	/// <summary>
 	/// ucAdvancedSettings.xaml 的交互逻辑
 	/// </summary>
-	public partial class ucAdvancedSettings : UserControl
+	public partial class UcAdvancedSettings : UserControl
 	{
-		public ucAdvancedSettings()
+		public UcAdvancedSettings()
 		{
 			InitializeComponent();			
         }    

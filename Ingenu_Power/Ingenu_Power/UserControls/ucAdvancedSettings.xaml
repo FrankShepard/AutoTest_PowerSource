@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Ingenu_Power.UserControls.ucAdvancedSettings"
+﻿<UserControl x:Class="Ingenu_Power.UserControls.UcAdvancedSettings"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 

@@ -268,5 +268,21 @@ namespace Ingenu_Power.Domain
 		/// 扫码枪值已被更新的标记
 		/// </summary>
 		public static bool ScannerCodeRefreshed = false;
+		/// <summary>
+		/// 记录程序允许时的日期
+		/// </summary>
+		public static DateTime Measured_Date = DateTime.Now.Date;
+		/// <summary>
+		/// 记录程序运行当天的产品测试总数
+		/// </summary>
+		public static int Measured_WholeProductCount = 0;
+		/// <summary>
+		/// 记录程序运行当天的合格产品总数
+		/// </summary>
+		public static int Measured_CorrectProductCount = 0;
+		/// <summary>
+		/// 记录程序运行当天的不合格产品总数
+		/// </summary>
+		public static int Measured_UncorrectProductCount = 0;
 	}
 }

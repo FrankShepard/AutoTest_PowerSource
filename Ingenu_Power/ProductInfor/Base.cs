@@ -515,7 +515,7 @@ namespace ProductInfor
 			Int32 waittime = 0;
 			while (sp_product.BytesToRead == 0) {
 				Thread.Sleep( 5 );
-				if (++waittime > 20) {
+				if (++waittime > 100) {
 					error_information = "待测产品通讯响应超时";//仪表响应超时
 					return error_information;
 				}
