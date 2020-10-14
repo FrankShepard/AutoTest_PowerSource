@@ -799,15 +799,21 @@ namespace ProductInfor
 							Thread.Sleep( 3000 ); //非面板电源的蜂鸣器工作时时长较长，此处暂时无法减少时间
 							Thread.Sleep ( delay_magnification * 200 ); //保证蜂鸣器能响
 
-							//将备电电压设置到19V以下，验证备电自杀功能
-							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, ( 18.4m + VoltageDrop ), true, true, serialPort, out error_information );
-							if (error_information != string.Empty) { continue; }
-							Thread.Sleep( 1500 );
-							Thread.Sleep( delay_magnification * 50 );
-							generalData_DCPower = measureDetails.Measure_vReadDCPowerResult( serialPort, out error_information );
-							if (generalData_DCPower.ActrulyCurrent > 0.01m) { //需要注意：程控直流电源采集输出电流存在偏差，此处设置为10mA防止错误判断
-								error_information = "待测电源的自杀功能失败，请注意此异常"; continue;
-							}
+							////将备电电压设置到19V以下，验证备电自杀功能 - 目前MCU程序并不包含快速自杀功能
+							//measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, ( 18.4m + VoltageDrop ), true, true, serialPort, out error_information );
+							//if (error_information != string.Empty) { continue; }
+							//int retry_count = 0;
+							//do {
+							//	Thread.Sleep( 300 );
+							//	Thread.Sleep( delay_magnification * 50 );
+							//	generalData_DCPower = measureDetails.Measure_vReadDCPowerResult( serialPort, out error_information );
+							//	if (generalData_DCPower.ActrulyCurrent > 0) {
+							//		error_information = "待测电源的自杀功能失败，请注意此异常";
+							//	}
+							//} while (( ++retry_count < 10 ) && ( error_information != string.Empty ));
+							//if (retry_count >= 10) {
+							//	error_information = "待测电源的自杀功能失败，请注意此异常"; continue;
+							//}
 
 							measureDetails.Measure_vSetDCPowerStatus ( infor_Sp.UsedBatsCount, source_voltage, true, false, serialPort, out error_information );
 						}

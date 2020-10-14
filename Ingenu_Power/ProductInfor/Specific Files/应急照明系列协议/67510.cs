@@ -1453,7 +1453,11 @@ namespace ProductInfor
 										break;
 									}
 								}
-							}
+							}						
+							//防止自杀时总线抢占，关电之前解除抢占数据
+							measureDetails.Measure_vCommSGUartParamterSet( MCU_Control.Comm_Type.Comm_None, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
+							if (error_information != string.Empty) { continue; }
+							
 							//关闭备电，查看是否可以在2s时间内自杀（方法为查看程控直流电源的输出电流是否低于60mA）
 							Thread.Sleep ( 2500 );
 							if ( infor_Sp.UsedBatsCount > 2 ) {
@@ -1463,17 +1467,13 @@ namespace ProductInfor
                             do {
                                 Thread.Sleep(delay_magnification * 50);
                                 generalData_DCPower = measureDetails.Measure_vReadDCPowerResult(serialPort, out error_information);
-                                if (generalData_DCPower.ActrulyCurrent > 0.01m) { //需要注意：程控直流电源采集输出电流存在偏差，此处设置为10mA防止错误判断
+                                if (generalData_DCPower.ActrulyCurrent > 0.06m) { //需要注意：程控直流电源采集输出电流存在偏差，此处设置为10mA防止错误判断
                                     error_information = "待测电源的自杀功能失败，请注意此异常"; 
                                 }
                             } while ((++retry_count < 3) && (error_information != string.Empty));
                             if(error_information != string.Empty) { continue; }
                             measureDetails.Measure_vSetDCPowerStatus(infor_Sp.UsedBatsCount, source_voltage, true, false, serialPort, out error_information);
-
-							//防止自杀时总线抢占，关电之前解除抢占数据
-							measureDetails.Measure_vCommSGUartParamterSet( MCU_Control.Comm_Type.Comm_None, infor_SG.Index_Txd, infor_SG.Index_Rxd, infor_SG.Reverse_Txd, infor_SG.Reverse_Rxd, serialPort, out error_information );
-							if (error_information != string.Empty) { continue; }
-
+						
 						}
 					}
 				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充

@@ -1206,10 +1206,16 @@ namespace ProductInfor
 							//将备电电压设置到19V以下，验证备电自杀功能
 							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, ( 18.4m + VoltageDrop ), true, true, serialPort, out error_information );
 							if (error_information != string.Empty) { continue; }
-							Thread.Sleep( 100 );
-							Thread.Sleep( delay_magnification * 50 );
-							generalData_DCPower = measureDetails.Measure_vReadDCPowerResult( serialPort, out error_information );
-							if (generalData_DCPower.ActrulyCurrent > 0.01m) { //需要注意：程控直流电源采集输出电流存在偏差，此处设置为10mA防止错误判断
+							int retry_count = 0;
+							do {
+								Thread.Sleep( 300 );
+								Thread.Sleep( delay_magnification * 50 );
+								generalData_DCPower = measureDetails.Measure_vReadDCPowerResult( serialPort, out error_information );
+								if (generalData_DCPower.ActrulyCurrent > 0) {
+									error_information = "待测电源的自杀功能失败，请注意此异常";
+								}
+							} while (( ++retry_count < 10 ) && ( error_information != string.Empty ));
+							if (retry_count >= 10) {
 								error_information = "待测电源的自杀功能失败，请注意此异常"; continue;
 							}
 
