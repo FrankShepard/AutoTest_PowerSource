@@ -1931,7 +1931,7 @@ namespace ProductInfor
 
 								//设置主电为欠压值
 								measureDetails.Measure_vSetACPowerStatus( true, serialPort, out error_information, infor_Mp.MpVoltage[ 0 ] );
-								if (error_information != string.Empty) { continue; }
+								if (error_information != string.Empty) { continue; }								
 
 								//保证切换前负载为满载
 								decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
@@ -1946,6 +1946,10 @@ namespace ProductInfor
 								}
 								measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, target_cc_value, true, out error_information );
 								if ( error_information != string.Empty ) { continue; }
+								////按功率等待，若是输出1功率较大 则需要在关主电前等待1.5s
+								//if (infor_Output.FullLoadValue[ 0 ] > 400m) {
+								//	Thread.Sleep( 5000 );
+								//}
 
 								measureDetails.Measure_vSetACPowerStatus ( false, serialPort, out error_information, infor_Mp.MpVoltage [ 0 ] );//关主电
 								if ( error_information != string.Empty ) { continue; }
