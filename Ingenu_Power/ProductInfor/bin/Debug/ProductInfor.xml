@@ -2927,6 +2927,15 @@
             继承自_64910的 面板式IG-M1302F 电源的相关信息
             </summary>
         </member>
+        <member name="M:ProductInfor._67210.Measure_vCutoffVoltageCheck(System.Boolean,System.Int32,System.String)">
+            <summary>
+            备电切断点检查 - 检查备电电压的采集误差
+            </summary>
+            <param name="whole_function_enable">全项测试与否，决定是否测试得到具体切断点</param>
+            <param name="delay_magnification">仪表间延迟时间的时间放大倍率</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>可能存在的故障信息</returns>
+        </member>
         <member name="M:ProductInfor._67210.Measure_vCheckSourceChangeMpRestart(System.Boolean,System.Int32,System.String)">
             <summary>
             检查主电恢复时输出是否异常

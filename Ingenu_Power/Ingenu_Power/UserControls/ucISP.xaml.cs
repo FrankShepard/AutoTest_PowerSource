@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections;
-using System.Data;
-using System.IO;
 using System.IO.Ports;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using Ingenu_Power.Domain;
 using MaterialDesignThemes.Wpf;
 

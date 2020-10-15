@@ -123,16 +123,6 @@ namespace Ingenu_Power.UserControls
 						int index = 0;
 						for (index = 0; index < table.Rows.Count; index++) {
 							if (login_user == table.Rows[ index ][ "用户名" ].ToString().Trim()) {
-								//检查提示是否需要更新dll文件
-								bool need_refresh_dll = false;
-								if(!Equals(table.Rows[index][ "ProductInfor文件需要更新" ],DBNull.Value )) {
-									need_refresh_dll = ( bool ) table.Rows[ index ][ "ProductInfor文件需要更新" ];
-								}
-								if (need_refresh_dll) {
-									//若是有dll更新，则需要修改提示图标
-									Dispatcher.Invoke( new MainWindow.Dlg_PkiKindChange( MainWindow.pCurrentWin.PkiKindChange ), PackIconKind.CloudDownload, "存在测试文件更新" );
-								}
-
 								if (( password != table.Rows[ index ][ "登陆密码" ].ToString().Trim().ToUpper() ) && ( password.ToUpper() != "RESET" )) {
 									//密码不匹配									
 									error_information = "密码错误，请重新输入密码";
@@ -148,6 +138,41 @@ namespace Ingenu_Power.UserControls
 									if (error_information == string.Empty) {
 										StaticInfor.UserRightLevel = Convert.ToInt32( table.Rows[ index ][ "权限等级" ] ); //获取权限等级
 
+										if (StaticInfor.UserRightLevel < 5) {
+											//检查提示是否需要更新dll文件,若是存在指定工位的dll文件更新则自动下载更新
+											bool need_refresh_dll = false;
+											if (!Equals( table.Rows[ index ][ "ProductInfor文件需要更新" ], DBNull.Value )) {
+												need_refresh_dll = ( bool ) table.Rows[ index ][ "ProductInfor文件需要更新" ];
+											}
+											if (need_refresh_dll) {
+												////若是有dll更新，则需要修改提示图标
+												//Dispatcher.Invoke( new MainWindow.Dlg_PkiKindChange( MainWindow.pCurrentWin.PkiKindChange ), PackIconKind.CloudDownload, "存在测试文件更新" );
+
+												string error_information_temp = string.Empty;
+												DataTable dataTable = database.V_DownloadFile( out error_information_temp );
+												if (error_information_temp != string.Empty) { error_information += ( error_information_temp + "\r\n" ); break; }
+												//检查 Mcu2.0_ProductInfor文件 是否存在
+												int row_index = 0;
+												for (row_index = 0; row_index < dataTable.Rows.Count; row_index++) {
+													if (!Equals( dataTable.Rows[ row_index ][ "Mcu2_0_ProductInfor文件" ], DBNull.Value )) {
+														string filePath = Directory.GetCurrentDirectory() + "\\Download";
+														if (!Directory.Exists( filePath )) {//如果不存在就创建文件夹
+															Directory.CreateDirectory( filePath );
+														}
+														filePath += "\\ProductInfor.dll"; //保存主MCU的程序到本地
+														FileStream fs = new FileStream( filePath, FileMode.Create, FileAccess.Write );
+														byte[] file_data =  MainWindow.ObjectToBytes( dataTable.Rows[ row_index ][ "Mcu2_0_ProductInfor文件" ] );
+														fs.Write( file_data, 0, file_data.Length );
+														fs.Close();
+														Properties.Settings.Default.Dll文件保存路径 = filePath;
+														//更新数据库，防止再次提示更新
+														database.V_UserInfor_Update( false, out error_information );
+														break;
+													}
+												}
+											}
+										}
+										
 										if (remeberpassword) {
 											Properties.Settings.Default.UserName = login_user;
 											Properties.Settings.Default.PassWord = password;
@@ -157,7 +182,7 @@ namespace Ingenu_Power.UserControls
 										}
 										Properties.Settings.Default.RememberPassWord = remeberpassword;
 										Properties.Settings.Default.Save();
-									}
+									}									
 								}
 								break;
 							}

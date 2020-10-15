@@ -130,10 +130,9 @@ namespace Ingenu_Power.Domain
 		/// <summary>
 		/// 更新用户数据 - 是否有文件更新
 		/// </summary>
-		/// <param name="user_name">用户登录名</param>
-		/// <param name="password">用户登录密码</param>
+		/// <param name="need_refresh">是否需要更新 待下载dll文件的状态</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void V_UserInfor_Update(bool refresh_dll_completed,out string error_information)
+		public void V_UserInfor_Update(bool need_refresh,out string error_information)
 		{
 			error_information = string.Empty;
 			try {
@@ -143,7 +142,7 @@ namespace Ingenu_Power.Domain
 
 					objCommand.CommandText = "UPDATE [盈帜电源].[dbo].[测试软件用户信息] SET [ProductInfor文件需要更新] = @ProductInfor文件需要更新 WHERE [计算机名] = '" + Environment.GetEnvironmentVariable( "ComputerName" ) + "'";
 					objCommand.Parameters.Clear();
-					objCommand.Parameters.AddWithValue( "@ProductInfor文件需要更新", false );
+					objCommand.Parameters.AddWithValue( "@ProductInfor文件需要更新", need_refresh );
 
 					V_UpdateInfor( objCommand, out error_information );
 				}
@@ -198,27 +197,32 @@ namespace Ingenu_Power.Domain
 		/// </summary>
 		/// <param name="file_bin">待上传的文件</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void V_UpdateFile(byte[] file_bin,out string error_information)
+		public void V_UpdateFile(byte[] file_bin, out string error_information)
 		{
 			error_information = string.Empty;
 			try {
 				using (SqlCommand objCommand = objConnection.CreateCommand()) {
 					objCommand.Connection = objConnection;
 					objCommand.CommandType = CommandType.Text;
-					//先删除现存的数据，再更新
-					objCommand.CommandText = "DELETE FROM [盈帜电源].[dbo].[dll文件保存表] WHERE [Mcu2_0_ProductInfor文件] is not null";
-					V_UpdateInfor( objCommand, out error_information );
-					if(error_information != string.Empty) { return; }
-
-					objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[dll文件保存表] (Mcu2_0_ProductInfor文件,修改时间) VALUES (@Mcu2_0_ProductInfor文件,@修改时间)";
-					//插入数据的填充
-					objCommand.Parameters.Clear();
-					objCommand.Parameters.AddWithValue( "@Mcu2_0_ProductInfor文件", file_bin );
-					objCommand.Parameters.AddWithValue( "@修改时间", DateTime.Now );
-
+					//检查数据库中是否存在数据，若是存在则update  若是不存在则insert
+					DataTable dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[dll文件保存表] ORDER BY [修改时间] DESC", out error_information );
+					if(dtTarget.Rows.Count > 0) {
+						//更新现有数据
+						objCommand.CommandText = "UPDATE [盈帜电源].[dbo].[dll文件保存表] SET [Mcu2_0_ProductInfor文件] = @Mcu2_0_ProductInfor文件 , [修改时间] = @修改时间";
+						objCommand.Parameters.Clear();
+						objCommand.Parameters.AddWithValue( "@Mcu2_0_ProductInfor文件", file_bin );
+						objCommand.Parameters.AddWithValue( "@修改时间", DateTime.Now );
+					} else {
+						//更新现有数据
+						objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[dll文件保存表] ([ProductInfor文件]  , [修改时间] ) VALUES (@Mcu2_0_ProductInfor文件 , @修改时间)";
+						objCommand.Parameters.Clear();
+						objCommand.Parameters.AddWithValue( "@Mcu2_0_ProductInfor文件", file_bin );
+						objCommand.Parameters.AddWithValue( "@修改时间", DateTime.Now );
+					}					
 					V_UpdateInfor( objCommand, out error_information );
 				}
-			} catch (Exception ex) {
+			}
+			catch (Exception ex) {
 				error_information += ex.ToString();
 				error_information += "Database.V_UpdateFile 数据库操作异常  \r\n";
 			}
