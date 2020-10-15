@@ -214,7 +214,7 @@ namespace Ingenu_Power.Domain
 						objCommand.Parameters.AddWithValue( "@修改时间", DateTime.Now );
 					} else {
 						//更新现有数据
-						objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[dll文件保存表] ([ProductInfor文件]  , [修改时间] ) VALUES (@Mcu2_0_ProductInfor文件 , @修改时间)";
+						objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[dll文件保存表] ([Mcu2_0_ProductInfor文件]  , [修改时间] ) VALUES (@Mcu2_0_ProductInfor文件 , @修改时间)";
 						objCommand.Parameters.Clear();
 						objCommand.Parameters.AddWithValue( "@Mcu2_0_ProductInfor文件", file_bin );
 						objCommand.Parameters.AddWithValue( "@修改时间", DateTime.Now );
