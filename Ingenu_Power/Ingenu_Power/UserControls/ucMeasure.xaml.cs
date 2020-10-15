@@ -497,8 +497,8 @@ namespace Ingenu_Power.UserControls
 												StaticInfor.measureItemShow.Measure_Value += measuredValue.Voltage_WithLoad[ index ].ToString( "0.0#" ) + "V ";
 											} else {
 												error_information_step = "第 " + (index+1).ToString() + " 路输出满载电压超过合格范围";
+												error_information_step += arrayList[4+index].ToString();
 												StaticInfor.measureItemShow.Measure_Value = "Failed";
-												break;
 											}
 										}
 									} else {

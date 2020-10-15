@@ -1664,12 +1664,16 @@ namespace ProductInfor
 								}
 								//合格范围的检测
 								specific_value [ index_of_channel ] = real_voltage;
-								if ( index_of_channel == 1 ) { //应急照明电源输出2压降存在于工装走线影响情况，在满载时增加上120mV的补偿
+								if ( index_of_channel == 1 ) { //应急照明电源输出2压降存在于工装走线影响情况，在满载时增加上300mV的补偿
 									if ( real_voltage < infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) {
-										specific_value [ index_of_channel ] += 0.12m;
+										specific_value [ index_of_channel ] += 0.3m;
+										if (specific_value[ index_of_channel] > infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 1 ] )
+										{
+											specific_value[ index_of_channel ] = infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 1 ] - 0.1m;
+										}
 									}
 								}
-								if ( ( real_voltage >= infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) && ( real_voltage <= infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 1 ] ) ) {
+								if ( ( specific_value[ index_of_channel ] >= infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 0 ] ) && ( specific_value[ index_of_channel ] <= infor_Output.Qualified_OutputVoltageWithLoad [ index_of_channel, 1 ] ) ) {
 									check_okey [ index_of_channel ] = true;
 								}
 
@@ -1946,10 +1950,10 @@ namespace ProductInfor
 								}
 								measureDetails.Measure_vSetChargeLoad ( serialPort, Itech.OperationMode.CC, target_cc_value, true, out error_information );
 								if ( error_information != string.Empty ) { continue; }
-								////按功率等待，若是输出1功率较大 则需要在关主电前等待1.5s
-								//if (infor_Output.FullLoadValue[ 0 ] > 400m) {
-								//	Thread.Sleep( 5000 );
-								//}
+								//按功率等待，若是输出1功率较大 则需要在关主电前等待1.5s
+								if (infor_Output.FullLoadValue[ 0 ] > 400m) {
+									Thread.Sleep( 1500 );
+								}
 
 								measureDetails.Measure_vSetACPowerStatus ( false, serialPort, out error_information, infor_Mp.MpVoltage [ 0 ] );//关主电
 								if ( error_information != string.Empty ) { continue; }
