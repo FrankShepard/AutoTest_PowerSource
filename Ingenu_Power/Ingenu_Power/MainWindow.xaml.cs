@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Ingenu_Power.Domain;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Win32;
 
@@ -427,22 +428,24 @@ namespace Ingenu_Power
 									};
 
 									saveFileDialog.Filter = "动态库文件(*.dll)|*.dll";
-									if (( bool )saveFileDialog.ShowDialog() == true) {
+									if (( bool ) saveFileDialog.ShowDialog() == true) {
 										string filePath = saveFileDialog.FileName;
 										FileStream fs = new FileStream( saveFileDialog.FileName, FileMode.Create, FileAccess.Write );
-										for(int row_index = 0;row_index < dataTable.Rows.Count; row_index++) {
-											if(Equals( dataTable.Rows[ row_index ][ "ProductInfor文件" ], DBNull.Value )) {
-												continue;
-											}
-											byte[] file_data = ObjectToBytes( dataTable.Rows[ row_index ][ "ProductInfor文件" ] );
-											fs.Write( file_data, 0, file_data.Length );
-											fs.Close();
-											break;
-										}										
-										//图标变化
-										Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), MaterialDesignThemes.Wpf.PackIconKind.Check );
-										Properties.Settings.Default.Dll文件保存路径 = filePath;
-										Properties.Settings.Default.Save();
+										for (int row_index = 0; row_index < dataTable.Rows.Count; row_index++) {
+											if (!Equals( dataTable.Rows[ row_index ][ "ProductInfor文件" ], DBNull.Value )) {
+												byte[] file_data = ObjectToBytes( dataTable.Rows[ row_index ][ "ProductInfor文件" ] );
+												fs.Write( file_data, 0, file_data.Length );
+												fs.Close();
+												//图标变化
+												Dispatcher.Invoke( new Dlg_PkiKindChange( PkiKindChange ), PackIconKind.CloudCheck );
+												Properties.Settings.Default.Dll文件保存路径 = filePath;
+												Properties.Settings.Default.Save();
+
+												//更新数据库，防止再次提示更新
+												database.V_UserInfor_Update( false, out error_information );
+												break;
+											}											
+										}
 									}
 								} else {
 									error_information = "数据库中缺少对应的DLL文件";

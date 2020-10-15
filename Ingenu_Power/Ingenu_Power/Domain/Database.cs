@@ -125,18 +125,45 @@ namespace Ingenu_Power.Domain
 			}
 		}
 
-        #endregion
+		/// <summary>
+		/// 更新用户数据 - 是否有文件更新
+		/// </summary>
+		/// <param name="need_refresh">是否需要更新 待下载dll文件的状态</param>
+		/// <param name="error_information">可能存在的错误信息</param>
+		public void V_UserInfor_Update(bool need_refresh, out string error_information)
+		{
+			error_information = string.Empty;
+			try {
+				using (SqlCommand objCommand = objConnection.CreateCommand()) {
+					objCommand.Connection = objConnection;
+					objCommand.CommandType = CommandType.Text;
 
-        #region -- ISP相关信息
+					objCommand.CommandText = "UPDATE [盈帜电源].[dbo].[测试软件用户信息] SET [ProductInfor文件需要更新] = @ProductInfor文件需要更新 WHERE [计算机名] = '" + Environment.GetEnvironmentVariable( "ComputerName" ) + "'";
+					objCommand.Parameters.Clear();
+					objCommand.Parameters.AddWithValue( "@ProductInfor文件需要更新", need_refresh );
 
-        /// <summary>
-        /// 获取硬件ID和硬件版本号所映射的软件ID和软件版本号
-        /// </summary>
-        /// <param name="id_hardware">产品ID中包含的硬件ID</param>
-        /// <param name="ver_hardware">产品ID中包含的硬件版本号</param>
-        /// <param name="error_information"> 可能存在的错误信息</param>
-        /// <returns>硬件ID、版本号与软件ID、版本号之间的对应数据表格</returns>
-        public DataTable V_SoftwareInfor_Get(int id_hardware,int ver_hardware, out string error_information)
+					V_UpdateInfor( objCommand, out error_information );
+				}
+			}
+			catch (Exception ex) {
+				error_information = ex.ToString() + "\r\n";
+				error_information += "Database.V_UpdateUserInfor 文件更新 数据库操作异常  \r\n";
+			}
+		}
+
+
+		#endregion
+
+		#region -- ISP相关信息
+
+		/// <summary>
+		/// 获取硬件ID和硬件版本号所映射的软件ID和软件版本号
+		/// </summary>
+		/// <param name="id_hardware">产品ID中包含的硬件ID</param>
+		/// <param name="ver_hardware">产品ID中包含的硬件版本号</param>
+		/// <param name="error_information"> 可能存在的错误信息</param>
+		/// <returns>硬件ID、版本号与软件ID、版本号之间的对应数据表格</returns>
+		public DataTable V_SoftwareInfor_Get(int id_hardware,int ver_hardware, out string error_information)
         {
             error_information = string.Empty;			
 			DataTable dtTarget = new DataTable();
@@ -176,12 +203,21 @@ namespace Ingenu_Power.Domain
 				using (SqlCommand objCommand = objConnection.CreateCommand()) {
 					objCommand.Connection = objConnection;
 					objCommand.CommandType = CommandType.Text;
-					//更新现有数据
-					objCommand.CommandText = "UPDATE [盈帜电源].[dbo].[dll文件保存表] SET [ProductInfor文件] = @ProductInfor文件 , [修改时间] = @修改时间";
-					//写具体数据
-					objCommand.Parameters.Clear();
-					objCommand.Parameters.AddWithValue( "@ProductInfor文件", file_bin );
-					objCommand.Parameters.AddWithValue( "@修改时间", DateTime.Now );
+					//检查数据库中是否存在数据，若是存在则update  若是不存在则insert
+					DataTable dtTarget = V_QueryInfor( "SELECT *  FROM [盈帜电源].[dbo].[dll文件保存表] ORDER BY [修改时间] DESC", out error_information );
+					if (dtTarget.Rows.Count > 0) {
+						//更新现有数据
+						objCommand.CommandText = "UPDATE [盈帜电源].[dbo].[dll文件保存表] SET [ProductInfor文件] = @ProductInfor文件 , [修改时间] = @修改时间";
+						objCommand.Parameters.Clear();
+						objCommand.Parameters.AddWithValue( "@ProductInfor文件", file_bin );
+						objCommand.Parameters.AddWithValue( "@修改时间", DateTime.Now );
+					} else {
+						//更新现有数据
+						objCommand.CommandText = "INSERT INTO [盈帜电源].[dbo].[dll文件保存表] ([ProductInfor文件]  , [修改时间] ) VALUES (@ProductInfor文件 , @修改时间)";
+						objCommand.Parameters.Clear();
+						objCommand.Parameters.AddWithValue( "@Mcu2_0_ProductInfor文件", file_bin );
+						objCommand.Parameters.AddWithValue( "@修改时间", DateTime.Now );
+					}
 					V_UpdateInfor( objCommand, out error_information );					
 				}
 			} catch (Exception ex) {
