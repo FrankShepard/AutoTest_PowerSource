@@ -981,6 +981,7 @@ namespace ProductInfor
 										}
 										if(error_information != string.Empty) { break; }
 									}
+									if (error_information != string.Empty) { continue; }
 									//检查主电过压点是否上报
 									int retry_count = 0;
 									do {

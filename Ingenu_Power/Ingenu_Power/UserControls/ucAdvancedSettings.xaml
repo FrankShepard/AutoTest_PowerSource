@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Ingenu_Power.UserControls"
 			  xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+			 xmlns:smtx="clr-namespace:ShowMeTheXAML;assembly=ShowMeTheXAML"
              mc:Ignorable="d" 
              d:DesignHeight="443" d:DesignWidth="726">
 	<Grid Height="443" Width="726" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -12,18 +13,66 @@
 			<Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="2*"/>
 						<ColumnDefinition Width="2.5*"/>
 					</Grid.ColumnDefinitions>
-					<GroupBox Grid.Row="0" Grid.Column="0" Header="通用设置" Style="{DynamicResource MaterialDesignGroupBox}" Margin="10" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0">
+					<GroupBox Grid.Row="0" Grid.Column="0" Header="权限设置" Style="{DynamicResource MaterialDesignGroupBox}" Margin="10" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0">
 						<Grid Margin="0">
 							<Grid.RowDefinitions >
+								<RowDefinition Height="2*"/>
 								<RowDefinition Height="*"/>
-								<RowDefinition Height="7*"/>
 							</Grid.RowDefinitions>
+								<TreeView Grid.Row="0" Grid.Column="0" Margin="0" >
+									<TreeViewItem IsExpanded="True">
+										<TreeViewItem.Header>
+											<WrapPanel>
+												<materialDesign:PackIcon Kind="AccountPlus" />
+												<TextBlock Text=" 新建用户"/>
+											</WrapPanel>
+										</TreeViewItem.Header>
+										<TreeViewItem Height="50">		
+											<TreeViewItem.Header>
+												<WrapPanel>
+												<TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="" MaxLength="5" Name="TxtAddedUser" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="80">
+														<materialDesign:HintAssist.Hint>
+															<StackPanel Orientation="Horizontal" Margin="0">
+																<materialDesign:PackIcon Kind="Worker" />
+																<TextBlock>员工姓名</TextBlock>
+															</StackPanel>
+														</materialDesign:HintAssist.Hint>
+													</TextBox>
+													<TextBlock Text="          "/>
+													<ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+														<materialDesign:HintAssist.Hint>
+															<StackPanel Orientation="Horizontal" Margin="0">
+																<materialDesign:PackIcon Kind="RadioTower" />
+																<TextBlock>权限等级</TextBlock>
+															</StackPanel>
+														</materialDesign:HintAssist.Hint>
+													<ComboBoxItem Content="访客"/>
+													<ComboBoxItem Content ="测试员"/>
+													<ComboBoxItem Content ="生产经理"/>
+													<ComboBoxItem Content ="管理员"/>
+													<ComboBoxItem Content ="超级管理员"/>
+													</ComboBox>
+
+													
+												</WrapPanel>
+											</TreeViewItem.Header>
+										</TreeViewItem>
+									</TreeViewItem>
+									<TreeViewItem>
+									<TreeViewItem.Header>
+										<WrapPanel>
+											<materialDesign:PackIcon Kind="AccountChild" />
+											<TextBlock Text=" 修改用户权限"/>
+										</WrapPanel>
+									</TreeViewItem.Header>
+								</TreeViewItem>
+								</TreeView>
 						</Grid>
 					</GroupBox>
-					<GroupBox Grid.Row="0" Grid.Column="1" Header="高级设置" Style="{DynamicResource MaterialDesignGroupBox}" Margin="10" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0" Visibility="Hidden">
+					<GroupBox Grid.Row="0" Grid.Column="1" Header="高级设置" Style="{DynamicResource MaterialDesignGroupBox}" Margin="10" materialDesign:ShadowAssist.ShadowDepth="Depth3" BorderThickness="0" >
 						<Grid>
 							<Grid.RowDefinitions >
 								<RowDefinition Height="*"/>
