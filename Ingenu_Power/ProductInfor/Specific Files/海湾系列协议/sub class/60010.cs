@@ -286,7 +286,7 @@ namespace ProductInfor
 							Thread.Sleep( 7000 ); //非面板式电源的蜂鸣器只在关断输出一段时间之后才会响，所以此处的延时时间不可忽略
 							Thread.Sleep ( delay_magnification * 100 ); //保证蜂鸣器能响
 							//将备电电压设置到19V以下，验证备电自杀功能
-							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, ( 18.4m + VoltageDrop ), true, true, serialPort, out error_information );
+							measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, ( 18.2m + VoltageDrop ), true, true, serialPort, out error_information );
 							if (error_information != string.Empty) { continue; }
 							int retry_count = 0;
 							do {

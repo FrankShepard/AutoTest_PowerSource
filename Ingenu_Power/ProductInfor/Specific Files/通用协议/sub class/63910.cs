@@ -9,7 +9,7 @@ using Instrument_Control;
 namespace ProductInfor
 {
 	/// <summary>
-	/// 继承自_64910的 6200/10A 电源的相关信息
+	/// 继承自_64910的 IG-M1102F 电源的相关信息
 	/// </summary>
 	public class _63910 : _64910
 	{

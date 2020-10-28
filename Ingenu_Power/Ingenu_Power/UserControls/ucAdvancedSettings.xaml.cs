@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Text.RegularExpressions;
 using System.Windows.Controls.Primitives;
+using Ingenu_Power.Domain;
+using System.Data;
 
 namespace Ingenu_Power.UserControls
 {
@@ -25,7 +27,24 @@ namespace Ingenu_Power.UserControls
 		public UcAdvancedSettings()
 		{
 			InitializeComponent();			
-        }    
+        }
 
-    }
+		/// <summary>
+		/// 获取所有用户权限等级信息
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void TreeViewItem_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			string error_information = string.Empty;
+			using (Database database = new Database()) {
+				database.V_Initialize( Properties.Settings.Default.SQL_Name, Properties.Settings.Default.SQL_User, Properties.Settings.Default.SQL_Password, out error_information );
+				if (error_information != string.Empty) { return; }
+				DataTable dataTable = database.V_UserInfor_Get( out error_information );
+				if(dataTable.Rows.Count > 0) {
+					DtgUser.DataContext = dataTable;
+				}
+			}			
+		}
+	}
 }

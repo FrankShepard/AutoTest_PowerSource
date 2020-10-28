@@ -2640,7 +2640,7 @@ namespace ProductInfor
 											if (allocate_channel[ allocate_index ] < 0) { continue; }
 											if (allocate_channel[ allocate_index ] == channel_index) {
 												Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load ) list[ allocate_index ];
-												if (generalData_Load.ActrulyVoltage > infor_Output.Qualified_OutputVoltageWithLoad[ channel_index, 0 ]) {
+												if (generalData_Load.ActrulyVoltage > infor_Output.Qualified_OutputVoltageWithLoad[ channel_index, 0 ]) {												
 													if (++make_sure_count[channel_index] > 3) {
 														restart_okey[ channel_index ] = true;
 													}

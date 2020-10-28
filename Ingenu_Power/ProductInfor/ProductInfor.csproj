@@ -88,6 +88,8 @@
     <Compile Include="Specific Files\应急照明系列协议\sub class\67710.cs" />
     <Compile Include="Specific Files\应急照明系列协议\sub class\67610.cs" />
     <Compile Include="Specific Files\法安通系列协议\61710.cs" />
+    <Compile Include="Specific Files\泰和安系列协议\70510.cs" />
+    <Compile Include="Specific Files\海湾系列协议\sub class\72810.cs" />
     <Compile Include="Specific Files\海湾系列协议\sub class\60610.cs" />
     <Compile Include="Specific Files\通用协议\sub class\73010.cs" />
     <Compile Include="Specific Files\通用协议\sub class\67010.cs" />

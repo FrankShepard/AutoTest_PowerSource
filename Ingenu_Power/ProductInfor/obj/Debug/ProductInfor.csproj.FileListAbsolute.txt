@@ -29,4 +29,3 @@ E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csproj.CopyComplete
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.dll
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.pdb
-E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\ProductInfor\obj\Debug\ProductInfor.csprojAssemblyReference.cache
