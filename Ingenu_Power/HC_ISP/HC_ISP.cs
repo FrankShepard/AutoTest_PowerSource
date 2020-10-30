@@ -262,7 +262,7 @@ namespace ISP
 
 #if true
 			StringBuilder sb = new StringBuilder();
-			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + sp_mcu.BaudRate.ToString() + "->";
+			string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " "  + sp_mcu.Parity.ToString() + " "+ sp_mcu.BaudRate.ToString() + " -> ";
 			for (int i = 0; i < command_bytes.Length; i++) {
 				if (command_bytes[ i ] < 0x10) {
 					text_value += "0";
@@ -300,7 +300,7 @@ namespace ISP
 
 #if true
 				sb = new StringBuilder();
-				text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
+				text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + sp_mcu.Parity.ToString() +" <- ";
 				for (int i = 0; i < Serialport_Redata.Length; i++) {
 					if (Serialport_Redata[ i ] < 0x10) {
 						text_value += "0";

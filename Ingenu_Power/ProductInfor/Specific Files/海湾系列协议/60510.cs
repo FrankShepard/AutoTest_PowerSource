@@ -128,7 +128,7 @@ namespace ProductInfor
 
 				byte[] sent_data = new byte[] { 0xA5, 0x22, 0x22, 0xE9 };
 				do {
-					Communicate_User_DoEvent( sent_data, serialPort, out error_information );
+					Communicate_User_DoEvent( IDVerion_Product , sent_data, serialPort, out error_information );
 				} while (( ++index < 3 ) && ( error_information != string.Empty ));
 			}
 		}
@@ -155,7 +155,7 @@ namespace ProductInfor
 			byte [ ] SerialportData = new byte [ ] { 0xA5, 0x30, 0x01, 0xD6 };
 			//连续发送2次进入管理员模式的命令
 			for ( int index = 0 ; index < 2 ; index++ ) {
-				Product_vCommandSend( SerialportData, serialPort, out error_information );
+				Product_vCommandSend( IDVerion_Product , SerialportData, serialPort, out error_information );
 			}
 			//等待200ms保证单片机可以执行从用户模式到管理员模式的切换，同时保证采样处于稳定状态
 			Thread.Sleep( 200 );
@@ -181,7 +181,7 @@ namespace ProductInfor
 				sp_product.Read( received_data, 0, sp_product.BytesToRead );
 #if true //以下为调试保留代码，实际调用时不使用
 				StringBuilder sb = new StringBuilder();
-				string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
+				string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " +  sp_product.Parity.ToString() + " <- ";
 				for (int i = 0; i < received_data.Length; i++) {
 					if (received_data[ i ] < 0x10) {
 						text_value += "0";
@@ -361,7 +361,7 @@ namespace ProductInfor
 					Calibrate_vClearValidata( measureDetails, mCU_Control, serialPort, out error_information );
 					if (error_information != string.Empty) { return; }
 					/*执行空载输出时电压的校准、主电周期及主电欠压点的校准*/
-					Calibrate_vEmptyLoad_Mp( allocate_channel, itech, mCU_Control, serialPort, out error_information );
+					Calibrate_vEmptyLoad_Mp( IDVerion_Product, allocate_channel, itech, mCU_Control, serialPort, out error_information );
 					if (error_information != string.Empty) { return; }
 					/*执行主电带载时的电流校准*/
 					Calibrate_vFullLoad_Mp( measureDetails, allocate_channel, calibrated_load_currents, itech, mCU_Control, serialPort, out error_information );

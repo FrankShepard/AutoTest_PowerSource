@@ -35,7 +35,8 @@ namespace ProductInfor
 			/*以下验证SQL用户名与密码是否能够和SQL数据库正常通讯*/
 			try {
 				/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作-----可能的原因是另一台电脑正在调用数据库，需要等待*/
-				while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
+				int retry_count = 0;
+				while (( objConnection.State == ConnectionState.Open ) && ( retry_count < 5000 )) { Thread.Sleep( 1 ); retry_count++; }
 				objConnection.Open();
 				objConnection.Close();      //前面能打开则此处可以关闭   防止后续操作异常 
 			} catch                               //'异常可能：数据库用户名或密码输入错误
@@ -93,7 +94,8 @@ namespace ProductInfor
 			error_information = string.Empty;
 			try {
 				/*如果数据库连接被打开，则需要等待数据库连接至关闭状态之后再更新数据库的操作-----可能的原因是另一台电脑正在调用数据库，需要等待*/
-				while (objConnection.State == ConnectionState.Open) { Thread.Sleep( 1 ); }
+				int retry_count = 0;
+				while (( objConnection.State == ConnectionState.Open ) && ( retry_count < 5000 )) { Thread.Sleep( 1 ); retry_count++; }
 
 				using (SqlCommand objCommand = objConnection.CreateCommand()) {
 					using (SqlDataAdapter objDataAdapter = new SqlDataAdapter()) {

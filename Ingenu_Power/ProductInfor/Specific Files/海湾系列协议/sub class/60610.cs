@@ -88,9 +88,9 @@ namespace ProductInfor
 			try {
 				if (sp_product.BytesToRead > 0) {
 					sp_product.Read( received_data, 0, sp_product.BytesToRead );
-#if false //以下为调试保留代码，实际调用时不使用
+#if false		//以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
-					string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "<-";
+					string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + sp_product.Parity.ToString() + " <-";
 					for (int i = 0; i < received_data.Length; i++) {
 						if (received_data[ i ] < 0x10) {
 							text_value += "0";

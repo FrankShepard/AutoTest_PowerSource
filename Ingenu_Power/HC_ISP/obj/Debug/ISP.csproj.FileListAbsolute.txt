@@ -25,3 +25,4 @@ E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\bin\Debug\ISP.pdb
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.csproj.CoreCompileInputs.cache
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.dll
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.pdb
+E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\HC_ISP\obj\Debug\ISP.csprojAssemblyReference.cache

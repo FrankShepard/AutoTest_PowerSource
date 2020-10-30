@@ -495,21 +495,27 @@ namespace ProductInfor
 		{
 			error_information = string.Empty;
 			int index = 0;
-			/*判断串口打开是否正常，若不正常则先要进行打开设置*/
-			serialPort.BaudRate = CommunicateBaudrate;
-			//!注意：本信号电源的串口模式为发送时 Mark
-			serialPort.Parity = Parity.Mark;
 
+			//!注意：本信号电源的串口模式为发送时 Mark
+			serialPort.Close( );
+			serialPort.BaudRate = CommunicateBaudrate;
+
+			/*判断串口打开是否正常，若不正常则先要进行打开设置*/
 			try { if (!serialPort.IsOpen) { serialPort.Open(); } } catch { error_information = "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
 
 			byte[] sent_data = Product_vCmdQuery( UserCmd.UserCmd_QueryWorkingStatus, 0, out error_information );
 			if (error_information != string.Empty) { return; }
 
 			do {
-				Communicate_User_DoEvent( sent_data, serialPort, out error_information );
-			} while (( ++index < 3 ) && ( error_information != string.Empty ));
-
-			serialPort.Parity = Parity.None; //发送完成之后，将校验模式更换为默认的none
+				serialPort.Parity = Parity.Mark;
+				Communicate_User_DoEvent( IDVerion_Product , sent_data, serialPort, out error_information );
+				if (error_information == string.Empty) {
+					break;
+				}
+				Thread.Sleep( 50 );
+			} while (++index < 3);
+			Thread.Sleep( 50 );
+			serialPort.Parity = Parity.None;
 		}
 
 		/// <summary>
@@ -520,33 +526,47 @@ namespace ProductInfor
 		public override void Communicate_User( SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
+
+			//!注意：本信号电源的串口模式为发送时 Mark
+			serialPort.Close( );
+			serialPort.BaudRate = CommunicateBaudrate;
+
 			int index = 0;
 			/*判断串口打开是否正常，若不正常则先要进行打开设置*/
-			serialPort.BaudRate = CommunicateBaudrate;
-			//!注意：本信号电源的串口模式为发送时 Mark
-			serialPort.Parity = Parity.Mark;
-
-			try { if ( !serialPort.IsOpen ) { serialPort.Open ( ); } } catch { error_information = "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
+			try { if ( !serialPort.IsOpen ) { serialPort.Open ( ); } } catch(Exception ex) {
+				error_information = ex.ToString( );
+				error_information += "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
 
 			byte[] sent_data = new byte[8];
-			for (int temp_index = 0; temp_index < 3; temp_index++) {
+			for (int temp_index = 0; temp_index < 5; temp_index++) {
 				if (error_information != string.Empty) { continue; }
+				Thread.Sleep( 50 );
+				index = 0;
+				serialPort.Parity = Parity.Mark;
 
-				if (temp_index == 0) {
-					sent_data = Product_vCmdQuery( UserCmd.UserCmd_QueryWorkingStatus, 0, out error_information );
-				} else if (temp_index == 1) {
-					sent_data = Product_vCmdQuery( UserCmd.UserCmd_QueryOutput, 1, out error_information );
-				} else if (temp_index == 2) {
-					sent_data = Product_vCmdQuery( UserCmd.UserCmd_QuerySp, 0, out error_information );
+				if ( temp_index == 0 ) {
+					sent_data = Product_vCmdQuery( UserCmd.UserCmd_QueryWorkingStatus , 0 , out error_information );
+				} else if ( temp_index == 1 ) {
+					sent_data = Product_vCmdQuery( UserCmd.UserCmd_QueryOutput , 1 , out error_information );
+				} else if ( temp_index == 2 ) {
+					sent_data = Product_vCmdQuery( UserCmd.UserCmd_QueryOutput , 2 , out error_information );
+				} else if ( temp_index == 3 ) {
+					sent_data = Product_vCmdQuery( UserCmd.UserCmd_QueryOutput , 3 , out error_information );
+				} else if ( temp_index == 4 ) {
+					sent_data = Product_vCmdQuery( UserCmd.UserCmd_QuerySp , 0 , out error_information );
 				}
 				if (error_information != string.Empty) { return; }
 
 				do {
-					Communicate_User_DoEvent( sent_data, serialPort, out error_information );
-				} while ((++index < 3) && (error_information == string.Empty));
+					Communicate_User_DoEvent( IDVerion_Product, sent_data, serialPort , out error_information );
+					if(error_information == string.Empty) {
+						break;
+					}
+					Thread.Sleep( 50 );
+				} while (++index < 3);
 			}
-
-			serialPort.Parity = Parity.None; //发送完成之后，将校验模式更换为默认的none
+			Thread.Sleep( 50 );
+			serialPort.Parity = Parity.None;
 		}
 
 		/// <summary>
@@ -557,18 +577,55 @@ namespace ProductInfor
 		public override void Communicate_Admin( SerialPort serialPort, out string error_information)
 		{
 			error_information = string.Empty;
-			serialPort.BaudRate = CommunicateBaudrate;
 			//!注意：本信号电源的串口模式为发送时 Mark
-			serialPort.Parity = Parity.Mark;
+			serialPort.Close( );
+			serialPort.BaudRate = CommunicateBaudrate;
 
-			byte[] SerialportData = Product_vCmdSet_Admin();
+			byte[ ] SerialportData = Product_vCmdSet_Admin();
 			//连续发送2次进入管理员模式的命令 
 			for ( int index = 0 ; index < 2; index++ ) {
-				Product_vCommandSend( SerialportData, serialPort, out error_information );
+				serialPort.Parity = Parity.Mark;
+				Product_vCommandSend( IDVerion_Product, SerialportData, serialPort, out error_information );
 				Thread.Sleep( 300 );
-			}	
+			}
+			serialPort.Close( );
+			Thread.Sleep( 50 );
+			serialPort.Parity = Parity.None;
+			serialPort.Open( );
+		}
 
-			serialPort.Parity = Parity.None; //发送完成之后，将校验模式更换为默认的none
+		/// <summary>
+		/// 与产品的具体通讯环节（设置蜂鸣器时长）
+		/// <param name="serialPort">使用到的实际串口</param>
+		/// <param name="error_information">可能存在的异常信息</param>
+		/// </summary>
+		private void Communicate_User_SetBeepTime(SerialPort serialPort, out string error_information)
+		{
+			error_information = string.Empty;
+			int index = 0;
+
+			//!注意：本信号电源的串口模式为发送时 Mark
+			serialPort.Close();
+			serialPort.BaudRate = CommunicateBaudrate;
+			serialPort.Parity = Parity.Mark;
+
+			/*判断串口打开是否正常，若不正常则先要进行打开设置*/
+			try { if (!serialPort.IsOpen) { serialPort.Open(); } } catch { error_information = "待测产品 出现了不能通讯的情况（无法打开串口），请注意此状态"; return; }
+
+			byte[] sent_data = Product_vCmdSet_BeepWorkingTime( 4200 );
+			if (error_information != string.Empty) { return; }
+
+			do {
+				Communicate_User_DoEvent( IDVerion_Product, sent_data, serialPort, out error_information );
+				if (error_information == string.Empty) {
+					break;
+				}
+				Thread.Sleep( 50 );
+			} while (++index < 3);
+			serialPort.Close();
+			Thread.Sleep( 50 );
+			serialPort.Parity = Parity.None;
+			serialPort.Open();
 		}
 
 		#endregion
@@ -734,7 +791,7 @@ namespace ProductInfor
 			SerialportData[ 0 ] = 230; //默认地址为230
 			SerialportData[ 1 ] = 5;
 			SerialportData[ 2 ] = ( byte ) UserCmd.UserCmd_SetBeepWorkingTime;
-			UInt16 target = Convert.ToUInt16( target_time * 1000 ); //单位统一为mV
+			UInt16 target = Convert.ToUInt16( target_time );
 			byte[] temp = BitConverter.GetBytes( target );
 			SerialportData[ 3 ] = temp[ 0 ];
 			SerialportData[ 4 ] = temp[ 1 ];
@@ -821,7 +878,7 @@ namespace ProductInfor
 					sp_product.Read( received_data, 0, sp_product.BytesToRead );
 #if true		 //以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
-					string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + sp_product.BaudRate.ToString()  + " ->";
+					string text_value = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " +sp_product.Parity.ToString() + " "+ sp_product.BaudRate.ToString()  + " <- ";
 					for (int i = 0; i < received_data.Length; i++) {
 						if(received_data[ i] < 0x10) {
 							text_value += "0";
@@ -880,7 +937,7 @@ namespace ProductInfor
 			string error_information = string.Empty;
 			try {
 				//提取需要查询的有效数据
-				switch(( UserCmd )SerialportData[2]) {
+				switch(( UserCmd )SerialportData[1]) {
 					case UserCmd.UserCmd_QuerySp:						
 						infor_Uart.Measured_SpVoltage[0] = Convert.ToDecimal( BitConverter.ToInt16( SerialportData, 2 ) ) / 1000m;
 						break;
@@ -906,13 +963,7 @@ namespace ProductInfor
 
 						infor_Uart.communicate_Signal.communicate_Signal_Output.Measured_OutputErrorSignal = Convert.ToBoolean( SerialportData[ 3 ] & 0x04 );
 						for (int channel_index = 0; channel_index < infor_Output.OutputChannelCount; channel_index++) {
-							if ((SerialportData[ 6 ] & ( 0x01 << channel_index )) != 0) {
-								infor_Uart.communicate_Signal.communicate_Signal_Output.Measured_OutputOpenSignal[ channel_index ] = true;
-							} else {
-								infor_Uart.communicate_Signal.communicate_Signal_Output.Measured_OutputOpenSignal[ channel_index ] = false;
-							}
-
-						infor_Uart.communicate_Signal.communicate_Signal_Output.Measured_OutputOpenSignal[ channel_index ] = Convert.ToBoolean( SerialportData[ 6 ] & ( 0x01 << channel_index ) );
+							infor_Uart.communicate_Signal.communicate_Signal_Output.Measured_OutputOpenSignal[ channel_index ] = Convert.ToBoolean( SerialportData[ 6 ] & ( 0x01 << channel_index ) );
 							infor_Uart.communicate_Signal.communicate_Signal_Output.Measured_OutputOverpowerSignal[ channel_index ] = Convert.ToBoolean( SerialportData[ 6 ] & ( 0x10 << channel_index ) );
 							infor_Uart.communicate_Signal.communicate_Signal_Output.Measured_OutputInProtectingStatusSignal[ channel_index ] = Convert.ToBoolean( SerialportData[ 7 ] & ( 0x01 << channel_index ) );
 							infor_Uart.communicate_Signal.communicate_Signal_Output.Measured_OutputUserCloseSignal[ channel_index ] = Convert.ToBoolean( SerialportData[ 7 ] & ( 0x10 << channel_index ) );
@@ -1003,7 +1054,7 @@ namespace ProductInfor
 					//仪表初始化
 					measureDetails.Measure_vInstrumentInitalize( whole_function_enable,12.5m * infor_Sp.UsedBatsCount, osc_ins, serialPort, out error_information );
 					if ( error_information != string.Empty ) { return error_information; }
-#if false //以下为调试保留代码，实际调用时不使用
+#if true //以下为调试保留代码，实际调用时不使用
 					StringBuilder sb = new StringBuilder();
 					string temp = DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss:fff" ) + " " + "产品校准";
 					sb.AppendLine( temp );
@@ -1060,17 +1111,14 @@ namespace ProductInfor
 						Calibrate_vClearValidata( measureDetails, mCU_Control, serialPort, out error_information );
 						if(error_information != string.Empty) { return; }
 						/*执行空载输出时电压的校准、主电周期及主电欠压点的校准*/
-						Calibrate_vEmptyLoad_Mp( allocate_channel_mp, itech, mCU_Control, serialPort, out error_information );
+						Calibrate_vEmptyLoad_Mp( IDVerion_Product,allocate_channel_mp, itech, mCU_Control, serialPort, out error_information );
 						if (error_information != string.Empty) { return; }
 						/*执行主电带载时的电流校准*/
 						Calibrate_vFullLoad_Mp( measureDetails, allocate_channel_mp, calibrated_load_currents_mp,  itech, mCU_Control, serialPort, out error_information );
-						if (error_information != string.Empty) { return; }
-						/*执行备电带载时电流校准*/
-						Calibrate_vFullLoad_Sp( measureDetails, allocate_channel_sp, calibrated_load_currents_sp, itech, mCU_Control, serialPort, out error_information );
-						if (error_information != string.Empty) { return; }
+						if (error_information != string.Empty) { return; }					
 						/*输出空载情况下，备电电压、OCP、蜂鸣器时长等其它相关的设置*/
 						Calibrate_vEmptyLoad_Sp( measureDetails, mCU_Control, serialPort, out error_information );
-						if (error_information != string.Empty) { return; }						
+						if (error_information != string.Empty) { return; }
 					}
 				}
 			}
@@ -1119,8 +1167,12 @@ namespace ProductInfor
 							} while (( ++wait_count < 35 ) && (infor_Uart.Measured_SpVoltage[0] < 0.8m * 12 * infor_Sp.UsedBatsCount));
 							if (( error_information != string.Empty ) || (wait_count >= 35)) { continue; }
 
+							//用户模式时设置蜂鸣器时间
+							Communicate_User_SetBeepTime( serialPort, out error_information );
+							if(error_information != string.Empty) { continue; }
+
 							//输出负载变化，减为轻载0.3A，防止固定电平电源动态响应问题而引发的产品掉电
-							decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
+							decimal[ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
 							decimal [ ] target_current = new decimal [ ] { 0.1m, 0.1m, 0.1m };
 							decimal[] max_voltage = new decimal[ infor_Output.OutputChannelCount ];
 							for(int index_channel = 0;index_channel< infor_Output.OutputChannelCount; index_channel++) {
@@ -1149,7 +1201,7 @@ namespace ProductInfor
 											Itech.GeneralData_Load generalData_Load_out = ( Itech.GeneralData_Load ) list [ allocate_index_1 ];
 											if ( Math.Abs ( generalData_Load_out.ActrulyVoltage - generalData_Load.ActrulyVoltage ) > 0.5m ) {
 												error_information = "输出通道 " + index.ToString() + " 的电压与备电压降过大 " + generalData_Load_out.ActrulyVoltage.ToString() + "  " + generalData_Load.ActrulyVoltage.ToString() ;
-											}
+											}											
 											break;
 										}
 									}
@@ -1184,7 +1236,7 @@ namespace ProductInfor
 									if ( error_information != string.Empty ) { break; }
 									Thread.Sleep ( infor_Sp.Delay_WaitForCutoff );
 									generalData_DCPower = measureDetails.Measure_vReadDCPowerResult ( serialPort, out error_information );
-									if ( generalData_DCPower.ActrulyCurrent < 0.05m ) {
+									if ( generalData_DCPower.ActrulyCurrent < 0.06m ) {
 										break;
 									}
 								}
@@ -1299,14 +1351,21 @@ namespace ProductInfor
 							//读取电源输出电压
 							ArrayList generalData_Loads = measureDetails.Measure_vReadOutputLoadResult ( serialPort, out error_information );
 							Itech.GeneralData_Load generalData_Load;
-							decimal real_current = 0m;
-							for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
+
+							//检查串口上报的输出通道电压和电流参数是否准确
+							int retry_count = 0;
+							do {
+								Communicate_User( serialPort, out error_information );
+							} while (( error_information != string.Empty ) && ( ++retry_count < 5 ));
+							if (error_information != string.Empty) { continue; }
+
+							for ( int index_of_channel = 0 ; index_of_channel < infor_Output.OutputChannelCount ; index_of_channel++ ) {
 								decimal real_voltage = 0m;
-								if (index_of_channel <= 1) { real_current = 0m; } //协议中的输出2和输出3的电流合并表示
-								for (int index_of_load = 0; index_of_load < allocate_channel.Length; index_of_load++) {
-									if (allocate_channel[ index_of_load ] == index_of_channel) {
-										generalData_Load = ( Itech.GeneralData_Load )generalData_Loads[ index_of_load ];
-										if (generalData_Load.ActrulyVoltage > real_voltage) { //并联负载中电压较高的值认为输出电压
+								decimal real_current = 0m; 
+								for ( int index_of_load = 0 ; index_of_load < allocate_channel.Length ; index_of_load++ ) {
+									if ( allocate_channel[ index_of_load ] == index_of_channel ) {
+										generalData_Load = ( Itech.GeneralData_Load ) generalData_Loads[ index_of_load ];
+										if ( generalData_Load.ActrulyVoltage > real_voltage ) { //并联负载中电压较高的值认为输出电压
 											real_voltage = generalData_Load.ActrulyVoltage;
 										}
 										real_current += generalData_Load.ActrulyCurrent;
@@ -1314,29 +1373,19 @@ namespace ProductInfor
 								}
 								//合格范围的检测
 								specific_value[ index_of_channel ] = real_voltage;
-								if((real_voltage >= infor_Output.Qualified_OutputVoltageWithLoad[index_of_channel,0] ) && (real_voltage <= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel, 1 ])) {
+								if ( ( real_voltage >= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel , 0 ] ) && ( real_voltage <= infor_Output.Qualified_OutputVoltageWithLoad[ index_of_channel , 1 ] ) ) {
 									check_okey[ index_of_channel ] = true;
 								}
-
-								//检查串口上报的输出通道电压和电流参数是否准确
-								int retry_count = 0;
-								do {
-									Thread.Sleep( 50 );
-									Communicate_User( serialPort, out error_information );
-								} while (( error_information != string.Empty ) && (++retry_count < 5));
-								if(error_information != string.Empty) { break; }
-								switch (index_of_channel) {
-									case 0:
-										if (Math.Abs( infor_Uart.Measured_OutputVoltage[ 0 ] - real_voltage ) > 0.5m) {
-											error_information = "电源测试得到的输出电压超过了合格误差范围 " + infor_Uart.Measured_OutputVoltage[ 0 ].ToString() + "  " + real_voltage.ToString() ;
-										}
-										if (Math.Abs( infor_Uart.Measured_OutputCurrent[ 0 ] - real_current ) > 0.5m) {
-											error_information = "电源测试得到的输出电流超过了合格误差范围 " + infor_Uart.Measured_OutputCurrent[ 0 ].ToString() + "  " + real_current.ToString() ;
-										}
-										break;
-									default: break;
+								
+								if ( Math.Abs( infor_Uart.Measured_OutputVoltage[ index_of_channel ] - real_voltage ) > 0.5m ) {
+									error_information = "电源测试得到的输出电压" + (index_of_channel + 1).ToString() + "超过了合格误差范围 " + infor_Uart.Measured_OutputVoltage[ index_of_channel ].ToString( ) + "  " + real_voltage.ToString( );
 								}
+								if ( Math.Abs( infor_Uart.Measured_OutputCurrent[ index_of_channel ] - real_current ) > 0.5m ) {
+									error_information = "电源测试得到的输出电流" + ( index_of_channel + 1 ).ToString() + "超过了合格误差范围 " + infor_Uart.Measured_OutputCurrent[ index_of_channel ].ToString( ) + "  " + real_current.ToString( );
+								}
+								if(error_information != string.Empty) { break; }
 							}
+							if (error_information != string.Empty) { continue; }
 						}
 					}
 				} else {//严重错误而无法执行时，进入此分支以完成返回数据的填充
@@ -1605,7 +1654,7 @@ namespace ProductInfor
 				if (temp_index == 0) {
 					using (MeasureDetails measureDetails = new MeasureDetails()) {
 						using (Itech itech = new Itech()) {
-							using (SerialPort serialPort = new SerialPort( port_name, delay_magnification, Parity.None, 8, StopBits.One )) {
+							using (SerialPort serialPort = new SerialPort( port_name, default_baudrate, Parity.None, 8, StopBits.One )) {
 								decimal[] real_value = new decimal[ MeasureDetails.Address_Load_Output.Length ];
 								int[] allocate_channel = Base_vAllcateChannel_SC( measureDetails, out real_value );
 								if (error_information != string.Empty) { continue; }

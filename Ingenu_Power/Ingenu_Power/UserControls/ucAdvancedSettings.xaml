@@ -27,7 +27,7 @@
 									<TreeViewItem.Header>
 										<WrapPanel>
 											<materialDesign:PackIcon Kind="AccountAdd" />
-											<TextBlock Text=" 新建用户"/>
+											<TextBlock Text=" 新增用户"/>
 										</WrapPanel>
 									</TreeViewItem.Header>
 									<TreeViewItem Height="50">
