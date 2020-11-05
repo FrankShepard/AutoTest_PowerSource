@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections;
-using System.Data;
 using System.IO.Ports;
 using System.Linq;
-using System.Text;
 using System.Threading;
+
 using Instrument_Control;
 
 namespace ProductInfor

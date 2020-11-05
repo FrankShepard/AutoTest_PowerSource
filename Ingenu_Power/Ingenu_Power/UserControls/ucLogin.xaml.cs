@@ -203,8 +203,7 @@ namespace Ingenu_Power.UserControls
 				//委托可能出现的错误
 				this.Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), StaticInfor.Error_Message, false );
 			}
+
 		}
-
-
 	}
 }

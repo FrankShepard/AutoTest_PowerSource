@@ -1128,14 +1128,11 @@ namespace ProductInfor
 			Communicate_UserSetOWP ( infor_Calibration.OutputOXP [ 0 ], serialPort, out error_information );
 			if ( error_information != string.Empty ) { return; }
 
-			//特殊型号电源需要设置输出开路最大电流、欠压点、切断点
-			//赋安  L系列应急照明电源 切断点和欠压点设置
-			if (( id_verion == "67510" ) || ( id_verion == "67610" ) || ( id_verion == "67710" )) {
-				Communicate_UserSetCutoffVoltage( infor_Sp.Target_CutoffVoltageLevel, serialPort, out error_information );
-				if (error_information != string.Empty) { return; }
-				Communicate_UserSetUnderVoltage( infor_Sp.Target_UnderVoltageLevel, serialPort, out error_information );
-				if (error_information != string.Empty) { return; }
-			}
+			//电源需要设置输出开路最大电流、欠压点、切断点
+			Communicate_UserSetCutoffVoltage( infor_Sp.Target_CutoffVoltageLevel, serialPort, out error_information );
+			if (error_information != string.Empty) { return; }
+			Communicate_UserSetUnderVoltage( infor_Sp.Target_UnderVoltageLevel, serialPort, out error_information );
+			if (error_information != string.Empty) { return; }
 
 			//软件复位以生效设置
 			Communicate_Admin ( serialPort, out error_information );
@@ -1162,7 +1159,7 @@ namespace ProductInfor
 			string error_information = string.Empty;
 			bool check_okey = false;
 			bool restart_status = false;
-			bool already_set_para = false; //特殊参数需要设置
+			bool already_set_para = false; //特殊参数需要设置			
 
 			for ( int temp_index = 0 ; temp_index < 2 ; temp_index++ ) {
 				if ( temp_index == 0 ) {

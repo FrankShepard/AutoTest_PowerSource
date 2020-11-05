@@ -954,6 +954,21 @@
             <param name="error_information">可能存在的错误信息</param>
             <returns>产品输出重启结果</returns>
         </member>
+        <member name="M:ProductInfor.Base.SoundPlay_vCloseSpSwitch">
+            <summary>
+            是否需要播放关闭备电的语音
+            </summary>
+        </member>
+        <member name="M:ProductInfor.Base.SoundPlay_vOpenMandtorySwitch">
+            <summary>
+            是否需要播放短路强启开关的语音
+            </summary>
+        </member>
+        <member name="M:ProductInfor.Base.SoundPlay_vCloseMandtorySwitch">
+            <summary>
+            是否需要播放撤销强启开关的语音
+            </summary>
+        </member>
         <member name="T:ProductInfor.Database">
             <summary>
             SQL数据库的操作，带返回可能存在异常信息的class
@@ -2201,6 +2216,44 @@
         <member name="M:ProductInfor._67510.Measure_vOutputShortProtect(System.Boolean,System.Int32,System.String)">
             <summary>
             短路保护检查 - 应急照明系列电源仅需对输出2进行短路
+            </summary>
+            <param name="whole_function_enable">全项测试与否</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
+        <member name="T:ProductInfor._70410">
+            <summary>
+            继承自 _67510 的 IG-Z1203F 电源的相关信息
+            </summary>
+        </member>
+        <member name="M:ProductInfor._70410.SoundPlay_vCloseSpSwitch">
+            <summary>
+            是否需要播放关闭备电的语音
+            </summary>
+        </member>
+        <member name="M:ProductInfor._70410.SoundPlay_vOpenMandtorySwitch">
+            <summary>
+            是否需要播放短路强启开关的语音
+            </summary>
+        </member>
+        <member name="M:ProductInfor._70410.SoundPlay_vCloseMandtorySwitch">
+            <summary>
+            是否需要播放撤销强启开关的语音
+            </summary>
+        </member>
+        <member name="M:ProductInfor._70410.Measure_vCheckSingleSpStartupAbility(System.Boolean,System.Int32,System.String)">
+            <summary>
+            测试备电单投功能
+            </summary>
+            <param name="whole_function_enable">全项测试与否</param>
+            <param name="delay_magnification">测试过程中的延迟时间等级</param>
+            <param name="port_name">使用到的串口名</param>
+            <returns>包含多个信息的动态数组</returns>
+        </member>
+        <member name="M:ProductInfor._70410.Measure_vCheckMandtoryStartupAbility(System.Boolean,System.Int32,System.String)">
+            <summary>
+            检查电源的强制启动功能是否正常
             </summary>
             <param name="whole_function_enable">全项测试与否</param>
             <param name="delay_magnification">测试过程中的延迟时间等级</param>
