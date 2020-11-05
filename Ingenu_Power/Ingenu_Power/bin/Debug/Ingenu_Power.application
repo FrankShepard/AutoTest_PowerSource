@@ -14,14 +14,14 @@
     <framework targetVersion="4.5" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="Ingenu_Power.exe.manifest" size="11843">
+    <dependentAssembly dependencyType="install" codebase="Ingenu_Power.exe.manifest" size="10613">
       <assemblyIdentity name="Ingenu_Power.exe" version="2.3.0.26" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>v4fyKxs/KvI3/kHbTcpG8mdQo2e5oofilBJ2m5f4xsU=</dsig:DigestValue>
+        <dsig:DigestValue>OQlFxbuzClT7lOn5DpW9/TZmOGDUahCb1KV1MNC+rmE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

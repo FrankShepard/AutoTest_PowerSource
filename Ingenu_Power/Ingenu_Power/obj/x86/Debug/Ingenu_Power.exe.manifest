@@ -50,7 +50,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>DQQR4pJNXezs+fuVNopBZBWe1IYdkbSUWXKtcpikprQ=</dsig:DigestValue>
+        <dsig:DigestValue>u6KYpWZJljMbpKSb9rRmx5hRAwz+3FZc+ZmWkUoWM/8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -181,33 +181,6 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
       <dsig:DigestValue>gNHdmsbzfQlnYSImZYtujETGTlkZdyW8owQoNa2rqRg=</dsig:DigestValue>
-    </hash>
-  </file>
-  <file name="Resources\请短路强启开关.wav" size="47752">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>SGY/Gi+AdWy9VpBcipAFTzTdUxa6gZcUOVzf/0YbYck=</dsig:DigestValue>
-    </hash>
-  </file>
-  <file name="Resources\请断开备电.wav" size="50710">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>hPISVfz6aED/RXD5ODuY7HjicFw24h+xnTdd4vwr6mM=</dsig:DigestValue>
-    </hash>
-  </file>
-  <file name="Resources\请断开强启.wav" size="40710">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>lVBBbFkturiOttSsvuQSHNFg1bTB8TYgu90f5S6bl0Y=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Resources\请重开备电.wav" size="47404">

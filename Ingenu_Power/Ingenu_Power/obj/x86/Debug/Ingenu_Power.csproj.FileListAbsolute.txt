@@ -225,7 +225,4 @@ E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\�
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\测试合格.wav
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\UserControls\ucAdvancedSettings.g.cs
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\UserControls\ucAdvancedSettings.baml
-E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\请短路强启开关.wav
-E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\请断开备电.wav
-E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\bin\Debug\Resources\请断开强启.wav
 E:\Git_Hub\AutoTest_PowerSource\Ingenu_Power\Ingenu_Power\obj\x86\Debug\Ingenu_Power.csprojAssemblyReference.cache
