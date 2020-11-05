@@ -1451,7 +1451,7 @@ namespace ProductInfor
 											Thread.Sleep( 100 );
 											error_information = "强制启动模式下，产品串口采集到的数据与真实电压/电流的输出超过了限定的最大范围0.5V \r\n" + infor_Uart.Measured_OutputCurrent.ToString() + " " + currents[ 0 ].ToString() + "\r\n" + infor_Uart.Measured_OutputVoltage.ToString() + " " + voltages[ 0 ].ToString();
 										}
-									} while ( ( error_information != string.Empty ) && ( ++retry_count < 10 ) );
+									} while ( ( error_information != string.Empty ) && ( ++retry_count < 50 ) );
 								}
 							}
 						}
