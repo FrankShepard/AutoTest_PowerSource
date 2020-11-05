@@ -38,7 +38,7 @@ namespace Ingenu_Power.UserControls
 		/// <summary>
 		/// 最大测试步骤数
 		/// </summary>
-		private const int MAX_STEP_COUNT = 27;
+		private const int MAX_STEP_COUNT = 30;
 
 		/// <summary>
 		/// 测试线程
@@ -430,7 +430,8 @@ namespace Ingenu_Power.UserControls
 						object[] parameters;
 						Measure_vParmetersReset( measureCondition.Product_ID ); //测试参数初始化
 
-						SoundPlayer player = new SoundPlayer(); //准备语音播放					
+						SoundPlayer player = new SoundPlayer(); //准备语音播放
+						string source_filePath = string.Empty;
 
 						//						while ((error_information == string.Empty) && (++measure_index <= MAX_STEP_COUNT) && (limit_status)) {
 						while ((++measure_index <= MAX_STEP_COUNT) && (limit_status)) {
@@ -446,50 +447,92 @@ namespace Ingenu_Power.UserControls
 									measuredValue.exist_comOrTTL = (bool)arrayList [ 2 ]; //元素2 - 声名产品是否存在通讯或者TTL电平信号功能
 									break;
 								case 2://仪表初始化操作
-									mi = id_verion.GetMethod( "Measure_vInstrumentInitalize" );
-									parameters = new object[] { measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
-									error_information_step = mi.Invoke( obj, parameters ).ToString();
+									//mi = id_verion.GetMethod( "Measure_vInstrumentInitalize" );
+									//parameters = new object[] { measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
+									//error_information_step = mi.Invoke( obj, parameters ).ToString();
 									break;
 								case 3://备电单投启动功能检查
-									string source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请重开备电.wav";
-									player.SoundLocation = source_filePath;
-								    player.Load(  );
-									player.Play();
-									mi = id_verion.GetMethod( "Measure_vCheckSingleSpStartupAbility" );
-									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
-									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
-									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
-									StaticInfor.measureItemShow.Measure_Item = "备电单投功能检查";
-									if ((error_information_step == string.Empty) && ( bool )arrayList[ 1 ] != false) { //元素1 - 备电单投启动功能正常与否
-										measuredValue.Check_SingleStartupAbility_Sp = true;
-										StaticInfor.measureItemShow.Measure_Value = "Pass";
-									} else {
-										StaticInfor.measureItemShow.Measure_Value = "Failed";
-										measuredValue.AllCheckOkey &= false;
+									//string source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请重开备电.wav";
+									//player.SoundLocation = source_filePath;
+									//player.Load();
+									//player.Play();
+									//mi = id_verion.GetMethod( "Measure_vCheckSingleSpStartupAbility" );
+									//parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
+									//arrayList = ( ArrayList ) mi.Invoke( obj, parameters );
+									//error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
+									//StaticInfor.measureItemShow.Measure_Item = "备电单投功能检查";
+									//if (( error_information_step == string.Empty ) && ( bool ) arrayList[ 1 ] != false) { //元素1 - 备电单投启动功能正常与否
+									//	measuredValue.Check_SingleStartupAbility_Sp = true;
+									//	StaticInfor.measureItemShow.Measure_Value = "Pass";
+									//} else {
+									//	StaticInfor.measureItemShow.Measure_Value = "Failed";
+									//	measuredValue.AllCheckOkey &= false;
+									//}
+									break;
+								case 4: //是否需要播放关闭备电的语音									
+									mi = id_verion.GetMethod( "SoundPlay_vCloseSpSwitch" );
+									parameters = null;
+									bool playmusic_closespswitch = (bool)mi.Invoke( obj, parameters );
+									if (playmusic_closespswitch == true) {
+										source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请断开备电.wav";
+										player = new SoundPlayer {
+											SoundLocation = source_filePath
+										};
+										player.Load();
+										player.Play();
+										Thread.Sleep( 1000 );
 									}
 									break;
-								case 4://强制模式启动功能检查	
-									mi = id_verion.GetMethod( "Measure_vCheckMandtoryStartupAbility" );
-									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
-									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
-									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
-									if (error_information_step == string.Empty) {
-										if (( bool ) arrayList[ 1 ] != false) { //元素1 - 是否存在强制模式
-											StaticInfor.measureItemShow.Measure_Item = "强制模式启动验证";
-											if (( bool ) arrayList[ 2 ] != false) { //元素2 - 强制模式启动功能正常与否
-												measuredValue.Check_MandatoryStartupAbility = true;
-												StaticInfor.measureItemShow.Measure_Value = "Pass";
-											} else {
-												StaticInfor.measureItemShow.Measure_Value = "Failed";
-												measuredValue.AllCheckOkey &= false;
-											}
-										}
-									} else {
-										StaticInfor.measureItemShow.Measure_Value = "Failed";
-										measuredValue.AllCheckOkey &= false;
+								case 5: //是否需要播放短路强启开关的语音
+									mi = id_verion.GetMethod( "SoundPlay_vOpenMandtorySwitch" );
+									parameters = null;
+									bool playmusic_openmandtoryswitch = ( bool ) mi.Invoke( obj, parameters );
+									if (playmusic_openmandtoryswitch == true) {
+										source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请短路强启开关.wav";
+										player = new SoundPlayer {
+											SoundLocation = source_filePath
+										};
+										player.Load();
+										player.Play();
+										Thread.Sleep( 3000 );
 									}
 									break;
-								case 5://备电切断点检查
+								case 6://强制模式启动功能检查
+									//mi = id_verion.GetMethod( "Measure_vCheckMandtoryStartupAbility" );
+									//parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
+									//arrayList = ( ArrayList )mi.Invoke( obj, parameters );
+									//error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
+									//if (error_information_step == string.Empty) {
+									//	if (( bool ) arrayList[ 1 ] != false) { //元素1 - 是否存在强制模式
+									//		StaticInfor.measureItemShow.Measure_Item = "强制模式启动验证";
+									//		if (( bool ) arrayList[ 2 ] != false) { //元素2 - 强制模式启动功能正常与否
+									//			measuredValue.Check_MandatoryStartupAbility = true;
+									//			StaticInfor.measureItemShow.Measure_Value = "Pass";
+									//		} else {
+									//			StaticInfor.measureItemShow.Measure_Value = "Failed";
+									//			measuredValue.AllCheckOkey &= false;
+									//		}
+									//	}
+									//} else {
+									//	StaticInfor.measureItemShow.Measure_Value = "Failed";
+									//	measuredValue.AllCheckOkey &= false;
+									//}
+									break;
+								case 7: //是否需要播放撤销强启开关的语音									
+									mi = id_verion.GetMethod( "SoundPlay_vCloseMandtorySwitch" );
+									parameters = null;
+									bool playmusic_closemandtoryswitch = ( bool ) mi.Invoke( obj, parameters );
+									if (playmusic_closemandtoryswitch == true) {
+										source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请断开强启.wav";
+										player = new SoundPlayer {
+											SoundLocation = source_filePath
+										};
+										player.Load();
+										player.Play();
+										Thread.Sleep( 3000 );
+									}
+									break;
+								case 8://备电切断点检查
 									mi = id_verion.GetMethod( "Measure_vCutoffVoltageCheck" );				
 									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
@@ -508,7 +551,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}							
 									break;
-								case 6://主电单投启动功能检查
+								case 9://主电单投启动功能检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSingleMpStartupAbility" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -522,7 +565,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 7://备电（可调直流电源）输出打开动作，准备充电
+								case 10://备电（可调直流电源）输出打开动作，准备充电
 									mi = id_verion.GetMethod( "Measure_vDCPowerOutputSet" );
 									parameters = new object[] { measureCondition.Magnification, Properties.Settings.Default.UsedSerialport, true, true };
 									arrayList = ( ArrayList ) mi.Invoke( obj, parameters );
@@ -536,7 +579,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 8://满载电压测试
+								case 11://满载电压测试
 									mi = id_verion.GetMethod ( "Measure_vVoltageWithLoad" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -561,7 +604,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;								
-								case 9://测试输出纹波
+								case 12://测试输出纹波
 									mi = id_verion.GetMethod ( "Measure_vRapple" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -585,7 +628,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;								
-								case 10://计算AC/DC部分效率
+								case 13://计算AC/DC部分效率
 									mi = id_verion.GetMethod ( "Measure_vEfficiency" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -599,7 +642,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 11://测试空载电压
+								case 14://测试空载电压
 									mi = id_verion.GetMethod ( "Measure_vVoltageWithoutLoad" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -626,7 +669,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 12://测试均充电流 -- 此时需要唤醒一次MCU控制板
+								case 15://测试均充电流 -- 此时需要唤醒一次MCU控制板
 									mi = id_verion.GetMethod ( "Measure_vCurrentEqualizedCharge" );
 									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -640,7 +683,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 13://测试浮充电压（此处可能需要进入电源产品的程序后门，减少充电时间）
+								case 16://测试浮充电压（此处可能需要进入电源产品的程序后门，减少充电时间）
 									mi = id_verion.GetMethod ( "Measure_vVoltageFloatingCharge" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -654,7 +697,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 14://浮充时关闭备电，用于识别备电丢失
+								case 17://浮充时关闭备电，用于识别备电丢失
 									mi = id_verion.GetMethod ( "Measure_vDCPowerOutputSet" );
 									parameters = new object[] { measureCondition.Magnification,Properties.Settings.Default.UsedSerialport ,false,false};
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -668,7 +711,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 15://计算负载效应
+								case 18://计算负载效应
 									mi = id_verion.GetMethod( "Measure_vEffectLoad" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measuredValue.Voltage_WithLoad, measuredValue.Voltage_WithoutLoad };
 									arrayList = ( ArrayList )mi.Invoke( obj, parameters );
@@ -692,7 +735,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 16://计算源效应
+								case 19://计算源效应
 									mi = id_verion.GetMethod ( "Measure_vEffectSource" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );									
@@ -718,7 +761,7 @@ namespace Ingenu_Power.UserControls
 										}
 									}
 									break;
-								case 17://识别备电丢失
+								case 20://识别备电丢失
 									mi = id_verion.GetMethod ( "Measure_vCheckDistinguishSpOpen" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -732,7 +775,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 18://重新开启备电，用于后续主备电转换
+								case 21://重新开启备电，用于后续主备电转换
 									mi = id_verion.GetMethod ( "Measure_vDCPowerOutputSet" );
 									parameters = new object[] { measureCondition.Magnification, Properties.Settings.Default.UsedSerialport, false, true };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -746,7 +789,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 19://主电丢失切换检查  -- 此时需要唤醒一次MCU控制板
+								case 22://主电丢失切换检查  -- 此时需要唤醒一次MCU控制板
 									Thread.Sleep ( 500 );
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpLost" );
 									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
@@ -761,7 +804,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 20://主电恢复存在切换检查
+								case 23://主电恢复存在切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpRestart" );
 									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -775,7 +818,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 21://主电欠压切换检查
+								case 24://主电欠压切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpUnderVoltage" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -791,7 +834,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 22://主电欠压恢复切换检查
+								case 25://主电欠压恢复切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpUnderVoltageRecovery" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -807,7 +850,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 23://主电过压切换检查
+								case 26://主电过压切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpOverVoltage" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -823,7 +866,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 24://主电过压恢复切换检查
+								case 27://主电过压恢复切换检查
 									mi = id_verion.GetMethod ( "Measure_vCheckSourceChangeMpOverVoltageRecovery" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -839,7 +882,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 25://测试OXP  -- 此时需要唤醒一次MCU控制板
+								case 28://测试OXP  -- 此时需要唤醒一次MCU控制板
 									mi = id_verion.GetMethod ( "Measure_vOXP" );
 									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -869,7 +912,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 26://短路保护检查
+								case 29://短路保护检查
 									mi = id_verion.GetMethod ( "Measure_vOutputShortProtect" );
 									parameters = new object[] { measureCondition.WholeFunction_Enable,measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
 									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
@@ -893,7 +936,7 @@ namespace Ingenu_Power.UserControls
 										measuredValue.AllCheckOkey &= false;
 									}
 									break;
-								case 27://填充串口通讯部分或者TTL部分的检查状态；执行到此处且没有错误，则说明串口或者TTL部分检查为正常(不含串口或者TTL信号的产品也认为此项正常)
+								case 30://填充串口通讯部分或者TTL部分的检查状态；执行到此处且没有错误，则说明串口或者TTL部分检查为正常(不含串口或者TTL信号的产品也认为此项正常)
 									if ( measuredValue.exist_comOrTTL ) {
 										measuredValue.CommunicateOrTTL_Okey = true;
 									}
@@ -925,14 +968,14 @@ namespace Ingenu_Power.UserControls
 						}
 
 						if (!measuredValue.AllCheckOkey) {
-							string source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\测试不合格.wav";
+							source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\测试不合格.wav";
 							player.SoundLocation = source_filePath;
 							player.Load();
 							player.Play();
 							StaticInfor.Measured_UncorrectProductCount++;
 							Properties.Settings.Default.产品异常总数 = StaticInfor.Measured_UncorrectProductCount;
 						} else {
-							string source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\测试合格.wav";
+							source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\测试合格.wav";
 							player.SoundLocation = source_filePath;
 							player.Load();
 							player.Play();
