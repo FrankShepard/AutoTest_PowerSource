@@ -906,9 +906,10 @@ namespace Instrument_Control
 		/// <summary>
 		/// 对待测产品MCU进行校准 - 主电周期及主电欠压点的校准
 		/// </summary>
+		/// <param name="ac_voltage">产品欠压校准对应的电压</param>
 		/// <param name="serialPort">使用到的串口</param>
 		/// <param name="error_information">可能存在的错误信息</param>
-		public void McuCalibrate_vMp( SerialPort serialPort, out string error_information )
+		public void McuCalibrate_vMp( decimal ac_voltage,SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			byte [ ] datas = new byte [ ] { 0, 0, 0, 0, 0, 0 };
@@ -918,7 +919,10 @@ namespace Instrument_Control
 			if ( error_information != string.Empty ) { return; }
 			//操作Flash时需要时间，给25ms进行实际操作的等待
 			Thread.Sleep ( 25 );
-			datas [ 1 ] = ( byte ) Config.Mcu_MainpowerUnderVoltageCountGet;
+			datas [ 1 ] = ( byte ) Config.Mcu_MainpowerUnderVoltageCountGet;		
+			byte[] voltage1 = BitConverter.GetBytes( Convert.ToUInt16( ac_voltage ) );
+			datas[ 2 ] = voltage1[ 1 ];
+			datas[ 3 ] = voltage1[ 0 ];
 			McuCalibrate_vSendCmd ( datas, serialPort, out error_information );
 			//操作Flash时需要时间，给25ms进行实际操作的等待
 			Thread.Sleep ( 25 );
@@ -1386,23 +1390,27 @@ namespace Instrument_Control
 				}
 			} while (--real_data_endindex > 0);
 
-			byte[] real_data = new byte[ real_data_endindex - real_data_startindex + 1 ];
-			Buffer.BlockCopy( received_data, real_data_startindex, real_data, 0, Math.Min( received_data.Length, real_data.Length ) );
+			if (real_data_endindex > real_data_startindex) {
+				byte[] real_data = new byte[ real_data_endindex - real_data_startindex + 1 ];
+				Buffer.BlockCopy( received_data, real_data_startindex, real_data, 0, Math.Min( received_data.Length, real_data.Length ) );
 
-			if (real_data.Length == 9) {
-				//先判断同步头字节是否满足要求;取消帧尾的判断（个别型号的电源重启时可能发送异常多个无意义字节）
-				if (( real_data[ 0 ] == Header_Vali ) && ( real_data[ 3 ] == 0x1F )) {
-					byte recevied_validatecode = McuCalibrate_vCalculateVali( real_data );
-					byte validatecode = real_data[ 7 ];
-					if (recevied_validatecode != validatecode) {
-						error_information = "待测单片机返回的校验码不匹配 \r\n";
-					} else {
-						if (real_data[ 2 ] == ( byte ) Config.FlashDataRead) {
-							McuBackdoor_uReceivedData[ 0 ] = real_data[ 5 ];
-							McuBackdoor_uReceivedData[ 1 ] = real_data[ 6 ];
+				if (real_data.Length == 9) {
+					//先判断同步头字节是否满足要求;取消帧尾的判断（个别型号的电源重启时可能发送异常多个无意义字节）
+					if (( real_data[ 0 ] == Header_Vali ) && ( real_data[ 3 ] == 0x1F )) {
+						byte recevied_validatecode = McuCalibrate_vCalculateVali( real_data );
+						byte validatecode = real_data[ 7 ];
+						if (recevied_validatecode != validatecode) {
+							error_information = "待测单片机返回的校验码不匹配 \r\n";
+						} else {
+							if (real_data[ 2 ] == ( byte ) Config.FlashDataRead) {
+								McuBackdoor_uReceivedData[ 0 ] = real_data[ 5 ];
+								McuBackdoor_uReceivedData[ 1 ] = real_data[ 6 ];
+							}
 						}
 					}
 				}
+			} else {
+				error_information = "待测单片机返回的响应数据异常 \r\n";
 			}
 
 			//个别型号的产品电源在上电下电时会错误的上传多余数据，此数据可能会对后续逻辑造成异常干扰；此处清除串口中的数据

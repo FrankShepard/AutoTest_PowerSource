@@ -10,7 +10,7 @@
 
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/%e8%af%b7%e6%96%ad%e5%bc%80%e5%a4%87%e7%94%b5.wav")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/%e8%af%b7%e6%96%ad%e5%bc%80%e5%bc%ba%e5%90%af.wav")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/%e8%af%b7%e7%9f%ad%e8%b7%af%e5%bc%ba%e5%90%af%e5%bc%80%e5%85%b3.wav")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/%e8%af%b7%e7%9f%ad%e8%b7%af%e5%bc%ba%e5%90%af.wav")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/%e8%af%b7%e9%87%8d%e5%bc%80%e5%a4%87%e7%94%b5.wav")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/%e6%b5%8b%e8%af%95%e4%b8%8d%e5%90%88%e6%a0%bc.wav")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/%e6%b5%8b%e8%af%95%e5%90%88%e6%a0%bc.wav")]

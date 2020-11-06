@@ -44,6 +44,10 @@ namespace Ingenu_Power.UserControls
 		/// 测试线程
 		/// </summary>
 		public Thread trdMeasure;
+		/// <summary>
+		/// 语音播放线程
+		/// </summary>
+		public Thread trdPlayMusic;
 
 		/// <summary>
 		/// Timer组件中进行进度条和测试项、测试环节、测试结果的显示
@@ -384,6 +388,15 @@ namespace Ingenu_Power.UserControls
 
 		#endregion
 
+		private void SoundPlayer_vStartMusic(string source_location)
+		{
+			SoundPlayer player = new SoundPlayer(); //准备语音播放
+			string source_filePath = source_location;
+			player.SoundLocation = source_filePath;
+			player.Load();
+			player.Play();
+		}
+
 		#region -- 测试环节中的测试操作步骤
 
 		/// <summary>
@@ -430,9 +443,6 @@ namespace Ingenu_Power.UserControls
 						object[] parameters;
 						Measure_vParmetersReset( measureCondition.Product_ID ); //测试参数初始化
 
-						SoundPlayer player = new SoundPlayer(); //准备语音播放
-						string source_filePath = string.Empty;
-
 						//						while ((error_information == string.Empty) && (++measure_index <= MAX_STEP_COUNT) && (limit_status)) {
 						while ((++measure_index <= MAX_STEP_COUNT) && (limit_status)) {
 							switch (measure_index) {
@@ -447,40 +457,34 @@ namespace Ingenu_Power.UserControls
 									measuredValue.exist_comOrTTL = (bool)arrayList [ 2 ]; //元素2 - 声名产品是否存在通讯或者TTL电平信号功能
 									break;
 								case 2://仪表初始化操作
-									//mi = id_verion.GetMethod( "Measure_vInstrumentInitalize" );
-									//parameters = new object[] { measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
-									//error_information_step = mi.Invoke( obj, parameters ).ToString();
+									mi = id_verion.GetMethod( "Measure_vInstrumentInitalize" );
+									parameters = new object[] { measureCondition.WholeFunction_Enable, Properties.Settings.Default.Instrment_OSC_INS, Properties.Settings.Default.UsedSerialport };
+									error_information_step = mi.Invoke( obj, parameters ).ToString();
 									break;
 								case 3://备电单投启动功能检查
-									//string source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请重开备电.wav";
-									//player.SoundLocation = source_filePath;
-									//player.Load();
-									//player.Play();
-									//mi = id_verion.GetMethod( "Measure_vCheckSingleSpStartupAbility" );
-									//parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
-									//arrayList = ( ArrayList ) mi.Invoke( obj, parameters );
-									//error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
-									//StaticInfor.measureItemShow.Measure_Item = "备电单投功能检查";
-									//if (( error_information_step == string.Empty ) && ( bool ) arrayList[ 1 ] != false) { //元素1 - 备电单投启动功能正常与否
-									//	measuredValue.Check_SingleStartupAbility_Sp = true;
-									//	StaticInfor.measureItemShow.Measure_Value = "Pass";
-									//} else {
-									//	StaticInfor.measureItemShow.Measure_Value = "Failed";
-									//	measuredValue.AllCheckOkey &= false;
-									//}
-									break;
-								case 4: //是否需要播放关闭备电的语音									
-									mi = id_verion.GetMethod( "SoundPlay_vCloseSpSwitch" );
-									parameters = null;
-									bool playmusic_closespswitch = (bool)mi.Invoke( obj, parameters );
-									if (playmusic_closespswitch == true) {
-										source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请断开备电.wav";
-										player = new SoundPlayer {
-											SoundLocation = source_filePath
+									if (trdPlayMusic == null) {
+										trdPlayMusic = new Thread( () => SoundPlayer_vStartMusic( Directory.GetCurrentDirectory() + "\\Resources\\请重开备电.wav" ) ) {
+											Name = "语音播放线程",
+											Priority = ThreadPriority.Lowest,
+											IsBackground = false
 										};
-										player.Load();
-										player.Play();
-										Thread.Sleep( 1000 );
+										trdPlayMusic.SetApartmentState( ApartmentState.STA );
+										trdPlayMusic.Start();
+									} else {										
+										trdPlayMusic = new Thread( () => SoundPlayer_vStartMusic( Directory.GetCurrentDirectory() + "\\Resources\\请重开备电.wav" ) );
+										trdPlayMusic.Start();
+									}
+									mi = id_verion.GetMethod( "Measure_vCheckSingleSpStartupAbility" );
+									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
+									arrayList = ( ArrayList ) mi.Invoke( obj, parameters );
+									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
+									StaticInfor.measureItemShow.Measure_Item = "备电单投功能检查";
+									if (( error_information_step == string.Empty ) && ( bool ) arrayList[ 1 ] != false) { //元素1 - 备电单投启动功能正常与否
+										measuredValue.Check_SingleStartupAbility_Sp = true;
+										StaticInfor.measureItemShow.Measure_Value = "Pass";
+									} else {
+										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
 									}
 									break;
 								case 5: //是否需要播放短路强启开关的语音
@@ -488,48 +492,46 @@ namespace Ingenu_Power.UserControls
 									parameters = null;
 									bool playmusic_openmandtoryswitch = ( bool ) mi.Invoke( obj, parameters );
 									if (playmusic_openmandtoryswitch == true) {
-										source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请短路强启开关.wav";
-										player = new SoundPlayer {
-											SoundLocation = source_filePath
-										};
-										player.Load();
-										player.Play();
-										Thread.Sleep( 3000 );
+										trdPlayMusic = new Thread( () => SoundPlayer_vStartMusic( Directory.GetCurrentDirectory() + "\\Resources\\请短路强启.wav" ) );
+										trdPlayMusic.Start();
+										this.Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), "请短路强启", false );
+										Thread.Sleep( 500 );
+										StaticInfor.autoResetEvent.Reset();
+										StaticInfor.autoResetEvent.WaitOne();
 									}
 									break;
 								case 6://强制模式启动功能检查
-									//mi = id_verion.GetMethod( "Measure_vCheckMandtoryStartupAbility" );
-									//parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification,Properties.Settings.Default.UsedSerialport };
-									//arrayList = ( ArrayList )mi.Invoke( obj, parameters );
-									//error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
-									//if (error_information_step == string.Empty) {
-									//	if (( bool ) arrayList[ 1 ] != false) { //元素1 - 是否存在强制模式
-									//		StaticInfor.measureItemShow.Measure_Item = "强制模式启动验证";
-									//		if (( bool ) arrayList[ 2 ] != false) { //元素2 - 强制模式启动功能正常与否
-									//			measuredValue.Check_MandatoryStartupAbility = true;
-									//			StaticInfor.measureItemShow.Measure_Value = "Pass";
-									//		} else {
-									//			StaticInfor.measureItemShow.Measure_Value = "Failed";
-									//			measuredValue.AllCheckOkey &= false;
-									//		}
-									//	}
-									//} else {
-									//	StaticInfor.measureItemShow.Measure_Value = "Failed";
-									//	measuredValue.AllCheckOkey &= false;
-									//}
+									mi = id_verion.GetMethod( "Measure_vCheckMandtoryStartupAbility" );
+									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
+									arrayList = ( ArrayList ) mi.Invoke( obj, parameters );
+									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
+									if (error_information_step == string.Empty) {
+										if (( bool ) arrayList[ 1 ] != false) { //元素1 - 是否存在强制模式
+											StaticInfor.measureItemShow.Measure_Item = "强制模式启动验证";
+											if (( bool ) arrayList[ 2 ] != false) { //元素2 - 强制模式启动功能正常与否
+												measuredValue.Check_MandatoryStartupAbility = true;
+												StaticInfor.measureItemShow.Measure_Value = "Pass";
+											} else {
+												StaticInfor.measureItemShow.Measure_Value = "Failed";
+												measuredValue.AllCheckOkey &= false;
+											}
+										}
+									} else {
+										StaticInfor.measureItemShow.Measure_Value = "Failed";
+										measuredValue.AllCheckOkey &= false;
+									}
 									break;
 								case 7: //是否需要播放撤销强启开关的语音									
 									mi = id_verion.GetMethod( "SoundPlay_vCloseMandtorySwitch" );
 									parameters = null;
 									bool playmusic_closemandtoryswitch = ( bool ) mi.Invoke( obj, parameters );
 									if (playmusic_closemandtoryswitch == true) {
-										source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请断开强启.wav";
-										player = new SoundPlayer {
-											SoundLocation = source_filePath
-										};
-										player.Load();
-										player.Play();
-										Thread.Sleep( 3000 );
+										trdPlayMusic = new Thread( () => SoundPlayer_vStartMusic( Directory.GetCurrentDirectory() + "\\Resources\\请断开强启.wav" ) );
+										trdPlayMusic.Start();
+										this.Dispatcher.Invoke( new MainWindow.Dlg_MessageTips( MainWindow.MessageTips ), "请断开强启", false );
+										Thread.Sleep( 500 );
+										StaticInfor.autoResetEvent.Reset();
+										StaticInfor.autoResetEvent.WaitOne();
 									}
 									break;
 								case 8://备电切断点检查
@@ -671,13 +673,13 @@ namespace Ingenu_Power.UserControls
 									break;
 								case 15://测试均充电流 -- 此时需要唤醒一次MCU控制板
 									mi = id_verion.GetMethod ( "Measure_vCurrentEqualizedCharge" );
-									parameters = new object[] {measureCondition.WholeFunction_Enable,measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
-									arrayList = ( ArrayList ) mi.Invoke ( obj, parameters );
-									error_information_step = arrayList [ 0 ].ToString ( ); //元素0 - 可能存在的错误信息
+									parameters = new object[] { measureCondition.WholeFunction_Enable, measureCondition.Magnification, Properties.Settings.Default.UsedSerialport };
+									arrayList = ( ArrayList ) mi.Invoke( obj, parameters );
+									error_information_step = arrayList[ 0 ].ToString(); //元素0 - 可能存在的错误信息
 									StaticInfor.measureItemShow.Measure_Item = "均充电流测试";
-									if ((error_information_step == string.Empty) && ( bool ) arrayList [ 1 ] != false ) { //元素1 - 均充电流合格与否的判断
-										measuredValue.Current_EqualizedCharge = ( decimal ) arrayList [ 2 ]; //元素2 - 具体的均充电流
-										StaticInfor.measureItemShow.Measure_Value = measuredValue.Current_EqualizedCharge.ToString("0.0#") +"A";
+									if (( error_information_step == string.Empty ) && ( bool ) arrayList[ 1 ] != false) { //元素1 - 均充电流合格与否的判断
+										measuredValue.Current_EqualizedCharge = ( decimal ) arrayList[ 2 ]; //元素2 - 具体的均充电流
+										StaticInfor.measureItemShow.Measure_Value = measuredValue.Current_EqualizedCharge.ToString( "0.0#" ) + "A";
 									} else {
 										StaticInfor.measureItemShow.Measure_Value = "Failed";
 										measuredValue.AllCheckOkey &= false;
@@ -967,21 +969,19 @@ namespace Ingenu_Power.UserControls
 							Dispatcher.Invoke( new dlg_PrograssBarSet( PrograssBarSet ), prgStep, measure_index, false );
 						}
 
+						string soundsorces = string.Empty;
 						if (!measuredValue.AllCheckOkey) {
-							source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\测试不合格.wav";
-							player.SoundLocation = source_filePath;
-							player.Load();
-							player.Play();
+							soundsorces = Directory.GetCurrentDirectory() + "\\Resources\\测试不合格.wav";
 							StaticInfor.Measured_UncorrectProductCount++;
 							Properties.Settings.Default.产品异常总数 = StaticInfor.Measured_UncorrectProductCount;
 						} else {
-							source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\测试合格.wav";
-							player.SoundLocation = source_filePath;
-							player.Load();
-							player.Play();
+							soundsorces = Directory.GetCurrentDirectory() + "\\Resources\\测试合格.wav";
 							StaticInfor.Measured_CorrectProductCount++;
 							Properties.Settings.Default.产品合格总数 = StaticInfor.Measured_CorrectProductCount;
 						}
+						trdPlayMusic = new Thread( () => SoundPlayer_vStartMusic( soundsorces ) );
+						trdPlayMusic.Start();
+
 						StaticInfor.Measured_WholeProductCount++;
 						Properties.Settings.Default.产品测试总数 = StaticInfor.Measured_WholeProductCount;
 						Properties.Settings.Default.Save();

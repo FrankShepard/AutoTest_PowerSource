@@ -308,8 +308,12 @@ namespace ProductInfor
 				for (int index = 0; index < 6; index++) {					
 					AllocateChannel[ index ] = index / 4;
 					if(index == 4) {
-						real_powers[ index ] = powers[ 1 ];
-					}else if(index == 5) {
+						if (output_count > 1) {
+							real_powers[ index ] = powers[ 1 ];
+						} else {
+							real_powers[ index ] = 0m;
+						}
+					} else if(index == 5) {
 						real_powers[ index ] = 0m;
 					} else {
 						if (should_work_power_left >= SingleLoadMaxPower) {
@@ -400,7 +404,11 @@ namespace ProductInfor
 				for (int index = 0; index < 6; index++) {
 					AllocateChannel[ index ] = index / 4;
 					if (index == 4) {
-						real_currents[ index ] = currents[ 1 ];
+						if (output_count > 1) {
+							real_currents[ index ] = currents[ 1 ];
+						} else {
+							real_currents[ index ] = 0m;
+						}
 					} else if (index == 5) {
 						real_currents[ index ] = 0m;
 					} else {
@@ -494,9 +502,13 @@ namespace ProductInfor
 				for (int index = 0; index < 6; index++) {
 					AllocateChannel[ index ] = index / 4;
 					if (index == 4) {
-						real_resistances[ index ] = resistances[ 1]; //5V输出  隔离通道的电阻直接使用设定值
+						if (output_count > 1) {
+							real_resistances[ index ] = real_resistances[ 1 ];//5V输出  隔离通道的电阻直接使用设定值
+						} else {
+							real_resistances[ index ] = 7500m;//使用最大的电阻，对输出电压影响放到最低
+						}
 					} else if (index == 5) {
-						real_resistances[ index ] = 7500m; //使用最大的电阻，对输出电压影响放到最低
+						real_resistances[ index ] = 7500m; 
 					} else {
 						if (should_work_power_left >= SingleLoadMaxPower) {
 							real_resistances[ index ] = Convert.ToDecimal( Math.Pow( Convert.ToDouble( real_voltages[ 0 ] ), 2.0 ) ) / SingleLoadMaxPower;

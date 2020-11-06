@@ -394,7 +394,7 @@ namespace ProductInfor
 		/// <param name="change_to_auto_mode">是否需要按照自动模式</param>
 		/// <param name="serialPort">使用到的实际串口</param>
 		/// <param name="error_information">可能存在的异常信息</param>
-		private void Communicate_vUserSetWorkingMode( bool change_to_auto_mode, SerialPort serialPort, out string error_information )
+		public void Communicate_vUserSetWorkingMode( bool change_to_auto_mode, SerialPort serialPort, out string error_information )
 		{
 			error_information = string.Empty;
 			int index = 0;
@@ -1106,8 +1106,10 @@ namespace ProductInfor
 			error_information = string.Empty;
 			serialPort.BaudRate = CommunicateBaudrate;
 			//统一禁止备电单投功能
-			mCU_Control.McuCalibrate_vBatsSingleWorkEnableSet ( serialPort, out error_information );
-			if ( error_information != string.Empty ) { return; }
+			if (( IDVerion_Product == "70410" ) || ( IDVerion_Product == "74710" ) || ( IDVerion_Product == "74810" )) {
+				mCU_Control.McuCalibrate_vBatsSingleWorkEnableSet( serialPort, out error_information );
+				if (error_information != string.Empty) { return; }
+			}
 			//退出管理员模式，之前的软件版本中没有此命令，如果没有此命令则需要软件复位操作
 			mCU_Control.McuCalibrate_vExitCalibration ( serialPort, out error_information );
 			if ( error_information != string.Empty ) {
@@ -1548,10 +1550,10 @@ namespace ProductInfor
 												error_information = "电源测试得到的输出电压超过了合格误差范围 " + infor_Uart.Measured_OutputVoltage.ToString() + "  " + specific_value[index_of_channel].ToString();
 											}
 											if (Math.Abs( infor_Uart.Measured_OutputCurrent - real_current ) > 0.5m) {
-												error_information = "电源测试得到的输出电流超过了合格误差范围 " + infor_Uart.Measured_OutputCurrent.ToString() + "  " + real_current.ToString() ;
+												error_information += "电源测试得到的输出电流超过了合格误差范围 " + infor_Uart.Measured_OutputCurrent.ToString() + "  " + real_current.ToString() ;
 											}
 											if (Math.Abs( infor_Uart.Measured_MpVoltage - infor_Mp.MpVoltage[ 1 ] ) > 5m) {
-												error_information = "电源测试得到的主电电压超过了合格误差范围 " + infor_Uart.Measured_MpVoltage.ToString() + "  " +infor_Mp.MpVoltage[1].ToString();
+												error_information += "电源测试得到的主电电压超过了合格误差范围 " + infor_Uart.Measured_MpVoltage.ToString() + "  " +infor_Mp.MpVoltage[1].ToString();
 											}
 											break;
 										default: break;
@@ -2219,9 +2221,10 @@ namespace ProductInfor
 								ArrayList list = new ArrayList ( );
                                 using (Itech itech = new Itech())
                                 {
-                                    for (int retry_count = 0; retry_count < 3; retry_count++)
+                                    for (int retry_count = 0; retry_count < 7; retry_count++)
                                     {
-                                        list = measureDetails.Measure_vReadOutputLoadResult(serialPort, out error_information);
+										Thread.Sleep( 200 );
+										list = measureDetails.Measure_vReadOutputLoadResult(serialPort, out error_information);
                                         if (error_information != string.Empty) { continue; }
                                         for (int channel_index = 0; channel_index < infor_Output.OutputChannelCount; channel_index++)
                                         {

@@ -444,7 +444,7 @@ namespace Ingenu_Power
 		{
 			if (message != string.Empty) {
 				ResultMessageDialog resultMessageDialog = new ResultMessageDialog();
-				resultMessageDialog.MessageTips( message, cancel_showed );
+				resultMessageDialog.MessageTips( message, cancel_showed );				
 			}
 		}
 

@@ -1294,7 +1294,12 @@ namespace ProductInfor
 				}
 			}
 
-			mCU_Control.McuCalibrate_vMp( serialPort, out error_information );
+			if((id_verion == "70410") || (id_verion == "73110")) {
+				//! IG-Z1203F、IG-Z2244F  主电采集稍微有点慢，需要增加延时后才可以进行主电欠压点的采集（原因是主电欠压点采集时会一起处理）
+				Thread.Sleep( 1000 );
+			}
+
+			mCU_Control.McuCalibrate_vMp( infor_Calibration.MpUnderVoltage, serialPort, out error_information );
 			if (error_information != string.Empty) { return; }
 
 			//过压点具体值需要校准的情况
@@ -1419,6 +1424,7 @@ namespace ProductInfor
 							Communicate_Admin( serialPort, out error_information );
 						}
 						//立刻写入数据，防止后续掉电
+						Thread.Sleep(300);
 						serialPort.BaudRate = CommunicateBaudrate;
 						mCU_Control.McuCalibrate_vMpOutputCurrent( index_of_calibration_channel, voltage, current, serialPort, out error_information );
 						channel_calibrated = true;
@@ -1611,13 +1617,7 @@ namespace ProductInfor
 		{
 			ArrayList arrayList = new ArrayList();//元素0 - 可能存在的错误信息 ； 元素1 - 备电单投启动功能正常与否
 			string error_information = string.Empty;
-			bool check_okey = false;
-
-			string source_filePath = Directory.GetCurrentDirectory() + "\\Resources\\请重开备电.wav";
-			SoundPlayer player = new SoundPlayer();
-			player.SoundLocation = source_filePath;
-			player.Load();
-			player.Play();
+			bool check_okey = false;	
 
 			for (int temp_index = 0; temp_index < 2; temp_index++) {
 				if (temp_index == 0) {
@@ -4065,14 +4065,6 @@ namespace ProductInfor
 				error_information += "待测电源输出重启时间超时";
 			}
 			return output_rebuild;
-		}
-
-		/// <summary>
-		/// 是否需要播放关闭备电的语音
-		/// </summary>
-		public virtual bool SoundPlay_vCloseSpSwitch()
-		{
-			return false;
 		}
 
 		/// <summary>

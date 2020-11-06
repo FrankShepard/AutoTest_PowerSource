@@ -3543,10 +3543,11 @@
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>
-        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vMp(System.IO.Ports.SerialPort,System.String@)">
+        <member name="M:Instrument_Control.MCU_Control.McuCalibrate_vMp(System.Decimal,System.IO.Ports.SerialPort,System.String@)">
             <summary>
             对待测产品MCU进行校准 - 主电周期及主电欠压点的校准
             </summary>
+            <param name="ac_voltage">产品欠压校准对应的电压</param>
             <param name="serialPort">使用到的串口</param>
             <param name="error_information">可能存在的错误信息</param>
         </member>

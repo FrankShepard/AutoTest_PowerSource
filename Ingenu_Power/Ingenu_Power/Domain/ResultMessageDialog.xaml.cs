@@ -21,7 +21,7 @@ namespace Ingenu_Power.Domain
 		public delegate void dlg_MessageTips(string message, bool cancel_showed);
 
 		/// <summary>
-		/// 检查用户名与密码是否有效
+		/// 显示错误信息
 		/// </summary>
 		/// <param name="message">需要显示的信息</param>
 		/// <param name="sender"></param>
@@ -36,6 +36,7 @@ namespace Ingenu_Power.Domain
 
 			try {
 				await DialogHost.Show( this, "RootDialog" );
+				StaticInfor.autoResetEvent.Set();
 			} catch {
 				; //可能是之前的 DialogHost 没有关闭造成，不要显示  方式异常退出
 			}

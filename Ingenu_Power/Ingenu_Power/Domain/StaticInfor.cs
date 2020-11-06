@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -239,6 +240,11 @@ namespace Ingenu_Power.Domain
 
 
 		#endregion
+
+		/// <summary>
+		/// 线程间的同步使用
+		/// </summary>
+		public static AutoResetEvent autoResetEvent = new AutoResetEvent(false);
 
 		/// <summary>
 		/// 用于数据库的登陆的相关参数
