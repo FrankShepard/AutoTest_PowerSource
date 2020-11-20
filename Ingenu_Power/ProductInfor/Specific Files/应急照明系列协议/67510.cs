@@ -2337,7 +2337,7 @@ namespace ProductInfor
 								if ( error_information != string.Empty ) { continue; }
 
 								//撤销短路之后输出1和输出2可以正常启动
-								Thread.Sleep ( 1200 );
+								Thread.Sleep ( 2000 );
 								Thread.Sleep ( 100 * delay_magnification );
 								ArrayList list = new ArrayList ( );
 								using ( Itech itech = new Itech ( ) ) {
@@ -2348,10 +2348,11 @@ namespace ProductInfor
 											if ( allocate_channel [ index ] == channel_index ) {
 												Itech.GeneralData_Load generalData_Load = ( Itech.GeneralData_Load ) list [ index ];
 												if ( generalData_Load.ActrulyVoltage > 0.95m * infor_Output.Qualified_OutputVoltageWithLoad [ channel_index, 0 ] ) {
-													check_okey [ channel_index ] = true;
+													check_okey [ channel_index ] = true;													
 												}
 												break;
 											}
+											Thread.Sleep(10);
 										}
 									}
 								}
