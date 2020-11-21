@@ -68,7 +68,7 @@ namespace ProductInfor
 						//infor_Uart.communicate_Signal.Measured_ChargeCompletedSignal = Convert.ToBoolean( SerialportData[ 3 + SerialportData[ 2 ] ] & 0x02 );
 						//infor_Uart.communicate_Signal.Measured_IsChargingSignal = Convert.ToBoolean( SerialportData[ 3 + SerialportData[ 2 ] ] & 0x01 );
 
-						infor_Uart.Measured_MpVoltage = ( ( SerialportData[ 5 ] & 0xF0 ) >> 4 ) * 1000 + ( SerialportData[ 5 ] & 0x0F ) * 100 + ( ( SerialportData[ 6 ] & 0xF0 ) >> 4 ) * 10 + ( SerialportData[ 5 ] & 0x0F );
+						infor_Uart.Measured_MpVoltage = ( ( SerialportData[ 5 ] & 0xF0 ) >> 4 ) * 1000 + ( SerialportData[ 5 ] & 0x0F ) * 100 + ( ( SerialportData[ 6 ] & 0xF0 ) >> 4 ) * 10 + ( SerialportData[ 6 ] & 0x0F );
 						infor_Uart.Measured_OutputVoltage = ( ( ( SerialportData[ 7 ] & 0xF0 ) >> 4 ) * 1000 + ( SerialportData[ 7 ] & 0x0F ) * 100 + ( ( SerialportData[ 8 ] & 0xF0 ) >> 4 ) * 10 + ( SerialportData[ 8 ] & 0x0F ) ) / 10m;
 						infor_Uart.Measured_OutputCurrent = ( ( ( SerialportData[ 9 ] & 0xF0 ) >> 4 ) * 1000 + ( SerialportData[ 9 ] & 0x0F ) * 100 + ( ( SerialportData[ 10 ] & 0xF0 ) >> 4 ) * 10 + ( SerialportData[ 10 ] & 0x0F ) ) / 100m;
 						infor_Uart.Measured_SpVoltage[ 0 ] = ( ( ( SerialportData[ 11 ] & 0xF0 ) >> 4 ) * 1000 + ( SerialportData[ 11 ] & 0x0F ) * 100 + ( ( SerialportData[ 12 ] & 0xF0 ) >> 4 ) * 10 + ( SerialportData[ 12 ] & 0x0F ) ) / 10m;
@@ -234,7 +234,7 @@ namespace ProductInfor
 								measureDetails.Measure_vSetOutputLoad( serialPort, LoadType.LoadType_CC, target_value, true, out error_information );
 								measureDetails.Measure_vSetDCPowerStatus( infor_Sp.UsedBatsCount, ( infor_Sp.Target_CutoffVoltageLevel - 0.3m ), true, true, serialPort, out error_information );
 								if (error_information != string.Empty) { continue; }
-								Thread.Sleep(1000); //等待可能关输出的情况
+								Thread.Sleep(2000); //等待可能关输出的情况
 
 								Itech.GeneralData_Load generalData_Load = new Itech.GeneralData_Load();
 								//等待一段时间后查看待测电源是否成功启动；此处需要注意：个别产品电源在启动的一瞬间会造成通讯的异常，隔离也无法解决，只能依靠软件放宽的方式处理
@@ -492,13 +492,13 @@ namespace ProductInfor
 						using (SerialPort serialPort = new SerialPort( port_name, default_baudrate, Parity.None, 8, StopBits.One )) {
 							//按照标准满载进行带载
 							int[] allocate_channel = Base_vAllcateChannel_FullLoad( measureDetails, serialPort, true, out error_information );
+							Thread.Sleep( 500 ); //等待升压部分的稳定
 							//读取电源输出电压
 							ArrayList generalData_Loads = measureDetails.Measure_vReadOutputLoadResult( serialPort, out error_information );
 							Itech.GeneralData_Load generalData_Load;
 							decimal real_current = 0m;
 							for (int index_of_channel = 0; index_of_channel < infor_Output.OutputChannelCount; index_of_channel++) {
 								decimal real_voltage = 0m;
-								if (index_of_channel <= 1) { real_current = 0m; } //协议中的输出2和输出3的电流合并表示
 								for (int index_of_load = 0; index_of_load < allocate_channel.Length; index_of_load++) {
 									if (allocate_channel[ index_of_load ] == index_of_channel) {
 										generalData_Load = ( Itech.GeneralData_Load ) generalData_Loads[ index_of_load ];
@@ -523,7 +523,7 @@ namespace ProductInfor
 								do {
 									//检查串口上报的输出通道电压和电流参数是否准确；还有主电电压是否正常
 									Communicate_User( serialPort, out error_information );
-									if (error_information != string.Empty) { break; }
+									if (error_information != string.Empty) { continue; }
 									switch (index_of_channel) {
 										case 0:
 											if (Math.Abs( infor_Uart.Measured_OutputVoltage - specific_value[ index_of_channel ] ) > 0.5m) {

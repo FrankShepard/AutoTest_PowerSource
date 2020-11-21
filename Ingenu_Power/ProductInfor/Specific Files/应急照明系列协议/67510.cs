@@ -357,7 +357,8 @@ namespace ProductInfor
 
 			do {
 				Communicate_User_DoEvent( IDVerion_Product , sent_data, serialPort, out error_information );
-			} while ( ( ++index < 3 ) && ( error_information != string.Empty ) );
+				Thread.Sleep(50);
+			} while ( ( ++index < 5 ) && ( error_information != string.Empty ) );
 		}
 
 		/// <summary>
@@ -383,9 +384,9 @@ namespace ProductInfor
 			//连续发送2次进入管理员模式的命令
 			for ( int index = 0 ; index < 2 ; index++ ) {
 				Product_vCommandSend ( IDVerion_Product, SerialportData, serialPort, out error_information );
+				//等待300ms保证单片机可以执行从用户模式到管理员模式的切换，同时保证采样处于稳定状态
+				Thread.Sleep( 300 );
 			}
-			//等待50ms保证单片机可以执行从用户模式到管理员模式的切换，同时保证采样处于稳定状态
-			Thread.Sleep ( 50 );
 		}
 
 		/// <summary>
@@ -1111,10 +1112,10 @@ namespace ProductInfor
 				if (error_information != string.Empty) { return; }
 			}
 			//退出管理员模式，之前的软件版本中没有此命令，如果没有此命令则需要软件复位操作
-			mCU_Control.McuCalibrate_vExitCalibration ( serialPort, out error_information );
-			if ( error_information != string.Empty ) {
+			//mCU_Control.McuCalibrate_vExitCalibration ( serialPort, out error_information );
+			//if ( error_information != string.Empty ) {
 				mCU_Control.McuCalibrate_vReset ( serialPort, out error_information );
-			}
+			//}
 			//等待可以正常通讯
 			int retry_count = 0;
 			do {

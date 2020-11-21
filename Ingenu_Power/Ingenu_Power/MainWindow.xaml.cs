@@ -114,12 +114,12 @@ namespace Ingenu_Power
 			//更新记录当天的测试日期及合格数量的相关信息
 			if(StaticInfor.Measured_Date != Properties.Settings.Default.程序运行日期) {
 				Properties.Settings.Default.程序运行日期 = StaticInfor.Measured_Date;
-				Properties.Settings.Default.产品合格总数 = StaticInfor.Measured_WholeProductCount;
+				Properties.Settings.Default.产品测试总数 = StaticInfor.Measured_WholeProductCount;
 				Properties.Settings.Default.产品合格总数 = StaticInfor.Measured_CorrectProductCount;
 				Properties.Settings.Default.产品异常总数 = StaticInfor.Measured_UncorrectProductCount;
 				Properties.Settings.Default.Save();
 			} else {
-				StaticInfor.Measured_WholeProductCount = Properties.Settings.Default.产品合格总数;
+				StaticInfor.Measured_WholeProductCount = Properties.Settings.Default.产品测试总数;
 				StaticInfor.Measured_CorrectProductCount = Properties.Settings.Default.产品合格总数;
 				StaticInfor.Measured_UncorrectProductCount = Properties.Settings.Default.产品异常总数;
 			}

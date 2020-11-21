@@ -145,9 +145,9 @@ namespace ProductInfor
 			//连续发送2次进入管理员模式的命令
 			for (int index = 0; index < 2; index++) {
 				Product_vCommandSend( IDVerion_Product, SerialportData, serialPort, out error_information );
+				//等待300ms保证单片机可以执行从用户模式到管理员模式的切换，同时保证采样处于稳定状态
+				Thread.Sleep( 300 );
 			}
-			//等待200ms保证单片机可以执行从用户模式到管理员模式的切换，同时保证采样处于稳定状态
-			Thread.Sleep( 200 );
 		}
 
 		/// <summary>

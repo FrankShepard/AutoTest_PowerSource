@@ -979,12 +979,12 @@ namespace Ingenu_Power.UserControls
 							StaticInfor.Measured_CorrectProductCount++;
 							Properties.Settings.Default.产品合格总数 = StaticInfor.Measured_CorrectProductCount;
 						}
-						trdPlayMusic = new Thread( () => SoundPlayer_vStartMusic( soundsorces ) );
-						trdPlayMusic.Start();
-
 						StaticInfor.Measured_WholeProductCount++;
 						Properties.Settings.Default.产品测试总数 = StaticInfor.Measured_WholeProductCount;
 						Properties.Settings.Default.Save();
+
+						trdPlayMusic = new Thread( () => SoundPlayer_vStartMusic( soundsorces ) );
+						trdPlayMusic.Start();
 
 						//仪表状态重置，防止更换产品时带电
 						mi = id_verion.GetMethod ( "Measure_vInstrumentOff" );
