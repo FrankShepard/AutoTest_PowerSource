@@ -2291,6 +2291,13 @@ namespace ProductInfor
 								}
 								if ( !should_test_short ) { continue; }
 
+								//2020.11.21 输出功率超过 700W 的电源在短路时可能因为 多个负载的不同步短路而出现主电保护损坏的情况，为了防止此类异常，先不要进行短路保护
+								if(infor_Output.FullLoadValue[0] > 700m) {
+									check_okey[ 0 ] = true;
+									check_okey[ 1 ] = true;
+									continue;
+								}
+
 								//通道的带载分配计算，用于获取电子负载的通道分配情况；然后恢复满载带载情况
 								decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
 								int [ ] allocate_channel = Base_vAllcateChannel_EmptyLoad ( measureDetails, serialPort, out error_information );
