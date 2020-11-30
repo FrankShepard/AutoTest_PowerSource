@@ -2171,6 +2171,14 @@ namespace ProductInfor
 								}
 								if ( !should_test_short ) { continue; }
 
+								//输出1功率超过了700W 则不要进行短路验证，防止主电炸机
+								if(infor_Output.FullLoadValue[0] > 700m) {
+									for (int index = 0; index < infor_Output.OutputChannelCount; index++) {
+										check_okey[ index ] = true;
+									}
+									continue;
+								}
+
 								//通道的带载分配计算，用于获取电子负载的通道分配情况；然后恢复满载带载情况
 								decimal [ ] real_value = new decimal [ MeasureDetails.Address_Load_Output.Length ];
 								int [ ] allocate_channel = Base_vAllcateChannel_EmptyLoad ( measureDetails, serialPort, out error_information );
