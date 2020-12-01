@@ -39,11 +39,11 @@ namespace ProductInfor
 		/// <summary>
 		/// 仪表通讯波特率 - 艾德克斯电子负载
 		/// </summary>
-		public const int Baudrate_Instrument_Load = 9600;
+		public const int Baudrate_Instrument_Load = 115200;
 		/// <summary>
 		/// 仪表通讯波特率 - 艾德克斯直流电源
 		/// </summary>
-		private const int Baudrate_Instrument_DCPower = 9600;
+		private const int Baudrate_Instrument_DCPower = 38400;
 		/// <summary>
 		/// 仪表通讯波特率 - 程控交流电源
 		/// </summary>
